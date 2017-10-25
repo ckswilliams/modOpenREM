@@ -13,7 +13,7 @@ requires = [
     'django-filter >= 0.10,<0.15',
     'pytz >= 0a',
     'humanize',
-    'pydicom >= 0.9.9',
+    'pydicom == 0.9.9',
     'django-pagination',
     'xlsxwriter',
     'celery >= 3.1',
@@ -25,6 +25,7 @@ requires = [
     'pandas',
     'xlrd',
     'testfixtures',
+    'mock',
     'django-debug-toolbar',
     ]
 
@@ -43,7 +44,7 @@ setup(
         'openrem/scripts/openrem_store.py',
         'openrem/scripts/openrem_qr.py',
     ],
-    license='GPLv3 with additional permissions',  
+    license='GPLv3 with additional permissions',
 #    description='Radiation Exposure Monitoring for physicists',
     description='Developer beta only',
     long_description=README,

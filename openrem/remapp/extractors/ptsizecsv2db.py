@@ -14,7 +14,7 @@
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
 #    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -139,7 +139,7 @@ def websizeimport(csv_pk = None, *args, **kwargs):
             try:
                 csvrecord.logfile.save(logfile,headerrow)
             except OSError as e:
-                csvrecord.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+                csvrecord.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
                 csvrecord.status = 'ERROR'
                 csvrecord.save()
                 return

@@ -61,10 +61,10 @@ def stop_store(request, pk):
         if store:
             store[0].run = False
             store[0].save()
-            store[0].status = "Quit signal sent"
+            store[0].status = u"Quit signal sent"
             store[0].save()
         else:
-            print "Can't stop store SCP: Invalid primary key"
+            print u"Can't stop store SCP: Invalid primary key"
     return redirect('/openrem/admin/dicomsummary/')
 
 import json
@@ -86,17 +86,17 @@ def status_update_store(request):
     store = DicomStoreSCP.objects.get(pk=scp_pk)
 
     if echo is "Success":
-        resp['message'] = "<div>Last status: {0}</div>".format(store.status)
-        resp['statusindicator'] = "<h3 class='pull-right panel-title'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Server is alive</h3>"
-        resp['delbutton'] = "<button type='button' class='btn btn-primary' disabled='disabled'>Delete</button>"
-        resp['startbutton'] = ""
-        resp['stopbutton'] = "<a class='btn btn-danger' href='/openrem/admin/dicomstore/{0}/stop/' role='button'>Stop server</a>".format(scp_pk)
+        resp['message'] = u"<div>Last status: {0}</div>".format(store.status)
+        resp['statusindicator'] = u"<h3 class='pull-right panel-title'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Server is alive</h3>"
+        resp['delbutton'] = u"<button type='button' class='btn btn-primary' disabled='disabled'>Delete</button>"
+        resp['startbutton'] = u""
+        resp['stopbutton'] = u"<a class='btn btn-danger' href='/openrem/admin/dicomstore/{0}/stop/' role='button'>Stop server</a>".format(scp_pk)
     elif echo is "AssocFail":
-        resp['message'] = "<div>Last status: {0}</div>".format(store.status)
-        resp['statusindicator'] = "<h3 class='pull-right panel-title status-red'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Association fail - server not running?</h3>"
-        resp['delbutton'] = "<a class='btn btn-primary' href='/openrem/admin/dicomstore/{0}/delete/' role='button'>Delete</a>".format(scp_pk)
-        resp['startbutton'] = "<a class='btn btn-success' href='/openrem/admin/dicomstore/{0}/start/' role='button'>Start server</a>".format(scp_pk)
-        resp['stopbutton'] = ""
+        resp['message'] = u"<div>Last status: {0}</div>".format(store.status)
+        resp['statusindicator'] = u"<h3 class='pull-right panel-title status-red'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Association fail - server not running?</h3>"
+        resp['delbutton'] = u"<a class='btn btn-primary' href='/openrem/admin/dicomstore/{0}/delete/' role='button'>Delete</a>".format(scp_pk)
+        resp['startbutton'] = u"<a class='btn btn-success' href='/openrem/admin/dicomstore/{0}/start/' role='button'>Start server</a>".format(scp_pk)
+        resp['stopbutton'] = u""
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
@@ -108,53 +108,53 @@ def q_update(request):
 
     resp = {}
     data = request.POST
-    query_id = data.get('query_id')
-    resp['query_id'] = query_id
+    query_id = data.get('queryID')
+    resp['queryID'] = query_id
     try:
         query = DicomQuery.objects.get(query_id=query_id)
     except ObjectDoesNotExist:
-        resp['status'] = 'not complete'
-        resp['message'] = '<h4>Query {0} not yet started</h4>'.format(query_id)
+        resp['status'] = u'not complete'
+        resp['message'] = u'<h4>Query {0} not yet started</h4>'.format(query_id)
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
     if query.failed:
-        resp['status'] = 'failed'
+        resp['status'] = u'failed'
         resp['message'] ='<h4>Query Failed</h4> {0}'.format(query.message)
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
     study_rsp = query.dicomqrrspstudy_set.all()
     if not query.complete:
         modalities = study_rsp.values('modalities_in_study').annotate(count=Count('pk'))
-        table = ['<table class="table table-bordered"><tr><th>Modalities in study</th><th>Number of responses</th></tr>']
+        table = [u'<table class="table table-bordered"><tr><th>Modalities in study</th><th>Number of responses</th></tr>']
         for m in modalities:
-            table.append('<tr><td>')
+            table.append(u'<tr><td>')
             if m['modalities_in_study']:
-                table.append(', '.join(json.loads(m['modalities_in_study'])))
+                table.append(u', '.join(json.loads(m['modalities_in_study'])))
             else:
-                table.append('Unknown')
-            table.append('</td><td>')
+                table.append(u'Unknown')
+            table.append(u'</td><td>')
             table.append(str(m['count']))
-            table.append('</tr></td>')
-        table.append('</table>')
+            table.append(u'</tr></td>')
+        table.append(u'</table>')
         tablestr = ''.join(table)
-        resp['status'] = 'not complete'
-        resp['message'] ='<h4>{0}</h4><p>Responses so far:</p> {1}'.format(query.stage, tablestr)
+        resp['status'] = u'not complete'
+        resp['message'] = u'<h4>{0}</h4><p>Responses so far:</p> {1}'.format(query.stage, tablestr)
     else:
         modalities = study_rsp.values('modality').annotate(count=Count('pk'))
-        table = ['<table class="table table-bordered"><tr><th>Modality</th><th>Number of responses</th></tr>']
+        table = [u'<table class="table table-bordered"><tr><th>Modality</th><th>Number of responses</th></tr>']
         for m in modalities:
-            table.append('<tr><td>')
+            table.append(u'<tr><td>')
             if m['modality']:
                 table.append(m['modality'])
             else:
-                table.append('Unknown - SR only study?')
-            table.append('</td><td>')
+                table.append(u'Unknown - SR only study?')
+            table.append(u'</td><td>')
             table.append(str(m['count']))
-            table.append('</tr></td>')
-        table.append('</table>')
-        tablestr = ''.join(table)
-        resp['status'] = 'complete'
-        resp['message'] ='<h4>Query complete</h4> {0}'.format(tablestr)
+            table.append(u'</tr></td>')
+        table.append(u'</table>')
+        tablestr = u''.join(table)
+        resp['status'] = u'complete'
+        resp['message'] = u'<h4>Query complete</h4> {0}'.format(tablestr)
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
@@ -178,9 +178,12 @@ def q_process(request, *args, **kwargs):
             date_until = form.cleaned_data.get('date_until_field')
             modalities = form.cleaned_data.get('modality_field')
             inc_sr = form.cleaned_data.get('inc_sr_field')
-            duplicates = form.cleaned_data.get('duplicates_field')
+            remove_duplicates = form.cleaned_data.get('duplicates_field')
             desc_exclude = form.cleaned_data.get('desc_exclude_field')
             desc_include = form.cleaned_data.get('desc_include_field')
+            stationname_exclude = form.cleaned_data.get('stationname_exclude_field')
+            stationname_include = form.cleaned_data.get('stationname_include_field')
+            get_toshiba_images = form.cleaned_data.get('get_toshiba_images_field')
             query_id = str(uuid.uuid4())
 
             if date_from:
@@ -196,19 +199,36 @@ def q_process(request, *args, **kwargs):
                 study_desc_inc = map(unicode.lower, map(unicode.strip, desc_include.split(',')))
             else:
                 study_desc_inc = None
+            if stationname_exclude:
+                stationname_exc = map(unicode.lower, map(unicode.strip, stationname_exclude.split(',')))
+            else:
+                stationname_exc = None
+            if stationname_include:
+                stationname_inc = map(unicode.lower, map(unicode.strip, stationname_include.split(',')))
+            else:
+                stationname_inc = None
+
+            filters = {
+                'stationname_inc': stationname_inc,
+                'stationname_exc': stationname_exc,
+                'study_desc_inc': study_desc_inc,
+                'study_desc_exc': study_desc_exc,
+            }
 
             task = qrscu.delay(qr_scp_pk=rh_pk, store_scp_pk=store_pk, query_id=query_id, date_from=date_from,
-                               date_until=date_until, modalities=modalities, inc_sr=inc_sr, duplicates=duplicates,
-                               study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc)
+                               date_until=date_until, modalities=modalities, inc_sr=inc_sr,
+                               remove_duplicates=remove_duplicates, filters=filters,
+                               get_toshiba_images=get_toshiba_images,
+                               )
 
             resp = {}
-            resp['message'] = 'Request created'
-            resp['status'] = 'not complete'
-            resp['query_id'] = query_id
+            resp['message'] = u'Request created'
+            resp['status'] = u'not complete'
+            resp['queryID'] = query_id
 
             return HttpResponse(json.dumps(resp), content_type='application/json')
         else:
-            print "Bother, form wasn't valid"
+            print u"Bother, form wasn't valid"
             errors = form.errors
             print errors
             print form
@@ -226,7 +246,7 @@ def q_process(request, *args, **kwargs):
 
             return render_to_response(
                 'remapp/dicomqr.html',
-                {'form':form, 'admin':admin},
+                {'form': form, 'admin': admin},
                 context_instance=RequestContext(request)
             )
             # return HttpResponse(
@@ -245,7 +265,7 @@ def dicom_qr_page(request, *args, **kwargs):
     from remapp.netdicom.tools import echoscu
 
     if not request.user.groups.filter(name="importqrgroup"):
-        messages.error(request, "You are not in the importqrgroup - please contact your administrator")
+        messages.error(request, u"You are not in the importqrgroup - please contact your administrator")
         return redirect('/openrem/')
 
     form = DicomQueryForm
@@ -255,18 +275,18 @@ def dicom_qr_page(request, *args, **kwargs):
     for store in stores:
         echo = echoscu(scp_pk=store.pk, store_scp=True)
         if echo is "Success":
-            storestatus[store.name] = "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> responding to DICOM echo"
+            storestatus[store.name] = u"<span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> responding to DICOM echo"
         else:
-            storestatus[store.name] = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
+            storestatus[store.name] = u"<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
 
     qrstatus = {}
     qr = DicomRemoteQR.objects.all()
     for scp in qr:
         echo = echoscu(scp_pk=scp.pk, qr_scp=True)
         if echo is "Success":
-            qrstatus[scp.name] = "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> responding to DICOM echo"
+            qrstatus[scp.name] = u"<span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> responding to DICOM echo"
         else:
-            qrstatus[scp.name] = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
+            qrstatus[scp.name] = u"<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -275,7 +295,7 @@ def dicom_qr_page(request, *args, **kwargs):
 
     return render_to_response(
         'remapp/dicomqr.html',
-        {'form':form, 'storestatus':storestatus, 'qrstatus':qrstatus, 'admin':admin},
+        {'form': form, 'storestatus': storestatus, 'qrstatus': qrstatus, 'admin': admin},
         context_instance=RequestContext(request)
     )
 
@@ -285,8 +305,8 @@ def r_start(request):
     from remapp.netdicom.qrscu import movescu
     resp = {}
     data = request.POST
-    query_id = data.get('query_id')
-    resp['query_id'] = query_id
+    query_id = data.get('queryID')
+    resp['queryID'] = query_id
 
     movescu.delay(query_id)
 
@@ -300,25 +320,25 @@ def r_update(request):
 
     resp = {}
     data = request.POST
-    query_id = data.get('query_id')
-    resp['query_id'] = query_id
+    query_id = data.get('queryID')
+    resp['queryID'] = query_id
     try:
         query = DicomQuery.objects.get(query_id=query_id)
     except ObjectDoesNotExist:
-        resp['status'] = 'not complete'
-        resp['message'] = '<h4>Move request {0} not yet started</h4>'.format(query_id)
+        resp['status'] = u'not complete'
+        resp['message'] = u'<h4>Move request {0} not yet started</h4>'.format(query_id)
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
     if query.failed:
-        resp['status'] = 'failed'
-        resp['message'] ='<h4>Move request failed</h4> {0}'.format(query.message)
+        resp['status'] = u'failed'
+        resp['message'] = u'<h4>Move request failed</h4> {0}'.format(query.message)
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
     if not query.move_complete:
-        resp['status'] = 'not complete'
-        resp['message'] ='<h4>{0}</h4>'.format(query.stage)
+        resp['status'] = u'not complete'
+        resp['message'] = u'<h4>{0}</h4>'.format(query.stage)
     else:
-        resp['status'] = 'move complete'
-        resp['message'] = '<h4>Move request complete</h4>'
+        resp['status'] = u'move complete'
+        resp['message'] = u'<h4>Move request complete</h4>'
 
     return HttpResponse(json.dumps(resp), content_type='application/json')

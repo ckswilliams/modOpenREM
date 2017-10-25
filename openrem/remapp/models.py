@@ -37,6 +37,47 @@ from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
 
+class AdminTaskQuestions(SingletonModel):
+    """
+    Record if admin tasks have been dealt with
+    """
+    ask_revert_to_074_question = models.BooleanField(default=True)
+
+
+class NotPatientIndicatorsID(models.Model):
+    """
+    Table to record strings that indicate a patient ID is really a test or QA ID
+    """
+    not_patient_id = models.CharField(max_length=64)
+
+    def get_absolute_url(self):
+        return reverse('not_patient_indicators')
+
+    def __unicode__(self):
+        return self.not_patient_id
+
+    class Meta:
+        verbose_name = u'Not-patient indicator ID'
+        verbose_name_plural = u'Not-patient indicator IDs'
+
+
+class NotPatientIndicatorsName(models.Model):
+    """
+    Table to record strings that indicate a patient name is really a test or QA name
+    """
+    not_patient_name = models.CharField(max_length=64)
+
+    def get_absolute_url(self):
+        return reverse('not_patient_indicators')
+
+    def __unicode__(self):
+        return self.not_patient_name
+
+    class Meta:
+        verbose_name = u'Not-patient indicator name'
+        verbose_name_plural = u'Not-patient indicator names'
+
+
 class SkinDoseMapCalcSettings(SingletonModel):
     enable_skin_dose_maps = models.BooleanField(default=False, verbose_name="Enable skin dose maps?")
     calc_on_import = models.BooleanField(default=True, verbose_name="Calculate skin dose map on import?")
@@ -138,6 +179,8 @@ class DicomQRRspStudy(models.Model):
     modalities_in_study = models.CharField(max_length=100, blank=True, null=True)
     study_description = models.TextField(blank=True, null=True)
     number_of_study_related_series = models.IntegerField(blank=True, null=True)
+    sop_classes_in_study = models.TextField(blank=True, null=True)
+    station_name = models.CharField(max_length=16, blank=True, null=True)
 
     def set_modalities_in_study(self, x):
         self.modalities_in_study = json.dumps(x)
@@ -154,6 +197,9 @@ class DicomQRRspSeries(models.Model):
     modality = models.CharField(max_length=16, blank=True, null=True)
     series_description = models.TextField(blank=True, null=True)
     number_of_series_related_instances = models.IntegerField(blank=True, null=True)
+    station_name = models.CharField(max_length=16, blank=True, null=True)
+    sop_class_in_series = models.TextField(blank=True,null=True)
+    image_level_move = models.BooleanField(default=False)
 
 
 class DicomQRRspImage(models.Model):
@@ -290,6 +336,8 @@ class UserProfile(models.Model):
 
     plotHistograms = models.BooleanField(default=False)
 
+    plotCaseInsensitiveCategories = models.BooleanField(default=False)
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -316,6 +364,7 @@ class UniqueEquipmentNames(models.Model):
     gantry_id = models.TextField(blank=True, null=True)
     gantry_id_hash = models.CharField(max_length=64, blank=True, null=True)
     display_name = models.TextField(blank=True, null=True)
+    user_defined_modality = models.CharField(max_length=16, blank=True, null=True)
     hash_generated = models.BooleanField(default=False)
 
     class Meta:
@@ -364,7 +413,7 @@ class ContextID(models.Model):
     + Could be prefilled from the tables in DICOM 3.16, but is actually populated as the codes occur. \
     This assumes they are used correctly.
     """
-    code_value = models.CharField(max_length=16)
+    code_value = models.TextField()
     code_meaning = models.TextField(blank=True, null=True)
     cid_table = models.CharField(max_length=16, blank=True)
 
@@ -406,9 +455,9 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     performing_physician_name = models.TextField(blank=True, null=True)
     operator_name = models.TextField(blank=True, null=True)
     modality_type = models.CharField(max_length=16, blank=True, null=True)
-    procedure_code_value = models.CharField(max_length=16, blank=True, null=True)
+    procedure_code_value = models.TextField(blank=True, null=True)
     procedure_code_meaning = models.TextField(blank=True, null=True)
-    requested_procedure_code_value = models.CharField(max_length=16, blank=True, null=True)
+    requested_procedure_code_value = models.TextField(blank=True, null=True)
     requested_procedure_code_meaning = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
@@ -611,6 +660,12 @@ class IrradEventXRaySourceData(models.Model):  # TID 10003b
     grid_aspect_ratio = models.TextField(blank=True, null=True)
     grid_period = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
     grid_focal_distance = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
+
+    def convert_gy_to_mgy(self):
+        """Converts Gy to mGy for display in web interface
+        """
+        if self.dose_rp:
+            return 1000*self.dose_rp
 
 
 class XrayGrid(models.Model):
@@ -1003,10 +1058,21 @@ class SizeSpecificDoseEstimation(models.Model):
     """
     # TODO: Add this to the rdsr extraction routines. Issue #168
     ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData)
-    measurement_method = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10023
+    measurement_method = models.ForeignKey(ContextID, blank=True, null=True, related_name='ssde_method')  # CID 10023
     measured_lateral_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     measured_ap_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     derived_effective_diameter = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    water_equivalent_diameter = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    water_equivalent_diameter_method = models.ForeignKey(
+        ContextID, blank=True, null=True, related_name='ssde_wed_method')  # CID 10024
+    wed_estimate_location_z = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+
+
+class WEDSeriesOrInstances(models.Model):
+    """From TID 10013 Series or Instance used for Water Equivalent Diameter estimation
+    """
+    size_specific_dose_estimation = models.ForeignKey(SizeSpecificDoseEstimation)
+    wed_series_or_instance = models.TextField(blank=True, null=True)  # referenced UID
 
 
 class CtDoseCheckDetails(models.Model):  # TID 10015

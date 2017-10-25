@@ -10,6 +10,9 @@ Headline changes
 * Imports: Hologic DBT proprietary projection images now have laterality and accumulated AGD extracted correctly
 * Charts: Added mammography scatter plot, thanks to `@rijkhorst`_
 * Exports: DX and RF exports work with multiple filters, and will be displayed to max 4 sf
+* Interface/Imports: Now possible to define a modality as DX or fluoro when RDSR is ambiguous
+* Interface: Operator's name is now displayed in the details page for each modality, along with the performing
+  physician's name for CT and fluoro
 
 ***************************************************
 Upgrading an OpenREM server with no internet access

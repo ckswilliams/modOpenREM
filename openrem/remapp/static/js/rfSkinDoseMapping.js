@@ -561,4 +561,5 @@ function switch2d3dSkinDoseMap() {
     $('#phantomDimensions').toggleClass('whiteText');
     $('#patientHeight').toggleClass('whiteText');
     $('#patientMass').toggleClass('whiteText');
+    $('#patientOrientation').toggleClass('whiteText');
 }

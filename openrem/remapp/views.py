@@ -13,8 +13,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -49,8 +49,8 @@ from django.shortcuts import render, render_to_response, redirect, get_object_or
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from openremproject.settings import MEDIA_ROOT
 import remapp
+from openremproject.settings import MEDIA_ROOT
 from remapp.forms import SizeUploadForm
 from remapp.models import GeneralStudyModuleAttr, create_user_profile
 from remapp.models import SizeUpload
@@ -61,6 +61,26 @@ try:
     plotting = 1
 except ImportError:
     plotting = 0
+
+
+from django.template.defaultfilters import register
+
+
+@register.filter
+def multiply(value, arg):
+    """
+    Return multiplication within Django templates
+
+    :param value: the value to multiply
+    :param arg: the second value to multiply
+    :return: the multiplication
+    """
+    try:
+        value = float(value)
+        arg = float(arg)
+        return value * arg
+    except ValueError:
+        return None
 
 
 def logout_page(request):
@@ -208,7 +228,8 @@ def dx_summary_chart_data(request):
                              user_profile.plotDXAcquisitionMeankVp, user_profile.plotDXAcquisitionMeanmAs,
                              user_profile.plotDXStudyPerDayAndHour,
                              median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
-                             user_profile.plotHistogramBins, user_profile.plotHistograms)
+                             user_profile.plotHistogramBins, user_profile.plotHistograms,
+                             user_profile.plotCaseInsensitiveCategories)
 
     return JsonResponse(return_structure, safe=False)
 
@@ -221,7 +242,7 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                          plot_acquisition_mean_kvp, plot_acquisition_mean_mas,
                          plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems,
-                         plot_histogram_bins, plot_histograms):
+                         plot_histogram_bins, plot_histograms, plot_case_insensitive_categories):
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
     from django.utils.datastructures import MultiValueDictKeyError
 
@@ -232,6 +253,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             if f.form.data['acquisition_protocol']:
                 exp_include = [o.study_instance_uid for o in f]
         except MultiValueDictKeyError:
+            pass
+        except KeyError:
             pass
 
     if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour:
@@ -248,6 +271,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 study_events = f.qs
         except MultiValueDictKeyError:
             study_events = f.qs
+        except KeyError:
+            pass
 
     if plot_request_mean_dap or plot_request_freq:
         try:
@@ -263,6 +288,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 request_events = f.qs
         except MultiValueDictKeyError:
             request_events = f.qs
+        except KeyError:
+            request_events = f.qs
 
     if plot_acquisition_mean_dap or plot_acquisition_freq:
         result = average_chart_inc_histogram_data(f.qs,
@@ -273,7 +300,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisition_names'] = result['series_names']
@@ -290,7 +318,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_request_mean_dap, plot_request_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['requestSystemList'] = result['system_list']
         return_structure['request_names'] = result['series_names']
@@ -307,7 +336,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_study_mean_dap, plot_study_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['study_names'] = result['series_names']
@@ -324,7 +354,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_acquisition_mean_kvp, 0,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionkVpSystemList'] = result['system_list']
         return_structure['acquisition_kvp_names'] = result['series_names']
@@ -341,7 +372,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_acquisition_mean_mas, 0,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionmAsSystemList'] = result['system_list']
         return_structure['acquisition_mas_names'] = result['series_names']
@@ -356,7 +388,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                               'study_date',
                                               'projectionxrayradiationdose__irradeventxraydata__date_time_started',
                                               median_available, plot_average_choice,
-                                              1000000, plot_acquisition_mean_dap_over_time_period)
+                                              1000000, plot_acquisition_mean_dap_over_time_period,
+                                              case_insensitive_categories=plot_case_insensitive_categories)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMedianDAPoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -371,7 +404,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                               'study_date',
                                               'projectionxrayradiationdose__irradeventxraydata__date_time_started',
                                               median_available, plot_average_choice,
-                                              1, plot_acquisition_mean_dap_over_time_period)
+                                              1, plot_acquisition_mean_dap_over_time_period,
+                                              case_insensitive_categories=plot_case_insensitive_categories)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMediankVpoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -385,7 +419,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                               'study_date',
                                               'projectionxrayradiationdose__irradeventxraydata__date_time_started',
                                               median_available, plot_average_choice,
-                                              0.001, plot_acquisition_mean_dap_over_time_period)
+                                              0.001, plot_acquisition_mean_dap_over_time_period,
+                                              case_insensitive_categories=plot_case_insensitive_categories)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMedianmAsoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -403,8 +438,6 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
 def dx_detail_view(request, pk=None):
     """Detail view for a DX study
     """
-    from django.contrib import messages
-    from remapp.models import GeneralStudyModuleAttr
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
@@ -431,9 +464,13 @@ def rf_summary_list_filter(request):
     from remapp.forms import RFChartOptionsForm
 
     if request.user.groups.filter(name='pidgroup'):
-        f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
+        f = RFFilterPlusPid(
+            request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by(
+            ).distinct())
     else:
-        f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
+        f = RFSummaryListFilter(
+            request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by(
+            ).distinct())
 
     try:
         # See if the user has plot settings in userprofile
@@ -566,16 +603,16 @@ def rf_summary_chart_data(request):
         rf_plot_calculations(f, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
                              user_profile.plotRFStudyPerDayAndHour, user_profile.plotRFStudyFreq,
-                             user_profile.plotRFStudyDAP, user_profile.plotHistograms)
+                             user_profile.plotRFStudyDAP, user_profile.plotHistograms,
+                             user_profile.plotCaseInsensitiveCategories)
 
     return JsonResponse(return_structure, safe=False)
 
 
 def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_per_systems,
                          plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_study_dap,
-                         plot_histograms):
-    from remapp.models import IrradEventXRayData, Median
-    from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
+                         plot_histograms, plot_case_insensitive_categories):
+    from interface.chart_functions import average_chart_inc_histogram_data, workload_chart_data
 
     return_structure = {}
 
@@ -598,7 +635,8 @@ def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_p
                                                   plot_study_dap, plot_study_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
@@ -615,12 +653,68 @@ def rf_detail_view(request, pk=None):
     """
     from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
+    from django.db.models import Sum
+    import numpy as np
+    from django.core.exceptions import ObjectDoesNotExist
+    import operator
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
-    except:
+    except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
+
+    # get the totals
+    irradiation_types = [(u'Fluoroscopy',), (u'Acquisition',)]
+    stu_dose_totals = [(0, 0), (0, 0)]
+    stu_time_totals = [0, 0]
+    total_dap = 0
+    total_dose = 0
+    # Iterate over the planes (for bi-plane systems, for single plane systems there is only one)
+    for dose_ds in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+        accum_dose_ds = dose_ds.accumprojxraydose_set.get()
+        stu_dose_totals[0] = tuple(map(operator.add, stu_dose_totals[0],
+                                       (accum_dose_ds.fluoro_dose_area_product_total*1000000,
+                                        accum_dose_ds.fluoro_dose_rp_total)))
+        stu_dose_totals[1] = tuple(map(operator.add, stu_dose_totals[1],
+                                       (accum_dose_ds.acquisition_dose_area_product_total*1000000,
+                                        accum_dose_ds.acquisition_dose_rp_total)))
+        stu_time_totals[0] = stu_time_totals[0] + accum_dose_ds.total_fluoro_time
+        stu_time_totals[1] = stu_time_totals[1] + accum_dose_ds.total_acquisition_time
+        total_dap = total_dap + accum_dose_ds.dose_area_product_total
+        total_dose = total_dose + accum_dose_ds.dose_rp_total
+
+    # get info for different Acquisition Types
+    stu_inc_totals = GeneralStudyModuleAttr.objects.filter(
+            pk=pk,
+            projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning__contains=
+            'Acquisition'
+        ).annotate(
+            sum_dap=Sum('projectionxrayradiationdose__irradeventxraydata__dose_area_product')*1000000,
+            sum_dose_rp=Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__dose_rp')
+        ).order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
+    stu_dose_totals.extend(stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by(
+        'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type'))
+    acq_irr_types = stu_inc_totals.values_list(
+        'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning').order_by(
+            'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
+    # stu_time_totals = [None] * len(stu_irr_types)
+    for _, irr_type in enumerate(acq_irr_types):
+        stu_time_totals.append(GeneralStudyModuleAttr.objects.filter(
+            pk=pk,
+            projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
+            irr_type[0]).aggregate(
+                Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__irradiation_duration')
+            ).values()[0])
+    irradiation_types.extend([(u'- ' + acq_type[0],) for acq_type in acq_irr_types])
+
+    # Add the study totals
+    irradiation_types.append((u'Total',))
+    stu_dose_totals.append((total_dap*1000000, total_dose))
+    # does total duration (summed over fluoroscopy and acquisitions) means something?
+    stu_time_totals.append(stu_time_totals[0]+stu_time_totals[1])
+
+    study_totals = np.column_stack((irradiation_types, stu_dose_totals, stu_time_totals)).tolist()
 
     from remapp.models import SkinDoseMapCalcSettings
     from django.core.exceptions import ObjectDoesNotExist
@@ -638,7 +732,8 @@ def rf_detail_view(request, pk=None):
 
     return render_to_response(
         'remapp/rfdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin,
+         'study_totals': study_totals},
         context_instance=RequestContext(request)
     )
 
@@ -650,8 +745,6 @@ def rf_detail_view_skin_map(request, pk=None):
     from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
     from django.http import JsonResponse
-    from openremproject.settings import MEDIA_ROOT
-    import os
     import cPickle as pickle
     import gzip
 
@@ -678,14 +771,42 @@ def rf_detail_view_skin_map(request, pk=None):
         skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(pk)+'.p')
 
     from remapp.version import __skin_map_version__
+
+    # If patient weight is missing from the database then db_pat_mass will be undefined
+    try:
+        db_pat_mass = float(GeneralStudyModuleAttr.objects.get(pk=pk).patientstudymoduleattr_set.get().patient_weight)
+    except ValueError:
+        db_pat_mass = 73.2
+    except TypeError:
+        db_pat_mass = 73.2
+
+    # If patient weight is missing from the database then db_pat_mass will be undefined
+    try:
+        db_pat_height = float(GeneralStudyModuleAttr.objects.get(pk=pk).patientstudymoduleattr_set.get().patient_size) * 100
+    except ValueError:
+        db_pat_height = 178.6
+    except TypeError:
+        db_pat_height = 178.6
+
     loaded_existing_data = False
+    pat_mass_unchanged = False
+    pat_height_unchanged = False
     if os.path.exists(skin_map_path):
         with gzip.open(skin_map_path, 'rb') as f:
             existing_skin_map_data = pickle.load(f)
         try:
             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
-                return_structure = existing_skin_map_data
-                loaded_existing_data = True
+                # Round the float values to 1 decimal place and convert to string before comparing
+                if str(round(existing_skin_map_data['patient_height'], 1)) == str(round(db_pat_height, 1)):
+                    pat_height_unchanged = True
+
+                # Round the float values to 1 decimal place and convert to string before comparing
+                if str(round(existing_skin_map_data['patient_mass'], 1)) == str(round(db_pat_mass, 1)):
+                    pat_mass_unchanged = True
+
+                if pat_height_unchanged and pat_mass_unchanged:
+                    return_structure = existing_skin_map_data
+                    loaded_existing_data = True
         except KeyError:
             pass
 
@@ -790,16 +911,9 @@ def ct_summary_list_filter(request):
 
 @login_required
 def ct_summary_chart_data(request):
-    from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid, ct_acq_filter
+    from remapp.interface.mod_filters import ct_acq_filter
     from openremproject import settings
     from django.http import JsonResponse
-
-    # if request.user.groups.filter(name='pidgroup'):
-    #     f = CTFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-    #         modality_type__exact='CT').order_by().distinct())
-    # else:
-    #     f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-    #         modality_type__exact='CT').order_by().distinct())
 
     if request.user.groups.filter(name='pidgroup'):
         pid = True
@@ -832,7 +946,7 @@ def ct_summary_chart_data(request):
                              user_profile.plotCTStudyMeanCTDI,
                              user_profile.plotCTStudyMeanDLPOverTime, user_profile.plotCTStudyMeanDLPOverTimePeriod, user_profile.plotCTStudyPerDayAndHour,
                              median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
-                             user_profile.plotHistogramBins, user_profile.plotHistograms)
+                             user_profile.plotHistogramBins, user_profile.plotHistograms, user_profile.plotCaseInsensitiveCategories)
 
     return JsonResponse(return_structure, safe=False)
 
@@ -842,7 +956,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                          plot_study_mean_ctdi,
                          plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
-                         plot_histograms):
+                         plot_histograms, plot_case_insensitive_categories):
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
     from django.utils.datastructures import MultiValueDictKeyError
 
@@ -853,6 +967,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             if f.form.data['acquisition_protocol']:
                 exp_include = [o.study_instance_uid for o in f]
         except MultiValueDictKeyError:
+            pass
+        except KeyError:
             pass
 
     if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
@@ -869,6 +985,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 study_events = f.qs
         except MultiValueDictKeyError:
             study_events = f.qs
+        except KeyError:
+            study_events = f.qs
 
     if plot_request_mean_dlp or plot_request_freq:
         try:
@@ -884,6 +1002,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 request_events = f.qs
         except MultiValueDictKeyError:
             request_events = f.qs
+        except KeyError:
+            request_events = f.qs
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
         result = average_chart_inc_histogram_data(f.qs,
@@ -895,7 +1015,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
                                                   exclude_constant_angle=True,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisitionNameList'] = result['series_names']
@@ -913,7 +1034,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
                                                   exclude_constant_angle=True,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionSystemListCTDI'] = result['system_list']
         return_structure['acquisitionNameListCTDI'] = result['series_names']
@@ -930,7 +1052,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_study_mean_dlp, plot_study_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
@@ -948,7 +1071,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
                                                   exclude_constant_angle=True,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['studySystemListCTDI'] = result['system_list']
         return_structure['studyNameListCTDI'] = result['series_names']
@@ -965,7 +1089,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_request_mean_dlp, plot_request_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['requestSystemList'] = result['system_list']
         return_structure['requestNameList'] = result['series_names']
@@ -979,7 +1104,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                               'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                                               'study_date', 'study_date',
                                               median_available, plot_average_choice,
-                                              1, plot_study_mean_dlp_over_time_period)
+                                              1, plot_study_mean_dlp_over_time_period,
+                                              case_insensitive_categories=plot_case_insensitive_categories)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['studyMedianDLPoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -1030,9 +1156,13 @@ def mg_summary_list_filter(request):
         del filter_data['page']
 
     if request.user.groups.filter(name='pidgroup'):
-        f = MGFilterPlusPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
+        f = MGFilterPlusPid(
+            filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG').order_by(
+            ).distinct())
     else:
-        f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
+        f = MGSummaryListFilter(
+            filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG').order_by(
+            ).distinct())
 
     try:
         # See if the user has plot settings in userprofile
@@ -1042,16 +1172,12 @@ def mg_summary_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
 
-    if user_profile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
-        median_available = True
-    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         user_profile.median_available = True
         user_profile.save()
-        median_available = True
     else:
         user_profile.median_available = False
         user_profile.save()
-        median_available = False
 
     # Obtain the chart options from the request
     chart_options_form = MGChartOptionsForm(request.GET)
@@ -1215,12 +1341,10 @@ def mg_detail_view(request, pk=None):
 
 
 def openrem_home(request):
-    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings
+    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
     from datetime import datetime
-    import pytz
     from collections import OrderedDict
-    utc = pytz.UTC
 
     test_dicom_store_settings = DicomDeleteSettings.objects.all()
     if not test_dicom_store_settings:
@@ -1275,26 +1399,10 @@ def openrem_home(request):
             user_profile = request.user.userprofile
 
     if request.user.is_authenticated():
-        if homedata['mg']:
-            user_profile.displayMG = True
-        else:
-            user_profile.displayMG = False
-
-        if homedata['ct']:
-            user_profile.displayCT = True
-        else:
-            user_profile.displayCT = False
-
-        if homedata['rf']:
-            user_profile.displayRF = True
-        else:
-            user_profile.displayRF = False
-
-        if homedata['dx']:
-            user_profile.displayDX = True
-        else:
-            user_profile.displayDX = False
-
+        user_profile.displayMG = bool(homedata['mg'])
+        user_profile.displayCT = bool(homedata['ct'])
+        user_profile.displayRF = bool(homedata['rf'])
+        user_profile.displayDX = bool(homedata['dx'])
         user_profile.save()
 
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)
@@ -1339,8 +1447,19 @@ def openrem_home(request):
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
 
+    admin_questions = {}
+    admin_questions_true = False
+    if request.user.groups.filter(name="admingroup"):
+        not_patient_indicator_question = AdminTaskQuestions.get_solo().ask_revert_to_074_question
+        admin_questions['not_patient_indicator_question'] = not_patient_indicator_question
+        # if any(value for value in admin_questions.itervalues()):
+        #     admin_questions_true = True  # Don't know why this doesn't work
+        if not_patient_indicator_question:
+            admin_questions_true = True  # Doing this instead
+
     return render(request, "remapp/home.html",
-                  {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups})
+                  {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
+                   'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true})
 
 
 @login_required
@@ -1435,7 +1554,7 @@ def size_process(request, *args, **kwargs):
             csvrecord.id_type = request.POST['id_type']
             csvrecord.save()
 
-            job = websizeimport.delay(csv_pk=kwargs['pk'])
+            websizeimport.delay(csv_pk=kwargs['pk'])
 
             return HttpResponseRedirect("/openrem/admin/sizeimports")
 
@@ -1448,7 +1567,7 @@ def size_process(request, *args, **kwargs):
         csvrecord = SizeUpload.objects.all().filter(id__exact=kwargs['pk'])
         with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
             try:
-                dialect = csv.Sniffer().sniff(csvfile.read(1024))
+                # dialect = csv.Sniffer().sniff(csvfile.read(1024))
                 csvfile.seek(0)
                 if csv.Sniffer().has_header(csvfile.read(1024)):
                     csvfile.seek(0)
@@ -1492,10 +1611,6 @@ def size_imports(request, *args, **kwargs):
 
     :param request:
     """
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
-    from remapp.models import SizeUpload
-
     if not request.user.groups.filter(name="importsizegroup") and not request.user.groups.filter(name="admingroup"):
         messages.error(request, "You are not in the import size group - please contact your administrator")
         return redirect('/openrem/')
@@ -1526,7 +1641,6 @@ def size_delete(request):
     :param request: Contains the task ID
     :type request: POST
     """
-    from django.http import HttpResponseRedirect
     from django.core.urlresolvers import reverse
     from django.contrib import messages
     from remapp.models import SizeUpload
@@ -1558,7 +1672,6 @@ def size_abort(request, pk):
     """
     from celery.task.control import revoke
     from django.http import HttpResponseRedirect
-    from django.shortcuts import get_object_or_404
     from remapp.models import SizeUpload
 
     size_import = get_object_or_404(SizeUpload, pk=pk)
@@ -1590,7 +1703,6 @@ def size_download(request, task_id):
     import os
     from django.core.servers.basehttp import FileWrapper
     from django.utils.encoding import smart_str
-    from django.shortcuts import redirect
     from django.contrib import messages
     from openremproject.settings import MEDIA_ROOT
     from remapp.models import SizeUpload
@@ -1649,16 +1761,23 @@ def display_names_view(request):
 
     f = UniqueEquipmentNames.objects.order_by('display_name')
 
-    ct_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT").distinct()
-    mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
-    dx_names = f.filter(Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") | Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
-    rf_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF").distinct()
-    ot_names = f.filter(~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") & ~Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") & ~Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") & ~Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") & ~Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
+    #if user_defined_modality is filled, we should use this value, otherwise the value of modality type in the general_study module
+    #so we look if the concatenation of the user_defined_modality (empty if not used) and modality_type starts with a specific modality type
+    ct_names = f.filter(Q(user_defined_modality="CT") | (
+                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT"))).distinct()
+    mg_names = f.filter(Q(user_defined_modality="MG") | (
+                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG"))).distinct()
+    dx_names = f.filter(Q(user_defined_modality="DX") | (
+                        Q(user_defined_modality__isnull=True) & (Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
+                                                                 Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
+    rf_names = f.filter(Q(user_defined_modality="RF") | (
+                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
+    ot_names = f.filter(~Q(user_defined_modality__isnull=True) | (
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR"))).distinct()
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1697,14 +1816,34 @@ def display_name_update(request):
     from remapp.forms import UpdateDisplayNamesForm
 
     if request.method == 'POST':
+        error_message = ''
         new_display_name = request.POST.get('new_display_name')
+        new_user_defined_modality = request.POST.get('new_user_defined_modality')
         for pk in request.POST.get('pks').split(','):
             display_name_data = UniqueEquipmentNames.objects.get(pk=int(pk))
             if not display_name_data.hash_generated:
                 display_name_gen_hash(display_name_data)
-            display_name_data.display_name = new_display_name
+            if new_display_name:
+                display_name_data.display_name = new_display_name
+            if new_user_defined_modality and (not display_name_data.user_defined_modality == new_user_defined_modality):
+                #See if change is valid otherwise return validation error
+                #Assuming modality is always the same, so we take the first
+                try:
+                    modality = GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)[0].modality_type
+                except:
+                    modality = ''
+                if (modality == 'DX') or (modality == 'CR') or (modality == 'RF'):
+                    display_name_data.user_defined_modality = new_user_defined_modality
+                    # We can't reimport as new modality type, instead we just change the modality type value
+                    GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk).update(modality_type=new_user_defined_modality)
+                elif not modality:
+                    error_message = error_message + 'Can\'t determine modality type for ' + display_name_data.display_name + ', user defined modality type not set.\n'
+                else:
+                    error_message = error_message + 'Modality type change is not allowed for ' + display_name_data.display_name + ' (only changing from DX to RF and vice versa is allowed).\n'
             display_name_data.save()
 
+        if error_message:
+            messages.error(request, error_message)
         return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
     else:
@@ -1762,6 +1901,7 @@ def chart_options_view(request):
             user_profile.plotSeriesPerSystem = general_form.cleaned_data['plotSeriesPerSystem']
             user_profile.plotHistogramBins = general_form.cleaned_data['plotHistogramBins']
             user_profile.plotHistograms = general_form.cleaned_data['plotHistograms']
+            user_profile.plotCaseInsensitiveCategories = general_form.cleaned_data['plotCaseInsensitiveCategories']
 
             user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
             user_profile.plotCTAcquisitionMeanCTDI = ct_form.cleaned_data['plotCTAcquisitionMeanCTDI']
@@ -1824,7 +1964,8 @@ def chart_options_view(request):
                          'plotInitialSortingDirection': user_profile.plotInitialSortingDirection,
                          'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
                          'plotHistogramBins': user_profile.plotHistogramBins,
-                         'plotHistograms': user_profile.plotHistograms}
+                         'plotHistograms': user_profile.plotHistograms,
+                         'plotCaseInsensitiveCategories': user_profile.plotCaseInsensitiveCategories}
 
     ct_form_data = {'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
                     'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
@@ -1883,6 +2024,72 @@ def chart_options_view(request):
         return_structure,
         context_instance=RequestContext(request)
     )
+
+
+@login_required
+def not_patient_indicators(request):
+    """Displays current not-patient indicators
+    """
+    from remapp.models import NotPatientIndicatorsID, NotPatientIndicatorsName
+
+    not_patient_ids = NotPatientIndicatorsID.objects.all()
+    not_patient_names = NotPatientIndicatorsName.objects.all()
+
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/notpatient.html',
+        {'ids': not_patient_ids, 'names': not_patient_names, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
+def not_patient_indicators_as_074(request):
+    """Add patterns to no-patient indicators to replicate 0.7.4 behaviour"""
+    from remapp.models import NotPatientIndicatorsID, NotPatientIndicatorsName
+
+    if request.user.groups.filter(name="admingroup"):
+        not_patient_ids = NotPatientIndicatorsID.objects.all()
+        not_patient_names = NotPatientIndicatorsName.objects.all()
+
+        id_indicators = [u'*phy*', u'*test*', u'*qa*']
+        name_indicators = [u'*phys*', u'*test*', u'*qa*']
+
+        for id_indicator in id_indicators:
+            if not not_patient_ids.filter(not_patient_id__iexact=id_indicator):
+                NotPatientIndicatorsID(not_patient_id=id_indicator).save()
+
+        for name_indicator in name_indicators:
+            if not not_patient_names.filter(not_patient_name__iexact=name_indicator):
+                NotPatientIndicatorsName(not_patient_name=name_indicator).save()
+
+        messages.success(request, "0.7.4 style not-patient indicators restored")
+        return redirect(reverse_lazy('not_patient_indicators'))
+
+    else:
+        messages.error(request, "Only members of the admingroup are allowed to modify not-patient indicators")
+    return redirect(reverse_lazy('not_patient_indicators'))
+
+
+@login_required
+def admin_questions_hide_not_patient(request):
+    """Hides the not-patient revert to 0.7.4 question"""
+    from remapp.models import AdminTaskQuestions
+
+    if request.user.groups.filter(name="admingroup"):
+        admin_question = AdminTaskQuestions.objects.all()[0]
+        admin_question.ask_revert_to_074_question = False
+        admin_question.save()
+        messages.success(request, u"Identifying not-patient exposure question won't be shown again")
+        return redirect(reverse_lazy('home'))
+    else:
+        messages.error(request, u"Only members of the admingroup are allowed config this question")
+    return redirect(reverse_lazy('not_patient_indicators'))
 
 
 @login_required
@@ -2067,3 +2274,96 @@ class SkinDoseMapCalcSettingsUpdate(UpdateView):
         else:
             messages.info(self.request, "No changes made")
         return super(SkinDoseMapCalcSettingsUpdate, self).form_valid(form)
+
+
+class NotPatientNameCreate(CreateView):
+    from remapp.forms import NotPatientNameForm
+    from remapp.models import NotPatientIndicatorsName
+
+    model = NotPatientIndicatorsName
+    form_class = NotPatientNameForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientNameUpdate(UpdateView):
+    from remapp.forms import NotPatientNameForm
+    from remapp.models import NotPatientIndicatorsName
+
+    model = NotPatientIndicatorsName
+    form_class = NotPatientNameForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientNameDelete(DeleteView):
+    from remapp.models import NotPatientIndicatorsName
+
+    model = NotPatientIndicatorsName
+    success_url = reverse_lazy('not_patient_indicators')
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+class NotPatientIDCreate(CreateView):
+    from remapp.forms import NotPatientIDForm
+    from remapp.models import NotPatientIndicatorsID
+
+    model = NotPatientIndicatorsID
+    form_class = NotPatientIDForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientIDUpdate(UpdateView):
+    from remapp.forms import NotPatientIDForm
+    from remapp.models import NotPatientIndicatorsID
+
+    model = NotPatientIndicatorsID
+    form_class = NotPatientIDForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientIDDelete(DeleteView):
+    from remapp.models import NotPatientIndicatorsID
+
+    model = NotPatientIndicatorsID
+    success_url = reverse_lazy('not_patient_indicators')
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context

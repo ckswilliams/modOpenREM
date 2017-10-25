@@ -1,3 +1,5 @@
+# This Python file uses the following encoding: utf-8
+
 # OpenREM root UID: 1.2.826.0.1.3680043.9.5224.
 # Provided by Medical Connections https://www.medicalconnections.co.uk/FreeUID
 
@@ -24,18 +26,22 @@
 # Includes an extra 1. after the root UID to enable future use for
 # anthing else.
 
-from celery import shared_task
 import logging
+from netdicom.applicationentity import AE
+from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
+from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 
 logger = logging.getLogger(__name__)
+qr_logger = logging.getLogger('remapp.netdicom.qrscu')
+
 
 # call back
 def OnAssociateResponse(association):
-    logger.info("Association response received")
+    logger.info(u"Association response received")
 
 
 def OnAssociateRequest(association):
-    logger.info("Association resquested")
+    logger.info(u"Association resquested")
     return True
 
 
@@ -49,9 +55,6 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
     :param kwargs:
     :return: 'AssocFail', Success or ?
     """
-    from netdicom.applicationentity import AE
-    from netdicom.SOPclass import VerificationSOPClass
-    from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from remapp.models import DicomRemoteQR, DicomStoreSCP
 
     if store_scp and scp_pk:
@@ -68,7 +71,7 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
         if not aet:
             aet = "OPENREMECHO"
     else:
-        logger.warning("echoscu called without SCP information")
+        logger.warning(u"echoscu called without SCP information")
         return 0
 
     rp = scp.port
@@ -83,36 +86,64 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
 
 
     # create application entity with just Verification SOP classes as SCU
-    my_ae = AE(aet.encode('ascii','ignore'), 0, [VerificationSOPClass], [], ts)
+    my_ae = AE(aet.encode('ascii', 'ignore'), 0, [VerificationSOPClass], [], ts)
     my_ae.OnAssociateResponse = OnAssociateResponse
     my_ae.OnAssociateRequest = OnAssociateRequest
     my_ae.start()
 
     # remote application entity
-    remote_ae = dict(Address=rh, Port=rp, AET=aec.encode('ascii','ignore'))
+    remote_ae = dict(Address=rh, Port=rp, AET=aec.encode('ascii', 'ignore'))
 
     # create association with remote AE
-    logger.debug("Request association with {0} {1} {2}".format(rh, rp, aec))
+    logger.debug(u"Request association with {0} {1} {2}".format(rh, rp, aec))
     assoc = my_ae.RequestAssociation(remote_ae)
 
     if not assoc:
-        logger.info("Association with {0} {1} {2} was not successful".format(rh, rp, aec))
+        logger.info(u"Association with {0} {1} {2} was not successful".format(rh, rp, aec))
         return "AssocFail"
-    logger.debug("assoc is ... %s", assoc)
+    logger.debug(u"assoc is ... %s", assoc)
 
     # perform a DICOM ECHO
-    logger.debug("DICOM Echo... {0} {1} {2}".format(rh, rp, aec))
+    logger.debug(u"DICOM Echo... {0} {1} {2}".format(rh, rp, aec))
     echo = assoc.VerificationSOPClass.SCU(1)
-    logger.debug('done with status %s', echo)
+    logger.debug(u'done with status %s', echo)
 
-    logger.debug("Release association from {0} {1} {2}".format(rh, rp, aec))
+    logger.debug(u"Release association from {0} {1} {2}".format(rh, rp, aec))
     assoc.Release(0)
 
     # done
     my_ae.Quit()
     if echo.Type is "Success":
-        logger.info("Returning Success response from echo to {0} {1} {2}".format(rh, rp, aec))
+        logger.info(u"Returning Success response from echo to {0} {1} {2}".format(rh, rp, aec))
         return "Success"
     else:
-        logger.info("Returning EchoFail response from echo to {0} {1} {2}. Type is {3}.".format(rh, rp, aec, echo.Type))
+        logger.info(u"Returning EchoFail response from echo to {0} {1} {2}. Type is {3}.".format(rh, rp, aec, echo.Type))
         return "EchoFail"
+
+
+def _create_ae(aet, port=None, sop_scu=None, sop_scp=None, transfer_syntax=None):
+    """
+    Function to create an application entity
+    :param aet: string, AE Title
+    :param sop_classes: list of supported SOP classes from netdicom.SOPclass to override default set
+    :param transfer_syntax: list of supported transfer syntax from dicom.UID to override default set
+    :return: application entity object ready to be started
+    """
+    qr_logger.debug(u"Create AE called with AET {0}, port {1}, SOP SCUs {2}, SOP SCPs {3} and transfer syntax {4} "
+                 u"(None if default)".format(aet, port, sop_scu, sop_scp, transfer_syntax))
+    if port is None:
+        port = 0
+    if sop_scu is None:
+        sop_scu = [StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass]
+    if sop_scp is None:
+        sop_scp = []
+    if transfer_syntax is None:
+        transfer_syntax = [ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian]
+
+    qr_logger.debug(u"Creating AE with AET {0}, port {1}, SOP SCUs {2}, SOP SCPs {3} and transfer syntax {4}".format(
+        aet, port, sop_scu, sop_scp, transfer_syntax))
+    my_ae = AE(aet, port, sop_scu, sop_scp, transfer_syntax)
+    my_ae.OnAssociateResponse = OnAssociateResponse
+    my_ae.OnAssociateRequest = OnAssociateRequest
+
+    return my_ae

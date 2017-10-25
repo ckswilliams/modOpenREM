@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #!/usr/local/bin/python
 # scripts/openrem_store
 
@@ -12,7 +13,7 @@ import sys
 from openrem.remapp.netdicom import storescp
 
 if len(sys.argv) != 2:
-    sys.exit('Error: Supply at one argument - the ID of the SCP configuration from the web interface')
+    sys.exit(u'Error: Supply at one argument - the ID of the SCP configuration from the web interface')
 
 try:
     print "Starting OpenREM Store SCP. Kill with control-c"

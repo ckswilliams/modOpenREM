@@ -99,6 +99,9 @@ showing those that correspond to what is contained in the histogram bin.
 
 Clicking on a legend entry toggles the visibility of the corresponding series.
 
+Only data with non-zero and non-blank dose values are included in the chart
+data calculations.
+
 =============================================================
 2. Pie chart showing the frequency of each item in a category
 =============================================================
@@ -118,6 +121,10 @@ Clicking on any of the pie chart segments will filter the displayed studies,
 showing only the studies that correspond to what is contained in that segment.
 As for the bar charts, this doesn't work perfectly, as the category filtering
 isn't exact.
+
+Only data with non-zero and non-blank dose values are included in the chart
+data calculations.
+
 
 ============================================================
 3. Line chart showing how an average value changes over time
@@ -141,6 +148,9 @@ across a range of dates and then releasing the mouse button will zoom in on
 that selection.
 
 Clicking on a legend entry toggles the visibility of the corresponding series.
+
+Only data with non-zero and non-blank dose values are included in the chart
+data calculations.
 
 =============================================================
 4. Pie chart showing the number of events per day of the week
@@ -166,6 +176,9 @@ Each segment represents a day of the week, and shows the number of events that
 have taken place on that day (figure 9). Clicking on one of the segments will
 take you to a pie chart that shows the number of events per on that day (figure
 10).
+
+All data, including zero blank dose values are included in the data
+calculations for this chart type.
 
 =============================================
 5. Scatter plot showing one value vs. another
@@ -200,6 +213,9 @@ can be seen again.
 
 Clicking on a system's legend entry toggles the display of the corresponding
 series on the chart.
+
+Only data with non-zero and non-blank dose values are included in the chart
+data calculations.
 
 ********************
 Exporting chart data
@@ -268,6 +284,15 @@ summary pages.
 
 The first option, ``Plot charts?``, determines whether any plots are shown.
 This also controls whether the data for the plots is calculated by OpenREM.
+
+Switching ``Case-insensitive categories`` on will force chart categories to be
+lowercase. This can be helpful if several rooms use the same wording but with
+different capitalisation for acquisition protocol, study description or
+requested procedure. With this option switched on then all rooms with the same
+wording, irrespective of capitalisation, will be shown side-by-side under the
+same single category. With the option switched off there will be a seperate
+category for each differently capitalised category.
+
 Some plot data is slow to calculate when there is a large amount of data: some
 users may prefer to leave ``Plot charts?`` off for performance reasons.
 ``Plot charts?`` can be switched on and activated with a click of the
@@ -364,6 +389,12 @@ Chart types - mammography
 *************************
 
 * Scatter plot of average glandular dose vs. compressed thickness for each
+  acquisition
+
+* Scatter plot of kVp vs. compressed thickness for each
+  acquisition
+
+* Scatter plot of mAs vs. compressed thickness for each
   acquisition
 
 * Pie chart showing the number of studies carried out per weekday

@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -40,14 +41,11 @@ def check_uid(uid, level='Study'):
     from remapp.models import GeneralStudyModuleAttr
     
     if level == 'Study':
-        existing = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = uid)
+        existing = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=uid)
     elif level == 'Event':
-        existing = GeneralStudyModuleAttr.objects.filter(projectionxrayradiationdose__irradeventxraydata__irradiation_event_uid__exact = uid)
+        existing = GeneralStudyModuleAttr.objects.filter(
+            projectionxrayradiationdose__irradeventxraydata__irradiation_event_uid__exact=uid)
     if existing:
         return existing.count()
 
     return 0
-
-if __name__ == '__main__':
-    import sys
-    sys.exit(check_uid())

@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -28,34 +29,41 @@
 
 """
 
-from dicom import charset
 
-
-def get_not_pt(dataset, char_set=charset.default_encoding):
+def get_not_pt(dataset):
     """Looks for indications that a study might be a test or QA study.
-    
+
     Some values that might indicate a study was for QA or similar purposes
     are not recorded in the database, for example patient name. Therefore
     this module attempts to find such indications and creates an xml
-    style string that can be recorded in the database.
+    style string that can be recorded in the database on study import.
 
     :param dataset:     The DICOM dataset.
     :type dataset:      dataset
     :returns:           str. -- xml style string if any trigger values are found.
     """
+    import fnmatch
     from remapp.tools.get_values import get_value_kw
-    patient_id = get_value_kw('PatientID', dataset, char_set=char_set)
-    patient_name = get_value_kw('PatientName', dataset, char_set=char_set)
-    id_indicators = ['phy', 'test', 'qa']
-    name_indicators = ['phys', 'test', 'qa']
+    from remapp.models import NotPatientIndicatorsID, NotPatientIndicatorsName
+
+    patient_id = get_value_kw('PatientID', dataset)
+    patient_name = get_value_kw('PatientName', dataset)
+
+    id_indicators = NotPatientIndicatorsID.objects.order_by('id')
+    name_indicators = NotPatientIndicatorsName.objects.order_by('id')
+
     id_contains = []
     name_contains = []
+
     if patient_id:
-        id_contains = [indicator
-                       for indicator in id_indicators if indicator in patient_id.lower()]
+        for pattern in id_indicators:
+            if fnmatch.fnmatch(patient_id.lower(), pattern.not_patient_id.lower()):
+                id_contains += [pattern.not_patient_id.lower()]
+
     if patient_name:
-        name_contains = [indicator
-                         for indicator in name_indicators if indicator in patient_name.lower()]
+        for pattern in name_indicators:
+            if fnmatch.fnmatch(patient_name.lower(), pattern.not_patient_name.lower()):
+                name_contains += [pattern.not_patient_name.lower()]
+
     if id_contains or name_contains:
-        return '<IDContains Data="{0}" /> <NameContains Data="{1}" />'.format(str(id_contains)[1:-1],
-                                                                              str(name_contains)[1:-1])
+        return u'IDs: {0} | Names: {1}'.format(u' '.join(id_contains), u' '.join(name_contains))

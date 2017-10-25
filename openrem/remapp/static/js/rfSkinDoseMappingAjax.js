@@ -1,4 +1,16 @@
 /**
+ * Returns the logarithm of y with base x (ie. logxy). This is used as an alternative to Math.log10 which is not
+ * supported in Internet Explorer
+ * @param x - the base to use
+ * @param y - the number for which the logarithm is required
+ * @returns {number} - the base x logarithm of y
+ */
+function getBaseLog(x, y) {
+    return Math.log(y) / Math.log(x);
+}
+
+
+/**
  * Function to convert a url to an array of key pairs
  * @param url
  * @returns {{}}
@@ -73,6 +85,11 @@ $(document).ready(function() {
                     $('#phantomDimensions').html(json.phantom_height + 'x' + json.phantom_width + 'x' + json.phantom_depth);
                     $('#patientHeight').html((json.patient_height / 100).toFixed(2));
                     $('#patientMass').html(json.patient_mass.toFixed(1));
+                    $('#patientOrientation').html(json.patient_orientation);
+
+                    if (json.patient_height_source.indexOf('extracted') >= 0) $('#patientHeightLabel').html('Extracted patient height: ');
+                    if (json.patient_mass_source.indexOf('extracted') >= 0) $('#patientMassLabel').html('Extracted patient mass: ');
+                    if (json.patient_orientation_source.indexOf('extracted') >= 0) $('#patientOrientationLabel').html('Extracted patient orientation: ');
 
                     $('input[name=windowWidthSlider]').prop({
                         'max': skinDoseMapObj.windowWidth,
@@ -155,15 +172,3 @@ $(document).ready(function() {
     });
     return false;
 });
-
-
-/**
- * Returns the logarithm of y with base x (ie. logxy). This is used as an alternative to Math.log10 which is not
- * supported in Internet Explorer
- * @param x - the base to use
- * @param y - the number for which the logarithm is required
- * @returns {number} - the base x logarithm of y
- */
-function getBaseLog(x, y) {
-    return Math.log(y) / Math.log(x);
-}

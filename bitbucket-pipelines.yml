@@ -1,10 +1,35 @@
 image: python:2.7
 
 pipelines:
-  default:
+  default:  # Standard commits are tested but not deployed
     - step:
-        script: # Modify the commands below to build your repository.
+        script:
           - mv openrem/openremproject/local_settings.py{.example,}
           - mv openrem/openremproject/wsgi.py{.example,}
           - pip install -U tox
           - tox -e ci
+  branches:
+    develop:  # Commits to the develop branch are tested and deployed to dev.openrem.org on success
+      - step:
+          script:
+            - mv openrem/openremproject/local_settings.py{.example,}
+            - mv openrem/openremproject/wsgi.py{.example,}
+            - pip install -U tox
+            - tox -e ci
+            - pip install fabric
+            - mkdir -p ~/.ssh
+            - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
+            - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
+            - fab deploy:host=deploy@dev.openrem.org
+    '*stage':  # Commits to any branch ending in 'stage' are tested and deployed to testing.openrem.org
+      - step:
+          script:
+            - mv openrem/openremproject/local_settings.py{.example,}
+            - mv openrem/openremproject/wsgi.py{.example,}
+            - pip install -U tox
+            - tox -e ci
+            - pip install fabric
+            - mkdir -p ~/.ssh
+            - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
+            - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
+            - fab deploy:host=deploy@testing.openrem.org

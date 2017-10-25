@@ -13,7 +13,7 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
+#    Foundation trust in connection with this Program in any press or
 #    other public announcement without the prior written consent of 
 #    The Royal Marsden NHS Foundation Trust.
 #
@@ -36,7 +36,8 @@ from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
 from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate
-
+from remapp.views import NotPatientNameCreate, NotPatientNameUpdate, NotPatientNameDelete
+from remapp.views import NotPatientIDCreate, NotPatientIDUpdate, NotPatientIDDelete
 
 urlpatterns = patterns('remapp.views',
 
@@ -44,14 +45,14 @@ urlpatterns = patterns('remapp.views',
         'openrem_home', name='home'),
 
     url(r'^rf/$',
-        'rf_summary_list_filter'),
+        'rf_summary_list_filter', name='rf_summary_list_filter'),
     url(r'^rf/chart/$',
         'rf_summary_chart_data', name='rf_summary_chart_data'),
     url(r'^rf/(?P<pk>\d+)/$', 'rf_detail_view', name='rf_detail_view'),
     url(r'^rf/(?P<pk>\d+)/skin_map/$', 'rf_detail_view_skin_map', name='rf_detail_view_skin_map'),
 
     url(r'^ct/$',
-        'ct_summary_list_filter'),
+        'ct_summary_list_filter', name='ct_summary_list_filter'),
     url(r'^ct/chart/$',
         'ct_summary_chart_data', name='ct_summary_chart_data'),
     url(r'^ct/(?P<pk>\d+)/$', 'ct_detail_view', name='ct_detail_view'),
@@ -63,7 +64,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^dx/(?P<pk>\d+)/$', 'dx_detail_view', name='dx_detail_view'),
 
     url(r'^mg/$',
-        'mg_summary_list_filter'),
+        'mg_summary_list_filter', name='mg_summary_list_filter'),
     url(r'^mg/chart/$',
         'mg_summary_chart_data', name='mg_summary_chart_data'),
     url(r'^mg/(?P<pk>\d+)/$', 'mg_detail_view', name='mg_detail_view'),
@@ -90,18 +91,27 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/patientidsettings/(?P<pk>\d+)/$', PatientIDSettingsUpdate.as_view(), name='patient_id_settings_update'),
     url(r'^admin/dicomdelsettings/(?P<pk>\d+)/$', DicomDeleteSettingsUpdate.as_view(), name='dicom_delete_settings_update'),
     url(r'^admin/skindosemapsettings/(?P<pk>\d+)/$', SkinDoseMapCalcSettingsUpdate.as_view(), name='skin_dose_map_settings_update'),
-)
+    url(r'^admin/notpatientindicators/$', 'not_patient_indicators', name='not_patient_indicators'),
+    url(r'^admin/notpatientindicators/restore074/$', 'not_patient_indicators_as_074', name='not_patient_indicators_as_074'),
+    url(r'^admin/notpatientindicators/names/add/$', NotPatientNameCreate.as_view(), name='notpatientname_add'),
+    url(r'^admin/notpatientindicators/names/(?P<pk>\d+)/$', NotPatientNameUpdate.as_view(), name='notpatientname_update'),
+    url(r'^admin/notpatientindicators/names/(?P<pk>\d+)/delete/$', NotPatientNameDelete.as_view(), name='notpatientname_delete'),
+    url(r'^admin/notpatientindicators/id/add/$', NotPatientIDCreate.as_view(), name='notpatienid_add'),
+    url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/$', NotPatientIDUpdate.as_view(), name='notpatientid_update'),
+    url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/delete/$', NotPatientIDDelete.as_view(), name='notpatientid_delete'),
+    url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient', name='admin_questions_hide_not_patient'),
+   )
 
 urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^export/$', 'export'),
-    url(r'^exportctcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'ctcsv1'),
-    url(r'^exportctxlsx1/(?P<name>\w+)/(?P<patid>\w+)/$', 'ctxlsx1'),
-    url(r'^exportdxcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'dxcsv1'),
-    url(r'^exportdxxlsx1/(?P<name>\w+)/(?P<patid>\w+)/$', 'dxxlsx1'),
-    url(r'^exportflcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'flcsv1'),
-    url(r'^exportrfxlsx1/(?P<name>\w+)/(?P<patid>\w+)/$', 'rfxlsx1'),
+    url(r'^exportctcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'ctcsv1'),
+    url(r'^exportctxlsx1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'ctxlsx1'),
+    url(r'^exportdxcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'dxcsv1'),
+    url(r'^exportdxxlsx1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'dxxlsx1'),
+    url(r'^exportflcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'flcsv1'),
+    url(r'^exportrfxlsx1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'rfxlsx1'),
     url(r'^exportrfopenskin/(?P<pk>\d+)$', 'rfopenskin'),
-    url(r'^exportmgcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'mgcsv1'),
+    url(r'^exportmgcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'mgcsv1'),
     url(r'^exportmgnhsbsp/$', 'mgnhsbsp'),
     url(r'^download/(?P<task_id>[a-f0-9-]{36})$', 'download'),
     url(r'^deletefile/$', 'deletefile'),
