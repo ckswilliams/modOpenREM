@@ -1003,10 +1003,8 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                     logger.debug(traceback.format_exc())
                                         except KeyError, e:
                                             logger.debug(traceback.format_exc())
-                                            pass
                                         except Exception, e:
                                             logger.debug(traceback.format_exc())
-                                            pass
                                             # The end of updating the RDSR
                                             ##############################################
                                 except KeyError:
