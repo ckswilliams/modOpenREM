@@ -2,7 +2,7 @@
 # scripts/openrem_rdsr_toshiba_ct_from_dose_images
 
 """Script to launch the rdsr_toshiba_ct_from_dose_images module to import information from
-   Toshiba CT dose images and additional information from image tags. 
+   Toshiba CT dose images and additional information from image tags.
 
     :param folder_name: absolute path to Toshiba CT study DICOM files.
     :type filename: str.
@@ -11,7 +11,7 @@
         * Toshiba Aquilion CXL software version V4.40ER011
         * Toshiba Aquilion CX  software version V4.51ER014
         * Toshiba Aquilion CXL software version V4.86ER008
-        
+
 """
 
 import sys

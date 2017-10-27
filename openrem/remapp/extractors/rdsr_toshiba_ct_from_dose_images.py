@@ -1,3 +1,11 @@
+# This Python file uses the following encoding: utf-8
+"""
+..  module:: rdsr_toshiba_fct_from_dose_images.
+    :synopsis: Module to create a radiation dose structured report from legacy Toshiba CT studies
+
+..  moduleauthor:: David Platten
+"""
+
 import sys
 import os
 from openrem.remapp.extractors import rdsr
@@ -63,7 +71,9 @@ def find_dose_summary_objects(folder_path):
     return dose_summary_object_list
 
 
-def copy_files_from_a_to_b(src_folder, dest_folder):
+def _copy_files_from_a_to_b(src_folder, dest_folder):
+    """Copy files in src_folder to dest_folder
+    """
     src_files = os.listdir(src_folder)
     for file_name in src_files:
         full_file_name = os.path.join(src_folder, file_name)
@@ -270,7 +280,6 @@ def _find_extra_info(dicom_path):
                                 logger.debug('DLP unpacked from dcm[0x7005,0x1040] ({0}).'.format(unpack('<d', ''.join(dcm[0x7005, 0x1040]))[0]))
                         except KeyError:
                             logger.debug('There was a key error when finding DLP.')
-                            pass
                         except TypeError:
                             pass
                         except Exception:
@@ -1018,6 +1027,8 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
 
 @shared_task
 def rdsr_toshiba_ct_from_dose_images(folder_name):
+    """Function to create radiation dose structured reports from a folder of dose images.
+    """
     import dicom
 
     rdsr_name = 'sr.dcm'
@@ -1052,7 +1063,7 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
                 subfolder_paths.append(subfolder_path)
                 if not os.path.isdir(subfolder_path):
                     os.mkdir(subfolder_path)
-                copy_files_from_a_to_b(folder, subfolder_path)
+                _copy_files_from_a_to_b(folder, subfolder_path)
 
             # Delete all but one pair of dose summary objects from each subfolder
             for unique_study_time in unique_study_times:
