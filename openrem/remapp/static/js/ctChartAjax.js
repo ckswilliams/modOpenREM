@@ -50,13 +50,13 @@ $(document).ready(function() {
             }
 
             // Number of events per study chart data
-            if(typeof plotCTStudyNumEvents !== 'undefined') {
+            if(typeof plotCTStudyNumEvents !== "undefined") {
                 updateAverageChart(json.studyNameList, json.studySystemList, json.studySummaryNumEvents, json.studyHistogramDataNumEvents, plotAverageChoice, 'studyNumEventsDIV', colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'studyNumEventsDIV');
             }
 
             // Number of events per request chart data
-            if(typeof plotCTRequestNumEvents !== 'undefined') {
+            if(typeof plotCTRequestNumEvents !== "undefined") {
                 updateAverageChart(json.requestNameList, json.requestSystemList, json.requestSummaryNumEvents, json.requestHistogramDataNumEvents, plotAverageChoice, 'requestPlotNumEventsDIV', colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'requestPlotNumEventsDIV');
             }
