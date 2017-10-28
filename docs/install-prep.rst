@@ -137,6 +137,21 @@ of the in-built SQLite database. However, you should expect to start again when 
 * :doc:`postgresql`
 * :doc:`postgresql_windows`
 
+Resources for creating RDSR for older Toshiba CT scanners
+=========================================================
+
+_New in version 0.8.0_
+
+If you need to import data from older Toshiba CT scanners into OpenREM then the following tools need to be available
+on the same server as OpenREM:
+
+    * The `Offis DICOM toolkit`_
+    * `Java`_
+    * pixelmed.jar from the `PixelMed Java DICOM Toolkit`_
+
+For more information see :ref:`toshiba_legacy_imports`. The locations of these executables needs to be configured in the
+``local_settings.py`` - see :ref:`toshiba_configuration`.
+
 Install OpenREM
 ===============
 
@@ -169,3 +184,6 @@ once activated, the scripts can be called without a `python` prefix from anywher
 .. _virtualenv: https://virtualenv.pypa.io/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
 .. _consider virtualenv: `Virtualenv and virtualenvwrapper`_
+.. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
+.. _`Java`: http://java.com/en/download/
+.. _`PixelMed Java DICOM Toolkit`: http://www.pixelmed.com/dicomtoolkit.html
