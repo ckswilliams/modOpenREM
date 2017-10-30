@@ -124,7 +124,8 @@
             <th>
                 <table>
                     <tr><td class="nowrap">Study description</td></tr>
-                    <tr><td class="nowrap">Requested procedure</td></tr>
+                    <tr><td class="nowrap">Procedure</td></tr>
+                    <tr><td class="nowrap">Requested Procedure</td></tr>
                     <tr><td class="nowrap">Accession number</td></tr>
                 </table>
             </th>
@@ -158,8 +159,9 @@
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
                         <table onclick="window.location='/openrem/dx/{{ exam.id }}/';">
-                            <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
-                            <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
+                          <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
+                          <tr><td class="nowrap">{{ exam.procedure_code_meaning }}</td></tr>
+                          <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
                         {% if not exam.accession_hashed %}
                             <tr><td class="nowrap">{{ exam.accession_number }}</td></tr>
                         {% endif %}

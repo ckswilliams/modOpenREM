@@ -19,6 +19,7 @@
                 <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
                 <li>Study time: {{ generalstudymoduleattr.study_time|date:"H:i" }}</li>
                 <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
+                <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
                 <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
                 <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }} years</li>
                 <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:2 }} m, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
@@ -50,13 +51,25 @@
                 <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
             <br>
             <table class="table table-condensed table-bordered small">
-                <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th><th>Total time (s)</th>
+                <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th><th>Total duration (s)</th>
                 {% for irr_type in study_totals %}
                     <tr>
-                    <td>{{ irr_type.0 }}</td>
-                    <td><script>document.write({{ irr_type.1 }}.toFixed(2));</script></td>
-                    <td><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></td>
-                    <td><script>document.write({{ irr_type.3 }}.toFixed(2));</script></td>
+                    {% if '- ' in irr_type.0 %}
+                        <td><i>{{ irr_type.0 }}</i></td>
+                        <td style="text-align:right"><i><script>document.write({{ irr_type.1 }}.toFixed(2));</script></i></td>
+                        <td style="text-align:right"><i><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></i></td>
+                        <td style="text-align:right"><i><script>document.write({{ irr_type.3 }}.toFixed(2));</script></i></td>
+                    {% elif 'Total' in irr_type.0 %}
+                        <td><strong>{{ irr_type.0 }}</strong></td>
+                        <td><strong><script>document.write({{ irr_type.1 }}.toFixed(2));</script></strong></td>
+                        <td><strong><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></strong></td>
+                        <td><strong><script>document.write({{ irr_type.3 }}.toFixed(2));</script></strong></td>
+                    {% else %}
+                        <td>{{ irr_type.0 }}</td>
+                        <td><script>document.write({{ irr_type.1 }}.toFixed(2));</script></td>
+                        <td><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></td>
+                        <td><script>document.write({{ irr_type.3 }}.toFixed(2));</script></td>
+                    {% endif %}
                     </tr>
                 {% endfor %}
             </table>
@@ -330,7 +343,9 @@
   <th>Plane</th>
   <th>DAP (cGy.cm<sup>2</sup>)</th>
   <th>Dose at reference point (mGy)</th>
-  <th>Exposure time (ms)</th>
+  <th>Duration (ms)<br>
+      Exposure time (ms)
+  </th>
   <th>kVp</th>
   <th>mA</th>
   <th>Filters (mm)</th>
@@ -348,7 +363,19 @@
         <td>{{ event.acquisition_plane }}</td>
         <td><script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script></td>
         <td><script>document.write({{ event.irradeventxraysourcedata_set.get.convert_gy_to_mgy }}.toPrecision(3));</script></td>
-        <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:1 }}</td>
+        <td>
+        {% if event.irradeventxraysourcedata_set.get.irradiation_duration %}
+            {{ event.irradeventxraysourcedata_set.get.irradiation_duration|multiply:1000|floatformat:1 }}
+        {% else %}
+            <i>n/a</i>
+        {% endif %}
+        <br>
+        {% if event.irradeventxraysourcedata_set.get.exposure_time %}
+            {{ event.irradeventxraysourcedata_set.get.exposure_time }}
+        {% else %}
+            <i>n/a</i>
+        {% endif %}
+        </td>
         <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
         <td>

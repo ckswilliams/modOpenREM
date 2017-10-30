@@ -4,21 +4,26 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
-
+* `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
+* `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
 * `#542`_  Interface: Added display name to all detailed html pages
-* `#535`_  Interface: Fixed problem where categorie names that included a plus symbol caused filtering and chart issues
+* `#535`_  Interface: Fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
+* `#529`_  Charts: Added CT charts of number of irradiation events per study description and requested procedure
 * `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
+* `#526`_  Code quality: Addressed some of the code quality/style issues raised by `Codacy`_
 * `#525`_  Importing: Improved mammo import by checking compression force before converting to float
 * `#524`_  Importing: Improved mammo import by checking anode exists before converting to DICOM terms
 * `#523`_  Importing: Changed mammo import to use del_no_match instead of del_mg_im if not mammo
+* `#521`_  Testing: Added tests for dual source CT imports
 * `#518`_  Importing: Fixed imports where CT Target Region isn't specified
 * `#517`_  Interface: Operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
 * `#516`_  Imports: MultiValue person names are now stored as a decoded string, not a list
 * `#511`_  Testing: develop and other branches can now be deployed to dev.openrem.org and testing.openrem.org automatically
 * `#509`_  Skin dose maps: now recalculated on view if recorded height or weight has changed since last calculation
 * `#508`_  Testing: DX sample files are now tested
+* `#507`_  Interface: Mammo now filterable by study description, procedure, requested procedure and acquisition protocol
 * `#505`_  Charts: n is now displayed on charts
 * `#504`_  Charts: Fixed issue with null values
 * `#503`_  Internationalisation: more robust decoding and use of unicode throughout
@@ -29,7 +34,7 @@ OpenREM version history
 * `#498`_  Exports: Missing units added to header fields
 * `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
-* `#494`_  Charts: Charts now ignore non-zero data when calculating mean, median and number of events
+* `#494`_  Charts: Charts now ignore blank and zero-value data when calculating mean, median and number of events
 * `#493`_  Charts: Added user option to made chart categories all lower case
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
@@ -1344,3 +1349,4 @@ Reopened issue
 ..  _`NHSBSP specific mammography csv export`: https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
 ..  _@rijkhorst: https://bitbucket.org/rijkhorst/
 ..  _@LuukO: https://bitbucket.org/LuukO/
+..  _Codacy: https://www.codacy.com/app/OpenREM/openrem

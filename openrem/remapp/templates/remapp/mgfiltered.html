@@ -120,7 +120,9 @@ $('.datepicker').datepicker({
             <th>Date</th>
             <th>
                 <table>
-                    <tr><td class="nowrap">Acquisition protocol</td></tr>
+                    <tr><td class="nowrap">Study description</td></tr>
+                    <tr><td class="nowrap">Procedure</td></tr>
+                    <tr><td class="nowrap">Requested Procedure</td></tr>
                     <tr><td class="nowrap">Accession number</td></tr>
                 </table>
             </th>
@@ -154,7 +156,9 @@ $('.datepicker').datepicker({
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">
                     <table onclick="window.location='/openrem/mg/{{ exam.id }}/';">
+                        <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
                         <tr><td class="nowrap">{{ exam.procedure_code_meaning }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
                   {% if not exam.accession_hashed %}
                         <tr><td class="nowrap">{{ exam.accession_number }}</td></tr>
                   {% endif %}

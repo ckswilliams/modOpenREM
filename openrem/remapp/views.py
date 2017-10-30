@@ -63,6 +63,26 @@ except ImportError:
     plotting = 0
 
 
+from django.template.defaultfilters import register
+
+
+@register.filter
+def multiply(value, arg):
+    """
+    Return multiplication within Django templates
+
+    :param value: the value to multiply
+    :param arg: the second value to multiply
+    :return: the multiplication
+    """
+    try:
+        value = float(value)
+        arg = float(arg)
+        return value * arg
+    except ValueError:
+        return None
+
+
 def logout_page(request):
     """
     Log users out and re-direct them to the main page.
@@ -459,9 +479,13 @@ def rf_summary_list_filter(request):
     from remapp.forms import RFChartOptionsForm, itemsPerPageForm
 
     if request.user.groups.filter(name='pidgroup'):
-        f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
+        f = RFFilterPlusPid(
+            request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by(
+            ).distinct())
     else:
-        f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
+        f = RFSummaryListFilter(
+            request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by(
+            ).distinct())
 
     try:
         # See if the user has plot settings in userprofile
@@ -661,25 +685,66 @@ def rf_detail_view(request, pk=None):
     from remapp.models import GeneralStudyModuleAttr
     from django.db.models import Sum
     import numpy as np
+    from django.core.exceptions import ObjectDoesNotExist
+    import operator
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
-        stu_inc_totals = GeneralStudyModuleAttr.objects.filter(pk=pk).annotate(
-            sum_dap = Sum('projectionxrayradiationdose__irradeventxraydata__dose_area_product')*1000000,
-            sum_dose_rp = Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__dose_rp')
-        ).order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
-        stu_dose_totals = stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
-        stu_irr_types = stu_inc_totals.values_list('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
-        stu_time_totals = [None] * len(stu_irr_types)
-        for idx, irr_type in enumerate(stu_irr_types):
-            stu_time_totals[idx] = GeneralStudyModuleAttr.objects.filter(pk=pk,
-                                                  projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
-                                                  irr_type[0]).aggregate(
-                Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure_time')).values()[0] / 1000
-        study_totals = np.column_stack((stu_irr_types, stu_dose_totals, stu_time_totals)).tolist()
-    except:
+    except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
+
+    # get the totals
+    irradiation_types = [(u'Fluoroscopy',), (u'Acquisition',)]
+    stu_dose_totals = [(0, 0), (0, 0)]
+    stu_time_totals = [0, 0]
+    total_dap = 0
+    total_dose = 0
+    # Iterate over the planes (for bi-plane systems, for single plane systems there is only one)
+    for dose_ds in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+        accum_dose_ds = dose_ds.accumprojxraydose_set.get()
+        stu_dose_totals[0] = tuple(map(operator.add, stu_dose_totals[0],
+                                       (accum_dose_ds.fluoro_dose_area_product_total*1000000,
+                                        accum_dose_ds.fluoro_dose_rp_total)))
+        stu_dose_totals[1] = tuple(map(operator.add, stu_dose_totals[1],
+                                       (accum_dose_ds.acquisition_dose_area_product_total*1000000,
+                                        accum_dose_ds.acquisition_dose_rp_total)))
+        stu_time_totals[0] = stu_time_totals[0] + accum_dose_ds.total_fluoro_time
+        stu_time_totals[1] = stu_time_totals[1] + accum_dose_ds.total_acquisition_time
+        total_dap = total_dap + accum_dose_ds.dose_area_product_total
+        total_dose = total_dose + accum_dose_ds.dose_rp_total
+
+    # get info for different Acquisition Types
+    stu_inc_totals = GeneralStudyModuleAttr.objects.filter(
+            pk=pk,
+            projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning__contains=
+            'Acquisition'
+        ).annotate(
+            sum_dap=Sum('projectionxrayradiationdose__irradeventxraydata__dose_area_product')*1000000,
+            sum_dose_rp=Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__dose_rp')
+        ).order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
+    stu_dose_totals.extend(stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by(
+        'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type'))
+    acq_irr_types = stu_inc_totals.values_list(
+        'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning').order_by(
+            'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
+    # stu_time_totals = [None] * len(stu_irr_types)
+    for _, irr_type in enumerate(acq_irr_types):
+        stu_time_totals.append(GeneralStudyModuleAttr.objects.filter(
+            pk=pk,
+            projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
+            irr_type[0]).aggregate(
+                Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__irradiation_duration')
+            ).values()[0])
+    irradiation_types.extend([(u'- ' + acq_type[0],) for acq_type in acq_irr_types])
+
+    # Add the study totals
+    irradiation_types.append((u'Total',))
+    stu_dose_totals.append((total_dap*1000000, total_dose))
+    # does total duration (summed over fluoroscopy and acquisitions) means something?
+    stu_time_totals.append(stu_time_totals[0]+stu_time_totals[1])
+
+    study_totals = np.column_stack((irradiation_types, stu_dose_totals, stu_time_totals)).tolist()
 
     from remapp.models import SkinDoseMapCalcSettings
     from django.core.exceptions import ObjectDoesNotExist
@@ -830,8 +895,10 @@ def ct_summary_list_filter(request):
             user_profile.plotCTStudyMeanDLP = chart_options_form.cleaned_data['plotCTStudyMeanDLP']
             user_profile.plotCTStudyMeanCTDI = chart_options_form.cleaned_data['plotCTStudyMeanCTDI']
             user_profile.plotCTStudyFreq = chart_options_form.cleaned_data['plotCTStudyFreq']
+            user_profile.plotCTStudyNumEvents = chart_options_form.cleaned_data['plotCTStudyNumEvents']
             user_profile.plotCTRequestMeanDLP = chart_options_form.cleaned_data['plotCTRequestMeanDLP']
             user_profile.plotCTRequestFreq = chart_options_form.cleaned_data['plotCTRequestFreq']
+            user_profile.plotCTRequestNumEvents = chart_options_form.cleaned_data['plotCTRequestNumEvents']
             user_profile.plotCTStudyPerDayAndHour = chart_options_form.cleaned_data['plotCTStudyPerDayAndHour']
             user_profile.plotCTStudyMeanDLPOverTime = chart_options_form.cleaned_data['plotCTStudyMeanDLPOverTime']
             user_profile.plotCTStudyMeanDLPOverTimePeriod = chart_options_form.cleaned_data[
@@ -850,8 +917,10 @@ def ct_summary_list_filter(request):
                          'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
                          'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                          'plotCTStudyFreq': user_profile.plotCTStudyFreq,
+                         'plotCTStudyNumEvents': user_profile.plotCTStudyNumEvents,
                          'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
                          'plotCTRequestFreq': user_profile.plotCTRequestFreq,
+                         'plotCTRequestNumEvents': user_profile.plotCTRequestNumEvents,
                          'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
                          'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
                          'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,
@@ -922,8 +991,8 @@ def ct_summary_chart_data(request):
 
     return_structure =\
         ct_plot_calculations(f, user_profile.plotCTAcquisitionFreq, user_profile.plotCTAcquisitionMeanCTDI, user_profile.plotCTAcquisitionMeanDLP,
-                             user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP,
-                             user_profile.plotCTStudyMeanCTDI,
+                             user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTRequestNumEvents,
+                             user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP, user_profile.plotCTStudyMeanCTDI, user_profile.plotCTStudyNumEvents,
                              user_profile.plotCTStudyMeanDLPOverTime, user_profile.plotCTStudyMeanDLPOverTimePeriod, user_profile.plotCTStudyPerDayAndHour,
                              median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
                              user_profile.plotHistogramBins, user_profile.plotHistograms, user_profile.plotCaseInsensitiveCategories)
@@ -932,8 +1001,8 @@ def ct_summary_chart_data(request):
 
 
 def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, plot_acquisition_mean_dlp,
-                         plot_request_freq, plot_request_mean_dlp, plot_study_freq, plot_study_mean_dlp,
-                         plot_study_mean_ctdi,
+                         plot_request_freq, plot_request_mean_dlp, plot_request_num_events,
+                         plot_study_freq, plot_study_mean_dlp, plot_study_mean_ctdi, plot_study_num_events,
                          plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
                          plot_histograms, plot_case_insensitive_categories):
@@ -942,7 +1011,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
     return_structure = {}
 
-    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq:
+    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
         try:
             if f.form.data['acquisition_protocol']:
                 exp_include = [o.study_instance_uid for o in f]
@@ -951,7 +1020,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         except KeyError:
             pass
 
-    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
+    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
         try:
             if f.form.data['acquisition_protocol']:
                 # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
@@ -968,7 +1037,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         except KeyError:
             study_events = f.qs
 
-    if plot_request_mean_dlp or plot_request_freq:
+    if plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
         try:
             if f.form.data['acquisition_protocol']:
                 # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
@@ -1060,6 +1129,25 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         if plot_histograms:
             return_structure['studyHistogramDataCTDI'] = result['histogram_data']
 
+    if plot_study_num_events:
+        result = average_chart_inc_histogram_data(study_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'study_description',
+                                                  'ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events',
+                                                  1,
+                                                  plot_study_num_events, 0,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
+
+        return_structure['studySummaryNumEvents'] = result['summary']
+        if not plot_study_mean_dlp and not plot_study_freq:
+            return_structure['studySystemList'] = result['system_list']
+            return_structure['studyNameList'] = result['series_names']
+        if plot_study_num_events and plot_histograms:
+            return_structure['studyHistogramDataNumEvents'] = result['histogram_data']
+
     if plot_request_mean_dlp or plot_request_freq:
         result = average_chart_inc_histogram_data(request_events,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
@@ -1077,6 +1165,25 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         return_structure['requestSummary'] = result['summary']
         if plot_request_mean_dlp and plot_histograms:
             return_structure['requestHistogramData'] = result['histogram_data']
+
+    if plot_request_num_events:
+        result = average_chart_inc_histogram_data(request_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'requested_procedure_code_meaning',
+                                                  'ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events',
+                                                  1,
+                                                  plot_request_num_events, 0,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
+
+        return_structure['requestSummaryNumEvents'] = result['summary']
+        if not plot_request_mean_dlp and not plot_request_freq:
+            return_structure['requestSystemList'] = result['system_list']
+            return_structure['requestNameList'] = result['series_names']
+        if plot_request_num_events and plot_histograms:
+            return_structure['requestHistogramDataNumEvents'] = result['histogram_data']
 
     if plot_study_mean_dlp_over_time:
         result = average_chart_over_time_data(study_events,
@@ -1136,9 +1243,13 @@ def mg_summary_list_filter(request):
         del filter_data['page']
 
     if request.user.groups.filter(name='pidgroup'):
-        f = MGFilterPlusPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
+        f = MGFilterPlusPid(
+            filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG').order_by(
+            ).distinct())
     else:
-        f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
+        f = MGSummaryListFilter(
+            filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG').order_by(
+            ).distinct())
 
     try:
         # See if the user has plot settings in userprofile
@@ -1900,8 +2011,10 @@ def chart_options_view(request):
             user_profile.plotCTStudyMeanDLP = ct_form.cleaned_data['plotCTStudyMeanDLP']
             user_profile.plotCTStudyMeanCTDI = ct_form.cleaned_data['plotCTStudyMeanCTDI']
             user_profile.plotCTStudyFreq = ct_form.cleaned_data['plotCTStudyFreq']
+            user_profile.plotCTStudyNumEvents = ct_form.cleaned_data['plotCTStudyNumEvents']
             user_profile.plotCTRequestMeanDLP = ct_form.cleaned_data['plotCTRequestMeanDLP']
             user_profile.plotCTRequestFreq = ct_form.cleaned_data['plotCTRequestFreq']
+            user_profile.plotCTRequestNumEvents = ct_form.cleaned_data['plotCTRequestNumEvents']
             user_profile.plotCTStudyPerDayAndHour = ct_form.cleaned_data['plotCTStudyPerDayAndHour']
             user_profile.plotCTStudyMeanDLPOverTime = ct_form.cleaned_data['plotCTStudyMeanDLPOverTime']
             user_profile.plotCTStudyMeanDLPOverTimePeriod = ct_form.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
@@ -1964,8 +2077,10 @@ def chart_options_view(request):
                     'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
                     'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                     'plotCTStudyFreq': user_profile.plotCTStudyFreq,
+                    'plotCTStudyNumEvents': user_profile.plotCTStudyNumEvents,
                     'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
                     'plotCTRequestFreq': user_profile.plotCTRequestFreq,
+                    'plotCTRequestNumEvents': user_profile.plotCTRequestNumEvents,
                     'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
                     'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
                     'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,

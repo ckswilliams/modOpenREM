@@ -124,6 +124,9 @@ class RFSummaryListFilter(django_filters.FilterSet):
     date_after = django_filters.DateFilter(lookup_type='gte', label=u'Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     date_before = django_filters.DateFilter(lookup_type='lte', label=u'Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label=u'Study description')
+    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
+    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
@@ -173,8 +176,9 @@ class CTSummaryListFilter(django_filters.FilterSet):
     date_after = django_filters.DateFilter(lookup_type='gte', label=u'Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     date_before = django_filters.DateFilter(lookup_type='lte', label=u'Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label=u'Study description')
-    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
     requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='ctradiationdose__ctirradiationeventdata__acquisition_protocol')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
@@ -286,7 +290,10 @@ class MGSummaryListFilter(django_filters.FilterSet):
     """
     date_after = django_filters.DateFilter(lookup_type='gte', label=u'Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     date_before = django_filters.DateFilter(lookup_type='lte', label=u'Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure')
+    study_description = django_filters.CharFilter(lookup_type='icontains', label=u'Study description')
+    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
+    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
@@ -334,8 +341,9 @@ class DXSummaryListFilter(django_filters.FilterSet):
     date_after = django_filters.DateFilter(lookup_type='gte', label=u'Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     date_before = django_filters.DateFilter(lookup_type='lte', label=u'Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label=u'Study description')
-    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
     requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
@@ -357,6 +365,8 @@ class DXSummaryListFilter(django_filters.FilterSet):
             'date_before', 
             'institution_name',
             'study_description',
+            'procedure_code_meaning',
+            'requested_procedure',
             'acquisition_protocol',
             'patient_age_min',
             'patient_age_max',
