@@ -6,6 +6,7 @@ Upgrade to OpenREM 0.8.0
 Headline changes
 ****************
 
+* Imports: Can now create RDSR for import from legacy Toshiba CT studies using Offis DCMTK and Pixelmed
 * Imports: No longer tries to import non-dose report Enhanced Structured Reports
 * Imports: Hologic DBT proprietary projection images now have laterality and accumulated AGD extracted correctly
 * Charts: Added mammography scatter plot, thanks to `@rijkhorst`_
@@ -35,6 +36,30 @@ Upgrading from version 0.7.4
 
 * Consider setting the timezone and language in ``local_settings.py``. See ``local_settings.py.example``.
 
+
+**************************************
+Adding legacy Toshiba CT functionality
+**************************************
+
+If you need to import data from older Toshiba CT scanners into OpenREM then the following tools need to be available
+on the same server as OpenREM:
+
+    * The `Offis DICOM toolkit`_
+    * `Java`_
+    * pixelmed.jar from the `PixelMed Java DICOM Toolkit`_
+
+The paths to these must be set in `local_settings.py` for your system:
+
+.. sourcecode:: bash
+
+    # Locations of various tools for DICOM RDSR creation from CT images
+    DCMTK_PATH = 'C:/Apps/dcmtk-3.6.0-win32-i386/bin'
+    DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
+    DCMMKDIR = os.path.join(DCMTK_PATH, 'dcmmkdir.exe')
+    JAVA_EXE = 'C:/Apps/doseUtility/windows/jre/bin/java.exe'
+    JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
+    PIXELMED_JAR = 'C:/Apps/doseUtility/pixelmed.jar'
+    PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
 
 
 ..  _@rijkhorst: https://bitbucket.org/rijkhorst/
