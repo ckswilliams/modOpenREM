@@ -199,7 +199,7 @@ http://www.i18nguy.com/unicode/language-identifiers.html
 
     LANGUAGE_CODE = 'en-us'
 
-.. _toshiba_configuration
+.. _toshiba_configuration:
 
 Toshiba CT RDSR creation
 ^^^^^^^^^^^^^^^^^^^^^^^^

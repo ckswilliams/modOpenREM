@@ -48,7 +48,7 @@ For CT dose summary files from Philips CT scanners
 
     openrem_ctphilips.py filename.dcm
 
-.. _toshiba_legacy_imports
+.. _toshiba_legacy_imports:
 
 For CT dose summary files from older Toshiba CT scanners
 --------------------------------------------------------

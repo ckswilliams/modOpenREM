@@ -140,7 +140,7 @@ of the in-built SQLite database. However, you should expect to start again when 
 Resources for creating RDSR for older Toshiba CT scanners
 =========================================================
 
-_New in version 0.8.0_
+*New in version 0.8.0*
 
 If you need to import data from older Toshiba CT scanners into OpenREM then the following tools need to be available
 on the same server as OpenREM:
