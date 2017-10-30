@@ -50,7 +50,7 @@ on the same server as OpenREM:
 
 The paths to these must be set in `local_settings.py` for your system:
 
-.. sourcecode:: bash
+.. sourcecode:: python
 
     # Locations of various tools for DICOM RDSR creation from CT images
     DCMTK_PATH = 'C:/Apps/dcmtk-3.6.0-win32-i386/bin'
@@ -63,3 +63,6 @@ The paths to these must be set in `local_settings.py` for your system:
 
 
 ..  _@rijkhorst: https://bitbucket.org/rijkhorst/
+.. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
+.. _`Java`: http://java.com/en/download/
+.. _`PixelMed Java DICOM Toolkit`: http://www.pixelmed.com/dicomtoolkit.html
