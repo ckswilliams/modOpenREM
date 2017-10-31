@@ -61,6 +61,14 @@ The paths to these must be set in `local_settings.py` for your system:
     PIXELMED_JAR = 'C:/Apps/doseUtility/pixelmed.jar'
     PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
 
+The example above is for Windows. On linux,
+if you have installed hte Offis DICOM toolkit with ``sudo apt install dcmtk`` or similar, you can find the path for the
+configuration below using the command ``which dcmconv``. This will be something like ``/usr/bin/dcmconv``, so the
+``DCMTK_PATH`` would be ``'/usr/bin`` and the ``DCMCONV`` would be ``os.path.join(DCMTK_PATH, 'dcmconv')``. Similarly
+for ``DCMMKDIR`` and ``JAVA_EXE``, which might be ``/usr/bin/java``. The pixelmed.jar file should be downloaded from
+the link above, and you will need to provide the path to where you have saved it.
+
+
 
 ..  _@rijkhorst: https://bitbucket.org/rijkhorst/
 .. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
