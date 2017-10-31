@@ -10,6 +10,7 @@ OpenREM version history
 * `#535`_  Interface: Fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
+* `#529`_  Charts: Added CT charts of number of irradiation events per study description and requested procedure
 * `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#526`_  Code quality: Addressed some of the code quality/style issues raised by `Codacy`_
 * `#525`_  Importing: Improved mammo import by checking compression force before converting to float
@@ -33,7 +34,7 @@ OpenREM version history
 * `#498`_  Exports: Missing units added to header fields
 * `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
-* `#494`_  Charts: Charts now ignore non-zero data when calculating mean, median and number of events
+* `#494`_  Charts: Charts now ignore blank and zero-value data when calculating mean, median and number of events
 * `#493`_  Charts: Added user option to made chart categories all lower case
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
