@@ -59,19 +59,24 @@ import os
 logfilename = os.path.join(MEDIA_ROOT, "openrem.log")
 qrfilename = os.path.join(MEDIA_ROOT, "openrem_qr.log")
 storefilename = os.path.join(MEDIA_ROOT, "openrem_store.log")
+extractorfilename = os.path.join(MEDIA_ROOT, "openrem_extractor.log")
+
 LOGGING['handlers']['file']['filename'] = logfilename          # General logs
 LOGGING['handlers']['qr_file']['filename'] = qrfilename        # Query Retrieve SCU logs
 LOGGING['handlers']['store_file']['filename'] = storefilename  # Store SCP logs
+LOGGING['handlers']['extractor_file']['filename'] = extractorfilename  # Extractor logs
 
 # Set log message format. Options are 'verbose' or 'simple'. Recommend leaving as 'verbose'.
 LOGGING['handlers']['file']['formatter'] = 'verbose'        # General logs
 LOGGING['handlers']['qr_file']['formatter'] = 'verbose'     # Query Retrieve SCU logs
 LOGGING['handlers']['store_file']['formatter'] = 'verbose'  # Store SCP logs
+LOGGING['handlers']['extractor_file']['formatter'] = 'verbose'  # Extractor logs
 
 # Set the log level. Options are 'DEBUG', 'INFO', 'WARNING', 'ERROR', and 'CRITICAL', with progressively less logging.
 LOGGING['loggers']['remapp']['level'] = 'INFO'                    # General logs
 LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'     # Query Retrieve SCU logs
 LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs
+LOGGING['loggers']['remapp.extractors.rdsr_toshiba_ct_from_dose_images']['level'] = 'INFO'  # Toshiba RDSR creation extractor logs
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -82,3 +87,12 @@ TIME_ZONE = 'Europe/London'
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
+
+# Locations of various tools for DICOM RDSR creation from CT images
+DCMTK_PATH = 'C:\\Users\\David\\Apps\\dcmtk-3.6.0-win32-i386\\bin'
+DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
+DCMMKDIR = os.path.join(DCMTK_PATH, 'dcmmkdir.exe')
+JAVA_EXE = 'C:\\Users\\David\\Apps\\doseUtility\\windows\\jre\\bin\\java.exe'
+JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
+PIXELMED_JAR = 'C:\\Users\\David\\Apps\\doseUtility\\pixelmed.jar'
+PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
