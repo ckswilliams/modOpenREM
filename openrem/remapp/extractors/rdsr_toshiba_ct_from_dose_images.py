@@ -448,7 +448,7 @@ def _make_dicomdir(folder, dcmmkdir_exe):
     import subprocess  # nosec
 
     command = dcmmkdir_exe + ' --recurse --output-file ' + os.path.join(folder, 'DICOMDIR') + ' --input-directory ' + folder
-    subprocess.call(command.split())  # nose
+    subprocess.call(command.split())  # nosec
 
 
 def _make_dicom_rdsr(folder, pixelmed_jar_command, sr_filename):
@@ -464,7 +464,7 @@ def _make_dicom_rdsr(folder, pixelmed_jar_command, sr_filename):
     import subprocess  # nosec
 
     command = pixelmed_jar_command + ' ' + folder + ' ' + os.path.join(folder, sr_filename)
-    subprocess.call(command.split())  # nose
+    subprocess.call(command.split())  # nosec
 
 
 def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_info, new_rdsr_file):
