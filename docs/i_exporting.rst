@@ -71,16 +71,6 @@ by ticking the delete checkbox and clicking the delete button at the bottom:
     :height: 268px
     :alt: Deleting exports
 
-.. warning::
-
-    Large exports have been killed by the operating system due to running 
-    out of memory - a 6500 CT exam xlsx export was killed after 3400 
-    studies for example. This issue is being tracked as `#116`_ and will
-    hopefully be addressed in the next release. It is possible that if debug 
-    mode is turned off then memory will be managed better, but I also need
-    to modify the xlsx export to make use of the memory optimisation mode in 
-    xlsxwriter.
-
 Specific modality export information
 ====================================
 
@@ -120,7 +110,23 @@ then you should further prepare the data as follows:
 Where patients have had both 2D and tomographic exposures in the same study, NCCPM will be able to match them up as they
 will have the same patient number in both surveys.
 
+Opening csv exports in Excel
+============================
 
+If the export contains non-ASCII characters, then Microsoft Excel is unlikely to display them correctly by default. This
+issue does not occur with Libre Office which defaults to UTF-8 -- behaviour with other applications will vary.
+
+To correctly render characters in csv files with Excel, you will need to follow the following procedure:
+
+#. Open Excel.
+#. On the ``Data`` tab of the ribbon interface, select ``From Text`` in the ``Get External Data`` section.
+#. Select your exported csv file and click ``Import``
+#. Ensure that Data Type ``Fixed width`` is selected.
+#. Change the ``File origin`` from ``Windows (ANSI)`` to ``65001 : Unicode (UTF-8)`` -- the easiest way to find it is to
+   scroll right to the bottom of the list, then move up one.
+#. Click ``Next >``
+#. Change the delimiter to just ``Comma``
+#. Either click ``Finish`` or ``Next >`` if you want to further customise the import.
 
 ..  _`#116`: https://bitbucket.org/openrem/openrem/issue/116/
 ..  _ACR MQCM 1999 Equivalent code.: http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4014.html
