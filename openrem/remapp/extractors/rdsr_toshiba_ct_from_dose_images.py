@@ -405,11 +405,12 @@ def _make_explicit_vr_little_endian(folder, dcmconv_exe):
         dcmconv_exe (str): A string containing the dcmconv command
 
     """
-    import subprocess
+    # Security implications of using subprocess have been considered - it is necessary for this function to work.
+    import subprocess  # nosec
 
     for filename in os.listdir(folder):
         command = dcmconv_exe + ' +te ' + os.path.join(folder, filename) + ' ' + os.path.join(folder, filename)
-        subprocess.call(command.split())
+        subprocess.call(command.split())  # nosec
 
 
 def _make_dicomdir(folder, dcmmkdir_exe):
