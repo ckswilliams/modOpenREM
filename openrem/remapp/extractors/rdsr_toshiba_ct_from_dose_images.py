@@ -428,11 +428,11 @@ def _make_explicit_vr_little_endian(folder, dcmconv_exe):
 
     """
     # Security implications of using subprocess have been considered - it is necessary for this function to work.
-    import subprocess   # nosec
+    import subprocess  # nosec
 
     for filename in os.listdir(folder):
         command = dcmconv_exe + ' +te ' + os.path.join(folder, filename) + ' ' + os.path.join(folder, filename)
-        subprocess.call(command.split())   # nosec
+        subprocess.call(command.split())  # nosec
 
 
 def _make_dicomdir(folder, dcmmkdir_exe):
@@ -444,10 +444,11 @@ def _make_dicomdir(folder, dcmmkdir_exe):
         dcmmkdir_exe (str): A string containing the dcmmkdir command
 
     """
-    import subprocess
+    # Security implications of using subprocess have been considered - it is necessary for this function to work.
+    import subprocess  # nosec
 
     command = dcmmkdir_exe + ' --recurse --output-file ' + os.path.join(folder, 'DICOMDIR') + ' --input-directory ' + folder
-    subprocess.call(command.split())
+    subprocess.call(command.split())  # nose
 
 
 def _make_dicom_rdsr(folder, pixelmed_jar_command, sr_filename):
@@ -459,10 +460,11 @@ def _make_dicom_rdsr(folder, pixelmed_jar_command, sr_filename):
         sr_filename (str): A string containing the filename to use when creating the rdsr.
 
     """
-    import subprocess
+    # Security implications of using subprocess have been considered - it is necessary for this function to work.
+    import subprocess  # nosec
 
     command = pixelmed_jar_command + ' ' + folder + ' ' + os.path.join(folder, sr_filename)
-    subprocess.call(command.split())
+    subprocess.call(command.split())  # nose
 
 
 def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_info, new_rdsr_file):
