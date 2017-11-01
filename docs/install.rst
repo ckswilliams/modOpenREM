@@ -100,7 +100,7 @@ Linux example::
     MEDIA_ROOT = "/var/openrem/media/"
 
 Windows example::
-    
+
     MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
 
 
@@ -182,7 +182,7 @@ Time zone
 ^^^^^^^^^
 
 Configure the local timezone in order to get correct times in the logfiles.
-The default timezone is set at 'Europe/London'. Valid options can be found here: 
+The default timezone is set at 'Europe/London'. Valid options can be found here:
 http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 
 .. sourcecode:: python
@@ -192,12 +192,44 @@ http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 Language
 ^^^^^^^^
 
-Configure the local language. Default language is set at us-english. Valid options can be found here: 
+Configure the local language. Default language is set at us-english. Valid options can be found here:
 http://www.i18nguy.com/unicode/language-identifiers.html
 
 .. sourcecode:: python
 
     LANGUAGE_CODE = 'en-us'
+
+.. _toshiba_configuration:
+
+Toshiba CT RDSR creation
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you need to import data from older Toshiba CT scanners into OpenREM then the following tools need to be available
+on the same server as OpenREM:
+
+    * The `Offis DICOM toolkit`_
+    * `Java`_
+    * pixelmed.jar from the `PixelMed Java DICOM Toolkit`_
+
+The paths to these must be set in ``local_settings.py`` for your system:
+
+.. sourcecode:: python
+
+    # Locations of various tools for DICOM RDSR creation from CT images
+    DCMTK_PATH = 'C:/Apps/dcmtk-3.6.0-win32-i386/bin'
+    DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
+    DCMMKDIR = os.path.join(DCMTK_PATH, 'dcmmkdir.exe')
+    JAVA_EXE = 'C:/Apps/doseUtility/windows/jre/bin/java.exe'
+    JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
+    PIXELMED_JAR = 'C:/Apps/doseUtility/pixelmed.jar'
+    PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
+
+The example above is for Windows. On linux,
+if you have installed the Offis DICOM toolkit with ``sudo apt install dcmtk`` or similar, you can find the path for the
+configuration above using the command ``which dcmconv``. This will be something like ``/usr/bin/dcmconv``, so the
+``DCMTK_PATH`` would be ``'/usr/bin`` and the ``DCMCONV`` would be ``os.path.join(DCMTK_PATH, 'dcmconv')``. Similarly
+for ``DCMMKDIR`` and ``JAVA_EXE``, which might be ``/usr/bin/java``. The pixelmed.jar file should be downloaded from
+the link above, and you will need to provide the path to where you have saved it.
 
 .. _database_creation:
 
@@ -307,3 +339,6 @@ node (Store Service Class Provider/SCP) and possibly a query-retrieve service cl
 To find out more about this, refer to the :doc:`netdicom` docs.
 
 
+.. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
+.. _`Java`: http://java.com/en/download/
+.. _`PixelMed Java DICOM Toolkit`: http://www.pixelmed.com/dicomtoolkit.html
