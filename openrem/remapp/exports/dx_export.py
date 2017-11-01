@@ -98,11 +98,9 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
-    from django.db.models import Q # For the Q "OR" query used for DX and CR
-    from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+    from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
 
@@ -379,16 +377,14 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     
     """
 
-    import os, sys, datetime
+    import sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
     from remapp.tools.get_values import return_for_export, string_to_float
-    from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
     import uuid
 
