@@ -431,25 +431,6 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     book = text_and_date_formats(book, wsalldata, pid=pid, name=name, patid=patid)
 
-    # # Create format for cells that should be text (independently from the possibility to read it as a number)
-    # textformat = book.add_format({'num_format': '@'})
-    # dateformat = book.add_format({'num_format': settings.XLSX_DATE})
-    # timeformat = book.add_format({'num_format': settings.XLSX_TIME})
-    #
-    date_column = 7
-    if pid and patid:
-        date_column += 1
-        patid_column = 0
-    if pid and name:
-        date_column += 1
-        patid_column += 1
-    # wsalldata.set_column(date_column, date_column, 10, dateformat)  # allow date to be displayed.
-    # wsalldata.set_column(date_column + 1, date_column + 1, None, timeformat)  # allow time to be displayed.
-    # if pid and (name or patid):
-    #     wsalldata.set_column(date_column + 2, date_column + 2, 10, dateformat)  # Birth date column
-    # if pid and patid:
-    #     wsalldata.set_column(patid_column, patid_column, None, textformat)  # make sure leading zeros are not dropped
-    # wsalldata.set_column(date_column - 2, date_column - 2, None, textformat)
 
     # Some prep
     commonheaders = common_headers(pid=pid, name=name, patid=patid)
@@ -477,7 +458,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         u'Table Height',
         u'Comment'
         ]
-        
+
     # Generate list of protocols in queryset and create worksheets for each
     tsk.progress = u'Generating list of protocols in the dataset...'
     tsk.save()
@@ -520,14 +501,17 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # All data sheet
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames'))
+    max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
+                                 'total_number_of_radiographic_frames'))
 
-    alldataheaders = commonheaders
+    alldataheaders = list(commonheaders)
 
     tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
 
-    for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
+
+    for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
+                               'total_number_of_radiographic_frames__max']):
         alldataheaders += [
             u'E' + str(h+1) + u' Protocol',
             u'E' + str(h+1) + u' Anatomy',
@@ -550,12 +534,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             u'E' + str(h+1) + u' Comment',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    # wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
-    # if pid and (name or patid):
-    #     wsalldata.set_column(date_column+1, date_column+1, 10) # allow date to be displayed.
-    numcolumns = (19 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + date_column + 11
-    if not pid or pid and not (name or patid):
-        numcolumns -= 1
+    numcolumns = (19 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
+                                  'total_number_of_radiographic_frames__max']) + len(commonheaders) - 1
     numrows = e.count()
     wsalldata.autofilter(0, 0, numrows, numcolumns)
 
