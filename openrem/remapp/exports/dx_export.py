@@ -382,6 +382,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
+    from remapp.exports.export_common import text_and_date_formats, common_headers
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
     from remapp.tools.get_values import return_for_export, string_to_float
@@ -408,7 +409,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     try:
         tmpxlsx = TemporaryFile()
-        book = Workbook(tmpxlsx, {'default_date_format': settings.XLSX_DATE, 'strings_to_numbers': False})
+        book = Workbook(tmpxlsx, {'strings_to_numbers': False})
         tsk.progress = u'Workbook created'
         tsk.save()
     except:
@@ -427,44 +428,32 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
     wsalldata = book.add_worksheet('All data')
+
+    book = text_and_date_formats(book, wsalldata, pid=pid, name=name, patid=patid)
+
+    # # Create format for cells that should be text (independently from the possibility to read it as a number)
+    # textformat = book.add_format({'num_format': '@'})
+    # dateformat = book.add_format({'num_format': settings.XLSX_DATE})
+    # timeformat = book.add_format({'num_format': settings.XLSX_TIME})
+    #
     date_column = 7
-    if pid and name:
-        date_column += 1
     if pid and patid:
         date_column += 1
-    wsalldata.set_column(date_column, date_column, 10)  # allow date to be displayed.
-    if pid and (name or patid):
-        wsalldata.set_column(date_column+1, date_column+1, 10) # Date column
+        patid_column = 0
+    if pid and name:
+        date_column += 1
+        patid_column += 1
+    # wsalldata.set_column(date_column, date_column, 10, dateformat)  # allow date to be displayed.
+    # wsalldata.set_column(date_column + 1, date_column + 1, None, timeformat)  # allow time to be displayed.
+    # if pid and (name or patid):
+    #     wsalldata.set_column(date_column + 2, date_column + 2, 10, dateformat)  # Birth date column
+    # if pid and patid:
+    #     wsalldata.set_column(patid_column, patid_column, None, textformat)  # make sure leading zeros are not dropped
+    # wsalldata.set_column(date_column - 2, date_column - 2, None, textformat)
 
     # Some prep
-    pidheadings = []
-    if pid and name:
-        pidheadings += [u'Patient name']
-    if pid and patid:
-        pidheadings += [u'Patient ID']
-    commonheaders = pidheadings + [
-        u'Institution',
-        u'Manufacturer',
-        u'Model name',
-        u'Station name',
-        u'Display name',
-        u'Accession number',
-        u'Operator',
-        u'Study date',
-    ]
-    if pid and (name or patid):
-        commonheaders += [
-            u'Date of birth',
-        ]
+    commonheaders = common_headers(pid=pid, name=name, patid=patid)
     commonheaders += [
-        u'Patient age',
-        u'Patient sex',
-        u'Patient height',
-        u'Patient mass (kg)',
-        u'Test patient?',
-        u'Study description',
-        u'Requested procedure',
-        u'Number of events',
         u'DAP total (cGy.cm^2)',
         ]
     protocolheaders = commonheaders + [
@@ -510,18 +499,17 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     for protocol in protocolslist:
         tabtext = protocol.lower().replace(u" ", u"_")
-        translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
+        translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
+                             ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
         tabtext = tabtext.translate(translation_table) # remove illegal characters
         tabtext = tabtext[:31]
         if tabtext not in sheetlist:
             sheetlist[tabtext] = {
                 'sheet': book.add_worksheet(tabtext),
-                'count':0,
-                'protocolname':[protocol]}
-            sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
-            sheetlist[tabtext]['sheet'].set_column(date_column, date_column, 10) # Date column
-            if pid and (name or patid):
-                sheetlist[tabtext]['sheet'].set_column(date_column+1, date_column+1, 10) # Date column
+                'count': 0,
+                'protocolname': [protocol]}
+            sheetlist[tabtext]['sheet'].write_row(0, 0, protocolheaders)
+            book = text_and_date_formats(book, sheetlist[tabtext]['sheet'], pid=pid, name=name, patid=patid)
         else:
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
@@ -562,12 +550,14 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             u'E' + str(h+1) + u' Comment',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
-    if pid and (name or patid):
-        wsalldata.set_column(date_column+1, date_column+1, 10) # allow date to be displayed.
-    numcolumns = (29 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + date_column + 8
+    # wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
+    # if pid and (name or patid):
+    #     wsalldata.set_column(date_column+1, date_column+1, 10) # allow date to be displayed.
+    numcolumns = (19 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + date_column + 11
+    if not pid or pid and not (name or patid):
+        numcolumns -= 1
     numrows = e.count()
-    wsalldata.autofilter(0,0,numrows,numcolumns)
+    wsalldata.autofilter(0, 0, numrows, numcolumns)
 
     for row, exams in enumerate(e):
 
@@ -647,6 +637,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
+            exams.study_time,
         ]
         if pid and (name or patid):
             examdata += [
@@ -851,7 +842,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 display_name,
                 exams.accession_number,
                 exams.operator_name,
-                exams.study_date,  # Is a date - cell needs formatting
+                exams.study_date,
+                exams.study_time,
             ]
             if pid and (name or patid):
                 examdata += [
