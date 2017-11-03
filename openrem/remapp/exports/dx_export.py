@@ -33,7 +33,6 @@ from __future__ import division
 import csv
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
-from django.conf import settings
 
 
 def _get_xray_filterinfo(source):
@@ -93,9 +92,9 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     
     """
 
-    import os, sys, datetime
+    import datetime
+    import sys
     from tempfile import TemporaryFile
-    from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
     from remapp.models import Exports
@@ -377,9 +376,9 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     
     """
 
-    import sys, datetime
+    import datetime
+    import sys
     from tempfile import TemporaryFile
-    from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
     from remapp.exports.export_common import text_and_date_formats, common_headers
