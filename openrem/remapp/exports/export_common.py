@@ -33,8 +33,8 @@ def text_and_date_formats(book, sheet, pid=False, name=None, patid=None):
     """
     Function to write out the headings common to each sheet and modality and format the date, time, patient ID and
     accession number columns.
-    :param book: xlsx book to work on
-    :param sheet: xlsx sheet to work on
+    :param book: xlsxwriter book to work on
+    :param sheet: xlsxwriter sheet to work on
     :param pid: does the user have patient identifiable data permission
     :param name: has patient name been selected for export
     :param patid: has patient ID been selected for export
@@ -64,6 +64,7 @@ def text_and_date_formats(book, sheet, pid=False, name=None, patid=None):
 
     return book
 
+
 def common_headers(pid=False, name=None, patid=None):
     """
     Function to generate list of header text common to several exports
@@ -72,12 +73,12 @@ def common_headers(pid=False, name=None, patid=None):
     :param patid: has patient ID been selected for export
     :return: list of strings
     """
-    pidheadings = []
+    pid_headings = []
     if pid and name:
-        pidheadings += [u'Patient name']
+        pid_headings += [u'Patient name']
     if pid and patid:
-        pidheadings += [u'Patient ID']
-    commonheaders = pidheadings + [
+        pid_headings += [u'Patient ID']
+    headers = pid_headings + [
         u'Institution',
         u'Manufacturer',
         u'Model name',
@@ -89,10 +90,10 @@ def common_headers(pid=False, name=None, patid=None):
         u'Study Time',
     ]
     if pid and (name or patid):
-        commonheaders += [
+        headers += [
             u'Date of birth',
         ]
-    commonheaders += [
+    headers += [
         u'Age',
         u'Sex',
         u'Height',
@@ -103,4 +104,47 @@ def common_headers(pid=False, name=None, patid=None):
         u'No. events',
     ]
 
-    return commonheaders
+    return headers
+
+
+def generate_sheets(studies, book, protocol_headers, pid=False, name=None, patid=None):
+    """
+    Function to generate the sheets in the xlsx book based on the protocol names
+    :param studies: filtered queryset of exams
+    :param book: xlsxwriter book to work on
+    :param protocol_headers: list of headers to insert on each sheet
+    :param pid: does the user have patient identifiable data permission
+    :param name: has patient name been selected for export
+    :param patid: has patient ID been selected for export
+    :return: book
+    """
+    sheet_list = {}
+    protocols_list = []
+    for exams in studies:
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
+            if s.acquisition_protocol:
+                safe_protocol = s.acquisition_protocol
+            else:
+                safe_protocol = u'Unknown'
+            if safe_protocol not in protocols_list:
+                protocols_list.append(safe_protocol)
+    protocols_list.sort()
+
+    for protocol in protocols_list:
+        tab_text = protocol.lower().replace(u" ", u"_")
+        translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
+                             ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
+        tab_text = tab_text.translate(translation_table)  # remove illegal characters
+        tab_text = tab_text[:31]
+        if tab_text not in sheet_list:
+            sheet_list[tab_text] = {
+                'sheet': book.add_worksheet(tab_text),
+                'count': 0,
+                'protocolname': [protocol]}
+            sheet_list[tab_text]['sheet'].write_row(0, 0, protocol_headers)
+            book = text_and_date_formats(book, sheet_list[tab_text]['sheet'], pid=pid, name=name, patid=patid)
+        else:
+            if protocol not in sheet_list[tab_text]['protocolname']:
+                sheet_list[tab_text]['protocolname'].append(protocol)
+
+    return book, sheet_list

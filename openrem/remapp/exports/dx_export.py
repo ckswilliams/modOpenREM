@@ -31,8 +31,11 @@
 from __future__ import division
 
 import csv
+import logging
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
+
+logger = logging.getLogger(__name__)
 
 
 def _get_xray_filterinfo(source):
@@ -381,7 +384,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from tempfile import TemporaryFile
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.exports.export_common import text_and_date_formats, common_headers
+    from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
     from remapp.tools.get_values import return_for_export, string_to_float
@@ -412,13 +415,11 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = u'Workbook created'
         tsk.save()
     except:
-        # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
+            sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
     e = dx_acq_filter(filterdict, pid=pid).qs
-
-    # Remove duplicate entries from the results - hopefully no longer necessary, left here in case. Needs testing
-    # e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
 
     tsk.progress = u'Required study filter complete.'
     tsk.num_records = e.count()
@@ -429,7 +430,6 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     wsalldata = book.add_worksheet('All data')
 
     book = text_and_date_formats(book, wsalldata, pid=pid, name=name, patid=patid)
-
 
     # Some prep
     commonheaders = common_headers(pid=pid, name=name, patid=patid)
@@ -462,39 +462,10 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Generating list of protocols in the dataset...'
     tsk.save()
 
-    sheetlist = {}
-    protocolslist = []
-    for exams in e:
-        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
-            if s.acquisition_protocol:
-                safeprotocol = s.acquisition_protocol
-            else:
-                safeprotocol = u'Unknown'
-            if safeprotocol not in protocolslist:
-                protocolslist.append(safeprotocol)
-    protocolslist.sort()
-
     tsk.progress = u'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
-    for protocol in protocolslist:
-        tabtext = protocol.lower().replace(u" ", u"_")
-        translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
-                             ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
-        tabtext = tabtext.translate(translation_table) # remove illegal characters
-        tabtext = tabtext[:31]
-        if tabtext not in sheetlist:
-            sheetlist[tabtext] = {
-                'sheet': book.add_worksheet(tabtext),
-                'count': 0,
-                'protocolname': [protocol]}
-            sheetlist[tabtext]['sheet'].write_row(0, 0, protocolheaders)
-            book = text_and_date_formats(book, sheetlist[tabtext]['sheet'], pid=pid, name=name, patid=patid)
-        else:
-            if protocol not in sheetlist[tabtext]['protocolname']:
-                sheetlist[tabtext]['protocolname'].append(protocol)
-
-
+    book, sheet_list = generate_sheets(e, book, protocolheaders, pid=pid, name=name, patid=patid)
 
     ##################
     # All data sheet
@@ -730,7 +701,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                                  ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
             tabtext = tabtext.translate(translation_table)  # remove illegal characters
             tabtext = tabtext[:31]
-            sheetlist[tabtext]['count'] += 1
+            sheet_list[tabtext]['count'] += 1
 
             if pid and (name or patid):
                 try:
@@ -933,7 +904,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 s.comment,
             ]
 
-            sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'], 0, examdata)
+            sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, examdata)
 
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
     
@@ -986,7 +957,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Generate list of Series Protocols
     summarysheet.write(5,6, u"Series Protocol")
     summarysheet.write(5,7, u"Frequency")
-    sortedprotocols = sorted(sheetlist.iteritems(), key=lambda (k,v): v['count'], reverse=True)
+    sortedprotocols = sorted(sheet_list.iteritems(), key=lambda (k,v): v['count'], reverse=True)
     for row, item in enumerate(sortedprotocols):
         summarysheet.write(row+6,6,u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
         summarysheet.write(row+6,7,item[1]['count'])
