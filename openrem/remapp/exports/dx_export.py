@@ -560,8 +560,11 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             not_patient_indicator = None
 
         try:
-            total_number_of_radiographic_frames = int(exams.projectionxrayradiationdose_set.get(
-                ).accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames)
+            try:
+                total_number_of_radiographic_frames = int(exams.projectionxrayradiationdose_set.get(
+                    ).accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames)
+            except TypeError:
+                total_number_of_radiographic_frames = None
             if exams.projectionxrayradiationdose_set.get(
                 ).accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_area_product_total is not None:
                 cgycm2 = string_to_float(exams.projectionxrayradiationdose_set.get(
@@ -765,9 +768,12 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 total_number_of_radiographic_frames = None
                 cgycm2 = None
             else:
-                total_number_of_radiographic_frames = int(return_for_export(
-                    exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                    ).accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames'))
+                try:
+                    total_number_of_radiographic_frames = int(return_for_export(
+                        exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                        ).accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames'))
+                except TypeError:
+                    total_number_of_radiographic_frames = None
                 dap_total = return_for_export(
                     exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
                     ).accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
