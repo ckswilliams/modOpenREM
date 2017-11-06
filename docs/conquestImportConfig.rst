@@ -216,7 +216,7 @@ RDSR creation importer on images from older Toshiba CT scanners:
     end
 
 
-The above script depends on ``openrem_string_split`` are:
+The above script depends on ``openrem_string_split``:
 
 .. sourcecode:: lua
 
