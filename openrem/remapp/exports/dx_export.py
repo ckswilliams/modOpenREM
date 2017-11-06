@@ -34,8 +34,95 @@ import csv
 import logging
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
+from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger(__name__)
+
+
+def _dx_get_series_data(s):
+    """Return the series level data
+
+    :param s: series
+    :return: series data
+    """
+    try:
+        exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
+        average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
+        exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
+        try:
+            kvp = s.irradeventxraysourcedata_set.get().kvp_set.get().kvp
+        except ObjectDoesNotExist:
+            kvp = None
+        try:
+            uas = s.irradeventxraysourcedata_set.get().exposure_set.get().exposure
+            if uas:
+                mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+            else:
+                mas = None
+        except ObjectDoesNotExist:
+            mas = None
+        filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
+    except ObjectDoesNotExist:
+        exposure_control_mode = None
+        average_xray_tube_current = None
+        exposure_time = None
+        kvp = None
+        mas = None
+        filters = None
+        filter_thicknesses = None
+
+    try:
+        exposure_index = s.irradeventxraydetectordata_set.get().exposure_index
+        relative_xray_exposure = s.irradeventxraydetectordata_set.get().relative_xray_exposure
+    except ObjectDoesNotExist:
+        exposure_index = None
+        relative_xray_exposure = None
+
+    cgycm2 = s.convert_gym2_to_cgycm2()
+    entrance_exposure_at_rp = s.entrance_exposure_at_rp
+
+    try:
+        distance_source_to_detector = s.irradeventxraymechanicaldata_set.get(
+            ).doserelateddistancemeasurements_set.get().distance_source_to_detector
+        distance_source_to_entrance_surface = s.irradeventxraymechanicaldata_set.get(
+            ).doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface
+        distance_source_to_isocenter = s.irradeventxraymechanicaldata_set.get(
+            ).doserelateddistancemeasurements_set.get().distance_source_to_isocenter
+        table_height_position = s.irradeventxraymechanicaldata_set.get(
+            ).doserelateddistancemeasurements_set.get().table_height_position
+    except ObjectDoesNotExist:
+        distance_source_to_detector = None
+        distance_source_to_entrance_surface = None
+        distance_source_to_isocenter = None
+        table_height_position = None
+
+    series_data = [
+        s.acquisition_protocol,
+        str(s.anatomical_structure),
+    ]
+    try:
+        series_data += [s.image_view.code_meaning,]
+    except AttributeError:
+        series_data += [None, ]
+    series_data += [
+        exposure_control_mode,
+        kvp,
+        mas,
+        average_xray_tube_current,
+        exposure_time,
+        filters,
+        filter_thicknesses,
+        exposure_index,
+        relative_xray_exposure,
+        cgycm2,
+        entrance_exposure_at_rp,
+        distance_source_to_detector,
+        distance_source_to_entrance_surface,
+        distance_source_to_isocenter,
+        table_height_position,
+        s.comment,
+    ]
+    return series_data
 
 
 def _get_xray_filterinfo(source):
@@ -105,7 +192,6 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from django.shortcuts import redirect
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
-    from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
 
@@ -520,199 +606,212 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             row + 1, numrows)
         tsk.save()
 
-        examdata = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
+        common_exam_data = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
+        all_exam_data = list(common_exam_data)
 
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
-
-            try:
-                exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
-                average_xray_tube_current = string_to_float(
-                    s.irradeventxraysourcedata_set.get().average_xray_tube_current)
-                exposure_time = string_to_float(s.irradeventxraysourcedata_set.get().exposure_time)
-                try:
-                    kvp = string_to_float(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
-                except ObjectDoesNotExist:
-                    kvp = None
-
-                try:
-                    if s.irradeventxraysourcedata_set.get().exposure_set.get().exposure is not None:
-                        mas = string_to_float(
-                            s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
-                    else:
-                        mas = None
-                except ObjectDoesNotExist:
-                    mas = None
-                filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
-            except ObjectDoesNotExist:
-                exposure_control_mode = None
-                kvp = None
-                average_xray_tube_current = None
-                exposure_time = None
-                mas = None
-                filters = None
-                filter_thicknesses = None
-
-            try:
-                exposure_index = string_to_float(s.irradeventxraydetectordata_set.get().exposure_index)
-                relative_xray_exposure = string_to_float(s.irradeventxraydetectordata_set.get().relative_xray_exposure)
-            except ObjectDoesNotExist:
-                exposure_index = None
-                relative_xray_exposure = None
-
-            cgycm2 = string_to_float(s.convert_gym2_to_cgycm2())
-
-            entrance_exposure_at_rp = string_to_float(s.entrance_exposure_at_rp)
-
-            try:
-                s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
-            except:
-                distance_source_to_detector = None
-                distance_source_to_entrance_surface = None
-                distance_source_to_isocenter = None
-                table_height_position = None
-            else:
-                distance_source_to_detector = string_to_float(return_for_export(
-                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
-                    'distance_source_to_detector'))
-                distance_source_to_entrance_surface = string_to_float(return_for_export(
-                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
-                    'distance_source_to_entrance_surface'))
-                distance_source_to_isocenter = string_to_float(return_for_export(
-                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
-                    'distance_source_to_isocenter'))
-                table_height_position = string_to_float(return_for_export(
-                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
-                    'table_height_position'))
-
-            examdata += [
-                s.acquisition_protocol,
-                str(s.anatomical_structure),
-                str(s.image_view),
-                exposure_control_mode,
-                kvp,
-                mas,
-                average_xray_tube_current,
-                exposure_time,
-                filters,
-                filter_thicknesses,
-                exposure_index,
-                relative_xray_exposure,
-                cgycm2,
-                entrance_exposure_at_rp,
-                distance_source_to_detector,
-                distance_source_to_entrance_surface,
-                distance_source_to_isocenter,
-                table_height_position,
-                s.comment,
-            ]
-
-        wsalldata.write_row(row+1, 0, examdata)
-        
-        # Now we need to write a sheet per series protocol for each 'exams'.
-        
-        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
+            # Get series data
+            series_data = _dx_get_series_data(s)
+            # Add series to all data
+            all_exam_data += series_data
+            # Add series data to series tab
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
             tabtext = sheet_name(protocol)
             sheet_list[tabtext]['count'] += 1
+            sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
 
-            examdata = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
+        wsalldata.write_row(row + 1, 0, all_exam_data)
 
-            try:
-                s.irradeventxraysourcedata_set.get()
-            except ObjectDoesNotExist:
-                exposure_control_mode = None
-                kvp = None
-                average_xray_tube_current = None
-                exposure_time = None
-                mas = None
-                filters = None
-                filter_thicknesses = None
-            else:
-                exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
-                average_xray_tube_current = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get(),
-                                                                              'average_xray_tube_current'))
-                exposure_time = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get(),
-                                                                  'exposure_time'))
-                try:
-                    s.irradeventxraysourcedata_set.get().kvp_set.get()
-                except ObjectDoesNotExist:
-                    kvp = None
-                else:
-                    kvp = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp'))
+        # try:
+        #         exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
+        #         average_xray_tube_current = string_to_float(
+        #             s.irradeventxraysourcedata_set.get().average_xray_tube_current)
+        #         exposure_time = string_to_float(s.irradeventxraysourcedata_set.get().exposure_time)
+        #         try:
+        #             kvp = string_to_float(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
+        #         except ObjectDoesNotExist:
+        #             kvp = None
+        #
+        #         try:
+        #             if s.irradeventxraysourcedata_set.get().exposure_set.get().exposure is not None:
+        #                 mas = string_to_float(
+        #                     s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
+        #             else:
+        #                 mas = None
+        #         except ObjectDoesNotExist:
+        #             mas = None
+        #         filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
+        #     except ObjectDoesNotExist:
+        #         exposure_control_mode = None
+        #         kvp = None
+        #         average_xray_tube_current = None
+        #         exposure_time = None
+        #         mas = None
+        #         filters = None
+        #         filter_thicknesses = None
+        #
+        #     try:
+        #         exposure_index = string_to_float(s.irradeventxraydetectordata_set.get().exposure_index)
+        #         relative_xray_exposure = string_to_float(s.irradeventxraydetectordata_set.get().relative_xray_exposure)
+        #     except ObjectDoesNotExist:
+        #         exposure_index = None
+        #         relative_xray_exposure = None
+        #
+        #     cgycm2 = string_to_float(s.convert_gym2_to_cgycm2())
+        #
+        #     entrance_exposure_at_rp = string_to_float(s.entrance_exposure_at_rp)
+        #
+        #     try:
+        #         s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
+        #     except:
+        #         distance_source_to_detector = None
+        #         distance_source_to_entrance_surface = None
+        #         distance_source_to_isocenter = None
+        #         table_height_position = None
+        #     else:
+        #         distance_source_to_detector = string_to_float(return_for_export(
+        #             s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+        #             'distance_source_to_detector'))
+        #         distance_source_to_entrance_surface = string_to_float(return_for_export(
+        #             s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+        #             'distance_source_to_entrance_surface'))
+        #         distance_source_to_isocenter = string_to_float(return_for_export(
+        #             s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+        #             'distance_source_to_isocenter'))
+        #         table_height_position = string_to_float(return_for_export(
+        #             s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+        #             'table_height_position'))
+        #
+        #     examdata += [
+        #         s.acquisition_protocol,
+        #         str(s.anatomical_structure),
+        #         str(s.image_view),
+        #         exposure_control_mode,
+        #         kvp,
+        #         mas,
+        #         average_xray_tube_current,
+        #         exposure_time,
+        #         filters,
+        #         filter_thicknesses,
+        #         exposure_index,
+        #         relative_xray_exposure,
+        #         cgycm2,
+        #         entrance_exposure_at_rp,
+        #         distance_source_to_detector,
+        #         distance_source_to_entrance_surface,
+        #         distance_source_to_isocenter,
+        #         table_height_position,
+        #         s.comment,
+        #     ]
 
-                try:
-                    s.irradeventxraysourcedata_set.get().exposure_set.get()
-                except ObjectDoesNotExist:
-                    mas = None
-                else:
-                    uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
-                    if uas:
-                        mas = string_to_float(
-                            s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
-                    else:
-                        mas = None
-                filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
-            try:
-                s.irradeventxraydetectordata_set.get()
-            except ObjectDoesNotExist:
-                exposure_index = None
-                relative_xray_exposure = None
-            else:
-                exposure_index = string_to_float(return_for_export(s.irradeventxraydetectordata_set.get(),
-                                                                   'exposure_index'))
-                relative_xray_exposure = string_to_float(return_for_export(s.irradeventxraydetectordata_set.get(),
-                                                                           'relative_xray_exposure'))
 
-            cgycm2 = string_to_float(s.convert_gym2_to_cgycm2())
-
-            entrance_exposure_at_rp = string_to_float(return_for_export(s, 'entrance_exposure_at_rp'))
-
-            try:
-                s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
-            except:
-                distance_source_to_detector = None
-                distance_source_to_entrance_surface = None
-                distance_source_to_isocenter = None
-                table_height_position = None
-            else:
-                distance_source_to_detector = string_to_float(return_for_export(
-                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
-                    'distance_source_to_detector'))
-                distance_source_to_entrance_surface = string_to_float(return_for_export(
-                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
-                    'distance_source_to_entrance_surface'))
-                distance_source_to_isocenter = string_to_float(return_for_export(
-                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
-                    'distance_source_to_isocenter'))
-                table_height_position = string_to_float(return_for_export(
-                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
-                    'table_height_position'))
-
-            examdata += [
-                s.acquisition_protocol,
-                str(s.anatomical_structure),
-                str(s.image_view),
-                exposure_control_mode,
-                kvp,
-                mas,
-                average_xray_tube_current,
-                exposure_time,
-                filters,
-                filter_thicknesses,
-                exposure_index,
-                relative_xray_exposure,
-                cgycm2,
-                entrance_exposure_at_rp,
-                distance_source_to_detector,
-                distance_source_to_entrance_surface,
-                distance_source_to_isocenter,
-                table_height_position,
-                s.comment,
-            ]
-
-            sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, examdata)
+        # Now we need to write a sheet per series protocol for each 'exams'.
+        
+        # for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
+        #     protocol = s.acquisition_protocol
+        #     if not protocol:
+        #         protocol = u'Unknown'
+        #     tabtext = sheet_name(protocol)
+        #     sheet_list[tabtext]['count'] += 1
+        #
+        #     examdata = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
+        #
+        #     try:
+        #         s.irradeventxraysourcedata_set.get()
+        #     except ObjectDoesNotExist:
+        #         exposure_control_mode = None
+        #         kvp = None
+        #         average_xray_tube_current = None
+        #         exposure_time = None
+        #         mas = None
+        #         filters = None
+        #         filter_thicknesses = None
+        #     else:
+        #         exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
+        #         average_xray_tube_current = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get(),
+        #                                                                       'average_xray_tube_current'))
+        #         exposure_time = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get(),
+        #                                                           'exposure_time'))
+        #         try:
+        #             s.irradeventxraysourcedata_set.get().kvp_set.get()
+        #         except ObjectDoesNotExist:
+        #             kvp = None
+        #         else:
+        #             kvp = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp'))
+        #
+        #         try:
+        #             s.irradeventxraysourcedata_set.get().exposure_set.get()
+        #         except ObjectDoesNotExist:
+        #             mas = None
+        #         else:
+        #             uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
+        #             if uas:
+        #                 mas = string_to_float(
+        #                     s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
+        #             else:
+        #                 mas = None
+        #         filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
+        #     try:
+        #         s.irradeventxraydetectordata_set.get()
+        #     except ObjectDoesNotExist:
+        #         exposure_index = None
+        #         relative_xray_exposure = None
+        #     else:
+        #         exposure_index = string_to_float(return_for_export(s.irradeventxraydetectordata_set.get(),
+        #                                                            'exposure_index'))
+        #         relative_xray_exposure = string_to_float(return_for_export(s.irradeventxraydetectordata_set.get(),
+        #                                                                    'relative_xray_exposure'))
+        #
+        #     cgycm2 = string_to_float(s.convert_gym2_to_cgycm2())
+        #
+        #     entrance_exposure_at_rp = string_to_float(return_for_export(s, 'entrance_exposure_at_rp'))
+        #
+        #     try:
+        #         s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
+        #     except:
+        #         distance_source_to_detector = None
+        #         distance_source_to_entrance_surface = None
+        #         distance_source_to_isocenter = None
+        #         table_height_position = None
+        #     else:
+        #         distance_source_to_detector = string_to_float(return_for_export(
+        #             s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+        #             'distance_source_to_detector'))
+        #         distance_source_to_entrance_surface = string_to_float(return_for_export(
+        #             s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+        #             'distance_source_to_entrance_surface'))
+        #         distance_source_to_isocenter = string_to_float(return_for_export(
+        #             s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+        #             'distance_source_to_isocenter'))
+        #         table_height_position = string_to_float(return_for_export(
+        #             s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+        #             'table_height_position'))
+        #
+        #     examdata += [
+        #         s.acquisition_protocol,
+        #         str(s.anatomical_structure),
+        #         str(s.image_view),
+        #         exposure_control_mode,
+        #         kvp,
+        #         mas,
+        #         average_xray_tube_current,
+        #         exposure_time,
+        #         filters,
+        #         filter_thicknesses,
+        #         exposure_index,
+        #         relative_xray_exposure,
+        #         cgycm2,
+        #         entrance_exposure_at_rp,
+        #         distance_source_to_detector,
+        #         distance_source_to_entrance_surface,
+        #         distance_source_to_isocenter,
+        #         table_height_position,
+        #         s.comment,
+        #     ]
+        #
+        #     sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, examdata)
 
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
     
