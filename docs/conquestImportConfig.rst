@@ -8,9 +8,8 @@ The Conquest DICOM server can be configured to automatically run tasks when it r
 For example, a script can be run when a DX image is received that will extract dose information into OpenREM; Conquest
 will then delete the original image.
 
-These actions are set up in the ``dicom.ini`` file, located in the root of the Conquest installation folder.
-
-For example::
+These actions are set up in the ``dicom.ini`` file, located in the root of the Conquest installation folder. For
+example::
 
     ImportModality1   = MG
     ImportConverter1  = save to C:\conquest\dosedata\mammo\%o.dcm; system C:\conquest\openrem-mam-launch.bat C:\conquest\dosedata\mammo\%o.dcm; destroy
@@ -24,7 +23,7 @@ The ``ImportConverter`` instructions are separated by semicolons; the above exam
 + ``system C:\conquest\openrem-mam-launch.bat C:\conquest\dosedata\mammo\%o.dcm`` runs a DOS batch file, using the newly saved file as the argument. On my system this batch file runs the OpenREM ``openrem_mg.py`` import script
 + ``destroy`` tells Conquest to delete the image that it has just received.
 
-My system has three further import sections for DX, CR, and structured dose report DICOM objects::
+My system had three further import sections for DX, CR, and structured dose report DICOM objects::
 
     # Import of DX images
     ImportModality2   = DX
@@ -37,45 +36,49 @@ My system has three further import sections for DX, CR, and structured dose repo
     # Import of structured dose reports (this checks the DICOM tag 0008,0016 to see if it matches the value for a dose report)
     ImportConverter4  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.67"; {save to C:\conquest\dosedata\sr\%o.dcm; system C:\conquest\openrem-sr-launch.bat "C:\conquest\dosedata\sr\%o.dcm"; destroy}
 
+However, I have since move to calling lua scripts from Conquest, as described in the next section.
+
 Advanced Conquest DICOM object handling using lua scripts
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Conquest can be configured to use lua scripts to handle incoming DICOM objects. This enables more flexibility than the
 examples provided in the section above. For example, you may wish to keep all incoming images that contain the word
 ``physics`` in the patient name or id fields. You may also wish to direct images from different makes and models of
-scanner to different OpenREM import scripts. I use this technique to forward studies from some Toshiba Aquilion CX and
-CXL scanners to an importer that creates a DICOM RDSR object from the Toshiba dose summary images and information stored
-in the image tags. These particular scanners are not capable of producing their own RDSR objects directly.
+CT scanner to different OpenREM import scripts. I use this technique to forward studies from some Toshiba Aquilion CX
+and CXL scanners to an importer that creates a DICOM RDSR object from the Toshiba dose summary images and information
+stored in the image tags. These particular scanners are not capable of producing their own RDSR objects directly. I use
+the same script to delete images from CT scanners that I cannot extract data from.
 
 A lua script designed to handle any objects with modality ``CT`` can be called from ``dicom.ini`` in the following way::
 
     ImportConverter6 = ifequal "%m", "CT"; { process patient after 0 by openrem_import_ct.lua %p::%V0008,0070::%V0008,1090::%V0018,1020::%V0008,1010::%V0010,0010::%V0010,0020::%V0008,0020::%V0018,1000; }
 
-The above line will run a script called ``openrem_import_ct.lua`` once the complete patient data has been received and a
-delay of 10 minutes has elapsed (the default). The following information is passed on to the script:
+The above line will run a script called ``openrem_import_ct.lua`` once the complete patient data has been received by
+Conquest and a delay of 10 minutes has elapsed (the default). The following information is passed on to the script:
 
-    * %p, the path to a folder of DICOM objects
+    * ``%p``, the path to a folder of DICOM objects
 
-    * %V0008,0070, manufacturer
+    * ``%V0008,0070``, manufacturer
 
-    * %V0008,1090, model
+    * ``%V0008,1090``, model
 
-    * %V0018,1020, software version
+    * ``%V0018,1020``, software version
 
-    * %V0008,1010, station name
+    * ``%V0008,1010``, station name
 
-    * %V0010,0010, patient name
+    * ``%V0010,0010``, patient name
 
-    * %V0010,0020, patient id
+    * ``%V0010,0020``, patient id
 
-    * %V0008,0020, study date
+    * ``%V0008,0020``, study date
 
-    * %V0018,1000, device serial number
+    * ``%V0018,1000`, device serial number
 
-An example ``openrem_import_ct.lua`` script is shown below. The script keeps any images that contain ``physics`` in the
-patient name or id fields; it looks for any Philips dose info objects and imports these with the appropriate routine; it
-deletes images from scanners that cannot be used; it runs the Toshiba RDSR creation importer on images from older
-Toshiba CT scanners:
+An example ``openrem_import_ct.lua`` script is shown below. It receives the parameters passed to it as single string.
+The individual parameters are recovered by splitting up the string using the ``::`` substring as a delimiter. The script
+keeps any images that contain ``physics`` in the patient name or id fields; it looks for any Philips dose info objects
+and imports these with the appropriate routine; it deletes images from scanners that cannot be used; it runs the Toshiba
+RDSR creation importer on images from older Toshiba CT scanners:
 
 .. sourcecode:: lua
 
@@ -213,7 +216,7 @@ Toshiba CT scanners:
     end
 
 
-The contents of ``openrem_string_split`` are:
+The above script depends on ``openrem_string_split`` are:
 
 .. sourcecode:: lua
 
@@ -250,8 +253,8 @@ patient names and IDs. To do this set the SQLServer to a blank in the Conquest `
 Setting the compression for Conquest incoming DICOM images and archives
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Setting these options to ``ul`` within ``dicom.ini`` makes Conquest store DICOM objects using little endian explicit
-encoding::
+Setting the following options to ``ul`` within ``dicom.ini`` will make Conquest store DICOM objects using little endian
+explicit encoding::
 
     # Configuration of compression for incoming images and archival
     DroppedFileCompression   = ul
