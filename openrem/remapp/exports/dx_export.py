@@ -471,17 +471,19 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # All data sheet
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
-                                 'total_number_of_radiographic_frames'))
+    max_events_dict = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
+                                      'total_number_of_radiographic_frames'))
+    max_events = max_events_dict['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
+                                 'total_number_of_radiographic_frames__max']
+    if not max_events:
+        max_events = 1
 
     alldataheaders = list(commonheaders)
 
     tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
 
-
-    for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
-                               'total_number_of_radiographic_frames__max']):
+    for h in range(max_events):
         alldataheaders += [
             u'E' + str(h+1) + u' Protocol',
             u'E' + str(h+1) + u' Anatomy',
@@ -504,8 +506,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             u'E' + str(h+1) + u' Comment',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (19 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
-                                  'total_number_of_radiographic_frames__max']) + len(commonheaders) - 1
+    numcolumns = (19 * max_events) + len(commonheaders) - 1
     numrows = e.count()
     wsalldata.autofilter(0, 0, numrows, numcolumns)
 
