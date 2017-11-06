@@ -390,7 +390,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from tempfile import TemporaryFile
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets
+    from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
     from remapp.tools.get_values import return_for_export, string_to_float
@@ -471,7 +471,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
-    book, sheet_list = generate_sheets(e, book, protocolheaders, pid=pid, name=name, patid=patid)
+    book, sheet_list = generate_sheets(e, book, protocolheaders, modality=u"DX", pid=pid, name=name, patid=patid)
 
     ##################
     # All data sheet
@@ -698,7 +698,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 s.comment,
             ]
 
-        wsalldata.write_row(row+1,0, examdata)
+        wsalldata.write_row(row+1, 0, examdata)
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
@@ -706,11 +706,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
-            tabtext = protocol.lower().replace(u" ", u"_")
-            translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'),
-                                 ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
-            tabtext = tabtext.translate(translation_table)  # remove illegal characters
-            tabtext = tabtext[:31]
+            tabtext = sheet_name(protocol)
             sheet_list[tabtext]['count'] += 1
 
             if pid and (name or patid):

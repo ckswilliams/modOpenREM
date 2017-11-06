@@ -29,10 +29,13 @@
 
 """
 
-
+import logging
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
 
 # LO: maybe this function can be moved to tools (as it can be reused in other exports)
 
@@ -230,7 +233,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import GeneralStudyModuleAttr
+    from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name
     from remapp.models import Exports
     from remapp.interface.mod_filters import ct_acq_filter
     import uuid
@@ -259,7 +262,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = u'Workbook created'
         tsk.save()
     except:
-        # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
+            sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
     # Get the data!
@@ -269,59 +273,15 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.num_records = e.count()
     tsk.save()
 
-    # Create format for cells that should be text (independently from the possibility to read it as a number)
-    textformat = book.add_format({'num_format': '@'})
-    dateformat = book.add_format({'num_format': settings.XLSX_DATE})
-    timeformat = book.add_format({'num_format': settings.XLSX_TIME})
-
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet(u"Summary")
     wsalldata = book.add_worksheet(u'All data')
-    date_column = 7
-    if pid and name:
-        date_column += 1
-    if pid and patid:
-        date_column += 1
-    wsalldata.set_column(date_column, date_column, 10, dateformat)  # allow date to be displayed.
-    wsalldata.set_column(date_column+1, date_column+1, None, timeformat) # allow time to be displayed.
-    if pid and (name or patid):
-        wsalldata.set_column(date_column+2, date_column+2, 10, dateformat) # Birth date column
-    if pid and (name and patid):
-        wsalldata.set_column(1, 1, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
-    elif pid and (patid):
-        wsalldata.set_column(0, 0, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
-    wsalldata.set_column(date_column-2, date_column-2, None, textformat) # Take care AccessionNumber is inserted as text (it can look like a number with significant leading zero('s))
+
+    book = text_and_date_formats(book, wsalldata, pid=pid, name=name, patid=patid)
 
     # Some prep
-    pidheadings = []
-    if pid and name:
-        pidheadings += [u'Patient name']
-    if pid and patid:
-        pidheadings += [u'Patient ID']
-    commonheaders = pidheadings + [
-        u'Institution',
-        u'Manufacturer',
-        u'Model',
-        u'Station name',
-        u'Display name',
-        u'Accession number',
-        u'Operator',
-        u'Study Date',
-        u'Study Time',
-    ]
-    if pid and (name or patid):
-        commonheaders += [
-            u'Date of birth',
-        ]
+    commonheaders = common_headers(pid=pid, name=name, patid=patid)
     commonheaders += [
-        u'Age',
-        u'Sex',
-        u'Height',
-        u'Mass (kg)',
-        u'Test patient?',
-        u'Study description',
-        u'Requested procedure',
-        u'No. events',
         u'DLP total (mGy.cm)',
         ]
     protocolheaders = commonheaders + [
@@ -354,55 +314,18 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Generating list of protocols in the dataset...'
     tsk.save()
 
-    sheetlist = {}
-    protocolslist = []
-    for exams in e:
-        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
-            if s.acquisition_protocol:
-                safeprotocol = s.acquisition_protocol
-            else:
-                safeprotocol = u'Unknown'
-            if safeprotocol not in protocolslist:
-                protocolslist.append(safeprotocol)
-    protocolslist.sort()
-
-    tsk.progress = u'Creating an Excel safe version of protocol names and creating a worksheet for each...'
-    tsk.save()
-
-    for protocol in protocolslist:
-        tabtext = protocol.lower().replace(u" ", u"_")
-        translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
-                             ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
-        tabtext = tabtext.translate(translation_table) # remove illegal characters
-        tabtext = tabtext[:31]
-        if tabtext not in sheetlist:
-            sheetlist[tabtext] = {
-                'sheet': book.add_worksheet(tabtext),
-                'count':0,
-                'protocolname':[protocol]}
-            sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
-            sheetlist[tabtext]['sheet'].set_column(date_column, date_column, 10, dateformat) # Date column
-            sheetlist[tabtext]['sheet'].set_column(date_column+1, date_column+1, None, timeformat) # Time column
-            if pid and (name or patid):
-                sheetlist[tabtext]['sheet'].set_column(date_column+2, date_column+2, 10, dateformat) # Birth date column
-            if pid and (name and patid):
-                sheetlist[tabtext]['sheet'].set_column(1, 1, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
-            elif pid and (patid):
-                sheetlist[tabtext]['sheet'].set_column(0, 0, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
-            sheetlist[tabtext]['sheet'].set_column(date_column-2, date_column-2, None, textformat) # Take care AccessionNumber is inserted as text (it can look like a number with significant leading zero('s))
-        else:
-            if protocol not in sheetlist[tabtext]['protocolname']:
-                sheetlist[tabtext]['protocolname'].append(protocol)
+    book, sheet_list = generate_sheets(e, book, protocolheaders, modality=u"CT", pid=pid, name=name, patid=patid)
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
+    max_events_dict = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
+    max_events = max_events_dict['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']
 
-    alldataheaders = commonheaders
+    alldataheaders = list(commonheaders)
 
     tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
 
-    for h in xrange(max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']):
+    for h in range(max_events):
         alldataheaders += [
             u'E' + str(h+1) + u' Protocol',
             u'E' + str(h+1) + u' Type',
@@ -429,13 +352,14 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             u'E' + str(h+1) + u' Comments',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']) + date_column + 11
+    numcolumns = len(alldataheaders) - 1
     numrows = e.count()
-    wsalldata.autofilter(0,0,numrows,numcolumns)
+    wsalldata.autofilter(0, 0, numrows, numcolumns)
 
-    for row,exams in enumerate(e):
+    for row, exams in enumerate(e):
 
-        tsk.progress = u'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
+        tsk.progress = u'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(
+            row + 1, numrows)
         tsk.save()
 
         allexamdata = _ct_common_get_data(exams, pid, name, patid)
@@ -449,19 +373,15 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
-            tabtext = protocol.lower().replace(u" ", u"_")
-            translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
-                                 ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
-            tabtext = tabtext.translate(translation_table) # remove illegal characters
-            tabtext = tabtext[:31]
-            sheetlist[tabtext]['count'] += 1
+            tabtext = sheet_name(protocol)
+            sheet_list[tabtext]['count'] += 1
             
             examdata = _ct_common_get_data(exams, pid, name, patid)
             examdata += _ct_get_series_data(s)
 
-            sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'],0,examdata)
+            sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, examdata)
 
-        wsalldata.write_row(row+1,0, allexamdata)
+        wsalldata.write_row(row+1, 0, allexamdata)
 
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
     
@@ -483,7 +403,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
     toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = u'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    linetwostring = u'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
+                    u'See http://openrem.org'
     summarysheet.write(0, 0, toplinestring, titleformat)
     summarysheet.write(1, 0, linetwostring)
 
@@ -514,7 +435,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Generate list of Series Protocols
     summarysheet.write(5, 6, u"Series Protocol")
     summarysheet.write(5, 7, u"Frequency")
-    sortedprotocols = sorted(sheetlist.iteritems(), key=lambda (k,v): v['count'], reverse=True)
+    sortedprotocols = sorted(sheet_list.iteritems(), key=lambda (k, v): v['count'], reverse=True)
     for row, item in enumerate(sortedprotocols):
         summarysheet.write(row+6, 6, u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
         summarysheet.write(row+6, 7, item[1]['count'])
@@ -528,14 +449,16 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     xlsxfilename = u"ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
-        tsk.filename.save(xlsxfilename,File(tmpxlsx))
+        tsk.filename.save(xlsxfilename, File(tmpxlsx))
     except OSError as e:
-        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(
+            e.errno, e.strerror)
         tsk.status = u'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(
+            sys.exc_info()[0])
         tsk.status = u'ERROR'
         tsk.save()
         return

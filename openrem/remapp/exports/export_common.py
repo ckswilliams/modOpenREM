@@ -60,7 +60,7 @@ def text_and_date_formats(book, sheet, pid=False, name=None, patid=None):
         sheet.set_column(date_column + 2, date_column + 2, 10, dateformat)  # Birth date column
     if pid and patid:
         sheet.set_column(patid_column, patid_column, None, textformat)  # make sure leading zeros are not dropped
-    sheet.set_column(date_column - 2, date_column - 2, None, textformat)
+    sheet.set_column(date_column - 2, date_column - 2, None, textformat) # Accession number as text
 
     return book
 
@@ -107,12 +107,27 @@ def common_headers(pid=False, name=None, patid=None):
     return headers
 
 
-def generate_sheets(studies, book, protocol_headers, pid=False, name=None, patid=None):
+def sheet_name(protocol_name):
+    """
+    Creates Excel safe version of protocol name for sheet tab text
+    :param protocol_name: string, protocol name
+    :return: string, Excel safe sheet name for tab text
+    """
+    tab_text = protocol_name.lower().replace(u" ", u"_")
+    translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
+                         ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
+    tab_text = tab_text.translate(translation_table)  # remove illegal characters
+    tab_text = tab_text[:31]
+    return tab_text
+
+
+def generate_sheets(studies, book, protocol_headers, modality=None, pid=False, name=None, patid=None):
     """
     Function to generate the sheets in the xlsx book based on the protocol names
     :param studies: filtered queryset of exams
     :param book: xlsxwriter book to work on
     :param protocol_headers: list of headers to insert on each sheet
+    :param modality: study modality to determine database location of acquisition_protocol
     :param pid: does the user have patient identifiable data permission
     :param name: has patient name been selected for export
     :param patid: has patient ID been selected for export
@@ -121,7 +136,11 @@ def generate_sheets(studies, book, protocol_headers, pid=False, name=None, patid
     sheet_list = {}
     protocols_list = []
     for exams in studies:
-        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
+        if modality in u"DX":
+            events = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')
+        elif modality in u"CT":
+            events =  exams.ctradiationdose_set.get().ctirradiationeventdata_set.all()
+        for s in events:
             if s.acquisition_protocol:
                 safe_protocol = s.acquisition_protocol
             else:
@@ -131,11 +150,7 @@ def generate_sheets(studies, book, protocol_headers, pid=False, name=None, patid
     protocols_list.sort()
 
     for protocol in protocols_list:
-        tab_text = protocol.lower().replace(u" ", u"_")
-        translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
-                             ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
-        tab_text = tab_text.translate(translation_table)  # remove illegal characters
-        tab_text = tab_text[:31]
+        tab_text = sheet_name(protocol)
         if tab_text not in sheet_list:
             sheet_list[tab_text] = {
                 'sheet': book.add_worksheet(tab_text),
