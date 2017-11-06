@@ -163,3 +163,132 @@ def generate_sheets(studies, book, protocol_headers, modality=None, pid=False, n
                 sheet_list[tab_text]['protocolname'].append(protocol)
 
     return book, sheet_list
+
+
+def get_common_data(modality, exams, pid=None, name=None, patid=None):
+    """Get the data common to several exports
+
+    :param modality: Modality for the number of irradiation events database location
+    :param exams: exam to export
+    :param pid: does the user have patient identifiable data permission
+    :param name: has patient name been selected for export
+    :param patid: has patient ID been selected for export
+    :return: the common data for that exam
+    """
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.tools.get_values import return_for_export, string_to_float
+
+    if pid and (name or patid):
+        try:
+            patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
+            if name:
+                patient_name = exams.patientmoduleattr_set.get().patient_name
+            if patid:
+                patient_id = exams.patientmoduleattr_set.get().patient_id
+        except ObjectDoesNotExist:
+            patient_birth_date = None
+            patient_name = None
+            patient_id = None
+
+    try:
+        institution_name = exams.generalequipmentmoduleattr_set.get().institution_name
+        manufacturer = exams.generalequipmentmoduleattr_set.get().manufacturer
+        manufacturer_model_name = exams.generalequipmentmoduleattr_set.get().manufacturer_model_name
+        station_name = exams.generalequipmentmoduleattr_set.get().station_name
+        display_name = exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
+    except ObjectDoesNotExist:
+        institution_name = None
+        manufacturer = None
+        manufacturer_model_name = None
+        station_name = None
+        display_name = None
+
+    try:
+        patient_sex = exams.patientmoduleattr_set.get().patient_sex
+    except ObjectDoesNotExist:
+        patient_sex = None
+
+    try:
+        patient_age_decimal = string_to_float(exams.patientstudymoduleattr_set.get().patient_age_decimal)
+        patient_size = string_to_float(exams.patientstudymoduleattr_set.get().patient_size)
+        patient_weight = string_to_float(exams.patientstudymoduleattr_set.get().patient_weight)
+    except ObjectDoesNotExist:
+        patient_age_decimal = None
+        patient_size = None
+        patient_weight = None
+
+    try:
+        not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+    except ObjectDoesNotExist:
+        not_patient_indicator = None
+
+    if modality in u"CT":
+        try:
+            exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
+        except ObjectDoesNotExist:
+            total_number_of_irradiation_events = None
+            ct_dose_length_product_total = None
+        else:
+            try:
+                total_number_of_irradiation_events = int(
+                    exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events)
+            except TypeError:
+                total_number_of_irradiation_events = None
+            ct_dose_length_product_total = string_to_float(
+                exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total)
+    elif modality in u"DX":
+        try:
+            total_number_of_radiographic_frames = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                ).accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames
+            dap_total = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                ).accumintegratedprojradiogdose_set.get().dose_area_product_total
+            if dap_total:
+                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                    ).accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+            else:
+                cgycm2 = None
+        except ObjectDoesNotExist:
+            total_number_of_radiographic_frames = None
+            cgycm2 = None
+
+    examdata = []
+    if pid and name:
+        examdata += [patient_name]
+    if pid and patid:
+        examdata += [patient_id]
+    examdata += [
+        institution_name,
+        manufacturer,
+        manufacturer_model_name,
+        station_name,
+        display_name,
+        exams.accession_number,
+        exams.operator_name,
+        exams.study_date,
+        exams.study_time,
+    ]
+    if pid and (name or patid):
+        examdata += [
+            patient_birth_date,
+        ]
+    examdata += [
+        patient_age_decimal,
+        patient_sex,
+        patient_size,
+        patient_weight,
+        not_patient_indicator,
+        exams.study_description,
+        exams.requested_procedure_code_meaning,
+    ]
+    if modality in u"CT":
+        examdata += [
+            total_number_of_irradiation_events,
+            ct_dose_length_product_total,
+        ]
+    elif modality in u"DX":
+        examdata += [
+            total_number_of_radiographic_frames,
+            cgycm2,
+        ]
+
+    return examdata

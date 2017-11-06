@@ -391,7 +391,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from django.core.files import File
     from django.db.models import Count
     from django.shortcuts import redirect
-    from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name
+    from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, get_common_data
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
     from remapp.tools.get_values import return_for_export, string_to_float
@@ -520,98 +520,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             row + 1, numrows)
         tsk.save()
 
-        if pid and (name or patid):
-            try:
-                patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
-                if name:
-                    patient_name = exams.patientmoduleattr_set.get().patient_name
-                if patid:
-                    patient_id = exams.patientmoduleattr_set.get().patient_id
-            except ObjectDoesNotExist:
-                patient_birth_date = None
-                patient_name = None
-                patient_id = None
+        examdata = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
 
-        try:
-            institution_name = exams.generalequipmentmoduleattr_set.get().institution_name
-            manufacturer = exams.generalequipmentmoduleattr_set.get().manufacturer
-            manufacturer_model_name = exams.generalequipmentmoduleattr_set.get().manufacturer_model_name
-            station_name = exams.generalequipmentmoduleattr_set.get().station_name
-            display_name = exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
-        except ObjectDoesNotExist:
-            institution_name = None
-            manufacturer = None
-            manufacturer_model_name = None
-            station_name = None
-            display_name = None
-
-        try:
-            patient_sex = exams.patientmoduleattr_set.get().patient_sex
-        except ObjectDoesNotExist:
-            patient_sex = None
-
-        try:
-            patient_age = string_to_float(exams.patientstudymoduleattr_set.get().patient_age_decimal)
-            patient_size = string_to_float(exams.patientstudymoduleattr_set.get().patient_size)
-            patient_weight = string_to_float(exams.patientstudymoduleattr_set.get().patient_weight)
-        except ObjectDoesNotExist:
-            patient_age  = None
-            patient_size = None
-            patient_weight = None
-
-        try:
-            not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
-        except ObjectDoesNotExist:
-            not_patient_indicator = None
-
-        try:
-            try:
-                total_number_of_radiographic_frames = int(exams.projectionxrayradiationdose_set.get(
-                    ).accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames)
-            except TypeError:
-                total_number_of_radiographic_frames = None
-            if exams.projectionxrayradiationdose_set.get(
-                ).accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_area_product_total is not None:
-                cgycm2 = string_to_float(exams.projectionxrayradiationdose_set.get(
-                    ).accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2())
-            else:
-                cgycm2 = None
-        except ObjectDoesNotExist:
-            total_number_of_radiographic_frames = None
-            cgycm2 = None
-
-        examdata = []
-        if pid and name:
-            examdata += [patient_name]
-        if pid and patid:
-            examdata += [patient_id]
-
-        examdata += [
-            institution_name,
-            manufacturer,
-            manufacturer_model_name,
-            station_name,
-            display_name,
-            exams.accession_number,
-            exams.operator_name,
-            exams.study_date,
-            exams.study_time,
-        ]
-        if pid and (name or patid):
-            examdata += [
-                patient_birth_date,
-            ]
-        examdata += [
-            patient_age,
-            patient_sex,
-            patient_size,
-            patient_weight,
-            not_patient_indicator,
-            exams.study_description,
-            exams.requested_procedure_code_meaning,
-            total_number_of_radiographic_frames,
-            cgycm2,
-        ]
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
 
             try:
@@ -707,116 +617,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             tabtext = sheet_name(protocol)
             sheet_list[tabtext]['count'] += 1
 
-            if pid and (name or patid):
-                try:
-                    exams.patientmoduleattr_set.get()
-                except ObjectDoesNotExist:
-                    if name:
-                        patient_name = None
-                    if patid:
-                        patient_id = None
-                else:
-                    if name:
-                        patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
-                    if patid:
-                        patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
-            try:
-                exams.generalequipmentmoduleattr_set.get()
-            except ObjectDoesNotExist:
-                institution_name = None
-                manufacturer = None
-                manufacturer_model_name = None
-                station_name = None
-                display_name = None
-            else:
-                institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
-                manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
-                manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
-                station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
-                display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
-
-            try:
-                exams.patientmoduleattr_set.get()
-            except ObjectDoesNotExist:
-                patient_sex = None
-            else:
-                patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-
-            try:
-                exams.patientstudymoduleattr_set.get()
-            except ObjectDoesNotExist:
-                patient_age = None
-                patient_size = None
-                patient_weight = None
-            else:
-                patient_age = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
-                                                                'patient_age_decimal'))
-                patient_size = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
-                                                                 'patient_size'))
-                patient_weight = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
-                                                                   'patient_weight'))
-
-            try:
-                exams.patientmoduleattr_set.get()
-            except ObjectDoesNotExist:
-                not_patient_indicator = None
-            else:
-                not_patient_indicator = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
-
-            try:
-                exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
-            except ObjectDoesNotExist:
-                total_number_of_radiographic_frames = None
-                cgycm2 = None
-            else:
-                try:
-                    total_number_of_radiographic_frames = int(return_for_export(
-                        exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                        ).accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames'))
-                except TypeError:
-                    total_number_of_radiographic_frames = None
-                dap_total = return_for_export(
-                    exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                    ).accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
-                if dap_total:
-                    cgycm2 = string_to_float(
-                        exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                        ).accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2())
-                else:
-                    cgycm2 = None
-
-            examdata = []
-            if pid and name:
-                examdata += [patient_name]
-            if pid and patid:
-                examdata += [patient_id]
-
-            examdata += [
-                institution_name,
-                manufacturer,
-                manufacturer_model_name,
-                station_name,
-                display_name,
-                exams.accession_number,
-                exams.operator_name,
-                exams.study_date,
-                exams.study_time,
-            ]
-            if pid and (name or patid):
-                examdata += [
-                    patient_birth_date,
-                ]
-            examdata += [
-                patient_age,
-                patient_sex,
-                patient_size,
-                patient_weight,
-                not_patient_indicator,
-                exams.study_description,
-                exams.requested_procedure_code_meaning,
-                total_number_of_radiographic_frames,
-                cgycm2,
-                ]
+            examdata = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
 
             try:
                 s.irradeventxraysourcedata_set.get()

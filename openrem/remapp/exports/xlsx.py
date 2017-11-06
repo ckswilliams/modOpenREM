@@ -32,111 +32,12 @@
 import logging
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
+from remapp.exports.export_common import get_common_data
 
 logger = logging.getLogger(__name__)
 
 # LO: maybe this function can be moved to tools (as it can be reused in other exports)
 
-def _ct_common_get_data(exams, pid, name, patid):
-    from django.core.exceptions import ObjectDoesNotExist
-    from remapp.tools.get_values import return_for_export, string_to_float
-
-    if pid and (name or patid):
-        try:
-            exams.patientmoduleattr_set.get()
-        except ObjectDoesNotExist:
-            patient_birth_date = None
-            if name:
-                patient_name = None
-            if patid:
-                patient_id = None
-        else:
-            patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
-            if name:
-                patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
-            if patid:
-                patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
-
-    try:
-        exams.generalequipmentmoduleattr_set.get()
-    except ObjectDoesNotExist:
-        institution_name = None
-        manufacturer = None
-        manufacturer_model_name = None
-        station_name = None
-        display_name = None
-    else:
-        institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
-        manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
-        manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
-        station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
-        display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
-
-    try:
-        exams.patientmoduleattr_set.get()
-    except ObjectDoesNotExist:
-        patient_sex = None
-        not_patient = None
-    else:
-        patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-        not_patient = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
-
-    try:
-        exams.patientstudymoduleattr_set.get()
-    except ObjectDoesNotExist:
-        patient_age_decimal = None
-        patient_size = None
-        patient_weight = None
-    else:
-        patient_age_decimal = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal'))
-        patient_size = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size'))
-        patient_weight = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight'))
-
-    try:
-        exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
-    except ObjectDoesNotExist:
-        total_number_of_irradiation_events = None
-        ct_dose_length_product_total = None
-    else:
-        try:
-            total_number_of_irradiation_events = int(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events'))
-        except TypeError:
-            total_number_of_irradiation_events = None  # in case retrun_for_export returns None
-        ct_dose_length_product_total = string_to_float(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total'))
-
-    examdata = []
-    if pid and name:
-        examdata += [patient_name]
-    if pid and patid:
-        examdata += [patient_id]
-    examdata += [
-        institution_name,
-        manufacturer,
-        manufacturer_model_name,
-        station_name,
-        display_name,
-        exams.accession_number,
-        exams.operator_name,
-        exams.study_date,
-        exams.study_time,
-    ]
-    if pid and (name or patid):
-        examdata += [
-            patient_birth_date,
-        ]
-    examdata += [
-        patient_age_decimal,
-        patient_sex,
-        patient_size,
-        patient_weight,
-        not_patient,
-        exams.study_description,
-        exams.requested_procedure_code_meaning,
-        total_number_of_irradiation_events,
-        ct_dose_length_product_total,
-    ]
-
-    return examdata
 
 def _ct_get_series_data(s):
     from django.core.exceptions import ObjectDoesNotExist
@@ -362,7 +263,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             row + 1, numrows)
         tsk.save()
 
-        allexamdata = _ct_common_get_data(exams, pid, name, patid)
+        allexamdata = get_common_data(u"CT", exams, pid, name, patid)
 
         # Now we need to write a sheet per series protocol for each 'exams'.
         
@@ -376,7 +277,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             tabtext = sheet_name(protocol)
             sheet_list[tabtext]['count'] += 1
             
-            examdata = _ct_common_get_data(exams, pid, name, patid)
+            examdata = get_common_data(u"CT", exams, pid, name, patid)
             examdata += _ct_get_series_data(s)
 
             sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, examdata)
