@@ -90,9 +90,12 @@ def _get_xray_filterinfo(source):
 def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered DX database data to a single-sheet CSV file.
 
-    :param request: Query parameters from the DX filtered page URL.
-    :type request: HTTP get
-    
+    :param filterdict: Queryset of studies to export
+    :param pid: does the user have patient identifiable data permission
+    :param name: has patient name been selected for export
+    :param patid: has patient ID been selected for export
+    :param user: User that has started the export
+    :return: Saves csv file into Media directory for user to download
     """
 
     import datetime
@@ -127,15 +130,13 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = u'CSV file created'
         tsk.save()
     except:
-        # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
+            sys.exc_info()[0]))
         return redirect('/openrem/export/')
         
     # Get the data!
 
     e = dx_acq_filter(filterdict, pid=pid).qs
-
-    # Remove duplicate entries from the results - hopefully no longer necessary, left here in case. Needs testing
-    # e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
 
     tsk.progress = u'Required study filter complete.'
     tsk.save()
@@ -177,9 +178,14 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     ]
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames'))
+    max_events_dict = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
+                                      'total_number_of_radiographic_frames'))
+    max_events = max_events_dict['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__'
+                                 'total_number_of_radiographic_frames__max']
+    if not max_events:
+        max_events = 1
 
-    for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
+    for h in range(max_events):
         headers += [
             'E' + str(h+1) + u' Protocol',
             'E' + str(h+1) + u' Image view',
