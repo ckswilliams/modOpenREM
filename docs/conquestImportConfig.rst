@@ -36,7 +36,7 @@ My system had three further import sections for DX, CR, and structured dose repo
     # Import of structured dose reports (this checks the DICOM tag 0008,0016 to see if it matches the value for a dose report)
     ImportConverter4  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.67"; {save to C:\conquest\dosedata\sr\%o.dcm; system C:\conquest\openrem-sr-launch.bat "C:\conquest\dosedata\sr\%o.dcm"; destroy}
 
-However, I have since move to calling lua scripts from Conquest, as described in the next section.
+However, I have since moved to calling lua scripts from Conquest, as described in the next section.
 
 Advanced Conquest DICOM object handling using lua scripts
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -72,7 +72,7 @@ Conquest and a delay of 10 minutes has elapsed (the default). The following info
 
     * ``%V0008,0020``, study date
 
-    * ``%V0018,1000`, device serial number
+    * ``%V0018,1000``, device serial number
 
 An example ``openrem_import_ct.lua`` script is shown below. It receives the parameters passed to it as single string.
 The individual parameters are recovered by splitting up the string using the ``::`` substring as a delimiter. The script
