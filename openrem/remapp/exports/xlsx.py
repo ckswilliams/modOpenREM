@@ -14,8 +14,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -32,10 +32,8 @@
 import logging
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
-from django.conf import settings
 
 logger = logging.getLogger(__name__)
-
 
 # LO: maybe this function can be moved to tools (as it can be reused in other exports)
 
@@ -210,7 +208,7 @@ def _ct_get_series_data(s):
                 u'n/a',
                 ]
         except:
-                seriesdata += [u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', ]
+            seriesdata += [u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', ]
     seriesdata += [
         s.xray_modulation_type,
         str(s.comment),
@@ -221,17 +219,22 @@ def _ct_get_series_data(s):
 
 @shared_task
 def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
-    """Export filtered CT database data to multi-sheet Microsoft XSLX files.
+    """Export filtered CT database data to multi-sheet Microsoft XSLX files
 
-    :param filterdict: Query parameters from the CT filtered page URL.
-    :type filterdict: HTTP get
-    
+    :param filterdict: Queryset of studies to export
+    :param pid: does the user have patient identifiable data permission
+    :param name: has patient name been selected for export
+    :param patid: has patient ID been selected for export
+    :param user: User that has started the export
+    :return: Saves xlsx file into Media directory for user to download
     """
 
-    import os, sys, datetime
+    import sys
+    import datetime
+    import pkg_resources  # part of setuptools
     from tempfile import TemporaryFile
-    from django.conf import settings
     from django.core.files import File
+    from django.db.models import Count
     from django.shortcuts import redirect
     from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name
     from remapp.models import Exports
@@ -249,10 +252,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_date = datestamp
     tsk.progress = u'Query filters imported, task started'
     tsk.status = u'CURRENT'
-    if pid and (name or patid):
-        tsk.includes_pid = True
-    else:
-        tsk.includes_pid = False
+    tsk.includes_pid = bool(pid and (name or patid))
     tsk.export_user_id = user
     tsk.save()
 
@@ -389,9 +389,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Now populating the summary sheet...'
     tsk.save()
 
-    import pkg_resources  # part of setuptools
-    import datetime
-
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -415,7 +412,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Generate list of Study Descriptions
     summarysheet.write(5, 0, u"Study Description")
     summarysheet.write(5, 1, u"Frequency")
-    from django.db.models import Count
     study_descriptions = e.values("study_description").annotate(n=Count("pk"))
     for row, item in enumerate(study_descriptions.order_by('n').reverse()):
         summarysheet.write(row+6, 0, item['study_description'])
@@ -425,7 +421,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Generate list of Requested Procedures
     summarysheet.write(5, 3, u"Requested Procedure")
     summarysheet.write(5, 4, u"Frequency")
-    from django.db.models import Count
     requested_procedure = e.values("requested_procedure_code_meaning").annotate(n=Count("pk"))
     for row, item in enumerate(requested_procedure.order_by('n').reverse()):
         summarysheet.write(row+6, 3, item['requested_procedure_code_meaning'])
