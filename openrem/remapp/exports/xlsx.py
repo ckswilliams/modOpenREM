@@ -263,26 +263,23 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             row + 1, numrows)
         tsk.save()
 
-        allexamdata = get_common_data(u"CT", exams, pid, name, patid)
+        common_exam_data = get_common_data(u"CT", exams, pid, name, patid)
+        all_exam_data = list(common_exam_data)
 
-        # Now we need to write a sheet per series protocol for each 'exams'.
-        
-        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
+            # Get series data
+            series_data = _ct_get_series_data(s)
             # Add series to all data
-            allexamdata += _ct_get_series_data(s)
+            all_exam_data += series_data
             # Add series data to series tab
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
             tabtext = sheet_name(protocol)
             sheet_list[tabtext]['count'] += 1
-            
-            examdata = get_common_data(u"CT", exams, pid, name, patid)
-            examdata += _ct_get_series_data(s)
+            sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
 
-            sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, examdata)
-
-        wsalldata.write_row(row+1, 0, allexamdata)
+        wsalldata.write_row(row + 1, 0, all_exam_data)
 
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
     
