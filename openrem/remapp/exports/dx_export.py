@@ -35,9 +35,42 @@ import logging
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
+from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
+    get_common_data
 
 logger = logging.getLogger(__name__)
 
+
+def _series_headers(max_events):
+    """Return the series headers common to both DX exports
+    
+    :param max_events: number of series
+    :return: headers as a list of strings
+    """
+    series_headers = []
+    for series_number in range(max_events):
+        series_headers += [
+            u'E' + str(series_number+1) + u' Protocol',
+            u'E' + str(series_number+1) + u' Anatomy',
+            u'E' + str(series_number+1) + u' Image view',
+            u'E' + str(series_number+1) + u' Exposure control mode',
+            u'E' + str(series_number+1) + u' kVp',
+            u'E' + str(series_number+1) + u' mAs',
+            u'E' + str(series_number+1) + u' mA',
+            u'E' + str(series_number+1) + u' Exposure time (ms)',
+            u'E' + str(series_number+1) + u' Filters',
+            u'E' + str(series_number+1) + u' Filter thicknesses (mm)',
+            u'E' + str(series_number+1) + u' Exposure index',
+            u'E' + str(series_number+1) + u' Relative x-ray exposure',
+            u'E' + str(series_number+1) + u' DAP (cGy.cm^2)',
+            u'E' + str(series_number+1) + u' Entrance Exposure at RP (mGy)',
+            u'E' + str(series_number+1) + u' SDD Detector Dist',
+            u'E' + str(series_number+1) + u' SPD Patient Dist',
+            u'E' + str(series_number+1) + u' SIsoD Isocentre Dist',
+            u'E' + str(series_number+1) + u' Table Height',
+            u'E' + str(series_number+1) + u' Comment',
+            ]
+    return series_headers
 
 def _dx_get_series_data(s):
     """Return the series level data
@@ -229,33 +262,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.num_records = numresults
     tsk.save()
 
-    pidheadings = []
-    if pid and name:
-        pidheadings += [u'Patient name']
-    if pid and patid:
-        pidheadings += [u'Patient ID']
-    headers = pidheadings + [
-        u'Institution name',
-        u'Manufacturer',
-        u'Model name',
-        u'Station name',
-        u'Display name',
-        u'Accession number',
-        u'Operator',
-        u'Study date',
-    ]
-    if pid and (name or patid):
-        headers += [
-            u'Date of birth',
-        ]
+    headers = common_headers(pid=pid, name=name, patid=patid)
     headers += [
-        u'Patient age',
-        u'Patient sex',
-        u'Patient height',
-        u'Patient mass (kg)',
-        u'Study description',
-        u'Requested procedure',
-        u'Number of events',
         u'DAP total (cGy.cm^2)',
     ]
 
@@ -267,174 +275,28 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     if not max_events:
         max_events = 1
 
-    for h in range(max_events):
-        headers += [
-            'E' + str(h+1) + u' Protocol',
-            'E' + str(h+1) + u' Image view',
-            'E' + str(h+1) + u' Exposure control mode',
-            'E' + str(h+1) + u' kVp',
-            'E' + str(h+1) + u' mAs',
-            'E' + str(h+1) + u' mA',
-            'E' + str(h+1) + u' Exposure time (ms)',
-            'E' + str(h+1) + u' Filters',
-            'E' + str(h+1) + u' Filter thicknesses average (mm)',
-            'E' + str(h+1) + u' Exposure index',
-            'E' + str(h+1) + u' Relative x-ray exposure',
-            'E' + str(h+1) + u' DAP (cGy.cm^2)',
-            ]
+    headers += _series_headers(max_events)
 
     writer.writerow([unicode(header).encode("utf-8") for header in headers])
 
     tsk.progress = u'CSV header row written.'
     tsk.save()
 
-    for i, exams in enumerate(e):
-        if pid and (name or patid):
-            try:
-                patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
-                if name:
-                    patient_name = exams.patientmoduleattr_set.get().patient_name
-                if patid:
-                    patient_id = exams.patientmoduleattr_set.get().patient_id
-            except ObjectDoesNotExist:
-                patient_birth_date = None
-                patient_name = None
-                patient_id = None
-        try:
-            institution_name = exams.generalequipmentmoduleattr_set.get().institution_name
-            manufacturer = exams.generalequipmentmoduleattr_set.get().manufacturer
-            manufacturer_model_name = exams.generalequipmentmoduleattr_set.get().manufacturer_model_name
-            station_name = exams.generalequipmentmoduleattr_set.get().station_name
-            display_name = exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
-        except ObjectDoesNotExist:
-            institution_name = None
-            manufacturer = None
-            manufacturer_model_name = None
-            station_name = None
-            display_name = None
-        try:
-            patient_sex = exams.patientmoduleattr_set.get().patient_sex
-        except ObjectDoesNotExist:
-            patient_sex = None
-        try:
-            patient_age = exams.patientstudymoduleattr_set.get().patient_age_decimal
-            patient_size = exams.patientstudymoduleattr_set.get().patient_size
-            patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
-        except ObjectDoesNotExist:
-            patient_age = None
-            patient_size = None
-            patient_weight = None
-        try:
-            total_number_of_radiographic_frames = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                ).accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames
-            dap_total = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                ).accumintegratedprojradiogdose_set.get().dose_area_product_total
-            if dap_total:
-                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                    ).accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
-            else:
-                cgycm2 = None
-        except ObjectDoesNotExist:
-            total_number_of_radiographic_frames = None
-            cgycm2 = None
-
-        examdata = []
-        if pid and name:
-            examdata += [patient_name]
-        if pid and patid:
-            examdata += [patient_id]
-
-        examdata += [
-            institution_name,
-            manufacturer,
-            manufacturer_model_name,
-            station_name,
-            display_name,
-            exams.accession_number,
-            exams.operator_name,
-            exams.study_date,
-        ]
-        if pid and (name or patid):
-            examdata += [
-                patient_birth_date,
-            ]
-        examdata += [
-            patient_age,
-            patient_sex,
-            patient_size,
-            patient_weight,
-            exams.study_description,
-            exams.requested_procedure_code_meaning,
-            total_number_of_radiographic_frames,
-            cgycm2,
-        ]
-
+    for row, exams in enumerate(e):
+        exam_data = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
-
-            try:
-                exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
-                average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
-                exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
-                try:
-                    kvp = s.irradeventxraysourcedata_set.get().kvp_set.get().kvp
-                except ObjectDoesNotExist:
-                    kvp = None
-                try:
-                    uas = s.irradeventxraysourcedata_set.get().exposure_set.get().exposure
-                    if uas:
-                        mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
-                    else:
-                        mas = None
-                except ObjectDoesNotExist:
-                    mas = None
-                filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
-            except ObjectDoesNotExist:
-                exposure_control_mode = None
-                average_xray_tube_current = None
-                exposure_time = None
-                kvp = None
-                mas = None
-                filters = None
-                filter_thicknesses = None
-
-            try:
-                exposure_index = s.irradeventxraydetectordata_set.get().exposure_index
-                relative_xray_exposure = s.irradeventxraydetectordata_set.get().relative_xray_exposure
-            except ObjectDoesNotExist:
-                exposure_index = None
-                relative_xray_exposure = None
-
-            cgycm2 = s.convert_gym2_to_cgycm2()
-
-            examdata += [
-                s.acquisition_protocol,
-                ]
-            try:
-                examdata += [
-                s.image_view.code_meaning,
-                ]
-            except AttributeError:
-                pass
-            examdata += [
-                exposure_control_mode,
-                kvp,
-                mas,
-                average_xray_tube_current,
-                exposure_time,
-                filters,
-                filter_thicknesses,
-                exposure_index,
-                relative_xray_exposure,
-                cgycm2,
-                ]
-
-        for index, item in enumerate(examdata):
+            # Get series data
+            series_data = _dx_get_series_data(s)
+            # Add series to all data
+            exam_data += series_data
+        # Clear out any commas
+        for index, item in enumerate(exam_data):
             if item is None:
-                examdata[index] = ''
+                exam_data[index] = ''
             if isinstance(item, basestring) and u',' in item:
-                examdata[index] = item.replace(u',', u';')
-        writer.writerow([unicode(datastring).encode("utf-8") for datastring in examdata])
-        tsk.progress = u"{0} of {1}".format(i+1, numresults)
+                exam_data[index] = item.replace(u',', u';')
+        writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
+        tsk.progress = u"{0} of {1}".format(row + 1, numresults)
         tsk.save()
     tsk.progress = u'All study data written.'
     tsk.save()
@@ -476,7 +338,6 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from django.core.files import File
     from django.db.models import Count
     from django.shortcuts import redirect
-    from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, get_common_data
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
     import uuid
@@ -570,28 +431,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
 
-    for h in range(max_events):
-        alldataheaders += [
-            u'E' + str(h+1) + u' Protocol',
-            u'E' + str(h+1) + u' Anatomy',
-            u'E' + str(h+1) + u' Image view',
-            u'E' + str(h+1) + u' Exposure control mode',
-            u'E' + str(h+1) + u' kVp',
-            u'E' + str(h+1) + u' mAs',
-            u'E' + str(h+1) + u' mA',
-            u'E' + str(h+1) + u' Exposure time (ms)',
-            u'E' + str(h+1) + u' Filters',
-            u'E' + str(h+1) + u' Filter thicknesses (mm)',
-            u'E' + str(h+1) + u' Exposure index',
-            u'E' + str(h+1) + u' Relative x-ray exposure',
-            u'E' + str(h+1) + u' DAP (cGy.cm^2)',
-            u'E' + str(h+1) + u' Entrance Exposure at RP (mGy)',
-            u'E' + str(h+1) + u' SDD Detector Dist',
-            u'E' + str(h+1) + u' SPD Patient Dist',
-            u'E' + str(h+1) + u' SIsoD Isocentre Dist',
-            u'E' + str(h+1) + u' Table Height',
-            u'E' + str(h+1) + u' Comment',
-            ]
+    alldataheaders += _series_headers(max_events)
     wsalldata.write_row('A1', alldataheaders)
     numcolumns = (19 * max_events) + len(commonheaders) - 1
     numrows = e.count()
