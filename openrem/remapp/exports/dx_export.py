@@ -126,7 +126,6 @@ def _dx_get_series_data(s):
 
 
 def _get_xray_filterinfo(source):
-    from django.core.exceptions import ObjectDoesNotExist
     try:
         filters = u''
         filter_thicknesses = u''
@@ -480,8 +479,6 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, get_common_data
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.tools.get_values import return_for_export, string_to_float
-    from django.core.exceptions import ObjectDoesNotExist
     import uuid
 
     tsk = Exports.objects.create()

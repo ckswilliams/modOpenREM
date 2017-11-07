@@ -176,7 +176,6 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     :return: the common data for that exam
     """
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.tools.get_values import return_for_export, string_to_float
 
     if pid and (name or patid):
         try:
@@ -209,9 +208,9 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         patient_sex = None
 
     try:
-        patient_age_decimal = string_to_float(exams.patientstudymoduleattr_set.get().patient_age_decimal)
-        patient_size = string_to_float(exams.patientstudymoduleattr_set.get().patient_size)
-        patient_weight = string_to_float(exams.patientstudymoduleattr_set.get().patient_weight)
+        patient_age_decimal = exams.patientstudymoduleattr_set.get().patient_age_decimal
+        patient_size = exams.patientstudymoduleattr_set.get().patient_size
+        patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
     except ObjectDoesNotExist:
         patient_age_decimal = None
         patient_size = None
@@ -234,8 +233,8 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
                     exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events)
             except TypeError:
                 total_number_of_irradiation_events = None
-            ct_dose_length_product_total = string_to_float(
-                exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total)
+            ct_dose_length_product_total = exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(
+                ).ct_dose_length_product_total
     elif modality in u"DX":
         try:
             total_number_of_radiographic_frames = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
