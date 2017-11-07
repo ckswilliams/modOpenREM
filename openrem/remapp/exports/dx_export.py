@@ -221,7 +221,6 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     import sys
     from tempfile import TemporaryFile
     from django.core.files import File
-    from django.shortcuts import redirect
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
 
@@ -247,7 +246,6 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     except:
         logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
             sys.exc_info()[0]))
-        return redirect('/openrem/export/')
 
     # Get the data!
 
@@ -337,7 +335,6 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from tempfile import TemporaryFile
     from django.core.files import File
     from django.db.models import Count
-    from django.shortcuts import redirect
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
     import uuid
@@ -365,7 +362,6 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     except:
         logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
             sys.exc_info()[0]))
-        return redirect('/openrem/export/')
 
     e = dx_acq_filter(filterdict, pid=pid).qs
 

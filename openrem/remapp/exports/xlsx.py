@@ -136,7 +136,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from tempfile import TemporaryFile
     from django.core.files import File
     from django.db.models import Count
-    from django.shortcuts import redirect
     from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name
     from remapp.models import Exports
     from remapp.interface.mod_filters import ct_acq_filter
@@ -165,7 +164,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     except:
         logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
             sys.exc_info()[0]))
-        return redirect('/openrem/export/')
 
     # Get the data!
     e = ct_acq_filter(filterdict, pid=pid).qs
