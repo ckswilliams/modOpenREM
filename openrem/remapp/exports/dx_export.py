@@ -480,7 +480,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
     toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = u'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    linetwostring = u'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
+                    u'See http://openrem.org'
     summarysheet.write(0,0, toplinestring, titleformat)
     summarysheet.write(1,0, linetwostring)
 
