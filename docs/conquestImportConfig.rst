@@ -8,8 +8,10 @@ The Conquest DICOM server can be configured to automatically run tasks when it r
 For example, a script can be run when a DX image is received that will extract dose information into OpenREM; Conquest
 will then delete the original image.
 
-These actions are set up in the ``dicom.ini`` file, located in the root of the Conquest installation folder. For
-example::
+These actions are set up in the ``dicom.ini`` file, located in the root of the Conquest installation folder (an example
+``dicom.ini`` file is available here: :doc:`conquestImportConfig`).
+
+An example import converter::
 
     ImportModality1   = MG
     ImportConverter1  = save to C:\conquest\dosedata\mammo\%o.dcm; system C:\conquest\openrem-mam-launch.bat C:\conquest\dosedata\mammo\%o.dcm; destroy
