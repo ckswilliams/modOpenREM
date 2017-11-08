@@ -9,7 +9,7 @@ For example, a script can be run when a DX image is received that will extract d
 will then delete the original image.
 
 These actions are set up in the ``dicom.ini`` file, located in the root of the Conquest installation folder (an example
-``dicom.ini`` file is available here: :doc:`conquestImportConfig`).
+``dicom.ini`` file is available here: :doc:`conquestExampleDicomIni`).
 
 An example import converter::
 
