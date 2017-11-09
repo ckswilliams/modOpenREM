@@ -136,7 +136,7 @@ def generate_sheets(studies, book, protocol_headers, modality=None, pid=False, n
     sheet_list = {}
     protocols_list = []
     for exams in studies:
-        if modality in u"DX":
+        if modality in [u"DX", u"RF"]:
             events = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')
         elif modality in u"CT":
             events =  exams.ctradiationdose_set.get().ctirradiationeventdata_set.all()
@@ -249,6 +249,11 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         except ObjectDoesNotExist:
             total_number_of_radiographic_frames = None
             cgycm2 = None
+    elif modality in u"RF":
+        try:
+            event_count = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
+        except ObjectDoesNotExist:
+            event_count = None
 
     examdata = []
     if pid and name:
@@ -288,6 +293,10 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         examdata += [
             total_number_of_radiographic_frames,
             cgycm2,
+        ]
+    elif modality in u"RF":
+        examdata += [
+            event_count,
         ]
 
     return examdata
