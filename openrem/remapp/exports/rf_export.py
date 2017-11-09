@@ -710,8 +710,8 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = u'CSV file created'
         tsk.save()
     except:
-        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
-        return redirect('/openrem/export/')
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
+            sys.exc_info()[0]))
 
     # Get the data!
 
@@ -959,8 +959,8 @@ def rfopenskin(studyid):
         tsk.progress = u'CSV file created, starting to populate with events'
         tsk.save()
     except:
-        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
-        return redirect('/openrem/export/')
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
+            sys.exc_info()[0]))
 
     # Get the data
     study = GeneralStudyModuleAttr.objects.get(pk=studyid)
