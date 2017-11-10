@@ -34,7 +34,7 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filterinfo
+    get_common_data, get_xray_filter_info
 from remapp.tools.get_values import return_for_export, string_to_float
 
 logger = logging.getLogger(__name__)
@@ -151,7 +151,7 @@ def _get_series_data(event):
         ii_field_size = _get_db_value(event.irradeventxraysourcedata_set.get(), 'ii_field_size')
         exposure_time = _get_db_value(event.irradeventxraysourcedata_set.get(), 'exposure_time')
         dose_rp = _get_db_value(event.irradeventxraysourcedata_set.get(), 'dose_rp')
-        filter_material, filter_thick = get_xray_filterinfo(event.irradeventxraysourcedata_set.get())
+        filter_material, filter_thick = get_xray_filter_info(event.irradeventxraysourcedata_set.get())
         try:
             event.irradeventxraysourcedata_set.get().kvp_set.get()
         except ObjectDoesNotExist:
@@ -364,7 +364,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     filter_material = None
                     filter_thick = None
                 else:
-                    filter_material, filter_thick = get_xray_filterinfo(
+                    filter_material, filter_thick = get_xray_filter_info(
                         inst[0].irradeventxraysourcedata_set.get())
 
             protocol = _get_db_value(inst[0], "acquisition_protocol")

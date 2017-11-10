@@ -36,7 +36,7 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filterinfo
+    get_common_data, get_xray_filter_info
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ def _dx_get_series_data(s):
                 mas = None
         except ObjectDoesNotExist:
             mas = None
-        filters, filter_thicknesses = get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
+        filters, filter_thicknesses = get_xray_filter_info(s.irradeventxraysourcedata_set.get())
     except ObjectDoesNotExist:
         exposure_control_mode = None
         average_xray_tube_current = None
