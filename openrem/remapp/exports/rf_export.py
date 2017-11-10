@@ -524,7 +524,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             ]
     wsalldata.write_row('A1', alldataheaders)
     num_rows = e.count()
-    wsalldata.autofilter(0, 0, num_rows, len(alldataheaders))
+    wsalldata.autofilter(0, 0, num_rows, len(alldataheaders) - 1)
 
     # Populate summary sheet
     tsk.progress = u'Now populating the summary sheet...'
@@ -544,7 +544,8 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
     toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = u'OpenREM is copyright 2017 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    linetwostring = u'OpenREM is copyright 2017 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
+                    u'See http://openrem.org'
     summarysheet.write(0,0, toplinestring, titleformat)
     summarysheet.write(1,0, linetwostring)
 

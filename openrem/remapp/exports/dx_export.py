@@ -382,9 +382,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     alldataheaders += _series_headers(max_events)
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (19 * max_events) + len(commonheaders) - 1
     numrows = e.count()
-    wsalldata.autofilter(0, 0, numrows, numcolumns)
+    wsalldata.autofilter(0, 0, numrows, len(alldataheaders) - 1)
 
     for row, exams in enumerate(e):
 
@@ -429,7 +428,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
     toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = u'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
+    linetwostring = u'OpenREM is copyright 2017 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
                     u'See http://openrem.org'
     summarysheet.write(0,0, toplinestring, titleformat)
     summarysheet.write(1,0, linetwostring)
