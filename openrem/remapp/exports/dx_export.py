@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 def _series_headers(max_events):
     """Return the series headers common to both DX exports
-    
+
     :param max_events: number of series
     :return: headers as a list of strings
     """
@@ -196,9 +196,9 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
         tsk.progress = u'CSV file created'
         tsk.save()
-    except:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
-            sys.exc_info()[0]))
+    except IOError as e:
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+        exit()
 
     # Get the data!
 
@@ -312,9 +312,9 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         book = Workbook(tmpxlsx, {'strings_to_numbers': False})
         tsk.progress = u'Workbook created'
         tsk.save()
-    except:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
-            sys.exc_info()[0]))
+    except IOError as e:
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+        exit()
 
     e = dx_acq_filter(filterdict, pid=pid).qs
 

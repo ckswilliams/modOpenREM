@@ -161,9 +161,9 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         book = Workbook(tmpxlsx, {'strings_to_numbers':  False})
         tsk.progress = u'Workbook created'
         tsk.save()
-    except:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
-            sys.exc_info()[0]))
+    except IOError as e:
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+        exit()
 
     # Get the data!
     e = ct_acq_filter(filterdict, pid=pid).qs
@@ -208,7 +208,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         u'mA Modulation type',
         u'Comments',
         ]
-        
+
     # Generate list of protocols in queryset and create worksheets for each
     tsk.progress = u'Generating list of protocols in the dataset...'
     tsk.save()

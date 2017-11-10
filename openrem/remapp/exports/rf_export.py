@@ -282,9 +282,8 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         book = Workbook(tmpxlsx, {'strings_to_numbers':  False})
         tsk.progress = u'Workbook created'
         tsk.save()
-    except:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
-            sys.exc_info()[0]))
+    except IOError as e:
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
         exit()
 
     # Get the data
@@ -660,9 +659,9 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
         tsk.progress = u'CSV file created'
         tsk.save()
-    except:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
-            sys.exc_info()[0]))
+    except IOError as e:
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+        exit()
 
     # Get the data!
 
@@ -745,9 +744,7 @@ def rfopenskin(studyid):
 
     import sys, datetime
     from tempfile import TemporaryFile
-    from django.contrib import messages
     from django.core.files import File
-    from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.tools.get_values import export_csv_prep
@@ -769,9 +766,9 @@ def rfopenskin(studyid):
 
         tsk.progress = u'CSV file created, starting to populate with events'
         tsk.save()
-    except:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(
-            sys.exc_info()[0]))
+    except IOError as e:
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+        exit()
 
     # Get the data
     study = GeneralStudyModuleAttr.objects.get(pk=studyid)
