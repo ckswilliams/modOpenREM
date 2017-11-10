@@ -58,7 +58,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from tempfile import TemporaryFile
     from django.core.files import File
     from django.db.models import Count, Max
-    from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name
+    from remapp.exports.export_common import text_and_date_formats, generate_sheets, sheet_name
     from remapp.models import Exports
     from remapp.interface.mod_filters import ct_acq_filter
     import uuid
@@ -177,7 +177,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         wsalldata.write_row(row + 1, 0, all_exam_data)
 
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
-    
+
     # Populate summary sheet
     tsk.progress = u'Now populating the summary sheet...'
     tsk.save()
