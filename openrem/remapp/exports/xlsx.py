@@ -32,90 +32,9 @@
 import logging
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
-from remapp.exports.export_common import get_common_data
+from remapp.exports.export_common import get_common_data, generate_all_data_headers_ct, ct_get_series_data
 
 logger = logging.getLogger(__name__)
-
-# LO: maybe this function can be moved to tools (as it can be reused in other exports)
-
-
-def _ct_get_series_data(s):
-    from django.core.exceptions import ObjectDoesNotExist
-    from remapp.tools.get_values import return_for_export, string_to_float
-
-    try:
-        if s.ctdiw_phantom_type.code_value == u'113691':
-            phantom = u'32 cm'
-        elif s.ctdiw_phantom_type.code_value == u'113690':
-            phantom = u'16 cm'
-        else:
-            phantom = s.ctdiw_phantom_type.code_meaning
-    except AttributeError:
-        phantom = None
-
-    seriesdata = [
-        str(s.acquisition_protocol),
-        str(s.ct_acquisition_type),
-        s.exposure_time,
-        s.scanninglength_set.get().scanning_length,
-        s.nominal_single_collimation_width,
-        s.nominal_total_collimation_width,
-        s.pitch_factor,
-        s.number_of_xray_sources,
-        s.mean_ctdivol,
-        phantom,
-        s.dlp,
-        ]
-    if s.number_of_xray_sources > 1:
-        for source in s.ctxraysourceparameters_set.all():
-            seriesdata += [
-                str(source.identification_of_the_xray_source),
-                source.kvp,
-                source.maximum_xray_tube_current,
-                source.xray_tube_current,
-                source.exposure_time_per_rotation,
-                ]
-    else:
-        try:
-            try:
-                s.ctxraysourceparameters_set.get()
-            except ObjectDoesNotExist:
-                identification_of_the_xray_source = None
-                kvp = None
-                maximum_xray_tube_current = None
-                xray_tube_current = None
-                exposure_time_per_rotation = None
-            else:
-                identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                      'identification_of_the_xray_source')
-                kvp = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'kvp'))
-                maximum_xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                        'maximum_xray_tube_current'))
-                xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                'xray_tube_current'))
-                exposure_time_per_rotation = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                         'exposure_time_per_rotation'))
-
-            seriesdata += [
-                identification_of_the_xray_source,
-                kvp,
-                maximum_xray_tube_current,
-                xray_tube_current,
-                exposure_time_per_rotation,
-                u'n/a',
-                u'n/a',
-                u'n/a',
-                u'n/a',
-                u'n/a',
-                ]
-        except:
-            seriesdata += [u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', ]
-    seriesdata += [
-        s.xray_modulation_type,
-        str(s.comment),
-        ]
-    return seriesdata
-
 
 
 @shared_task
@@ -135,7 +54,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     import pkg_resources  # part of setuptools
     from tempfile import TemporaryFile
     from django.core.files import File
-    from django.db.models import Count
+    from django.db.models import Count, Max
     from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name
     from remapp.models import Exports
     from remapp.interface.mod_filters import ct_acq_filter
@@ -215,7 +134,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     book, sheet_list = generate_sheets(e, book, protocolheaders, modality=u"CT", pid=pid, name=name, patid=patid)
 
-    from django.db.models import Max
     max_events_dict = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
     max_events = max_events_dict['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']
 
@@ -224,32 +142,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
 
-    for h in range(max_events):
-        alldataheaders += [
-            u'E' + str(h+1) + u' Protocol',
-            u'E' + str(h+1) + u' Type',
-            u'E' + str(h+1) + u' Exposure time',
-            u'E' + str(h+1) + u' Scanning length',
-            u'E' + str(h+1) + u' Slice thickness',
-            u'E' + str(h+1) + u' Total collimation',
-            u'E' + str(h+1) + u' Pitch',
-            u'E' + str(h+1) + u' No. sources',
-            u'E' + str(h+1) + u' CTDIvol',
-            u'E' + str(h+1) + u' Phantom',
-            u'E' + str(h+1) + u' DLP',
-            u'E' + str(h+1) + u' S1 name',
-            u'E' + str(h+1) + u' S1 kVp',
-            u'E' + str(h+1) + u' S1 max mA',
-            u'E' + str(h+1) + u' S1 mA',
-            u'E' + str(h+1) + u' S1 Exposure time/rotation',
-            u'E' + str(h+1) + u' S2 name',
-            u'E' + str(h+1) + u' S2 kVp',
-            u'E' + str(h+1) + u' S2 max mA',
-            u'E' + str(h+1) + u' S2 mA',
-            u'E' + str(h+1) + u' S2 Exposure time/rotation',
-            u'E' + str(h+1) + u' mA Modulation type',
-            u'E' + str(h+1) + u' Comments',
-            ]
+    alldataheaders += generate_all_data_headers_ct(max_events)
+
     wsalldata.write_row('A1', alldataheaders)
     numcolumns = len(alldataheaders) - 1
     numrows = e.count()
@@ -266,7 +160,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
         for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
             # Get series data
-            series_data = _ct_get_series_data(s)
+            series_data = ct_get_series_data(s)
             # Add series to all data
             all_exam_data += series_data
             # Add series data to series tab

@@ -355,3 +355,117 @@ def get_xray_filter_info(source):
         filter_thicknesses = None
     return filters, filter_thicknesses
 
+
+def generate_all_data_headers_ct(max_events):
+    """Generate the headers for CT that repeat once for each series of the exaqm with the most series in
+
+    :param max_events: maximum number of times to repeat headers
+    :return: list of headers
+    """
+
+    repeating_series_headers = []
+    for h in range(max_events):
+        repeating_series_headers += [
+            u'E' + str(h+1) + u' Protocol',
+            u'E' + str(h+1) + u' Type',
+            u'E' + str(h+1) + u' Exposure time',
+            u'E' + str(h+1) + u' Scanning length',
+            u'E' + str(h+1) + u' Slice thickness',
+            u'E' + str(h+1) + u' Total collimation',
+            u'E' + str(h+1) + u' Pitch',
+            u'E' + str(h+1) + u' No. sources',
+            u'E' + str(h+1) + u' CTDIvol',
+            u'E' + str(h+1) + u' Phantom',
+            u'E' + str(h+1) + u' DLP',
+            u'E' + str(h+1) + u' S1 name',
+            u'E' + str(h+1) + u' S1 kVp',
+            u'E' + str(h+1) + u' S1 max mA',
+            u'E' + str(h+1) + u' S1 mA',
+            u'E' + str(h+1) + u' S1 Exposure time/rotation',
+            u'E' + str(h+1) + u' S2 name',
+            u'E' + str(h+1) + u' S2 kVp',
+            u'E' + str(h+1) + u' S2 max mA',
+            u'E' + str(h+1) + u' S2 mA',
+            u'E' + str(h+1) + u' S2 Exposure time/rotation',
+            u'E' + str(h+1) + u' mA Modulation type',
+            u'E' + str(h+1) + u' Comments',
+            ]
+
+    return repeating_series_headers
+
+
+def ct_get_series_data(s):
+    from remapp.tools.get_values import return_for_export, string_to_float
+
+    try:
+        if s.ctdiw_phantom_type.code_value == u'113691':
+            phantom = u'32 cm'
+        elif s.ctdiw_phantom_type.code_value == u'113690':
+            phantom = u'16 cm'
+        else:
+            phantom = s.ctdiw_phantom_type.code_meaning
+    except AttributeError:
+        phantom = None
+
+    seriesdata = [
+        str(s.acquisition_protocol),
+        str(s.ct_acquisition_type),
+        s.exposure_time,
+        s.scanninglength_set.get().scanning_length,
+        s.nominal_single_collimation_width,
+        s.nominal_total_collimation_width,
+        s.pitch_factor,
+        s.number_of_xray_sources,
+        s.mean_ctdivol,
+        phantom,
+        s.dlp,
+        ]
+    if s.number_of_xray_sources > 1:
+        for source in s.ctxraysourceparameters_set.all():
+            seriesdata += [
+                str(source.identification_of_the_xray_source),
+                source.kvp,
+                source.maximum_xray_tube_current,
+                source.xray_tube_current,
+                source.exposure_time_per_rotation,
+                ]
+    else:
+        try:
+            try:
+                s.ctxraysourceparameters_set.get()
+            except ObjectDoesNotExist:
+                identification_of_the_xray_source = None
+                kvp = None
+                maximum_xray_tube_current = None
+                xray_tube_current = None
+                exposure_time_per_rotation = None
+            else:
+                identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                      'identification_of_the_xray_source')
+                kvp = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'kvp'))
+                maximum_xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                        'maximum_xray_tube_current'))
+                xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                'xray_tube_current'))
+                exposure_time_per_rotation = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                         'exposure_time_per_rotation'))
+
+            seriesdata += [
+                identification_of_the_xray_source,
+                kvp,
+                maximum_xray_tube_current,
+                xray_tube_current,
+                exposure_time_per_rotation,
+                u'n/a',
+                u'n/a',
+                u'n/a',
+                u'n/a',
+                u'n/a',
+                ]
+        except:
+            seriesdata += [u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', ]
+    seriesdata += [
+        s.xray_modulation_type,
+        str(s.comment),
+        ]
+    return seriesdata

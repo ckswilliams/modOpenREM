@@ -32,7 +32,9 @@
 import csv
 import logging
 from celery import shared_task
-from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
+    get_common_data, get_xray_filter_info, generate_all_data_headers_ct, ct_get_series_data
 
 logger = logging.getLogger(__name__)
 
@@ -41,9 +43,12 @@ logger = logging.getLogger(__name__)
 def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered CT database data to a single-sheet CSV file.
 
-    :param request: Query parameters from the CT filtered page URL.
-    :type request: HTTP get
-    
+    :param filterdict: Queryset of studies to export
+    :param pid: does the user have patient identifiable data permission
+    :param name: has patient name been selected for export
+    :param patid: has patient ID been selected for export
+    :param user: User that has started the export
+    :return: Saves csv file into Media directory for user to download
     """
 
     import sys
@@ -51,6 +56,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from tempfile import TemporaryFile
     from django.core.files import File
     from django.core.exceptions import ObjectDoesNotExist
+    from django.db.models import Max
     from remapp.models import Exports
     from remapp.tools.get_values import return_for_export, export_csv_prep
     from remapp.interface.mod_filters import ct_acq_filter
@@ -64,10 +70,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_date = datestamp
     tsk.progress = u'Query filters imported, task started'
     tsk.status = u'CURRENT'
-    if pid and (name or patid):
-        tsk.includes_pid = True
-    else:
-        tsk.includes_pid = False
+    tsk.includes_pid = bool(pid and (name or patid))
     tsk.export_user_id = user
     tsk.save()
 
@@ -77,9 +80,9 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
         tsk.progress = u'CSV file created'
         tsk.save()
-    except:
-        logger.error(u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
-        return
+    except IOError as e:
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+        exit()
 
     # Get the data!
     e = ct_acq_filter(filterdict, pid=pid).qs
@@ -93,238 +96,33 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.num_records = numresults
     tsk.save()
 
-    headings = []
-    if pid and name:
-        headings += [u'Patient name']
-    if pid and patid:
-        headings += [u'Patient ID']
+    headings = common_headers(pid=pid, name=name, patid=patid)
     headings += [
-        u'Institution name',
-        u'Manufacturer',
-        u'Model name',
-        u'Station name',
-        u'Display name',
-        u'Accession number',
-        u'Operator',
-        u'Study date',
-    ]
-    if pid and (name or patid):
-        headings += [
-            u'Date of birth',
-        ]
-    headings += [
-        u'Patient age',
-        u'Patient sex',
-        u'Patient height',
-        u'Patient mass (kg)',
-        u'Test patient?',
-        u'Study description',
-        u'Requested procedure',
-        u'Number of events',
         u'DLP total (mGy.cm)',
         ]
 
-    from django.db.models import Max
-    max_events = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
-
-    for h in xrange(max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']):
-        headings += [
-            u'E' + str(h+1) + u' Protocol',
-            u'E' + str(h+1) + u' Type',
-            u'E' + str(h+1) + u' Exposure time',
-            u'E' + str(h+1) + u' Scanning length',
-            u'E' + str(h+1) + u' Slice thickness',
-            u'E' + str(h+1) + u' Total collimation',
-            u'E' + str(h+1) + u' Pitch',
-            u'E' + str(h+1) + u' No. sources',
-            u'E' + str(h+1) + u' CTDIvol',
-            u'E' + str(h+1) + u' Phantom',
-            u'E' + str(h+1) + u' DLP',
-            u'E' + str(h+1) + u' S1 name',
-            u'E' + str(h+1) + u' S1 kVp',
-            u'E' + str(h+1) + u' S1 max mA',
-            u'E' + str(h+1) + u' S1 mA',
-            u'E' + str(h+1) + u' S1 Exposure time/rotation',
-            u'E' + str(h+1) + u' S2 name',
-            u'E' + str(h+1) + u' S2 kVp',
-            u'E' + str(h+1) + u' S2 max mA',
-            u'E' + str(h+1) + u' S2 mA',
-            u'E' + str(h+1) + u' S2 Exposure time/rotation',
-            u'E' + str(h+1) + u' mA Modulation type',
-            ]
+    max_events_dict = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
+    max_events = max_events_dict['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']
+    headings += generate_all_data_headers_ct(max_events)
     writer.writerow(headings)
 
     tsk.progress = u'CSV header row written.'
     tsk.save()
 
     for i, exams in enumerate(e):
-        if pid and (name or patid):
-            try:
-                exams.patientmoduleattr_set.get()
-            except ObjectDoesNotExist:
-                patient_birth_date = None
-                if name:
-                    patient_name = None
-                if patid:
-                    patient_id = None
-            else:
-                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
-                if name:
-                    patient_name = export_csv_prep(return_for_export(exams.patientmoduleattr_set.get(), 'patient_name'))
-                if patid:
-                    patient_id = export_csv_prep(return_for_export(exams.patientmoduleattr_set.get(), 'patient_id'))
+        exam_data = get_common_data(u"CT", exams, pid, name, patid)
 
-        try:
-            exams.generalequipmentmoduleattr_set.get()
-        except ObjectDoesNotExist:
-            institution_name = None
-            manufacturer = None
-            manufacturer_model_name = None
-            station_name = None
-            display_name = None
-        else:
-            institution_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
-            manufacturer = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
-            manufacturer_model_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name'))
-            station_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name'))
-            display_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
+            # Get series data
+            exam_data += ct_get_series_data(s)
 
-        try:
-            exams.patientmoduleattr_set.get()
-        except ObjectDoesNotExist:
-            patient_sex = None
-            not_patient = None
-        else:
-            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-            not_patient = export_csv_prep(return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator'))
-
-        try:
-            exams.patientstudymoduleattr_set.get()
-        except ObjectDoesNotExist:
-            patient_age_decimal = None
-            patient_size = None
-            patient_weight = None
-        else:
-            patient_age_decimal = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
-
-        try:
-            exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
-        except ObjectDoesNotExist:
-            total_number_of_irradiation_events = None
-            ct_dose_length_product_total = None
-        else:
-            total_number_of_irradiation_events = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events')
-            ct_dose_length_product_total = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total')
-
-        examdata = []
-        if pid and name:
-            examdata += [patient_name]
-        if pid and patid:
-            examdata += [patient_id]
-        examdata += [
-            institution_name,
-            manufacturer,
-            manufacturer_model_name,
-            station_name,
-            display_name,
-            export_csv_prep(exams.accession_number),
-            export_csv_prep(exams.operator_name),
-            exams.study_date,
-        ]
-        if pid and (name or patid):
-            examdata += [
-                patient_birth_date,
-            ]
-        examdata += [
-            patient_age_decimal,
-            patient_sex,
-            patient_size,
-            patient_weight,
-            not_patient,
-            export_csv_prep(exams.study_description),
-            export_csv_prep(exams.requested_procedure_code_meaning),
-            total_number_of_irradiation_events,
-            ct_dose_length_product_total,
-            ]
-
-        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
-
-            try:
-                s.scanninglength_set.get()
-            except ObjectDoesNotExist:
-                scanning_length = None
-            else:
-                scanning_length = s.scanninglength_set.get().scanning_length
-
-            try:
-                if s.ctdiw_phantom_type.code_value == u'113691':
-                    phantom = u'32 cm'
-                elif s.ctdiw_phantom_type.code_value == u'113690':
-                    phantom = u'16 cm'
-                else:
-                    phantom = s.ctdiw_phantom_type.code_meaning
-            except AttributeError:
-                phantom = None
-
-            examdata += [
-                export_csv_prep(s.acquisition_protocol),
-                s.ct_acquisition_type,
-                s.exposure_time,
-                scanning_length,
-                s.nominal_single_collimation_width,
-                s.nominal_total_collimation_width,
-                s.pitch_factor,
-                s.number_of_xray_sources,
-                s.mean_ctdivol,
-                phantom,
-                s.dlp,
-                ]
-            if s.number_of_xray_sources > 1:
-                for source in s.ctxraysourceparameters_set.all():
-                    examdata += [
-                        source.identification_of_the_xray_source,
-                        source.kvp,
-                        source.maximum_xray_tube_current,
-                        source.xray_tube_current,
-                        source.exposure_time_per_rotation,
-                        ]
-            else:
-                try:
-
-                    try:
-                        s.ctxraysourceparameters_set.get()
-                    except ObjectDoesNotExist:
-                        identification_of_the_xray_source = None
-                        kvp = None
-                        maximum_xray_tube_current = None
-                        xray_tube_current = None
-                        exposure_time_per_rotation = None
-                    else:
-                        identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(), 'identification_of_the_xray_source')
-                        kvp = return_for_export(s.ctxraysourceparameters_set.get(), 'kvp')
-                        maximum_xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'maximum_xray_tube_current')
-                        xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'xray_tube_current')
-                        exposure_time_per_rotation = return_for_export(s.ctxraysourceparameters_set.get(), 'exposure_time_per_rotation')
-
-                    examdata += [
-                        identification_of_the_xray_source,
-                        kvp,
-                        maximum_xray_tube_current,
-                        xray_tube_current,
-                        exposure_time_per_rotation,
-                        u'n/a',
-                        u'n/a',
-                        u'n/a',
-                        u'n/a',
-                        u'n/a',
-                        ]
-                except:
-                        examdata += [u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', ]
-            examdata += [s.xray_modulation_type,]
-
-        writer.writerow(examdata)
+        # Clear out any commas
+        for index, item in enumerate(exam_data):
+            if item is None:
+                exam_data[index] = ''
+            if isinstance(item, basestring) and u',' in item:
+                exam_data[index] = item.replace(u',', u';')
+        writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
         tsk.progress = u"{0} of {1}".format(i+1, numresults)
         tsk.save()
     tsk.progress = u'All study data written.'
