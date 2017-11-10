@@ -1,3 +1,7 @@
+"""
+..  module:: tasks.py
+    :synopsis: Module to import all the functions that run as Celery tasks.
+"""
 from __future__ import absolute_import
 
 from celery import shared_task  # pylint: disable=unused-import

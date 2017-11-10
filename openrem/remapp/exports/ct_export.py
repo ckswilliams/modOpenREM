@@ -22,8 +22,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-..  module:: xlsx.
-    :synopsis: Module to export database data to multi-sheet Microsoft XLSX files.
+..  module:: ct_export.
+    :synopsis: Module to export database data to multi-sheet Microsoft XLSX files and single-sheet csv files
 
 ..  moduleauthor:: Ed McDonagh
 
