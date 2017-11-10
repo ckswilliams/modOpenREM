@@ -523,19 +523,8 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             u'G' + str(h+1) + u' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    common_header_columns = 32
-    if pid and name:
-        common_header_columns += 1
-    if pid and patid:
-        common_header_columns += 1
-    if pid and (name or patid):
-        common_header_columns += 1
-    numcolumns = (31 * (num_groups_max + 1) + common_header_columns)
-    numrows = e.count()
-    wsalldata.autofilter(0,0,numrows,numcolumns)
-
-        
-
+    num_rows = e.count()
+    wsalldata.autofilter(0, 0, num_rows, len(alldataheaders))
 
     # Populate summary sheet
     tsk.progress = u'Now populating the summary sheet...'
