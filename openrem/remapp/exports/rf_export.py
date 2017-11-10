@@ -204,6 +204,38 @@ def _get_series_data(event):
     return series_data
 
 
+def _all_data_headers(pid=False, name=None, patid=None):
+    """Compile list of column headers
+
+    :param pid: does the user have patient identifiable data permission
+    :param name: has patient name been selected for export
+    :param patid: has patient ID been selected for export
+    :return: list of headers for all_data sheet and csv sheet
+    """
+    all_data_headers = common_headers(pid=pid, name=name, patid=patid) + [
+        u'A DAP total (Gy.m^2)',
+        u'A Dose RP total (Gy)',
+        u'A Fluoro DAP total (Gy.m^2)',
+        u'A Fluoro dose RP total (Gy)',
+        u'A Fluoro time total (ms)',
+        u'A Acq. DAP total (Gy.m^2)',
+        u'A Acq. dose RP total (Gy)',
+        u'A Acq. time total (ms)',
+        u'A Number of events',
+        u'B DAP total (Gy.m^2)',
+        u'B Dose RP total (Gy)',
+        u'B Fluoro DAP total (Gy.m^2)',
+        u'B Fluoro dose RP total (Gy)',
+        u'B Fluoro time total (ms)',
+        u'B Acq. DAP total (Gy.m^2)',
+        u'B Acq. dose RP total (Gy)',
+        u'B Acq. time total (ms)',
+        u'B Number of events',
+    ]
+    return all_data_headers
+
+
+
 @shared_task
 def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered RF database data to multi-sheet Microsoft XSLX files.
@@ -273,28 +305,9 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
-    alldataheaders = common_headers(pid=pid, name=name, patid=patid) + [
-        u'A DAP total (Gy.m^2)',
-        u'A Dose RP total (Gy)',
-        u'A Fluoro DAP total (Gy.m^2)',
-        u'A Fluoro dose RP total (Gy)',
-        u'A Fluoro time total (ms)',
-        u'A Acq. DAP total (Gy.m^2)',
-        u'A Acq. dose RP total (Gy)',
-        u'A Acq. time total (ms)',
-        u'A Number of events',
-        u'B DAP total (Gy.m^2)',
-        u'B Dose RP total (Gy)',
-        u'B Fluoro DAP total (Gy.m^2)',
-        u'B Fluoro dose RP total (Gy)',
-        u'B Fluoro time total (ms)',
-        u'B Acq. DAP total (Gy.m^2)',
-        u'B Acq. dose RP total (Gy)',
-        u'B Acq. time total (ms)',
-        u'B Number of events',
-    ]
+    all_data_headers = _all_data_headers(pid=pid, name=name, patid=patid)
 
-    sheet_headers = list(alldataheaders)
+    sheet_headers = list(all_data_headers)
     protocolheaders = sheet_headers + [
         u'Time',
         u'Type',
@@ -488,7 +501,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.save()
 
     for h in range(num_groups_max):
-        alldataheaders += [
+        all_data_headers += [
             u'G' + str(h+1) + u' Type',
             u'G' + str(h+1) + u' Protocol',
             u'G' + str(h+1) + u' No. exposures',
@@ -522,9 +535,9 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             u'G' + str(h+1) + u' Secondary angle max',
             u'G' + str(h+1) + u' Secondary angle mean',
             ]
-    wsalldata.write_row('A1', alldataheaders)
+    wsalldata.write_row('A1', all_data_headers)
     num_rows = e.count()
-    wsalldata.autofilter(0, 0, num_rows, len(alldataheaders) - 1)
+    wsalldata.autofilter(0, 0, num_rows, len(all_data_headers) - 1)
 
     # Populate summary sheet
     tsk.progress = u'Now populating the summary sheet...'
@@ -674,159 +687,15 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.num_records = numresults
     tsk.save()
 
-    headings = []
-    if pid and name:
-        headings += [u'Patient name']
-    if pid and patid:
-        headings += [u'Patient ID']
-    headings += [
-        u'Manufacturer',
-        u'Model name',
-        u'Institution name',
-        u'Display name',
-        u'Accession number',
-        u'Study date',
-    ]
-    if pid and (name or patid):
-        headings += [
-            u'Date of birth',
-        ]
-    headings += [
-        u'Patient age',
-        u'Patient sex',
-        u'Patient height',
-        u'Patient mass (kg)',
-        u'Not patient?',
-        u'Study description',
-        u'Physician',
-        u'Operator',
-        u'Number of events',
-        u'Plane',
-        u'DAP total (Gy.m2)',
-        u'RP dose total (Gy)',
-        u'Fluoro DAP total (Gy.m2)',
-        u'Fluoro RP dose total (Gy)',
-        u'Total fluoro time (ms)',
-        u'Acquisition DAP total (Gy.m2)',
-        u'Acquisition RP dose total (Gy)',
-        u'Total acquisition time (ms)',
-        u'RP definition',
-        u'Plane (if bi-plane)',
-        u'DAP total (Gy.m2)',
-        u'RP dose total (Gy)',
-        u'Fluoro DAP total (Gy.m2)',
-        u'Fluoro RP dose total (Gy)',
-        u'Total fluoro time (ms)',
-        u'Acquisition DAP total (Gy.m2)',
-        u'Acquisition RP dose total (Gy)',
-        u'Total acquisition time (ms)',
-        u'RP definition',
-    ]
+    headings = _all_data_headers(pid=pid, name=name, patid=patid)
     writer.writerow(headings)
     for i, exams in enumerate(e):
 
-        if pid and (name or patid):
-            try:
-                exams.patientmoduleattr_set.get()
-            except ObjectDoesNotExist:
-                patient_birth_date = None
-                if name:
-                    patient_name = None
-                if patid:
-                    patient_id = None
-            else:
-                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
-                if name:
-                    patient_name = export_csv_prep(return_for_export(exams.patientmoduleattr_set.get(), 'patient_name'))
-                if patid:
-                    patient_id = export_csv_prep(return_for_export(exams.patientmoduleattr_set.get(), 'patient_id'))
-
-        try:
-            exams.generalequipmentmoduleattr_set.get()
-        except ObjectDoesNotExist:
-            manufacturer = None
-        else:
-            manufacturer = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
-
-        try:
-            exams.projectionxrayradiationdose_set.get().observercontext_set.get()
-        except ObjectDoesNotExist:
-            device_observer_name = None
-        else:
-            device_observer_name = export_csv_prep(return_for_export(exams.projectionxrayradiationdose_set.get(
-                ).observercontext_set.get(), 'device_observer_name'))
-
-        try:
-            exams.generalequipmentmoduleattr_set.get()
-        except ObjectDoesNotExist:
-            institution_name = None
-            display_name = None
-        else:
-            institution_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(
-                ), 'institution_name'))
-            display_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(
-                ).unique_equipment_name, 'display_name'))
-
-        try:
-            exams.patientmoduleattr_set.get()
-        except ObjectDoesNotExist:
-            patient_sex = None
-            not_patient = None
-        else:
-            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-            not_patient = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
-
-        try:
-            exams.patientstudymoduleattr_set.get()
-        except ObjectDoesNotExist:
-            patient_age_decimal = None
-            patient_size = None
-            patient_weight = None
-        else:
-            patient_age_decimal = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
-
-        try:
-            exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count()
-        except ObjectDoesNotExist:
-            count = None
-        else:
-            count = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count()
-
-        row = []
-        if pid and name:
-            row += [patient_name]
-        if pid and patid:
-            row += [patient_id]
-        row += [
-            manufacturer,
-            device_observer_name,
-            institution_name,
-            display_name,
-            export_csv_prep(exams.accession_number),
-            exams.study_date,
-        ]
-        if pid and (name or patid):
-            row += [
-                patient_birth_date,
-            ]
-        row += [
-            patient_age_decimal,
-            patient_sex,
-            patient_size,
-            patient_weight,
-            export_csv_prep(not_patient),
-            export_csv_prep(exams.study_description),
-            export_csv_prep(exams.performing_physician_name),
-            export_csv_prep(exams.operator_name),
-            count,
-        ]
+        exam_data = get_common_data(u"RF", exams, pid=pid, name=name, patid=patid)
 
         for plane in exams.projectionxrayradiationdose_set.get().accumxraydose_set.all():
             accum = _get_accumulated_data(plane)
-            row += [
-                accum['plane'],
+            exam_data += [
                 accum['dose_area_product_total'],
                 accum['dose_rp_total'],
                 accum['fluoro_dose_area_product_total'],
@@ -835,12 +704,17 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 accum['acquisition_dose_area_product_total'],
                 accum['acquisition_dose_rp_total'],
                 accum['total_acquisition_time'],
-                accum['reference_point_definition'],
+                accum['eventcount'],
             ]
-        writer.writerow(row)
-        tsk.progress = u"{0} of {1}".format(i+1, numresults)
+        # Clear out any commas
+        for index, item in enumerate(exam_data):
+            if item is None:
+                exam_data[index] = ''
+            if isinstance(item, basestring) and u',' in item:
+                exam_data[index] = item.replace(u',', u';')
+        writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
+        tsk.progress = u"{0} of {1}".format(i + 1, numresults)
         tsk.save()
-
 
     tsk.progress = u'All study data written.'
     tsk.save()
@@ -859,7 +733,6 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.status = u'ERROR'
         tsk.save()
         return
-
 
     tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
