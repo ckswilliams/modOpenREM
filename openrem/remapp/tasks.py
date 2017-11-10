@@ -4,7 +4,7 @@ from celery import shared_task
 
 
 from remapp.exports.exportcsv import exportMG2excel
-from remapp.exports.xlsx import ctxlsx, exportCT2excel
+from remapp.exports.ct_export import ctxlsx, exportCT2excel
 from remapp.exports.mg_csv_nhsbsp import mg_csv_nhsbsp
 from remapp.extractors.ptsizecsv2db import websizeimport
 from remapp.exports.dx_export import exportDX2excel, dxxlsx

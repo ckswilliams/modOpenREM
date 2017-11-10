@@ -119,9 +119,9 @@ urlpatterns += patterns('remapp.exports.exportviews',
 )
 
 urlpatterns += patterns('remapp.exports',
-    url(r'^xlsx/openrem/ct/',
-        'xlsx.ctxlsx'),
-)
+                        url(r'^xlsx/openrem/ct/',
+                            'ct_export.ctxlsx'),
+                        )
 
 urlpatterns += patterns('remapp.views',
     url(r'^charts_off/$',

@@ -6,7 +6,7 @@ import os
 from django.contrib.auth.models import User, Group
 from django.test import TestCase, RequestFactory
 from remapp.extractors import rdsr
-from remapp.exports.xlsx import ctxlsx
+from remapp.exports.ct_export import ctxlsx
 from remapp.models import PatientIDSettings, Exports
 
 
