@@ -81,13 +81,13 @@ def ctcsv1(request, name=None, pat_id=None):
     :type request: GET
     """
     from django.shortcuts import redirect
-    from remapp.exports.ct_export import exportCT2excel
+    from remapp.exports.ct_export import ct_csv
 
     pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportCT2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
-                                   pid['include_pat_id'], request.user.id)
+        job = ct_csv.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                           pid['include_pat_id'], request.user.id)
         logger.debug(u'Export CT to CSV job is {0}'.format(job))
     return redirect('/openrem/export/')
 

@@ -256,7 +256,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
 
 @shared_task
-def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
+def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered CT database data to a single-sheet CSV file.
 
     :param filterdict: Queryset of studies to export
@@ -279,7 +279,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     tsk = Exports.objects.create()
 
-    tsk.task_id = exportCT2excel.request.id
+    tsk.task_id = ct_csv.request.id
     tsk.modality = u"CT"
     tsk.export_type = u"CSV export"
     datestamp = datetime.datetime.now()
