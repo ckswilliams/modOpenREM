@@ -81,7 +81,7 @@ def ctcsv1(request, name=None, pat_id=None):
     :type request: GET
     """
     from django.shortcuts import redirect
-    from remapp.exports.exportcsv import exportCT2excel
+    from remapp.exports.xlsx import exportCT2excel
 
     pid = include_pid(request, name, pat_id)
 

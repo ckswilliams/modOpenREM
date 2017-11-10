@@ -18,7 +18,7 @@ Single sheet CSV exports
 ++++++++++++++++++++++++
    
 .. autotask:: remapp.exports.exportcsv.exportFL2excel
-.. autotask:: remapp.exports.exportcsv.exportCT2excel
+.. autotask:: remapp.exports.xlsx.exportCT2excel
 .. autotask:: remapp.exports.exportcsv.exportMG2excel
 .. autotask:: remapp.exports.dx_export.exportDX2excel
 

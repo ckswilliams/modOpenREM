@@ -28,11 +28,13 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
-
+import csv
 import logging
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
-from remapp.exports.export_common import get_common_data, generate_all_data_headers_ct, ct_get_series_data
+from remapp.exports.export_common import get_common_data, generate_all_data_headers_ct, ct_get_series_data, \
+    common_headers
+from remapp.exports.exportcsv import logger
 
 logger = logging.getLogger(__name__)
 
@@ -252,3 +254,111 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
+
+@shared_task
+def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
+    """Export filtered CT database data to a single-sheet CSV file.
+
+    :param filterdict: Queryset of studies to export
+    :param pid: does the user have patient identifiable data permission
+    :param name: has patient name been selected for export
+    :param patid: has patient ID been selected for export
+    :param user: User that has started the export
+    :return: Saves csv file into Media directory for user to download
+    """
+
+    import sys
+    import datetime
+    from tempfile import TemporaryFile
+    from django.core.files import File
+    from django.core.exceptions import ObjectDoesNotExist
+    from django.db.models import Max
+    from remapp.models import Exports
+    from remapp.tools.get_values import return_for_export, export_csv_prep
+    from remapp.interface.mod_filters import ct_acq_filter
+
+    tsk = Exports.objects.create()
+
+    tsk.task_id = exportCT2excel.request.id
+    tsk.modality = u"CT"
+    tsk.export_type = u"CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
+    tsk.includes_pid = bool(pid and (name or patid))
+    tsk.export_user_id = user
+    tsk.save()
+
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = u'CSV file created'
+        tsk.save()
+    except IOError as e:
+        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+        exit()
+
+    # Get the data!
+    e = ct_acq_filter(filterdict, pid=pid).qs
+
+    tsk.progress = u'Required study filter complete.'
+    tsk.save()
+
+    numresults = e.count()
+
+    tsk.progress = u'{0} studies in query.'.format(numresults)
+    tsk.num_records = numresults
+    tsk.save()
+
+    headings = common_headers(pid=pid, name=name, patid=patid)
+    headings += [
+        u'DLP total (mGy.cm)',
+        ]
+
+    max_events_dict = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
+    max_events = max_events_dict['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']
+    headings += generate_all_data_headers_ct(max_events)
+    writer.writerow(headings)
+
+    tsk.progress = u'CSV header row written.'
+    tsk.save()
+
+    for i, exams in enumerate(e):
+        exam_data = get_common_data(u"CT", exams, pid, name, patid)
+
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
+            # Get series data
+            exam_data += ct_get_series_data(s)
+
+        # Clear out any commas
+        for index, item in enumerate(exam_data):
+            if item is None:
+                exam_data[index] = ''
+            if isinstance(item, basestring) and u',' in item:
+                exam_data[index] = item.replace(u',', u';')
+        writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
+        tsk.progress = u"{0} of {1}".format(i+1, numresults)
+        tsk.save()
+    tsk.progress = u'All study data written.'
+    tsk.save()
+
+    csvfilename = u"ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = u'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = u'ERROR'
+        tsk.save()
+        return
+
+    tsk.status = u'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    tsk.save()
