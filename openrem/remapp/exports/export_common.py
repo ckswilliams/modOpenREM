@@ -305,6 +305,11 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
 
 
 def get_xray_filterinfo(source):
+    """Compile a string containing details of the filters, and a corresponding string of filter thicknesses
+
+    :param source: exposure in question
+    :return: two strings of filters and filter thicknesses
+    """
     try:
         filters = u''
         filter_thicknesses = u''
