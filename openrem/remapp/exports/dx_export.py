@@ -36,7 +36,7 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data
+    get_common_data, get_xray_filterinfo
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ def _dx_get_series_data(s):
                 mas = None
         except ObjectDoesNotExist:
             mas = None
-        filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
+        filters, filter_thicknesses = get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
     except ObjectDoesNotExist:
         exposure_control_mode = None
         average_xray_tube_current = None
@@ -156,53 +156,6 @@ def _dx_get_series_data(s):
         s.comment,
     ]
     return series_data
-
-
-def _get_xray_filterinfo(source):
-    try:
-        filters = u''
-        filter_thicknesses = u''
-        for current_filter in source.xrayfilters_set.all():
-            if 'Aluminum' in str(current_filter.xray_filter_material):
-                filters += u'Al'
-            elif 'Copper' in str(current_filter.xray_filter_material):
-                filters += u'Cu'
-            elif 'Tantalum' in str(current_filter.xray_filter_material):
-                filters += u'Ta'
-            elif 'Molybdenum' in str(current_filter.xray_filter_material):
-                filters += u'Mo'
-            elif 'Rhodium' in str(current_filter.xray_filter_material):
-                filters += u'Rh'
-            elif 'Silver' in str(current_filter.xray_filter_material):
-                filters += u'Ag'
-            elif 'Niobium' in str(current_filter.xray_filter_material):
-                filters += u'Nb'
-            elif 'Europium' in str(current_filter.xray_filter_material):
-                filters += u'Eu'
-            elif 'Lead' in str(current_filter.xray_filter_material):
-                filters += u'Pb'
-            else:
-                filters += str(current_filter.xray_filter_material)
-            filters += u' | '
-            thicknesses = [current_filter.xray_filter_thickness_minimum,
-                           current_filter.xray_filter_thickness_maximum]
-            if thicknesses[0] is not None and thicknesses[1] is not None:
-                thick = sum(thicknesses) / len(thicknesses)
-            elif thicknesses[0] is None and thicknesses[1] is None:
-                thick = ''
-            elif thicknesses[0] is not None:
-                thick = thicknesses[0]
-            elif thicknesses[1] is not None:
-                thick = thicknesses[1]
-            if thick:
-                thick = round(thick, 4)
-            filter_thicknesses += str(thick) + u' | '
-        filters = filters[:-3]
-        filter_thicknesses = filter_thicknesses[:-3]
-    except ObjectDoesNotExist:
-        filters = None
-        filter_thicknesses = None
-    return filters, filter_thicknesses
 
 
 @shared_task

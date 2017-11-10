@@ -34,7 +34,7 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data
+    get_common_data, get_xray_filterinfo
 from remapp.tools.get_values import return_for_export, string_to_float
 
 logger = logging.getLogger(__name__)
@@ -151,7 +151,7 @@ def _get_series_data(event):
         ii_field_size = _get_db_value(event.irradeventxraysourcedata_set.get(), 'ii_field_size')
         exposure_time = _get_db_value(event.irradeventxraysourcedata_set.get(), 'exposure_time')
         dose_rp = _get_db_value(event.irradeventxraysourcedata_set.get(), 'dose_rp')
-        filter_material, filter_thick = _get_xray_filterinfo(event.irradeventxraysourcedata_set.get())
+        filter_material, filter_thick = get_xray_filterinfo(event.irradeventxraysourcedata_set.get())
         try:
             event.irradeventxraysourcedata_set.get().kvp_set.get()
         except ObjectDoesNotExist:
@@ -202,53 +202,6 @@ def _get_series_data(event):
     ]
 
     return series_data
-
-
-def _get_xray_filterinfo(source):
-    try:
-        filters = u''
-        filter_thicknesses = u''
-        for current_filter in source.xrayfilters_set.all():
-            if u'Aluminum' in str(current_filter.xray_filter_material):
-                filters += u'Al'
-            elif u'Copper' in str(current_filter.xray_filter_material):
-                filters += u'Cu'
-            elif u'Tantalum' in str(current_filter.xray_filter_material):
-                filters += u'Ta'
-            elif u'Molybdenum' in str(current_filter.xray_filter_material):
-                filters += u'Mo'
-            elif u'Rhodium' in str(current_filter.xray_filter_material):
-                filters += u'Rh'
-            elif u'Silver' in str(current_filter.xray_filter_material):
-                filters += u'Ag'
-            elif u'Niobium' in str(current_filter.xray_filter_material):
-                filters += u'Nb'
-            elif u'Europium' in str(current_filter.xray_filter_material):
-                filters += u'Eu'
-            elif u'Lead' in str(current_filter.xray_filter_material):
-                filters += u'Pb'
-            else:
-                filters += str(current_filter.xray_filter_material)
-            filters += u' | '
-            thicknesses = [current_filter.xray_filter_thickness_minimum,
-                           current_filter.xray_filter_thickness_maximum]
-            if thicknesses[0] is not None and thicknesses[1] is not None:
-                thick = sum(thicknesses) / len(thicknesses)
-            elif thicknesses[0] is None and thicknesses[1] is None:
-                thick = u''
-            elif thicknesses[0] is not None:
-                thick = thicknesses[0]
-            elif thicknesses[1] is not None:
-                thick = thicknesses[1]
-            if thick:
-                thick = round(thick, 4)
-            filter_thicknesses += str(thick) + u' | '
-        filters = filters[:-3]
-        filter_thicknesses = filter_thicknesses[:-3]
-    except ObjectDoesNotExist:
-        filters = None
-        filter_thicknesses = None
-    return filters, filter_thicknesses
 
 
 @shared_task
@@ -411,7 +364,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     filter_material = None
                     filter_thick = None
                 else:
-                    filter_material, filter_thick = _get_xray_filterinfo(
+                    filter_material, filter_thick = get_xray_filterinfo(
                         inst[0].irradeventxraysourcedata_set.get())
 
             protocol = _get_db_value(inst[0], "acquisition_protocol")

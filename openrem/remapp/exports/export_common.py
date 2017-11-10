@@ -29,6 +29,9 @@
 
 """
 
+from django.core.exceptions import ObjectDoesNotExist
+
+
 def text_and_date_formats(book, sheet, pid=False, name=None, patid=None):
     """
     Function to write out the headings common to each sheet and modality and format the date, time, patient ID and
@@ -175,7 +178,6 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     :param patid: has patient ID been selected for export
     :return: the common data for that exam
     """
-    from django.core.exceptions import ObjectDoesNotExist
 
     if pid and (name or patid):
         try:
@@ -300,3 +302,51 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         ]
 
     return examdata
+
+
+def get_xray_filterinfo(source):
+    try:
+        filters = u''
+        filter_thicknesses = u''
+        for current_filter in source.xrayfilters_set.all():
+            if u'Aluminum' in str(current_filter.xray_filter_material):
+                filters += u'Al'
+            elif u'Copper' in str(current_filter.xray_filter_material):
+                filters += u'Cu'
+            elif u'Tantalum' in str(current_filter.xray_filter_material):
+                filters += u'Ta'
+            elif u'Molybdenum' in str(current_filter.xray_filter_material):
+                filters += u'Mo'
+            elif u'Rhodium' in str(current_filter.xray_filter_material):
+                filters += u'Rh'
+            elif u'Silver' in str(current_filter.xray_filter_material):
+                filters += u'Ag'
+            elif u'Niobium' in str(current_filter.xray_filter_material):
+                filters += u'Nb'
+            elif u'Europium' in str(current_filter.xray_filter_material):
+                filters += u'Eu'
+            elif u'Lead' in str(current_filter.xray_filter_material):
+                filters += u'Pb'
+            else:
+                filters += str(current_filter.xray_filter_material)
+            filters += u' | '
+            thicknesses = [current_filter.xray_filter_thickness_minimum,
+                           current_filter.xray_filter_thickness_maximum]
+            if thicknesses[0] is not None and thicknesses[1] is not None:
+                thick = sum(thicknesses) / len(thicknesses)
+            elif thicknesses[0] is None and thicknesses[1] is None:
+                thick = u''
+            elif thicknesses[0] is not None:
+                thick = thicknesses[0]
+            elif thicknesses[1] is not None:
+                thick = thicknesses[1]
+            if thick:
+                thick = round(thick, 4)
+            filter_thicknesses += str(thick) + u' | '
+        filters = filters[:-3]
+        filter_thicknesses = filter_thicknesses[:-3]
+    except ObjectDoesNotExist:
+        filters = None
+        filter_thicknesses = None
+    return filters, filter_thicknesses
+
