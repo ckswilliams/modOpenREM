@@ -13,8 +13,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -52,8 +52,11 @@ def _get_db_value(qs, location):
 
 
 def _get_accumulated_data(accumXrayDose):
-    from django.core.exceptions import ObjectDoesNotExist
-    from remapp.tools.get_values import return_for_export
+    """Extract all the summary level data
+
+    :param accumXrayDose: Accumulated x-ray radiation dose object
+    :return: dict of summary level data
+    """
     accum = {}
     accum['plane'] = accumXrayDose.acquisition_plane.code_meaning
     try:
@@ -249,10 +252,11 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     """
 
     import datetime
+    import pkg_resources  # part of setuptools
     import sys
     from tempfile import TemporaryFile
     from django.core.files import File
-    from django.db.models import Max, Min, Avg
+    from django.db.models import Max, Min, Avg, Count
     from remapp.models import GeneralStudyModuleAttr, IrradEventXRayData
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
@@ -269,10 +273,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_date = datestamp
     tsk.progress = u'Query filters imported, task started'
     tsk.status = u'CURRENT'
-    if pid and (name or patid):
-        tsk.includes_pid = True
-    else:
-        tsk.includes_pid = False
+    tsk.includes_pid = bool(pid and (name or patid))
     tsk.export_user_id = user
     tsk.save()
 
@@ -292,7 +293,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     else:
         df_filtered_qs = RFSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
     e = df_filtered_qs.qs
-    
+
     tsk.progress = u'Required study filter complete.'
     tsk.num_records = e.count()
     tsk.save()
@@ -543,9 +544,6 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Now populating the summary sheet...'
     tsk.save()
 
-    import pkg_resources  # part of setuptools
-    import datetime
-
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -569,7 +567,6 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Generate list of Study Descriptions
     summarysheet.write(5, 0, u"Study Description")
     summarysheet.write(5, 1, u"Frequency")
-    from django.db.models import Count
     study_descriptions = e.values("study_description").annotate(n=Count("pk"))
     for row, item in enumerate(study_descriptions.order_by('n').reverse()):
         summarysheet.write(row+6, 0, item['study_description'])
@@ -579,7 +576,6 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Generate list of Requested Procedures
     summarysheet.write(5, 3, u"Requested Procedure")
     summarysheet.write(5, 4, u"Frequency")
-    from django.db.models import Count
     requested_procedure = e.values("requested_procedure_code_meaning").annotate(n=Count("pk"))
     for row, item in enumerate(requested_procedure.order_by('n').reverse()):
         summarysheet.write(row+6, 3, item['requested_procedure_code_meaning'])
@@ -626,22 +622,21 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered fluoro database data to a single-sheet CSV file.
 
-    :param request: Query parameters from the fluoro filtered page URL.
-    :type request: HTTP get
-
+    :param filterdict: Queryset of studies to export
+    :param pid: does the user have patient identifiable data permission
+    :param name: has patient name been selected for export
+    :param patid: has patient ID been selected for export
+    :param user: User that has started the export
+    :return: Saves csv file into Media directory for user to download
     """
 
-    import os, sys, datetime
+    import datetime
+    import sys
     from tempfile import TemporaryFile
-    from django.conf import settings
     from django.core.files import File
-    from django.shortcuts import redirect
-    from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
-    from remapp.tools.get_values import return_for_export, export_csv_prep
-    from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
 
@@ -835,13 +830,13 @@ def rfopenskin(studyid):
         xray_filter_thickness_minimum = u''
         xray_filter_thickness_maximum = u''
         try:
-            for filter in event.irradeventxraysourcedata_set.get().xrayfilters_set.all():
+            for filters in event.irradeventxraysourcedata_set.get().xrayfilters_set.all():
                 try:
-                    if u"Copper" in filter.xray_filter_material.code_meaning:
-                        xray_filter_type = filter.xray_filter_type
-                        xray_filter_material = filter.xray_filter_material
-                        xray_filter_thickness_minimum = filter.xray_filter_thickness_minimum
-                        xray_filter_thickness_maximum = filter.xray_filter_thickness_maximum
+                    if u"Copper" in filters.xray_filter_material.code_meaning:
+                        xray_filter_type = filters.xray_filter_type
+                        xray_filter_material = filters.xray_filter_material
+                        xray_filter_thickness_minimum = filters.xray_filter_thickness_minimum
+                        xray_filter_thickness_maximum = filters.xray_filter_thickness_maximum
                 except AttributeError:
                     pass
         except ObjectDoesNotExist:
