@@ -6,7 +6,7 @@ import os
 from django.contrib.auth.models import User, Group
 from django.test import TestCase, RequestFactory
 from remapp.extractors import mam
-from remapp.exports.exportcsv import exportMG2excel
+from remapp.exports.mg_export import exportMG2excel
 from remapp.models import PatientIDSettings, Exports
 
 class ExportMammoCSV(TestCase):

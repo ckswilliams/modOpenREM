@@ -6,7 +6,7 @@ from __future__ import absolute_import
 
 from celery import shared_task  # pylint: disable=unused-import
 
-from remapp.exports.exportcsv import exportMG2excel  # pylint: disable=unused-import
+from remapp.exports.mg_export import exportMG2excel  # pylint: disable=unused-import
 from remapp.exports.ct_export import ctxlsx, ct_csv  # pylint: disable=unused-import
 from remapp.exports.mg_csv_nhsbsp import mg_csv_nhsbsp  # pylint: disable=unused-import
 from remapp.extractors.ptsizecsv2db import websizeimport  # pylint: disable=unused-import

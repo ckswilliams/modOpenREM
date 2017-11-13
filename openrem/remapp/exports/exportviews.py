@@ -235,7 +235,7 @@ def mgcsv1(request, name=None, pat_id=None):
     :return:
     """
     from django.shortcuts import redirect
-    from remapp.exports.exportcsv import exportMG2excel
+    from remapp.exports.mg_export import exportMG2excel
 
     pid = include_pid(request, name, pat_id)
 
