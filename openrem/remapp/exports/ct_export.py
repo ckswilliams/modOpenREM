@@ -391,39 +391,36 @@ def _ct_get_series_data(s):
                 ]
     else:
         try:
-            try:
-                s.ctxraysourceparameters_set.get()
-            except ObjectDoesNotExist:
-                identification_of_the_xray_source = None
-                kvp = None
-                maximum_xray_tube_current = None
-                xray_tube_current = None
-                exposure_time_per_rotation = None
-            else:
-                identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                      'identification_of_the_xray_source')
-                kvp = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'kvp'))
-                maximum_xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                        'maximum_xray_tube_current'))
-                xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                'xray_tube_current'))
-                exposure_time_per_rotation = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                         'exposure_time_per_rotation'))
+            s.ctxraysourceparameters_set.get()
+        except ObjectDoesNotExist:
+            identification_of_the_xray_source = None
+            kvp = None
+            maximum_xray_tube_current = None
+            xray_tube_current = None
+            exposure_time_per_rotation = None
+        else:
+            identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                  'identification_of_the_xray_source')
+            kvp = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'kvp'))
+            maximum_xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                    'maximum_xray_tube_current'))
+            xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
+                                                            'xray_tube_current'))
+            exposure_time_per_rotation = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                     'exposure_time_per_rotation'))
 
-            seriesdata += [
-                identification_of_the_xray_source,
-                kvp,
-                maximum_xray_tube_current,
-                xray_tube_current,
-                exposure_time_per_rotation,
-                u'n/a',
-                u'n/a',
-                u'n/a',
-                u'n/a',
-                u'n/a',
-                ]
-        except:
-            seriesdata += [u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', ]
+        seriesdata += [
+            identification_of_the_xray_source,
+            kvp,
+            maximum_xray_tube_current,
+            xray_tube_current,
+            exposure_time_per_rotation,
+            u'n/a',
+            u'n/a',
+            u'n/a',
+            u'n/a',
+            u'n/a',
+            ]
     seriesdata += [
         s.xray_modulation_type,
         str(s.comment),

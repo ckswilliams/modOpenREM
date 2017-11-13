@@ -600,9 +600,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """
 
     import datetime
-    import sys
     from tempfile import TemporaryFile
-    from django.core.files import File
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
