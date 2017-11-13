@@ -689,22 +689,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     csvfilename = u"rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
-    try:
-        tsk.filename.save(csvfilename,File(tmpfile))
-    except OSError as e:
-        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-    except:
-        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-
-    tsk.status = u'COMPLETE'
-    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
-    tsk.save()
+    write_export(tsk, csvfilename, tmpfile, datestamp)
 
 
 @shared_task
