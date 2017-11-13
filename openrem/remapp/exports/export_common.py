@@ -369,12 +369,10 @@ def create_xlsx(task):
     try:
         temp_xlsx = TemporaryFile()
         book = Workbook(temp_xlsx, {'strings_to_numbers':  False})
-    except IOError as e:
-        print("I/O error saving xlsx temporary file ({0}): {1}".format(e.errno, e.strerror))
-    except OSError as e:
-        print("OS error saving xlsx temporary file ({0}): {1}".format(e.errno, e.strerror))
+    except (OSError, IOError) as e:
+        print("Error saving xlsx temporary file ({0}): {1}".format(e.errno, e.strerror))
     except Exception:
-        print("Unexpected error:".format(sys.exc_info()[0]))
+        print("Unexpected error: {0}".format(sys.exc_info()[0]))
     else:
         task.progress = u'Workbook created'
         task.save()
@@ -395,12 +393,10 @@ def write_export(task, filename, temp_file, datestamp):
 
     try:
         task.filename.save(filename, File(temp_file))
-    except IOError as e:
-        print("I/O error saving export file ({0}): {1}".format(e.errno, e.strerror))
-    except OSError as e:
-        print("OS error saving export file ({0}): {1}".format(e.errno, e.strerror))
+    except (OSError, IOError) as e:
+        print("Error saving export file ({0}): {1}".format(e.errno, e.strerror))
     except Exception:
-        print("Unexpected error:".format(sys.exc_info()[0]))
+        print("Unexpected error: {0}".format(sys.exc_info()[0]))
 
     task.status = u'COMPLETE'
     task.processtime = (datetime.datetime.now() - datestamp).total_seconds()

@@ -30,7 +30,6 @@
 
 import logging
 import csv
-from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
@@ -717,9 +716,8 @@ def rfopenskin(studyid):
 
     u"""
 
-    import sys, datetime
+    import datetime
     from tempfile import TemporaryFile
-    from django.core.files import File
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.tools.get_values import export_csv_prep
