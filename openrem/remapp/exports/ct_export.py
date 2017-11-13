@@ -173,11 +173,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Now populating the summary sheet...'
     tsk.save()
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = u''
-
+    vers = pkg_resources.require("openrem")[0].version
     version = vers
     titleformat = book.add_format()
     titleformat.set_font_size=(22)

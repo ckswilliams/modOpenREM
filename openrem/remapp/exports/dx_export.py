@@ -392,11 +392,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     import pkg_resources  # part of setuptools
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-
+    vers = pkg_resources.require("openrem")[0].version
     version = vers
     titleformat = book.add_format()
     titleformat.set_font_size=(22)
