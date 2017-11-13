@@ -34,7 +34,7 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filter_info
+    get_common_data, get_xray_filter_info, create_xlsx, write_export
 from remapp.tools.get_values import return_for_export, string_to_float
 
 logger = logging.getLogger(__name__)
@@ -253,9 +253,6 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     import datetime
     import pkg_resources  # part of setuptools
-    import sys
-    from tempfile import TemporaryFile
-    from django.core.files import File
     from django.db.models import Max, Min, Avg, Count
     from remapp.models import GeneralStudyModuleAttr, IrradEventXRayData
     from remapp.models import Exports
@@ -277,13 +274,8 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_user_id = user
     tsk.save()
 
-    try:
-        tmpxlsx = TemporaryFile()
-        book = Workbook(tmpxlsx, {'strings_to_numbers':  False})
-        tsk.progress = u'Workbook created'
-        tsk.save()
-    except IOError as e:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+    tmpxlsx, book = create_xlsx(tsk)
+    if not tmpxlsx:
         exit()
 
     # Get the data
@@ -597,24 +589,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     xlsxfilename = u"rfexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
-    try:
-        tsk.filename.save(xlsxfilename,File(tmpxlsx))
-    except OSError as e:
-        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(
-            e.errno, e.strerror)
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-    except:
-        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(
-            sys.exc_info()[0])
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-
-    tsk.status = u'COMPLETE'
-    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
-    tsk.save()
+    write_export(tsk, xlsxfilename, tmpxlsx, datestamp)
 
 
 @shared_task
@@ -938,19 +913,4 @@ def rfopenskin(studyid):
 
     csvfilename = u"OpenSkinExport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
-    try:
-        tsk.filename.save(csvfilename,File(tmpfile))
-    except OSError as e:
-        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-    except:
-        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-
-    tsk.status = u'COMPLETE'
-    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
-    tsk.save()
+    write_export(tsk, csvfilename, tmpfile, datestamp)

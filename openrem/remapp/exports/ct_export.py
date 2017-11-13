@@ -32,9 +32,8 @@ import csv
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
-from xlsxwriter.workbook import Workbook
 from celery import shared_task
-from remapp.exports.export_common import get_common_data, common_headers
+from remapp.exports.export_common import get_common_data, common_headers, create_xlsx, write_export
 from remapp.exports.exportcsv import logger
 
 logger = logging.getLogger(__name__)
@@ -52,11 +51,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     :return: Saves xlsx file into Media directory for user to download
     """
 
-    import sys
     import datetime
     import pkg_resources  # part of setuptools
-    from tempfile import TemporaryFile
-    from django.core.files import File
     from django.db.models import Count, Max
     from remapp.exports.export_common import text_and_date_formats, generate_sheets, sheet_name
     from remapp.models import Exports
@@ -78,13 +74,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_user_id = user
     tsk.save()
 
-    try:
-        tmpxlsx = TemporaryFile()
-        book = Workbook(tmpxlsx, {'strings_to_numbers':  False})
-        tsk.progress = u'Workbook created'
-        tsk.save()
-    except IOError as e:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+    tmpxlsx, book = create_xlsx(tsk)
+    if not tmpxlsx:
         exit()
 
     # Get the data!
@@ -236,24 +227,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     xlsxfilename = u"ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
-    try:
-        tsk.filename.save(xlsxfilename, File(tmpxlsx))
-    except OSError as e:
-        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(
-            e.errno, e.strerror)
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-    except:
-        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(
-            sys.exc_info()[0])
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-
-    tsk.status = u'COMPLETE'
-    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
-    tsk.save()
+    write_export(tsk, xlsxfilename, tmpxlsx, datestamp)
 
 
 @shared_task
@@ -268,10 +242,8 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
     :return: Saves csv file into Media directory for user to download
     """
 
-    import sys
     import datetime
     from tempfile import TemporaryFile
-    from django.core.files import File
     from django.db.models import Max
     from remapp.models import Exports
     from remapp.interface.mod_filters import ct_acq_filter
@@ -345,22 +317,7 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
 
     csvfilename = u"ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
-    try:
-        tsk.filename.save(csvfilename,File(tmpfile))
-    except OSError as e:
-        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-    except:
-        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-
-    tsk.status = u'COMPLETE'
-    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
-    tsk.save()
+    write_export(tsk, csvfilename, tmpfile, datestamp)
 
 
 def _generate_all_data_headers_ct(max_events):

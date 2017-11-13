@@ -29,6 +29,7 @@
 
 """
 
+import sys
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -354,3 +355,53 @@ def get_xray_filter_info(source):
         filters = None
         filter_thicknesses = None
     return filters, filter_thicknesses
+
+
+def create_xlsx(task):
+    """Function to create the xlsx temporary file
+
+    :param task: Export task object
+    :return: workbook, temp file
+    """
+    from tempfile import TemporaryFile
+    from xlsxwriter.workbook import Workbook
+
+    try:
+        temp_xlsx = TemporaryFile()
+        book = Workbook(temp_xlsx, {'strings_to_numbers':  False})
+    except IOError as e:
+        print("I/O error saving xlsx temporary file ({0}): {1}".format(e.errno, e.strerror))
+    except OSError as e:
+        print("OS error saving xlsx temporary file ({0}): {1}".format(e.errno, e.strerror))
+    except Exception:
+        print("Unexpected error:".format(sys.exc_info()[0]))
+    else:
+        task.progress = u'Workbook created'
+        task.save()
+        return temp_xlsx, book
+
+
+def write_export(task, filename, temp_file, datestamp):
+    """Function to write out the exported xlsx or csv file.
+
+    :param task: Export task object
+    :param filename: Filename to use
+    :param temp_file: Temporary file
+    :param datestamp: dat and time export function started
+    :return: Nothing
+    """
+    import datetime
+    from django.core.files import File
+
+    try:
+        task.filename.save(filename, File(temp_file))
+    except IOError as e:
+        print("I/O error saving export file ({0}): {1}".format(e.errno, e.strerror))
+    except OSError as e:
+        print("OS error saving export file ({0}): {1}".format(e.errno, e.strerror))
+    except Exception:
+        print("Unexpected error:".format(sys.exc_info()[0]))
+
+    task.status = u'COMPLETE'
+    task.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    task.save()
