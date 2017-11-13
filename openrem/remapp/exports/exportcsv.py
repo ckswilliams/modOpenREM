@@ -129,14 +129,10 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     :return: Saves csv file into Media directory for user to download
     """
 
-    import sys
     import datetime
-    from tempfile import TemporaryFile
-    from django.core.files import File
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
-    from remapp.tools.get_values import return_for_export, export_csv_prep
     import uuid
 
     tsk = Exports.objects.create()
@@ -158,7 +154,6 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         exit()
         
     # Get the data!
-
     if pid:
         df_filtered_qs = MGFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
     else:
@@ -174,31 +169,6 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.save()
 
     headings = common_headers(modality=u"MG", pid=pid, name=name, patid=patid)
-
-    # headings = []
-    # if pid and name:
-    #     headings += [u'Patient name']
-    # if pid and patid:
-    #     headings += [u'Patient ID']
-    # headings += [
-    #     u'Institution name',
-    #     u'Manufacturer',
-    #     u'Station name',
-    #     u'Display name',
-    #     u'Accession number',
-    #     u'Study UID',
-    #     u'Study date',
-    #     u'Study time',
-    # ]
-    # if pid and (name or patid):
-    #     headings += [
-    #         u'Date of birth',
-    #     ]
-    # headings += [
-    #     u'Patient age',
-    #     u'Patient sex',
-    #     u'Number of events',
-    #     u'Study description',
     headings += [
         u'View',
         u'Laterality',
@@ -236,156 +206,6 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                     series_data[index] = item.replace(u',', u';')
             writer.writerow([unicode(data_string).encode("utf-8") for data_string in series_data])
 
-            # e = exam.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
-        # for exp in e:
-        #
-        #     if pid and (name or patid):
-        #         try:
-        #             exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get()
-        #         except ObjectDoesNotExist:
-        #             patient_birth_date = None
-        #             if name:
-        #                 patient_name = None
-        #             if patid:
-        #                 patient_id = None
-        #         else:
-        #             patient_birth_date = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_birth_date')
-        #             if name:
-        #                 patient_name = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_name'))
-        #             if patid:
-        #                 patient_id = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_id'))
-        #
-        #     try:
-        #         exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get()
-        #     except ObjectDoesNotExist:
-        #         institution_name = None
-        #         manufacturer = None
-        #         station_name = None
-        #         display_name = None
-        #     else:
-        #         institution_name = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'institution_name'))
-        #         manufacturer = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'manufacturer'))
-        #         station_name = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'station_name'))
-        #         display_name = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
-        #
-        #     try:
-        #         exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get()
-        #     except ObjectDoesNotExist:
-        #         patient_age_decimal = None
-        #     else:
-        #         patient_age_decimal = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-        #
-        #     try:
-        #         exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get()
-        #     except ObjectDoesNotExist:
-        #         patient_sex = None
-        #     else:
-        #         patient_sex = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_sex')
-        #
-        #     try:
-        #         exp.irradeventxraymechanicaldata_set.get()
-        #     except ObjectDoesNotExist:
-        #         compression_thickness = None
-        #         compression_force = None
-        #         magnification_factor = None
-        #     else:
-        #         compression_thickness = return_for_export(exp.irradeventxraymechanicaldata_set.get(), 'compression_thickness')
-        #         compression_force = return_for_export(exp.irradeventxraymechanicaldata_set.get(), 'compression_force')
-        #         magnification_factor = return_for_export(exp.irradeventxraymechanicaldata_set.get(), 'magnification_factor')
-        #
-        #     try:
-        #         exp.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
-        #     except ObjectDoesNotExist:
-        #         radiological_thickness = None
-        #     else:
-        #         radiological_thickness = return_for_export(exp.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'radiological_thickness')
-        #
-        #     try:
-        #         exp.irradeventxraysourcedata_set.get()
-        #     except ObjectDoesNotExist:
-        #         collimated_field_area = None
-        #         exposure_control_mode = None
-        #         anode_target_material = None
-        #         focal_spot_size = None
-        #         average_xray_tube_current = None
-        #         exposure_time = None
-        #         average_glandular_dose = None
-        #     else:
-        #         collimated_field_area = return_for_export(exp.irradeventxraysourcedata_set.get(), 'collimated_field_area')
-        #         exposure_control_mode = return_for_export(exp.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
-        #         anode_target_material = return_for_export(exp.irradeventxraysourcedata_set.get(), 'anode_target_material')
-        #         focal_spot_size = return_for_export(exp.irradeventxraysourcedata_set.get(), 'focal_spot_size')
-        #         average_xray_tube_current = return_for_export(exp.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
-        #         exposure_time = return_for_export(exp.irradeventxraysourcedata_set.get(), 'exposure_time')
-        #         average_glandular_dose = return_for_export(exp.irradeventxraysourcedata_set.get(), 'average_glandular_dose')
-        #
-        #     try:
-        #         exp.irradeventxraysourcedata_set.get().xrayfilters_set.get()
-        #     except ObjectDoesNotExist:
-        #         xray_filter_material = None
-        #     else:
-        #         xray_filter_material = return_for_export(exp.irradeventxraysourcedata_set.get().xrayfilters_set.get(), 'xray_filter_material')
-        #
-        #     try:
-        #         exp.irradeventxraysourcedata_set.get().kvp_set.get()
-        #     except ObjectDoesNotExist:
-        #         kvp = None
-        #     else:
-        #         kvp = return_for_export(exp.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
-        #
-        #     try:
-        #         exp.irradeventxraysourcedata_set.get().exposure_set.get()
-        #     except ObjectDoesNotExist:
-        #         exposure = None
-        #     else:
-        #         exposure = return_for_export(exp.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
-        #
-        #     row = []
-        #     if pid and name:
-        #         row += [patient_name]
-        #     if pid and patid:
-        #         row += [patient_id]
-        #     row += [
-        #         institution_name,
-        #         manufacturer,
-        #         station_name,
-        #         display_name,
-        #         export_csv_prep(exp.projection_xray_radiation_dose.general_study_module_attributes.accession_number),
-        #         exp.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid,
-        #         exp.projection_xray_radiation_dose.general_study_module_attributes.study_date,
-        #         exp.date_time_started,
-        #     ]
-        #     if pid and (name or patid):
-        #         row += [
-        #             patient_birth_date,
-        #         ]
-        #     row += [
-        #         patient_age_decimal,
-        #         patient_sex,
-        #         exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),
-        #         export_csv_prep(exp.projection_xray_radiation_dose.general_study_module_attributes.study_description),
-        #         exp.image_view,
-        #         exp.laterality,
-        #         export_csv_prep(exp.acquisition_protocol),
-        #         compression_thickness,
-        #         radiological_thickness,
-        #         compression_force,
-        #         magnification_factor,
-        #         collimated_field_area,
-        #         export_csv_prep(exposure_control_mode),
-        #         anode_target_material,
-        #         xray_filter_material,
-        #         focal_spot_size,
-        #         kvp,
-        #         average_xray_tube_current,
-        #         exposure_time,
-        #         exposure,
-        #         exp.entrance_exposure_at_rp,
-        #         average_glandular_dose,
-        #         exp.percent_fibroglandular_tissue,
-        #         export_csv_prep(exp.comment),
-        #         ]
-        #     writer.writerow(row)
         tsk.progress = u"{0} of {1}".format(study_index + 1, numresults)
         tsk.save()
 
