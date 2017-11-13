@@ -379,6 +379,28 @@ def create_xlsx(task):
         return temp_xlsx, book
 
 
+def create_csv(task):
+    """Function to create the xlsx temporary file
+
+    :param task: Export task object
+    :return: workbook, temp file
+    """
+    import csv
+    from tempfile import TemporaryFile
+
+    try:
+        temp_csv = TemporaryFile()
+        writer = csv.writer(temp_csv)
+    except (OSError, IOError) as e:
+        print("Error saving csv temporary file ({0}): {1}".format(e.errno, e.strerror))
+    except Exception:
+        print("Unexpected error: {0}".format(sys.exc_info()[0]))
+    else:
+        task.progress = u'CSV file created'
+        task.save()
+        return temp_csv, writer
+
+
 def write_export(task, filename, temp_file, datestamp):
     """Function to write out the exported xlsx or csv file.
 

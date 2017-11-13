@@ -30,12 +30,11 @@
 """
 from __future__ import division
 
-import csv
 import logging
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filter_info, create_xlsx, write_export
+    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +169,6 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """
 
     import datetime
-    from tempfile import TemporaryFile
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
 
@@ -187,18 +185,11 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_user_id = user
     tsk.save()
 
-    try:
-        tmpfile = TemporaryFile()
-        writer = csv.writer(tmpfile, dialect=csv.excel)
-
-        tsk.progress = u'CSV file created'
-        tsk.save()
-    except IOError as e:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+    tmpfile, writer = create_csv(tsk)
+    if not tmpfile:
         exit()
 
     # Get the data!
-
     e = dx_acq_filter(filterdict, pid=pid).qs
 
     tsk.progress = u'Required study filter complete.'
@@ -434,7 +425,6 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         summarysheet.write(row+6,6,u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
         summarysheet.write(row+6,7,item[1]['count'])
     summarysheet.set_column('G:G', 15)
-
 
     book.close()
     tsk.progress = u'XLSX book written.'

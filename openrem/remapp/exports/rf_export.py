@@ -29,11 +29,10 @@
 """
 
 import logging
-import csv
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filter_info, create_xlsx, write_export
+    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export
 from remapp.tools.get_values import return_for_export, string_to_float
 
 logger = logging.getLogger(__name__)
@@ -577,7 +576,6 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         summarysheet.write(row+6, 7, item[1]['count'])
     summarysheet.set_column('G:G', 15)
 
-
     book.close()
     tsk.progress = u'XLSX book written.'
     tsk.save()
@@ -600,7 +598,6 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """
 
     import datetime
-    from tempfile import TemporaryFile
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
@@ -614,25 +611,15 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_date = datestamp
     tsk.progress = u'Query filters imported, task started'
     tsk.status = u'CURRENT'
-    if pid and (name or patid):
-        tsk.includes_pid = True
-    else:
-        tsk.includes_pid = False
+    tsk.includes_pid = bool(pid and (name or patid))
     tsk.export_user_id = user
     tsk.save()
 
-    try:
-        tmpfile = TemporaryFile()
-        writer = csv.writer(tmpfile)
-
-        tsk.progress = u'CSV file created'
-        tsk.save()
-    except IOError as e:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+    tmpfile, writer = create_csv(tsk)
+    if not tmpfile:
         exit()
 
     # Get the data!
-
     if pid:
         df_filtered_qs = RFFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(
             modality_type__exact='RF'))
@@ -691,12 +678,11 @@ def rfopenskin(studyid):
     u"""Export filtered RF database data to multi-sheet Microsoft XSLX files.
 
     :param studyid: RF study database ID.
-    :type studyud: int
+    :type studyid: int
 
     u"""
 
     import datetime
-    from tempfile import TemporaryFile
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.tools.get_values import export_csv_prep
@@ -712,14 +698,8 @@ def rfopenskin(studyid):
     tsk.status = u'CURRENT'
     tsk.save()
 
-    try:
-        tmpfile = TemporaryFile()
-        writer = csv.writer(tmpfile)
-
-        tsk.progress = u'CSV file created, starting to populate with events'
-        tsk.save()
-    except IOError as e:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+    tmpfile, writer = create_csv(tsk)
+    if not tmpfile:
         exit()
 
     # Get the data

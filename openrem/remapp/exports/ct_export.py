@@ -28,13 +28,11 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
-import csv
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from celery import shared_task
-from remapp.exports.export_common import get_common_data, common_headers, create_xlsx, write_export
-from remapp.exports.exportcsv import logger
+from remapp.exports.export_common import get_common_data, common_headers, create_xlsx, create_csv, write_export
 
 logger = logging.getLogger(__name__)
 
@@ -216,7 +214,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         summarysheet.write(row+6, 7, item[1]['count'])
     summarysheet.set_column('G:G', 15)
 
-
     book.close()
     tsk.progress = u'XLSX book written.'
     tsk.save()
@@ -239,7 +236,6 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
     """
 
     import datetime
-    from tempfile import TemporaryFile
     from django.db.models import Max
     from remapp.models import Exports
     from remapp.interface.mod_filters import ct_acq_filter
@@ -257,14 +253,8 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_user_id = user
     tsk.save()
 
-    try:
-        tmpfile = TemporaryFile()
-        writer = csv.writer(tmpfile)
-
-        tsk.progress = u'CSV file created'
-        tsk.save()
-    except IOError as e:
-        logger.error("Unexpected error creating temporary file - please contact an administrator: {0}".format(e))
+    tmpfile, writer = create_csv(tsk)
+    if not tmpfile:
         exit()
 
     # Get the data!
