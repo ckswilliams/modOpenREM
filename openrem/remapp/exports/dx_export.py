@@ -70,6 +70,7 @@ def _series_headers(max_events):
             ]
     return series_headers
 
+
 def _dx_get_series_data(s):
     """Return the series level data
 
@@ -242,7 +243,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     csvfilename = u"dxexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
-    write_export(tsk, csvfilename,tmpfile, datestamp)
+    write_export(tsk, csvfilename, tmpfile, datestamp)
 
 
 @shared_task

@@ -69,9 +69,10 @@ def text_and_date_formats(book, sheet, pid=False, name=None, patid=None):
     return book
 
 
-def common_headers(pid=False, name=None, patid=None):
+def common_headers(modality=False, pid=False, name=None, patid=None):
     """
     Function to generate list of header text common to several exports
+    :param modality: export modality to customise some of the columns
     :param pid: does the user have patient identifiable data permission
     :param name: has patient name been selected for export
     :param patid: has patient ID been selected for export
@@ -100,8 +101,13 @@ def common_headers(pid=False, name=None, patid=None):
     headers += [
         u'Age',
         u'Sex',
-        u'Height',
-        u'Mass (kg)',
+    ]
+    if modality not in u"MG":
+        headers += [
+            u'Height',
+            u'Mass (kg)',
+        ]
+    headers += [
         u'Test patient?',
         u'Study description',
         u'Requested procedure',
@@ -252,7 +258,7 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         except ObjectDoesNotExist:
             total_number_of_radiographic_frames = None
             cgycm2 = None
-    elif modality in u"RF":
+    elif modality in [u"RF", u"MG"]:
         try:
             event_count = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
         except ObjectDoesNotExist:
@@ -281,8 +287,13 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     examdata += [
         patient_age_decimal,
         patient_sex,
-        patient_size,
-        patient_weight,
+    ]
+    if modality not in u"MG":
+        examdata += [
+            patient_size,
+            patient_weight,
+        ]
+    examdata += [
         not_patient_indicator,
         exams.study_description,
         exams.requested_procedure_code_meaning,
@@ -297,7 +308,7 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
             total_number_of_radiographic_frames,
             cgycm2,
         ]
-    elif modality in u"RF":
+    elif modality in [u"RF", u"MG"]:
         examdata += [
             event_count,
         ]
@@ -355,6 +366,24 @@ def get_xray_filter_info(source):
         filters = None
         filter_thicknesses = None
     return filters, filter_thicknesses
+
+
+def get_anode_target_material(source):
+    """Return abbreviated version of anode target material
+
+    :param source: x-ray source data for the exposure
+    :return: string containing target material abbreviation
+    """
+    if u"Molybdenum" in str(source.anode_target_material):
+        anode = u"Mo"
+    elif u"Rhodium" in str(source.anode_target_material):
+        anode = u"Rh"
+    elif u"Tungsten" in str(source.anode_target_material):
+        anode = u"W"
+    else:
+        anode = str(source.anode_target_material)
+
+    return anode
 
 
 def create_xlsx(task):
