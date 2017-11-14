@@ -259,7 +259,6 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     """
 
     import datetime
-    from django.db.models import Count
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
     import uuid
@@ -377,56 +376,6 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         wsalldata.write_row(row + 1, 0, all_exam_data)
 
     create_summary_sheet(tsk, e, book, summarysheet, sheet_list)
-    # # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
-    #
-    # # Populate summary sheet
-    # tsk.progress = u'Now populating the summary sheet...'
-    # tsk.save()
-    #
-    # import pkg_resources  # part of setuptools
-    #
-    # vers = pkg_resources.require("openrem")[0].version
-    # version = vers
-    # titleformat = book.add_format()
-    # titleformat.set_font_size=(22)
-    # titleformat.set_font_color=('#FF0000')
-    # titleformat.set_bold()
-    # toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    # linetwostring = u'OpenREM is copyright 2017 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
-    #                 u'See http://openrem.org'
-    # summarysheet.write(0,0, toplinestring, titleformat)
-    # summarysheet.write(1,0, linetwostring)
-    #
-    # # Number of exams
-    # summarysheet.write(3,0, u"Total number of exams")
-    # summarysheet.write(3,1,e.count())
-    #
-    # # Generate list of Study Descriptions
-    # summarysheet.write(5,0, u"Study Description")
-    # summarysheet.write(5,1, u"Frequency")
-    # study_descriptions = e.values("study_description").annotate(n=Count("pk"))
-    # for row, item in enumerate(study_descriptions.order_by('n').reverse()):
-    #     summarysheet.write(row+6,0,item['study_description'])
-    #     summarysheet.write(row+6,1,item['n'])
-    # summarysheet.set_column('A:A', 25)
-    #
-    # # Generate list of Requested Procedures
-    # summarysheet.write(5,3, u"Requested Procedure")
-    # summarysheet.write(5,4, u"Frequency")
-    # requested_procedure = e.values("requested_procedure_code_meaning").annotate(n=Count("pk"))
-    # for row, item in enumerate(requested_procedure.order_by('n').reverse()):
-    #     summarysheet.write(row+6,3,item['requested_procedure_code_meaning'])
-    #     summarysheet.write(row+6,4,item['n'])
-    # summarysheet.set_column('D:D', 25)
-    #
-    # # Generate list of Series Protocols
-    # summarysheet.write(5,6, u"Series Protocol")
-    # summarysheet.write(5,7, u"Frequency")
-    # sortedprotocols = sorted(sheet_list.iteritems(), key=lambda (k,v): v['count'], reverse=True)
-    # for row, item in enumerate(sortedprotocols):
-    #     summarysheet.write(row+6,6,u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
-    #     summarysheet.write(row+6,7,item[1]['count'])
-    # summarysheet.set_column('G:G', 15)
 
     book.close()
     tsk.progress = u'XLSX book written.'
