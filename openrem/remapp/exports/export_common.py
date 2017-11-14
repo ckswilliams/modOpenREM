@@ -69,7 +69,7 @@ def text_and_date_formats(book, sheet, pid=False, name=None, patid=None):
     return book
 
 
-def common_headers(modality=False, pid=False, name=None, patid=None):
+def common_headers(modality=None, pid=False, name=None, patid=None):
     """
     Function to generate list of header text common to several exports
     :param modality: export modality to customise some of the columns
@@ -92,7 +92,7 @@ def common_headers(modality=False, pid=False, name=None, patid=None):
         u'Accession number',
         u'Operator',
         u'Study date',
-        u'Study Time',
+        u'Study time',
     ]
     if pid and (name or patid):
         headers += [
@@ -102,7 +102,8 @@ def common_headers(modality=False, pid=False, name=None, patid=None):
         u'Age',
         u'Sex',
     ]
-    if modality not in u"MG":
+    mammo = bool(modality == u"MG")
+    if not mammo:
         headers += [
             u'Height',
             u'Mass (kg)',

@@ -33,8 +33,8 @@ import logging
 
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
-from remapp.exports.export_common import common_headers,  \
-    get_common_data, get_anode_target_material, get_xray_filter_info, create_csv, write_export
+from remapp.exports.export_common import common_headers,  text_and_date_formats, generate_sheets,\
+    get_common_data, get_anode_target_material, get_xray_filter_info, create_csv, create_xlsx, write_export
 
 logger = logging.getLogger(__name__)
 
@@ -118,14 +118,15 @@ def _mg_get_series_data(event):
 
 
 @shared_task
-def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
-    """Export filtered mammography database data to a single-sheet CSV file.
+def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx=False):
+    """Export filtered mammography database data to a single-sheet CSV file or a multi sheet xlsx file.
 
     :param filterdict: Queryset of studies to export
     :param pid: does the user have patient identifiable data permission
     :param name: has patient name been selected for export
     :param patid: has patient ID been selected for export
     :param user: User that has started the export
+    :param xlsx: Whether to export a single sheet csv or a multi sheet xlsx
     :return: Saves csv file into Media directory for user to download
     """
 
@@ -140,7 +141,10 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     if tsk.task_id is None:  # Required when testing without celery
         tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = u"MG"
-    tsk.export_type = u"CSV export"
+    if xlsx:
+        tsk.export_type = u"XLSX export"
+    else:
+        tsk.export_type = u"CSV export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
     tsk.progress = u'Query filters imported, task started'
@@ -149,10 +153,15 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_user_id = user
     tsk.save()
 
-    tmpfile, writer = create_csv(tsk)
-    if not tmpfile:
-        exit()
-        
+    if xlsx:
+        temp_xlsx, book = create_xlsx(tsk)
+        if not temp_xlsx:
+            exit()
+    else:
+        tmpfile, writer = create_csv(tsk)
+        if not tmpfile:
+            exit()
+
     # Get the data!
     if pid:
         df_filtered_qs = MGFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
@@ -167,6 +176,12 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     tsk.num_records = numresults
     tsk.save()
+
+    if xlsx:
+        # Add summary sheet and all data sheet
+        summarysheet = book.add_worksheet("Summary")
+        wsalldata = book.add_worksheet('All data')
+        book = text_and_date_formats(book, wsalldata, pid=pid, name=name, patid=patid)
 
     headings = common_headers(modality=u"MG", pid=pid, name=name, patid=patid)
     headings += [
@@ -192,8 +207,18 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         u'Exposure mode description'
         ]
 
-    writer.writerow(headings)
-    
+    if not xlsx:
+        writer.writerow(headings)
+    else:
+        # Generate list of protocols in queryset and create worksheets for each
+        tsk.progress = u'Generating list of protocols in the dataset...'
+        tsk.save()
+
+        tsk.progress = u'Creating an Excel safe version of protocol names and creating a worksheet for each...'
+        tsk.save()
+
+        book, sheet_list = generate_sheets(studies, book, headings, modality=u"MG", pid=pid, name=name, patid=patid)
+
     for study_index, exam in enumerate(studies):
         exam_data = get_common_data(u"MG", exam, pid=pid, name=name, patid=patid)
         for series in exam.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
