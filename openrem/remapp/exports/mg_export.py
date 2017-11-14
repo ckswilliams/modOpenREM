@@ -14,8 +14,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -59,6 +59,7 @@ def _series_headers(max_events):
             u'E' + str(series_number+1) + u' Mode',
             u'E' + str(series_number+1) + u' Target',
             u'E' + str(series_number+1) + u' Filter',
+            u'E' + str(series_number+1) + u' Filter thickness',
             u'E' + str(series_number+1) + u' Focal spot size',
             u'E' + str(series_number+1) + u' kVp',
             u'E' + str(series_number+1) + u' mA',
@@ -146,6 +147,7 @@ def _mg_get_series_data(event):
         exposure_control_mode,
         anode_target_material,
         filters,
+        filter_thicknesses,
         focal_spot_size,
         kvp,
         average_xray_tube_current,
@@ -213,7 +215,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
 
     tsk.progress = u'Required study filter complete.'
     tsk.save()
-        
+
     numresults = studies.count()
 
     tsk.num_records = numresults
@@ -239,6 +241,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
         u'Mode',
         u'Target',
         u'Filter',
+        u'Filter thickness',
         u'Focal spot size',
         u'kVp',
         u'mA',
