@@ -453,3 +453,65 @@ def write_export(task, filename, temp_file, datestamp):
     task.status = u'COMPLETE'
     task.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     task.save()
+
+
+def create_summary_sheet(task, studies, book, summary_sheet, sheet_list):
+    """Create summary sheet for xlsx exports
+
+    :param task: Export task object
+    :param studies: study level object that has been exported
+    :param book: xlsxwriter book to work on
+    :param summary_sheet: worksheet object
+    :param sheet_list: list of sheet names
+    :return: nothing
+    """
+    import datetime
+    import pkg_resources
+    from django.db.models import Count
+
+    # Populate summary sheet
+    task.progress = u'Now populating the summary sheet...'
+    task.save()
+
+    vers = pkg_resources.require("openrem")[0].version
+    version = vers
+    titleformat = book.add_format()
+    titleformat.set_font_size = 22
+    titleformat.set_font_color = '#FF0000'
+    titleformat.set_bold()
+    toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
+    linetwostring = u'OpenREM is copyright 2017 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
+                    u'See http://openrem.org'
+    summary_sheet.write(0, 0, toplinestring, titleformat)
+    summary_sheet.write(1, 0, linetwostring)
+
+    # Number of exams
+    summary_sheet.write(3, 0, u"Total number of exams")
+    summary_sheet.write(3, 1, studies.count())
+
+    # Generate list of Study Descriptions
+    summary_sheet.write(5, 0, u"Study Description")
+    summary_sheet.write(5, 1, u"Frequency")
+    study_descriptions = studies.values("study_description").annotate(n=Count("pk"))
+    for row, item in enumerate(study_descriptions.order_by('n').reverse()):
+        summary_sheet.write(row+6, 0, item['study_description'])
+        summary_sheet.write(row+6, 1, item['n'])
+    summary_sheet.set_column('A:A', 25)
+
+    # Generate list of Requested Procedures
+    summary_sheet.write(5, 3, u"Requested Procedure")
+    summary_sheet.write(5, 4, u"Frequency")
+    requested_procedure = studies.values("requested_procedure_code_meaning").annotate(n=Count("pk"))
+    for row, item in enumerate(requested_procedure.order_by('n').reverse()):
+        summary_sheet.write(row+6, 3, item['requested_procedure_code_meaning'])
+        summary_sheet.write(row+6, 4, item['n'])
+    summary_sheet.set_column('D:D', 25)
+
+    # Generate list of Series Protocols
+    summary_sheet.write(5, 6, u"Series Protocol")
+    summary_sheet.write(5, 7, u"Frequency")
+    sorted_protocols = sorted(sheet_list.iteritems(), key=lambda (k, v): v['count'], reverse=True)
+    for row, item in enumerate(sorted_protocols):
+        summary_sheet.write(row+6, 6, u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
+        summary_sheet.write(row+6, 7, item[1]['count'])
+    summary_sheet.set_column('G:G', 15)

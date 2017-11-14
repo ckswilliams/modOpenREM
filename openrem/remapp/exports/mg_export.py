@@ -33,7 +33,7 @@ import logging
 
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
-from remapp.exports.export_common import common_headers,  text_and_date_formats, generate_sheets,\
+from remapp.exports.export_common import common_headers,  text_and_date_formats, generate_sheets, create_summary_sheet,\
     get_common_data, get_anode_target_material, get_xray_filter_info, create_csv, create_xlsx, write_export, sheet_name
 
 logger = logging.getLogger(__name__)
@@ -226,6 +226,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
         book = text_and_date_formats(book, wsalldata, pid=pid, name=name, patid=patid)
 
     headings = common_headers(modality=u"MG", pid=pid, name=name, patid=patid)
+    all_data_headings = list(headings)
     headings += [
         u'View',
         u'Laterality',
@@ -261,11 +262,16 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
 
         book, sheet_list = generate_sheets(studies, book, headings, modality=u"MG", pid=pid, name=name, patid=patid)
 
+    max_events = 0
     for study_index, exam in enumerate(studies):
         common_exam_data = get_common_data(u"MG", exam, pid=pid, name=name, patid=patid)
         all_exam_data = list(common_exam_data)
 
+        this_study_max_events = 0
         for series in exam.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
+            this_study_max_events += 1
+            if this_study_max_events > max_events:
+                max_events = this_study_max_events
             series_data = _mg_get_series_data(series)
             if not xlsx:
                 series_data = list(common_exam_data) + series_data
@@ -292,6 +298,13 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
 
         tsk.progress = u"{0} of {1}".format(study_index + 1, numresults)
         tsk.save()
+
+    if xlsx:
+        all_data_headings += _series_headers(max_events)
+        wsalldata.write_row('A1', all_data_headings)
+        numrows = studies.count()
+        wsalldata.autofilter(0, 0, numrows, len(all_data_headings) - 1)
+        create_summary_sheet(tsk, studies, book, summarysheet, sheet_list)
 
     tsk.progress = u'All study data written.'
     tsk.save()
