@@ -147,7 +147,7 @@ def generate_sheets(studies, book, protocol_headers, modality=None, pid=False, n
     sheet_list = {}
     protocols_list = []
     for exams in studies:
-        if modality in [u"DX", u"RF"]:
+        if modality in [u"DX", u"RF", u"MG"]:
             events = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')
         elif modality in u"CT":
             events =  exams.ctradiationdose_set.get().ctirradiationeventdata_set.all()

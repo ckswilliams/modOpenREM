@@ -249,6 +249,29 @@ def mgcsv1(request, name=None, pat_id=None):
 
 @csrf_exempt
 @login_required
+def mgxlsx1(request, name=None, pat_id=None):
+    """
+    Launches export of mammo data to xlsx
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param patid: string, 0 or 1 from URL indicating if patient ID should be exported
+    :return:
+    """
+    from django.shortcuts import redirect
+    from remapp.exports.mg_export import exportMG2excel
+
+    pid = include_pid(request, name, pat_id)
+
+    if request.user.groups.filter(name="exportgroup"):
+        job = exportMG2excel.delay(request.GET, pid=pid['pidgroup'], name=pid['include_names'],
+                                   patid=pid['include_pat_id'], user=request.user.id, xlsx=True)
+        logger.debug(u'Export MG to xlsx job is {0}'.format(job))
+
+    return redirect('/openrem/export/')
+
+
+@csrf_exempt
+@login_required
 def mgnhsbsp(request):
     """View to launch celery task to export mammography studies to csv file using a NHSBSP template
 

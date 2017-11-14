@@ -34,9 +34,42 @@ import logging
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import common_headers,  text_and_date_formats, generate_sheets,\
-    get_common_data, get_anode_target_material, get_xray_filter_info, create_csv, create_xlsx, write_export
+    get_common_data, get_anode_target_material, get_xray_filter_info, create_csv, create_xlsx, write_export, sheet_name
 
 logger = logging.getLogger(__name__)
+
+
+def _series_headers(max_events):
+    """Return a list of series headers
+
+    :param max_events: number of series
+    :return: headers as a list of strings
+    """
+    series_headers = []
+    for series_number in range(max_events):
+        series_headers += [
+            u'E' + str(series_number+1) + u' View',
+            u'E' + str(series_number+1) + u' Laterality',
+            u'E' + str(series_number+1) + u' Acquisition',
+            u'E' + str(series_number+1) + u' Thickness',
+            u'E' + str(series_number+1) + u' Radiological thickness',
+            u'E' + str(series_number+1) + u' Force',
+            u'E' + str(series_number+1) + u' Mag',
+            u'E' + str(series_number+1) + u' Area',
+            u'E' + str(series_number+1) + u' Mode',
+            u'E' + str(series_number+1) + u' Target',
+            u'E' + str(series_number+1) + u' Filter',
+            u'E' + str(series_number+1) + u' Focal spot size',
+            u'E' + str(series_number+1) + u' kVp',
+            u'E' + str(series_number+1) + u' mA',
+            u'E' + str(series_number+1) + u' ms',
+            u'E' + str(series_number+1) + u' uAs',
+            u'E' + str(series_number+1) + u' ESD',
+            u'E' + str(series_number+1) + u' AGD',
+            u'E' + str(series_number+1) + u' % Fibroglandular tissue',
+            u'E' + str(series_number+1) + u' Exposure mode description'
+        ]
+    return series_headers
 
 
 def _mg_get_series_data(event):
@@ -92,9 +125,18 @@ def _mg_get_series_data(event):
     except ObjectDoesNotExist:
         exposure = None
 
+    if event.image_view:
+        view = event.image_view.code_meaning
+    else:
+        view = None
+    if event.laterality:
+        laterality = event.laterality.code_meaning
+    else:
+        laterality = None
+
     series_data = [
-        event.image_view,
-        event.laterality,
+        view,
+        laterality,
         event.acquisition_protocol,
         compression_thickness,
         radiological_thickness,
@@ -154,8 +196,8 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
     tsk.save()
 
     if xlsx:
-        temp_xlsx, book = create_xlsx(tsk)
-        if not temp_xlsx:
+        tmpfile, book = create_xlsx(tsk)
+        if not tmpfile:
             exit()
     else:
         tmpfile, writer = create_csv(tsk)
@@ -220,16 +262,33 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
         book, sheet_list = generate_sheets(studies, book, headings, modality=u"MG", pid=pid, name=name, patid=patid)
 
     for study_index, exam in enumerate(studies):
-        exam_data = get_common_data(u"MG", exam, pid=pid, name=name, patid=patid)
+        common_exam_data = get_common_data(u"MG", exam, pid=pid, name=name, patid=patid)
+        all_exam_data = list(common_exam_data)
+
         for series in exam.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
             series_data = _mg_get_series_data(series)
-            series_data = list(exam_data) + series_data
-            for index, item in enumerate(series_data):
-                if item is None:
-                    series_data[index] = ''
-                if isinstance(item, basestring) and u',' in item:
-                    series_data[index] = item.replace(u',', u';')
-            writer.writerow([unicode(data_string).encode("utf-8") for data_string in series_data])
+            if not xlsx:
+                series_data = list(common_exam_data) + series_data
+                for index, item in enumerate(series_data):
+                    if item is None:
+                        series_data[index] = ''
+                    if isinstance(item, basestring) and u',' in item:
+                        series_data[index] = item.replace(u',', u';')
+                writer.writerow([unicode(data_string).encode("utf-8") for data_string in series_data])
+            else:
+                all_exam_data += series_data  # For all data
+                protocol = series.acquisition_protocol
+                if not protocol:
+                    protocol = u'Unknown'
+                tabtext = sheet_name(protocol)
+                sheet_list[tabtext]['count'] += 1
+                try:
+                    sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
+                except TypeError:
+                    logger.error("Common is |{0}| series is |{1}|".format(common_exam_data, series_data))
+                    exit()
+        if xlsx:
+            wsalldata.write_row(study_index + 1, 0, all_exam_data)
 
         tsk.progress = u"{0} of {1}".format(study_index + 1, numresults)
         tsk.save()
@@ -237,6 +296,11 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
     tsk.progress = u'All study data written.'
     tsk.save()
 
-    csvfilename = u"mgexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    filetype_suffix = u"csv"
+    if xlsx:
+        book.close()
+        filetype_suffix = u"xlsx"
 
-    write_export(tsk, csvfilename, tmpfile, datestamp)
+    export_filename = u"mgexport{0}.{1}".format(datestamp.strftime("%Y%m%d-%H%M%S%f"), filetype_suffix)
+
+    write_export(tsk, export_filename, tmpfile, datestamp)
