@@ -95,13 +95,8 @@
           </div>
     </form>
 
-<script>
-$('.datepicker').datepicker({
-    format: "yyyy-mm-dd",
-    autoclose: true,
-    todayHighlight: true
-    });
-</script>
+    <script src="{{ STATIC_URL }}js/datepicker.js"></script>
+    <script src="{{ STATIC_URL }}js/formatDate.js"></script>
 
 {% endblock %}
 
