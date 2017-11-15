@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
+* `#559`_  Interface: Date pickers inconsistent start day fixed
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
 * `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
 * `#542`_  Interface: Added display name to all detailed html pages
