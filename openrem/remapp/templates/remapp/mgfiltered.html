@@ -32,6 +32,18 @@
     </p>
     <p>
           {% endif %}
+      <a href="/openrem/exportmgxlsx1/0/0/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to xlsx</a>
+          {% if admin.pidgroup %}
+              <a href="/openrem/exportmgxlsx1/1/0/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With names</a>
+              <a href="/openrem/exportmgxlsx1/0/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With ID</a>
+              <a href="/openrem/exportmxlsxv1/1/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With both</a>
+    </p>
+    <p>
+          {% endif %}
           <a href="/openrem/exportmgnhsbsp/?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to CSV using the NHSBSP format</a>
     </p>

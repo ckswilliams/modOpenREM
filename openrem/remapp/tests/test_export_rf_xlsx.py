@@ -67,11 +67,11 @@ class ExportRFxlsx(TestCase):
         task.delete()  # not necessary, by hey, why not?
 
     def test_filters(self):
-        '''
+        """
         Tests that fluoro studies can be exported to XLSX  with single or multiple filters
 
         TODO: Add test study with no filter
-        '''
+        """
         filter_set = ""
         pid = True
         name = False

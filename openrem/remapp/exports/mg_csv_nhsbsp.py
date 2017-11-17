@@ -29,10 +29,7 @@
 
 """
 
-import csv
 from celery import shared_task
-from django.conf import settings
-
 
 @shared_task
 def mg_csv_nhsbsp(filterdict, user=None):
@@ -44,14 +41,11 @@ def mg_csv_nhsbsp(filterdict, user=None):
     
     """
 
-    import os, sys, datetime
-    from tempfile import TemporaryFile
-    from django.conf import settings
-    from django.core.files import File
-    from django.shortcuts import redirect
+    import datetime
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter
+    from remapp.exports.export_common import create_csv, write_export
 
     tsk = Exports.objects.create()
 
@@ -66,17 +60,9 @@ def mg_csv_nhsbsp(filterdict, user=None):
     tsk.export_user_id = user
     tsk.save()
 
-    try:
-        tmpfile = TemporaryFile()
-        writer = csv.writer(tmpfile)
-
-        tsk.progress = u'CSV file created'
-        tsk.save()
-    except:
-        messages.error(request,
-                       u"Unexpected error creating temporary file - please contact an administrator: {0}".format(
-                           sys.exc_info()[0]))
-        return redirect('/openrem/export/')
+    tmpfile, writer = create_csv(tsk)
+    if not tmpfile:
+        exit()
 
     # Get the data!
 
@@ -152,9 +138,12 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 continue  # No point including these in the export
             bad_acq_words = [
                 u'scout', u'postclip', u'prefire', u'biopsy', u'postfire', u'stereo', u'specimen', u'artefact']
-            if any(word in exp.acquisition_protocol.lower() for word in bad_acq_words):
+            try:
+                if any(word in exp.acquisition_protocol.lower() for word in bad_acq_words):
+                    exp.nccpm_view = None
+                    continue  # Avoid exporting biopsy related exposures
+            except AttributeError:
                 exp.nccpm_view = None
-                continue  # Avoid exporting biopsy related exposures
             try:
                 target = exp.irradeventxraysourcedata_set.get().anode_target_material.code_meaning
             except AttributeError:
@@ -193,11 +182,14 @@ def mg_csv_nhsbsp(filterdict, user=None):
         for exp in exposures:
             if not exp.nccpm_view:
                 continue  # Avoid exporting exposures with no view code
-            automan = exp.irradeventxraysourcedata_set.get().exposure_control_mode
-            if u"AUTO" in automan.upper():
-                automan = u'AUTO'
-            elif u"MAN" in automan.upper():
-                automan = u"MANUAL"
+            try:
+                automan = exp.irradeventxraysourcedata_set.get().exposure_control_mode
+                if u"AUTO" in automan.upper():
+                    automan = u'AUTO'
+                elif u"MAN" in automan.upper():
+                    automan = u"MANUAL"
+            except AttributeError:
+                automan = None
 
             writer.writerow([
                 u'1',
@@ -223,21 +215,4 @@ def mg_csv_nhsbsp(filterdict, user=None):
     tsk.save()
 
     csvfilename = u"mg_nhsbsp_{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-
-    try:
-        tsk.filename.save(csvfilename, File(tmpfile))
-    except OSError as e:
-        tsk.progress = u"Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno,
-                                                                                                            e.strerror)
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-    except:
-        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(
-            sys.exc_info()[0])
-        tsk.status = u'ERROR'
-        tsk.save()
-        return
-    tsk.status = u'COMPLETE'
-    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
-    tsk.save()
+    write_export(tsk, csvfilename, tmpfile, datestamp)
