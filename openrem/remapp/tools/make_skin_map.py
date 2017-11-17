@@ -85,15 +85,45 @@ def make_skin_map(study_pk=None):
             pat_height = 178.6
             pat_height_source = u'assumed'
 
-        pat_pos_source = u'assumed'
-        if study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_table_relationship_cid:
-            patPos = str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
-                        )[0].patient_table_relationship_cid)[0] + "f" + str(study.projectionxrayradiationdose_set.get(
-                        ).irradeventxraydata_set.all()[0].patient_orientation_modifier_cid)[0]
-            patPos = patPos.upper()
-            pat_pos_source = u'extracted'
+        ptr = None
+        orientation_modifier = None
+        try:
+            ptr_meaning = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[
+                0].patient_table_relationship_cid.code_meaning.lower()
+            if ptr_meaning in u"headfirst":
+                ptr = u"H"
+            elif ptr_meaning in u"feet-first":
+                ptr = u"F"
+            else:
+                logger.info(u"Study PK {0}: Patient table relationship not recognised ({1}). "
+                            u"Assuming head first.".format(study_pk, ptr_meaning))
+        except AttributeError:
+            logger.info(u"Study PK {0}: Patient table relationship not found. Assuming head first.".format(study_pk))
+        try:
+            orientation_modifier_meaning = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[
+                0].patient_orientation_modifier_cid.code_meaning.lower()
+            if orientation_modifier_meaning in u"supine":
+                orientation_modifier = u"S"
+            elif orientation_modifier_meaning in u"prone":
+                orientation_modifier = u"P"
+            else:
+                logger.info(u"Study PK {0}: Orientation modifier not recognised ({1}). "
+                            u"Assuming supine.".format(study_pk, orientation_modifier_meaning))
+        except AttributeError:
+            logger.info(u"Study PK {0}: Orientation modifier not found. Assuming supine.".format(study_pk))
+        if ptr and orientation_modifier:
+            pat_pos_source = u"extracted"
+            patPos = ptr + u"F" + orientation_modifier
+        elif ptr:
+            pat_pos_source = u"supine assumed"
+            patPos = ptr + u"FS"
+        elif orientation_modifier:
+            pat_pos_source = u"head first assumed"
+            patPos = u"HF" + orientation_modifier
         else:
-            patPos = u'HFS'
+            pat_pos_source = u"assumed"
+            patPos = u"HFS"
+        logger.debug(u"patPos is {0} and source is {1}".format(patPos, pat_pos_source))
 
         my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D', patPos=patPos,
                                              pat_mass=pat_mass, pat_height=pat_height,
