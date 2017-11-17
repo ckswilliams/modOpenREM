@@ -124,20 +124,6 @@ def make_skin_map(study_pk=None):
             pat_pos_source = u"assumed"
             patPos = u"HFS"
         logger.debug(u"patPos is {0} and source is {1}".format(patPos, pat_pos_source))
-        # if study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_table_relationship_cid:
-        #     patPos = str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
-        #                 )[0].patient_table_relationship_cid)[0] + "f"
-        #     if study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
-        #         )[0].patient_orientation_modifier_cid:
-        #         patPos = patPos + str(study.projectionxrayradiationdose_set.get(
-        #                 ).irradeventxraydata_set.all()[0].patient_orientation_modifier_cid)[0]
-        #         pat_pos_source = u'extracted'
-        #     else:
-        #         patPos = patPos + 'S'
-        #         pat_pos_source = u'partly extracted'
-        #     patPos = patPos.upper()
-        # else:
-        #     patPos = u'HFS'
 
         my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D', patPos=patPos,
                                              pat_mass=pat_mass, pat_height=pat_height,
