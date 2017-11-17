@@ -81,13 +81,13 @@ def ctcsv1(request, name=None, pat_id=None):
     :type request: GET
     """
     from django.shortcuts import redirect
-    from remapp.exports.exportcsv import exportCT2excel
+    from remapp.exports.ct_export import ct_csv
 
     pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportCT2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
-                                   pid['include_pat_id'], request.user.id)
+        job = ct_csv.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                           pid['include_pat_id'], request.user.id)
         logger.debug(u'Export CT to CSV job is {0}'.format(job))
     return redirect('/openrem/export/')
 
@@ -103,7 +103,7 @@ def ctxlsx1(request, name=None, pat_id=None):
     :type request: GET
     """
     from django.shortcuts import redirect
-    from remapp.exports.xlsx import ctxlsx
+    from remapp.exports.ct_export import ctxlsx
 
     pid = include_pid(request, name, pat_id)
 
@@ -235,7 +235,7 @@ def mgcsv1(request, name=None, pat_id=None):
     :return:
     """
     from django.shortcuts import redirect
-    from remapp.exports.exportcsv import exportMG2excel
+    from remapp.exports.mg_export import exportMG2excel
 
     pid = include_pid(request, name, pat_id)
 
@@ -243,6 +243,29 @@ def mgcsv1(request, name=None, pat_id=None):
         job = exportMG2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
                                    pid['include_pat_id'], request.user.id)
         logger.debug(u'Export MG to CSV job is {0}'.format(job))
+
+    return redirect('/openrem/export/')
+
+
+@csrf_exempt
+@login_required
+def mgxlsx1(request, name=None, pat_id=None):
+    """
+    Launches export of mammo data to xlsx
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param patid: string, 0 or 1 from URL indicating if patient ID should be exported
+    :return:
+    """
+    from django.shortcuts import redirect
+    from remapp.exports.mg_export import exportMG2excel
+
+    pid = include_pid(request, name, pat_id)
+
+    if request.user.groups.filter(name="exportgroup"):
+        job = exportMG2excel.delay(request.GET, pid=pid['pidgroup'], name=pid['include_names'],
+                                   patid=pid['include_pat_id'], user=request.user.id, xlsx=True)
+        logger.debug(u'Export MG to xlsx job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
@@ -368,7 +391,7 @@ def deletefile(request):
                 messages.success(request, u"Export file and database entry deleted successfully.")
             except OSError as e:
                 messages.error(request, u"Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
-            except:
+            except Exception:
                 messages.error(request, u"Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
     return HttpResponseRedirect(reverse(exportviews.export))
