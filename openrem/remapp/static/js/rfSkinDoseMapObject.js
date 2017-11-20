@@ -19,6 +19,18 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     this.skinDoseMapWidth = 10;
     this.skinDoseMapHeight = 10;
 
+    this.minDose = 0.0;
+    this.maxDose = 10.0;
+
+    this.maxDoseLabel = this.maxDose.toFixed(3);
+    this.phantomDimensionsLabel = '70x34x20';
+    this.patientHeight = '1.79';
+    this.patientMass = '73.2';
+    this.patientOrientation = 'HFS';
+    this.patientHeightSource = 'Assumed';
+    this.patientMassSource = 'Assumed';
+    this.patientOrientationSource = 'Assumed';
+
     this.phantomFlatWidth = 14;
     this.phantomCurvedEdgeWidth = 31;
 
@@ -28,9 +40,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     this.leftBackBoundary = this.frontLeftBoundary + (this.phantomCurvedEdgeWidth * this.mag);
     this.backRightBoundary = this.leftBackBoundary + (this.phantomFlatWidth * this.mag);
     this.rightFrontBoundary = this.backRightBoundary + (this.phantomCurvedEdgeWidth * this.mag);
-
-    this.minDose = 0.0;
-    this.maxDose = 10.0;
 
     this.windowWidth = this.maxDose - this.minDose;
     this.windowLevel = this.minDose + (this.windowWidth / 2.0);
@@ -131,6 +140,29 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     /**
+     * Internal function to write on the skin dose map information
+     */
+    this.writeInformation = function () {
+        var _this = this;
+        _this.skinDoseMapContext.font = '8pt arial';
+        _this.skinDoseMapContext.textAlign = 'left';
+
+        _this.skinDoseMapContext.fillStyle = 'rgba(0, 0, 0, 1.0)';
+        _this.skinDoseMapContext.fillText('Calculated peak skin dose:', 5, 15);
+        _this.skinDoseMapContext.fillText('Phantom dimensions:', 5, 30);
+        _this.skinDoseMapContext.fillText(this.patientHeightSource + ' patient height:', 5, 45);
+        _this.skinDoseMapContext.fillText(this.patientMassSource + ' patient mass:', 5, 60);
+        _this.skinDoseMapContext.fillText(this.patientOrientationSource + ' patient orientation:', 5, 75);
+
+        _this.skinDoseMapContext.fillText(this.maxDoseLabel + ' Gy', 150, 15);
+        _this.skinDoseMapContext.fillText(this.phantomDimensionsLabel + ' (HxWxD)', 150, 30);
+        _this.skinDoseMapContext.fillText(this.patientHeight + ' m', 150, 45);
+        _this.skinDoseMapContext.fillText(this.patientMass + ' kg', 150, 60);
+        _this.skinDoseMapContext.fillText(this.patientOrientation, 150, 75);
+    };
+
+
+    /**
      * Internal function to resize the skin dose map
      */
     this.resizeSkinDoseMap = function () {
@@ -161,6 +193,7 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
             _this.drawOverlay();
         } else {
             _this.draw();
+            _this.writeInformation();
         }
     };
 
@@ -199,7 +232,7 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     this.updateMinDisplayedDose = function (minDisplayedDose) {
         var _this = this;
         minDisplayedDose = parseFloat(minDisplayedDose);
-        
+
         if (minDisplayedDose <= _this.minDose) {
             minDisplayedDose = _this.minDose;
         }

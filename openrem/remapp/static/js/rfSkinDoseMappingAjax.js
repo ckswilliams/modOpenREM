@@ -81,15 +81,17 @@ $(document).ready(function() {
                     skinDoseMapGroupOrigWidth = skin_dose_map_group.width();
                     skinDoseMapGroupOrigHeight = skin_dose_map_group.height();
 
-                    $('#maxDose').html(skinDoseMapObj.maxDose.toFixed(decimalPlaces));
-                    $('#phantomDimensions').html(json.phantom_height + 'x' + json.phantom_width + 'x' + json.phantom_depth);
-                    $('#patientHeight').html((json.patient_height / 100).toFixed(2));
-                    $('#patientMass').html(json.patient_mass.toFixed(1));
-                    $('#patientOrientation').html(json.patient_orientation);
+                    skinDoseMapObj.maxDoseLabel = skinDoseMapObj.maxDose.toFixed(decimalPlaces);
+                    skinDoseMapObj.phantomDimensionsLabel = json.phantom_height + 'x' + json.phantom_width + 'x' + json.phantom_depth;
+                    skinDoseMapObj.patientHeight = (json.patient_height / 100).toFixed(2);
+                    skinDoseMapObj.patientMass = json.patient_mass.toFixed(1);
+                    skinDoseMapObj.patientOrientation = json.patient_orientation;
 
-                    if (json.patient_height_source.indexOf('extracted') >= 0) $('#patientHeightLabel').html('Extracted patient height: ');
-                    if (json.patient_mass_source.indexOf('extracted') >= 0) $('#patientMassLabel').html('Extracted patient mass: ');
-                    if (json.patient_orientation_source.indexOf('extracted') >= 0) $('#patientOrientationLabel').html('Extracted patient orientation: ');
+                    if (json.patient_height_source.indexOf('extracted') >= 0) skinDoseMapObj.patientHeightSource = 'Extracted';
+                    if (json.patient_mass_source.indexOf('extracted') >= 0) skinDoseMapObj.patientMassSource = 'Extracted';
+                    if (json.patient_orientation_source.indexOf('extracted') >= 0) skinDoseMapObj.patientOrientationSource = 'Extracted';
+
+                    skinDoseMapObj.writeInformation();
 
                     $('input[name=windowWidthSlider]').prop({
                         'max': skinDoseMapObj.windowWidth,
