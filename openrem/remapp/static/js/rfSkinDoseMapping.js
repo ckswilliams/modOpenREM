@@ -1,4 +1,4 @@
-/*global skinDoseMapObj:true, skinDoseMapColourScaleObj:true, skinDoseMap3dObj:true, skinDoseMap3dHUDObj:true*/
+/*global skinDoseMapObj:true, skinDoseMapColourScaleObj:true, skinDoseMap3dObj:true, skinDoseMap3dHUDObj:true, renderer*/
 /*eslint no-undef: "error"*/
 
 /**
@@ -39,7 +39,7 @@ function colourScaleSelection() {
 function useNewColourScale(newScale, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
     skinDoseMap.useNewColourScale(newScale);
     skinDoseMap.draw();
-    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    if (skinDoseMap.showOverlay) {skinDoseMap.drawOverlay()};
     skinDoseMap.writeInformation();
 
     skinDoseMapColourScale.useNewColourScale(newScale);
@@ -150,7 +150,7 @@ function reset(skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDos
  */
 function updateWindowLevel(newWindowLevel, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
     newWindowLevel = parseFloat(newWindowLevel);
-    if (newWindowLevel < 0) newWindowLevel = 0;
+    if (newWindowLevel < 0) {newWindowLevel = 0;}
 
     $("input[name=currentWindowLevel]").val(newWindowLevel.toFixed(skinDoseMapColourScale.decimalPlaces));
     $("input[name=windowLevelSlider]").prop({"value": newWindowLevel});
@@ -211,6 +211,26 @@ function updateWindowWidth(newWindowWidth, skinDoseMap, skinDoseMapColourScale, 
 
     $("input[name=currentMinDisplayedDose]").val(skinDoseMap.minDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
     $("input[name=currentMaxDisplayedDose]").val(skinDoseMap.maxDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
+}
+
+
+/**
+ * Function to update the HTML sliders and their displayed values
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
+ */
+function updateSlidersAndValues(skinDoseMap, skinDoseMapColourScale) {
+    $("input[name=minDoseSlider]").prop({"value": skinDoseMap.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skinDoseMap.maxDisplayedDose});
+
+    $("input[name=currentMinDisplayedDose]").val(skinDoseMap.minDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skinDoseMap.maxDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
+
+    $("input[name=currentWindowLevel]").val(skinDoseMap.windowLevel.toFixed(skinDoseMapColourScale.decimalPlaces));
+    $("input[name=currentWindowWidth]").val(skinDoseMap.windowWidth.toFixed(skinDoseMapColourScale.decimalPlaces));
+
+    $("input[name=windowLevelSlider]").prop({"value": skinDoseMap.windowLevel});
+    $("input[name=windowWidthSlider]").prop({"value": skinDoseMap.windowWidth});
 }
 
 
@@ -330,26 +350,6 @@ function updateMaxDisplayedDoseManual(maxDisplayedDose, skinDoseMap, skinDoseMap
 }
 
 
-/**
- * Function to update the HTML sliders and their displayed values
- * @param skinDoseMap
- * @param skinDoseMapColourScale
- */
-function updateSlidersAndValues(skinDoseMap, skinDoseMapColourScale) {
-    $("input[name=minDoseSlider]").prop({"value": skinDoseMap.minDisplayedDose});
-    $("input[name=maxDoseSlider]").prop({"value": skinDoseMap.maxDisplayedDose});
-
-    $("input[name=currentMinDisplayedDose]").val(skinDoseMap.minDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
-    $("input[name=currentMaxDisplayedDose]").val(skinDoseMap.maxDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
-
-    $("input[name=currentWindowLevel]").val(skinDoseMap.windowLevel.toFixed(skinDoseMapColourScale.decimalPlaces));
-    $("input[name=currentWindowWidth]").val(skinDoseMap.windowWidth.toFixed(skinDoseMapColourScale.decimalPlaces));
-
-    $("input[name=windowLevelSlider]").prop({"value": skinDoseMap.windowLevel});
-    $("input[name=windowWidthSlider]").prop({"value": skinDoseMap.windowWidth});
-}
-
-
 var previousMousePosition = {
     x: 0,
     y: 0
@@ -371,8 +371,8 @@ $("#skinDoseMap")
         //var p = skinDoseMapObj.skinDoseMapContext.getImageData(x, y, 1, 1).data;
         var mag = skinDoseMapObj.mag;
         if (x <= this.width-1 && y <= this.height-1) {
-            var current_dose = parseFloat(skinDoseMapObj.skinDoseMap[(Math.floor(y/mag)) * Math.floor(this.width/mag) + Math.floor(x/mag)]).toPrecision(2) + " Gy";
-            $("[data-tooltip='skin_dose_map']").qtip("option", "content.text", current_dose);
+            var currentDose = parseFloat(skinDoseMapObj.skinDoseMap[(Math.floor(y/mag)) * Math.floor(this.width/mag) + Math.floor(x/mag)]).toPrecision(2) + " Gy";
+            $("[data-tooltip='skin_dose_map']").qtip("option", "content.text", currentDose);
         }
 
         var deltaMove = {
@@ -383,16 +383,16 @@ $("#skinDoseMap")
         if (isDragging) {
             var maxWL = parseFloat($("#windowLevelSlider")[0].max);
             var newWL = skinDoseMapObj.windowLevel * (100-deltaMove.y)/100;
-            if (newWL === 0) newWL += 0.01;
-            if (newWL < 0) newWL = 0;
-            if (newWL > maxWL) newWL = maxWL;
+            if (newWL === 0) {newWL += 0.01;}
+            if (newWL < 0) {newWL = 0;}
+            if (newWL > maxWL) {newWL = maxWL;}
             skinDoseMapObj.updateWindowLevel(newWL);
 
             var maxWW = parseFloat($("#windowWidthSlider")[0].max);
             var newWW = skinDoseMapObj.windowWidth + skinDoseMapObj.windowWidth * deltaMove.x/100;
-            if (newWW === 0) newWW += 0.01;
-            if (newWW < 0) newWW = 0;
-            if (newWW > maxWW) newWW = maxWW;
+            if (newWW === 0) {newWW += 0.01;}
+            if (newWW < 0) {newWW = 0;}
+            if (newWW > maxWW) {newWW = maxWW;}
             skinDoseMapObj.updateWindowWidth(newWW);
 
             skinDoseMapObj.draw();

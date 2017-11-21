@@ -90,9 +90,9 @@ $(document).ready(function() {
                     skinDoseMapObj.patientMass = json.patient_mass.toFixed(1);
                     skinDoseMapObj.patientOrientation = json.patient_orientation;
 
-                    if (json.patient_height_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientHeightSource = "Extracted"};
-                    if (json.patient_mass_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientMassSource = "Extracted"};
-                    if (json.patient_orientation_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientOrientationSource = "Extracted"};
+                    if (json.patient_height_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientHeightSource = "Extracted";}
+                    if (json.patient_mass_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientMassSource = "Extracted";}
+                    if (json.patient_orientation_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientOrientationSource = "Extracted";}
 
                     skinDoseMapObj.writeInformation();
 
@@ -140,9 +140,9 @@ $(document).ready(function() {
                         skinDoseMap3dHUDObj.patientHeight = (json.patient_height / 100).toFixed(2);
                         skinDoseMap3dHUDObj.patientMass = json.patient_mass.toFixed(1);
                         skinDoseMap3dHUDObj.patientOrientation = json.patient_orientation;
-                        if (json.patient_height_source.indexOf("extracted") >= 0) {skinDoseMap3dHUDObj.patientHeightSource = "Extracted"};
-                        if (json.patient_mass_source.indexOf("extracted") >= 0) {skinDoseMap3dHUDObj.patientMassSource = "Extracted"};
-                        if (json.patient_orientation_source.indexOf("extracted") >= 0) {skinDoseMap3dHUDObj.patientOrientationSource = "Extracted"};
+                        if (json.patient_height_source.indexOf("extracted") >= 0) {skinDoseMap3dHUDObj.patientHeightSource = "Extracted";}
+                        if (json.patient_mass_source.indexOf("extracted") >= 0) {skinDoseMap3dHUDObj.patientMassSource = "Extracted";}
+                        if (json.patient_orientation_source.indexOf("extracted") >= 0) {skinDoseMap3dHUDObj.patientOrientationSource = "Extracted";}
                         skinDoseMap3dHUDObj.initialise(skinDoseMap3dObj.canvas.width, skinDoseMap3dObj.canvas.height);
 
                         render();
@@ -161,8 +161,8 @@ $(document).ready(function() {
                         "<p>Sorry, the skin dose map could not be calculated for this study. Possible reasons for this are shown below:</p>" +
                         "<ul>";
 
-                    if (skinDoseMapObj.maxDose === 0) errorMessage += "<li>The maximum calculated dose was zero: it may be that every exposure has missed the phantom. This may be due to the way in which this x-ray system has defined the table and x-ray beam geometry.</li>";
-                    if (!isFinite(skinDoseMapObj.maxDose)) errorMessage +=  "<li>There is no data in skin dose map: the x-ray source to isocentre distance or dose at reference point are not present.</li>";
+                    if (skinDoseMapObj.maxDose === 0) {errorMessage += "<li>The maximum calculated dose was zero: it may be that every exposure has missed the phantom. This may be due to the way in which this x-ray system has defined the table and x-ray beam geometry.</li>";}
+                    if (!isFinite(skinDoseMapObj.maxDose)) {errorMessage +=  "<li>There is no data in skin dose map: the x-ray source to isocentre distance or dose at reference point are not present.</li>";}
 
                     errorMessage += "</ul>" +
                         "<p>Please consider feeding this back to the <a href='http://bitbucket.org/openskin/openskin/'>openSkin BitBucket project</a> " +
