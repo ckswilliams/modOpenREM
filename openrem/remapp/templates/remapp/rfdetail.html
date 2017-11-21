@@ -5,50 +5,51 @@
 {% block mainblock %}
     <div class="row">
         <div class="col-md-5">
+        {% with study=generalstudymoduleattr patientstudy=generalstudymoduleattr.patientstudymoduleattr_set.get %}
             <h1>Detail list of events</h1>
 
             <ul>
                 <li>
                     Accession number:
-                    {% if not generalstudymoduleattr.accession_hashed %}
-                        {{ generalstudymoduleattr.accession_number }}
+                    {% if not study.accession_hashed %}
+                        {{ study.accession_number }}
                     {% else %}
                         <i>hidden</i>
                     {% endif %}
                 </li>
-                <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
-                <li>Study time: {{ generalstudymoduleattr.study_time|date:"H:i" }}</li>
-                <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
-                <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
-                <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
-                <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }} years</li>
-                <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:2 }} m, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
+                <li>Study date: {{ study.study_date }}</li>
+                <li>Study time: {{ study.study_time|date:"H:i" }}</li>
+                <li>Study description: {{ study.study_description }}</li>
+                <li>Procedure: {{ study.procedure_code_meaning }}</li>
+                <li>Requested procedure: {{ study.requested_procedure_code_meaning }}</li>
+                <li>Patient age: {{ patientstudy.patient_age_decimal|floatformat:1 }} years</li>
+                <li>Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m, {{ patientstudy.patient_weight|floatformat:1 }} kg</li>
                 <li>
-                    {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                    {% for record in study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
                         Total DAP, {{ record.acquisition_plane }}:
                         {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
                         <br>
                     {% endfor %}
                 </li>
                 <li>
-                    {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                    {% for record in study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
                         Total dose at RP, {{ record.acquisition_plane }}:
                         <script>document.write({{ record.accumintegratedprojradiogdose_set.get.dose_rp_total }}.toPrecision(3));</script> Gy
                         <br>
                     {% endfor %}
                 </li>
-                <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
+                <li>Hospital: {{ study.generalequipmentmoduleattr_set.get.institution_name }}</li>
                 <li>
                     Equipment:
-                    {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
-                    {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                    {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
+                    {{ study.generalequipmentmoduleattr_set.get.manufacturer }} |
+                    {{ study.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+                    {{ study.generalequipmentmoduleattr_set.get.station_name }}
                 </li>
-                <li>Display name: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</li>
-                <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
-                <li>Performing physician(s): {{ generalstudymoduleattr.performing_physician_name }}</li>
-                <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
-                <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
+                <li>Display name: {{ study.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</li>
+                <li>Study UID: {{ study.study_instance_uid }}</li>
+                <li>Performing physician(s): {{ study.performing_physician_name }}</li>
+                <li>Operator(s): {{ study.operator_name }}</li>
+                <li>Test patient indicators? {{ study.patientmoduleattr_set.get.not_patient_indicator }}</li>
             <br>
             <table class="table table-condensed table-bordered small">
                 <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th><th>Total duration (s)</th>
@@ -75,6 +76,7 @@
             </table>
             </ul>
         </div>
+    {% endwith %}
 
         {% if admin.enable_skin_dose_maps %}
         <div class="col-md-7" id="skinDoseMapContainer">
