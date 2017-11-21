@@ -989,11 +989,10 @@ def _generalstudymoduleattributes(dataset, g, ch):
 
 
 def _rsdr2db(dataset):
-    import os, sys
+    import os
     import openrem_settings
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-    from django.db import models
 
     openrem_settings.add_project_to_path()
     from remapp.models import GeneralStudyModuleAttr
