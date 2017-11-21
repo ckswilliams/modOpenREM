@@ -4,6 +4,10 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
+* `#559`_  Interface: Date pickers inconsistent start day fixed
+* `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector postition are missing
+* `#557`_  Skin dose maps: Improved construction of patient orientation code
+* `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
 * `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
 * `#542`_  Interface: Added display name to all detailed html pages
@@ -38,9 +42,11 @@ OpenREM version history
 * `#493`_  Charts: Added user option to made chart categories all lower case
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
+* `#488`_  Exports: All exports now include study time
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
 * `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
 * `#485`_  Imports: CT RDSR now imports 'target region' correctly
+* `#484`_  Exports: Most exports now more efficient use of queries and are therefore faster. More to do!
 * `#482`_  Imports: DX extractor now extracts acquisition protocol, requested procedure name and study name for Fuji Go mobile; extracts acquisition protocol for Toshiba Radrex equipment; extracts requested procedure name from Carestream DRX-Revolution mobiles
 * `#476`_  Imports: Mixed latin-1 and UTF8 characters now imported, but need to be handled better if possible
 * `#475`_  Query Retrieve: Made -sr a stand-alone option - it has a very niche use-case!

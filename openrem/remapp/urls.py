@@ -112,6 +112,7 @@ urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^exportrfxlsx1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'rfxlsx1'),
     url(r'^exportrfopenskin/(?P<pk>\d+)$', 'rfopenskin'),
     url(r'^exportmgcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'mgcsv1'),
+    url(r'^exportmgxlsx1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'mgxlsx1'),
     url(r'^exportmgnhsbsp/$', 'mgnhsbsp'),
     url(r'^download/(?P<task_id>[a-f0-9-]{36})$', 'download'),
     url(r'^deletefile/$', 'deletefile'),
@@ -119,9 +120,9 @@ urlpatterns += patterns('remapp.exports.exportviews',
 )
 
 urlpatterns += patterns('remapp.exports',
-    url(r'^xlsx/openrem/ct/',
-        'xlsx.ctxlsx'),
-)
+                        url(r'^xlsx/openrem/ct/',
+                            'ct_export.ctxlsx'),
+                        )
 
 urlpatterns += patterns('remapp.views',
     url(r'^charts_off/$',
