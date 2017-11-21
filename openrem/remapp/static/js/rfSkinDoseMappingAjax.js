@@ -56,7 +56,7 @@ $(document).ready(function() {
         data: request_data,
         dataType: "json",
         success: function( json ) {
-            var skin_dose_map_container = $("#skinDoseMapContainer");
+            var skinDoseMapContainer = $("#skinDoseMapContainer");
 
             if (isCanvasSupported()) {
 
@@ -64,22 +64,22 @@ $(document).ready(function() {
 
                 if (skinDoseMapObj.maxDose !== 0 && isFinite(skinDoseMapObj.maxDose)) {
 
-                    var skin_dose_map_group = $("#skinDoseMapGroup");
-                    var openskin_info = $("#openskin_info");
+                    var skinDoseMapGroup = $("#skinDoseMapGroup");
+                    var openskinInfo = $("#openskin_info");
 
                     var decimalPlaces = Math.abs(Math.ceil(getBaseLog(10, skinDoseMapObj.maxDose))) + 2;
                     if (!isFinite(decimalPlaces)) decimalPlaces = 0;
 
-                    skin_dose_map_group.width(skinDoseMapObj.skinDoseMapCanvas.width + 80).height(skinDoseMapObj.skinDoseMapCanvas.height);
-                    openskin_info.width(skin_dose_map_group.width());
+                    skinDoseMapGroup.width(skinDoseMapObj.skinDoseMapCanvas.width + 80).height(skinDoseMapObj.skinDoseMapCanvas.height);
+                    openskinInfo.width(skinDoseMapGroup.width());
 
                     skinDoseMapObj.draw();
 
                     skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height, decimalPlaces);
                     skinDoseMapColourScaleObj.draw();
 
-                    skinDoseMapGroupOrigWidth = skin_dose_map_group.width();
-                    skinDoseMapGroupOrigHeight = skin_dose_map_group.height();
+                    skinDoseMapGroupOrigWidth = skinDoseMapGroup.width();
+                    skinDoseMapGroupOrigHeight = skinDoseMapGroup.height();
 
                     skinDoseMapObj.maxDoseLabel = skinDoseMapObj.maxDose.toFixed(decimalPlaces);
                     skinDoseMapObj.phantomDimensionsLabel = json.phantom_height + "x" + json.phantom_width + "x" + json.phantom_depth;
@@ -87,9 +87,9 @@ $(document).ready(function() {
                     skinDoseMapObj.patientMass = json.patient_mass.toFixed(1);
                     skinDoseMapObj.patientOrientation = json.patient_orientation;
 
-                    if (json.patient_height_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientHeightSource = "Extracted"}
-                    if (json.patient_mass_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientMassSource = "Extracted"}
-                    if (json.patient_orientation_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientOrientationSource = "Extracted"}
+                    if (json.patient_height_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientHeightSource = "Extracted"};
+                    if (json.patient_mass_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientMassSource = "Extracted"};
+                    if (json.patient_orientation_source.indexOf("extracted") >= 0) {skinDoseMapObj.patientOrientationSource = "Extracted"};
 
                     skinDoseMapObj.writeInformation();
 
@@ -137,18 +137,18 @@ $(document).ready(function() {
                         skinDoseMap3dHUDObj.patientHeight = (json.patient_height / 100).toFixed(2);
                         skinDoseMap3dHUDObj.patientMass = json.patient_mass.toFixed(1);
                         skinDoseMap3dHUDObj.patientOrientation = json.patient_orientation;
-                        if (json.patient_height_source.indexOf("extracted") >= 0) skinDoseMap3dHUDObj.patientHeightSource = "Extracted";
-                        if (json.patient_mass_source.indexOf("extracted") >= 0) skinDoseMap3dHUDObj.patientMassSource = "Extracted";
-                        if (json.patient_orientation_source.indexOf("extracted") >= 0) skinDoseMap3dHUDObj.patientOrientationSource = "Extracted";
+                        if (json.patient_height_source.indexOf("extracted") >= 0) {skinDoseMap3dHUDObj.patientHeightSource = "Extracted"};
+                        if (json.patient_mass_source.indexOf("extracted") >= 0) {skinDoseMap3dHUDObj.patientMassSource = "Extracted"};
+                        if (json.patient_orientation_source.indexOf("extracted") >= 0) {skinDoseMap3dHUDObj.patientOrientationSource = "Extracted"};
                         skinDoseMap3dHUDObj.initialise(skinDoseMap3dObj.canvas.width, skinDoseMap3dObj.canvas.height);
 
                         render();
                     }
                     $(".ajax-progress-skin-dose").hide();
 
-                    skin_dose_map_group.show();
+                    skinDoseMapGroup.show();
                     $("#skin_map_maxmin_controls").show();
-                    openskin_info.show();
+                    openskinInfo.show();
                 }
 
                 else {
@@ -165,13 +165,13 @@ $(document).ready(function() {
                         "<p>Please consider feeding this back to the <a href='http://bitbucket.org/openskin/openskin/'>openSkin BitBucket project</a> " +
                         "or <a href='http://groups.google.com/forum/#!forum/openrem'>OpenREM discussion group</a> so that the issue can be addressed.</p>";
 
-                    skin_dose_map_container.html(errorMessage);
+                    skinDoseMapContainer.html(errorMessage);
                 }
             }
 
             else {
                 $(".ajax-progress-skin-dose").hide();
-                skin_dose_map_container.html("<h2>OpenSkin radiation exposure incidence map</h2>" +
+                skinDoseMapContainer.html("<h2>OpenSkin radiation exposure incidence map</h2>" +
                     "<p>The skin dose map cannot be shown: your browser does not support the HTML &lt;canvas&gt; element.</p>");
             }
         },

@@ -2,24 +2,24 @@
  * Function to draw the available colour scales
  */
 function colourScaleSelection() {
-    var colour_scales = ["OrRd","PuBu","BuPu","Oranges","BuGn","YlOrBr",
+    var colourScales = ["OrRd","PuBu","BuPu","Oranges","BuGn","YlOrBr",
         "YlGn","Reds","RdPu","Greens","YlGnBu","Purples","GnBu","Greys",
         "YlOrRd","PuRd","Blues","PuBuGn"];
     var i, j;
-    var colour_scale;
+    var colourScale;
     var canvas, context;
-    var side_length = 15;
-    var num_shades = 11;
+    var sideLength = 15;
+    var numShades = 11;
 
-    for (i=0; i<colour_scales.length; i++) {
-        canvas = $("#" + colour_scales[i])[0];
+    for (i=0; i<colourScales.length; i++) {
+        canvas = $("#" + colourScales[i])[0];
         context = canvas.getContext("2d");
-        canvas.height = side_length;
-        canvas.width = side_length * num_shades;
-        colour_scale = chroma.scale(colour_scales[i]);
-        for (j=0; j<num_shades; j++) {
-            context.fillStyle = colour_scale(j/(num_shades-1));
-            context.fillRect(j*side_length, 0, side_length, side_length);
+        canvas.height = sideLength;
+        canvas.width = sideLength * numShades;
+        colourScale = chroma.scale(colourScales[i]);
+        for (j=0; j<numShades; j++) {
+            context.fillStyle = colourScale(j/(numShades-1));
+            context.fillRect(j*sideLength, 0, sideLength, sideLength);
         }
     }
 }
@@ -27,24 +27,24 @@ function colourScaleSelection() {
 
 /**
  * Function to set a new colour scale
- * @param new_scale
- * @param skin_dose_map_obj
- * @param skin_dose_map_colour_scale_obj
- * @param skin_dose_map_3d_obj
- * @param show_3d_skin_dose_map
+ * @param newScale
+ * @param skinDoseMapObj
+ * @param skinDoseMapColourScaleObj
+ * @param skinDoseMap3dObj
+ * @param show3dSkinDoseMap
  */
-function useNewColourScale(new_scale, skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_3d_obj, show_3d_skin_dose_map) {
-    skin_dose_map_obj.useNewColourScale(new_scale);
-    skin_dose_map_obj.draw();
-    if (skin_dose_map_obj.showOverlay) skin_dose_map_obj.drawOverlay();
-    skin_dose_map_obj.writeInformation();
+function useNewColourScale(newScale, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
+    skinDoseMapObj.useNewColourScale(newScale);
+    skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+    skinDoseMapObj.writeInformation();
 
-    skin_dose_map_colour_scale_obj.useNewColourScale(new_scale);
-    skin_dose_map_colour_scale_obj.draw();
+    skinDoseMapColourScaleObj.useNewColourScale(newScale);
+    skinDoseMapColourScaleObj.draw();
 
-    if (show_3d_skin_dose_map) {
-        skin_dose_map_3d_obj.useNewColourScale(new_scale);
-        skin_dose_map_3d_obj.draw();
+    if (show3dSkinDoseMap) {
+        skinDoseMap3dObj.useNewColourScale(newScale);
+        skinDoseMap3dObj.draw();
     }
 }
 
@@ -97,253 +97,253 @@ function doseInGyToRGB(dose) {
 
 /**
  * Function to reset the skin dose maps to their default settings
- * @param skin_dose_map_obj
- * @param skin_dose_map_colour_scale_obj
- * @param skin_dose_map_3d_obj
- * @param show_3d_skin_dose_map
- * @param skin_dose_map_3d_person_obj
+ * @param skinDoseMapObj
+ * @param skinDoseMapColourScaleObj
+ * @param skinDoseMap3dObj
+ * @param show3dSkinDoseMap
+ * @param skinDoseMap3dPersonObj
  */
-function reset(skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_3d_obj, show_3d_skin_dose_map, skin_dose_map_3d_person_obj) {
-    skin_dose_map_obj.updateWindowWidth(skin_dose_map_obj.maxDose - skin_dose_map_obj.minDose);
-    skin_dose_map_obj.updateWindowLevel(skin_dose_map_obj.minDose + (skin_dose_map_obj.windowWidth/2.0));
-    skin_dose_map_obj.draw();
-    if (skin_dose_map_obj.showOverlay) skin_dose_map_obj.drawOverlay();
-    skin_dose_map_obj.writeInformation();
+function reset(skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap, skinDoseMap3dPersonObj) {
+    skinDoseMapObj.updateWindowWidth(skinDoseMapObj.maxDose - skinDoseMapObj.minDose);
+    skinDoseMapObj.updateWindowLevel(skinDoseMapObj.minDose + (skinDoseMapObj.windowWidth/2.0));
+    skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+    skinDoseMapObj.writeInformation();
 
-    skin_dose_map_colour_scale_obj.minDose = skin_dose_map_obj.minDisplayedDose;
-    skin_dose_map_colour_scale_obj.maxDose = skin_dose_map_obj.maxDisplayedDose;
-    skin_dose_map_colour_scale_obj.redrawValues();
+    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
+    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
+    skinDoseMapColourScaleObj.redrawValues();
 
-    if (show_3d_skin_dose_map) {
-        skin_dose_map_3d_obj.windowWidth = skin_dose_map_obj.windowWidth;
-        skin_dose_map_3d_obj.windowLevel = skin_dose_map_obj.windowLevel;
-        skin_dose_map_3d_obj.draw();
+    if (show3dSkinDoseMap) {
+        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
+        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
+        skinDoseMap3dObj.draw();
 
-        skin_dose_map_3d_obj.reset();
-        skin_dose_map_3d_person_obj.reset();
+        skinDoseMap3dObj.reset();
+        skinDoseMap3dPersonObj.reset();
     }
 
-    $("input[name=currentWindowLevel]").val(skin_dose_map_obj.windowLevel.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $("input[name=currentWindowWidth]").val(skin_dose_map_obj.windowWidth.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentWindowLevel]").val(skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentWindowWidth]").val(skinDoseMapObj.windowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
 
-    $("input[name=windowLevelSlider]").prop({"value": skin_dose_map_obj.windowLevel});
-    $("input[name=windowWidthSlider]").prop({"value": skin_dose_map_obj.windowWidth});
+    $("input[name=windowLevelSlider]").prop({"value": skinDoseMapObj.windowLevel});
+    $("input[name=windowWidthSlider]").prop({"value": skinDoseMapObj.windowWidth});
 
-    $("input[name=minDoseSlider]").prop({"value": skin_dose_map_obj.minDose});
-    $("input[name=maxDoseSlider]").prop({"value": skin_dose_map_obj.maxDose});
+    $("input[name=minDoseSlider]").prop({"value": skinDoseMapObj.minDose});
+    $("input[name=maxDoseSlider]").prop({"value": skinDoseMapObj.maxDose});
 
-    $("input[name=currentMinDisplayedDose]").val(skin_dose_map_obj.minDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $("input[name=currentMaxDisplayedDose]").val(skin_dose_map_obj.maxDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skinDoseMapObj.minDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skinDoseMapObj.maxDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
 }
 
 
 /**
  * Function to update the skin dose map when the window level has been changed with a slider or the mouse
  * @param newWindowLevel
- * @param skin_dose_map_obj
- * @param skin_dose_map_colour_scale_obj
- * @param skin_dose_map_3d_obj
- * @param show_3d_skin_dose_map
+ * @param skinDoseMapObj
+ * @param skinDoseMapColourScaleObj
+ * @param skinDoseMap3dObj
+ * @param show3dSkinDoseMap
  */
-function updateWindowLevel(newWindowLevel, skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_3d_obj, show_3d_skin_dose_map) {
+function updateWindowLevel(newWindowLevel, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
     newWindowLevel = parseFloat(newWindowLevel);
     if (newWindowLevel < 0) newWindowLevel = 0;
 
-    $("input[name=currentWindowLevel]").val(newWindowLevel.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentWindowLevel]").val(newWindowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
     $("input[name=windowLevelSlider]").prop({"value": newWindowLevel});
 
-    skin_dose_map_obj.updateWindowLevel(newWindowLevel);
-    skin_dose_map_obj.draw();
-    if (skin_dose_map_obj.showOverlay) skin_dose_map_obj.drawOverlay();
-    skin_dose_map_obj.writeInformation();
+    skinDoseMapObj.updateWindowLevel(newWindowLevel);
+    skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+    skinDoseMapObj.writeInformation();
 
-    skin_dose_map_colour_scale_obj.minDose = skin_dose_map_obj.minDisplayedDose;
-    skin_dose_map_colour_scale_obj.maxDose = skin_dose_map_obj.maxDisplayedDose;
-    skin_dose_map_colour_scale_obj.redrawValues();
+    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
+    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
+    skinDoseMapColourScaleObj.redrawValues();
 
-    if (show_3d_skin_dose_map) {
-        skin_dose_map_3d_obj.windowWidth = skin_dose_map_obj.windowWidth;
-        skin_dose_map_3d_obj.windowLevel = skin_dose_map_obj.windowLevel;
-        skin_dose_map_3d_obj.draw();
+    if (show3dSkinDoseMap) {
+        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
+        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
+        skinDoseMap3dObj.draw();
     }
 
-    $("input[name=minDoseSlider]").prop({"value": skin_dose_map_obj.minDisplayedDose});
-    $("input[name=maxDoseSlider]").prop({"value": skin_dose_map_obj.maxDisplayedDose});
+    $("input[name=minDoseSlider]").prop({"value": skinDoseMapObj.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skinDoseMapObj.maxDisplayedDose});
 
-    $("input[name=currentMinDisplayedDose]").val(skin_dose_map_obj.minDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $("input[name=currentMaxDisplayedDose]").val(skin_dose_map_obj.maxDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
 }
 
 
 /**
  * Function to update the skin dose map when the window width has been changed with a slider or the mouse
  * @param newWindowWidth
- * @param skin_dose_map_obj
- * @param skin_dose_map_colour_scale_obj
- * @param skin_dose_map_3d_obj
- * @param show_3d_skin_dose_map
+ * @param skinDoseMapObj
+ * @param skinDoseMapColourScaleObj
+ * @param skinDoseMap3dObj
+ * @param show3dSkinDoseMap
  */
-function updateWindowWidth(newWindowWidth, skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_3d_obj, show_3d_skin_dose_map) {
+function updateWindowWidth(newWindowWidth, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
     newWindowWidth = parseFloat(newWindowWidth);
-    $("input[name=currentWindowWidth]").val(newWindowWidth.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentWindowWidth]").val(newWindowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
     $("input[name=windowWidthSlider]").prop({"value": newWindowWidth});
 
-    skin_dose_map_obj.updateWindowWidth(newWindowWidth);
-    skin_dose_map_obj.draw();
-    if (skin_dose_map_obj.showOverlay) skin_dose_map_obj.drawOverlay();
-    skin_dose_map_obj.writeInformation();
+    skinDoseMapObj.updateWindowWidth(newWindowWidth);
+    skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+    skinDoseMapObj.writeInformation();
 
-    skin_dose_map_colour_scale_obj.minDose = skin_dose_map_obj.minDisplayedDose;
-    skin_dose_map_colour_scale_obj.maxDose = skin_dose_map_obj.maxDisplayedDose;
-    skin_dose_map_colour_scale_obj.redrawValues();
+    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
+    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
+    skinDoseMapColourScaleObj.redrawValues();
 
-    if (show_3d_skin_dose_map) {
-        skin_dose_map_3d_obj.windowWidth = skin_dose_map_obj.windowWidth;
-        skin_dose_map_3d_obj.windowLevel = skin_dose_map_obj.windowLevel;
-        skin_dose_map_3d_obj.draw();
+    if (show3dSkinDoseMap) {
+        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
+        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
+        skinDoseMap3dObj.draw();
     }
 
-    $("input[name=minDoseSlider]").prop({"value": skin_dose_map_obj.minDisplayedDose});
-    $("input[name=maxDoseSlider]").prop({"value": skin_dose_map_obj.maxDisplayedDose});
+    $("input[name=minDoseSlider]").prop({"value": skinDoseMapObj.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skinDoseMapObj.maxDisplayedDose});
 
-    $("input[name=currentMinDisplayedDose]").val(skin_dose_map_obj.minDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $("input[name=currentMaxDisplayedDose]").val(skin_dose_map_obj.maxDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
 }
 
 
 /**
  * Function to update the skin dose map when the minimum displayed dose has been changed using a slider or the mouse
  * @param minDisplayedDose
- * @param skin_dose_map_obj
- * @param skin_dose_map_colour_scale_obj
- * @param skin_dose_map_3d_obj
- * @param show_3d_skin_dose_map
+ * @param skinDoseMapObj
+ * @param skinDoseMapColourScaleObj
+ * @param skinDoseMap3dObj
+ * @param show3dSkinDoseMap
  */
-function updateMinDisplayedDose(minDisplayedDose, skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_3d_obj, show_3d_skin_dose_map) {
+function updateMinDisplayedDose(minDisplayedDose, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
     minDisplayedDose = parseFloat(minDisplayedDose);
 
-    skin_dose_map_obj.updateMinDisplayedDose(minDisplayedDose);
-    skin_dose_map_obj.draw();
-    if (skin_dose_map_obj.showOverlay) skin_dose_map_obj.drawOverlay();
-    skin_dose_map_obj.writeInformation();
+    skinDoseMapObj.updateMinDisplayedDose(minDisplayedDose);
+    skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+    skinDoseMapObj.writeInformation();
 
-    skin_dose_map_colour_scale_obj.minDose = skin_dose_map_obj.minDisplayedDose;
-    skin_dose_map_colour_scale_obj.redrawValues();
+    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
+    skinDoseMapColourScaleObj.redrawValues();
 
-    if (show_3d_skin_dose_map) {
-        skin_dose_map_3d_obj.windowWidth = skin_dose_map_obj.windowWidth;
-        skin_dose_map_3d_obj.windowLevel = skin_dose_map_obj.windowLevel;
-        skin_dose_map_3d_obj.draw();
+    if (show3dSkinDoseMap) {
+        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
+        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
+        skinDoseMap3dObj.draw();
     }
 
-    updateSlidersAndValues(skin_dose_map_obj, skin_dose_map_colour_scale_obj);
+    updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj);
 }
 
 
 /**
  * Function to update the skin dose map when the maximum displayed dose has been changed using a slider or the mouse
  * @param maxDisplayedDose
- * @param skin_dose_map_obj
- * @param skin_dose_map_colour_scale_obj
- * @param skin_dose_map_3d_obj
- * @param show_3d_skin_dose_map
+ * @param skinDoseMapObj
+ * @param skinDoseMapColourScaleObj
+ * @param skinDoseMap3dObj
+ * @param show3dSkinDoseMap
  */
-function updateMaxDisplayedDose(maxDisplayedDose, skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_3d_obj, show_3d_skin_dose_map) {
+function updateMaxDisplayedDose(maxDisplayedDose, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
     maxDisplayedDose = parseFloat(maxDisplayedDose);
 
-    skin_dose_map_obj.updateMaxDisplayedDose(maxDisplayedDose);
-    skin_dose_map_obj.draw();
-    if (skin_dose_map_obj.showOverlay) skin_dose_map_obj.drawOverlay();
-    skin_dose_map_obj.writeInformation();
+    skinDoseMapObj.updateMaxDisplayedDose(maxDisplayedDose);
+    skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+    skinDoseMapObj.writeInformation();
 
-    skin_dose_map_colour_scale_obj.maxDose = skin_dose_map_obj.maxDisplayedDose;
-    skin_dose_map_colour_scale_obj.redrawValues();
+    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
+    skinDoseMapColourScaleObj.redrawValues();
 
-    if (show_3d_skin_dose_map) {
-        skin_dose_map_3d_obj.windowWidth = skin_dose_map_obj.windowWidth;
-        skin_dose_map_3d_obj.windowLevel = skin_dose_map_obj.windowLevel;
-        skin_dose_map_3d_obj.draw();
+    if (show3dSkinDoseMap) {
+        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
+        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
+        skinDoseMap3dObj.draw();
     }
 
-    updateSlidersAndValues(skin_dose_map_obj, skin_dose_map_colour_scale_obj);
+    updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj);
 }
 
 
 /**
  * Function to change the skin dose map when the minimum displayed dose has been changed manually
  * @param minDisplayedDose
- * @param skin_dose_map_obj
- * @param skin_dose_map_colour_scale_obj
- * @param skin_dose_map_3d_obj
- * @param show_3d_skin_dose_map
+ * @param skinDoseMapObj
+ * @param skinDoseMapColourScaleObj
+ * @param skinDoseMap3dObj
+ * @param show3dSkinDoseMap
  */
-function updateMinDisplayedDoseManual(minDisplayedDose, skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_3d_obj, show_3d_skin_dose_map) {
+function updateMinDisplayedDoseManual(minDisplayedDose, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
     minDisplayedDose = parseFloat(minDisplayedDose);
 
-    skin_dose_map_obj.updateMinDisplayedDoseManual(minDisplayedDose);
-    skin_dose_map_obj.draw();
-    if (skin_dose_map_obj.showOverlay) skin_dose_map_obj.drawOverlay();
-    skin_dose_map_obj.writeInformation();
+    skinDoseMapObj.updateMinDisplayedDoseManual(minDisplayedDose);
+    skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+    skinDoseMapObj.writeInformation();
 
-    skin_dose_map_colour_scale_obj.minDose = skin_dose_map_obj.minDisplayedDose;
-    skin_dose_map_colour_scale_obj.redrawValues();
+    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
+    skinDoseMapColourScaleObj.redrawValues();
 
-    if (show_3d_skin_dose_map) {
-        skin_dose_map_3d_obj.windowWidth = skin_dose_map_obj.windowWidth;
-        skin_dose_map_3d_obj.windowLevel = skin_dose_map_obj.windowLevel;
-        skin_dose_map_3d_obj.draw();
+    if (show3dSkinDoseMap) {
+        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
+        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
+        skinDoseMap3dObj.draw();
     }
 
-    updateSlidersAndValues(skin_dose_map_obj, skin_dose_map_colour_scale_obj);
+    updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj);
 }
 
 
 /**
  * Function to update the skin dose map when the maximum displayed dose has been changed
  * @param maxDisplayedDose
- * @param skin_dose_map_obj
- * @param skin_dose_map_colour_scale_obj
- * @param skin_dose_map_3d_obj
- * @param show_3d_skin_dose_map
+ * @param skinDoseMapObj
+ * @param skinDoseMapColourScaleObj
+ * @param skinDoseMap3dObj
+ * @param show3dSkinDoseMap
  */
-function updateMaxDisplayedDoseManual(maxDisplayedDose, skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_3d_obj, show_3d_skin_dose_map) {
+function updateMaxDisplayedDoseManual(maxDisplayedDose, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
     maxDisplayedDose = parseFloat(maxDisplayedDose);
 
-    skin_dose_map_obj.updateMaxDisplayedDoseManual(maxDisplayedDose);
-    skin_dose_map_obj.draw();
-    if (skin_dose_map_obj.showOverlay) skin_dose_map_obj.drawOverlay();
-    skin_dose_map_obj.writeInformation();
+    skinDoseMapObj.updateMaxDisplayedDoseManual(maxDisplayedDose);
+    skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+    skinDoseMapObj.writeInformation();
 
-    skin_dose_map_colour_scale_obj.maxDose = skin_dose_map_obj.maxDisplayedDose;
-    skin_dose_map_colour_scale_obj.redrawValues();
+    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
+    skinDoseMapColourScaleObj.redrawValues();
 
-    if (show_3d_skin_dose_map) {
-        skin_dose_map_3d_obj.windowWidth = skin_dose_map_obj.windowWidth;
-        skin_dose_map_3d_obj.windowLevel = skin_dose_map_obj.windowLevel;
-        skin_dose_map_3d_obj.draw();
+    if (show3dSkinDoseMap) {
+        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
+        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
+        skinDoseMap3dObj.draw();
     }
 
-    updateSlidersAndValues(skin_dose_map_obj, skin_dose_map_colour_scale_obj);
+    updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj);
 }
 
 
 /**
  * Function to update the HTML sliders and their displayed values
- * @param skin_dose_map_obj
- * @param skin_dose_map_colour_scale_obj
+ * @param skinDoseMapObj
+ * @param skinDoseMapColourScaleObj
  */
-function updateSlidersAndValues(skin_dose_map_obj, skin_dose_map_colour_scale_obj) {
-    $("input[name=minDoseSlider]").prop({"value": skin_dose_map_obj.minDisplayedDose});
-    $("input[name=maxDoseSlider]").prop({"value": skin_dose_map_obj.maxDisplayedDose});
+function updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj) {
+    $("input[name=minDoseSlider]").prop({"value": skinDoseMapObj.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skinDoseMapObj.maxDisplayedDose});
 
-    $("input[name=currentMinDisplayedDose]").val(skin_dose_map_obj.minDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $("input[name=currentMaxDisplayedDose]").val(skin_dose_map_obj.maxDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
 
-    $("input[name=currentWindowLevel]").val(skin_dose_map_obj.windowLevel.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $("input[name=currentWindowWidth]").val(skin_dose_map_obj.windowWidth.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentWindowLevel]").val(skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentWindowWidth]").val(skinDoseMapObj.windowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
 
-    $("input[name=windowLevelSlider]").prop({"value": skin_dose_map_obj.windowLevel});
-    $("input[name=windowWidthSlider]").prop({"value": skin_dose_map_obj.windowWidth});
+    $("input[name=windowLevelSlider]").prop({"value": skinDoseMapObj.windowLevel});
+    $("input[name=windowWidthSlider]").prop({"value": skinDoseMapObj.windowWidth});
 }
 
 
@@ -496,13 +496,13 @@ var skinDoseMapGroupOrigWidth, skinDoseMapGroupOrigHeight;
 $("#skinDoseMapFullscreenBtn").click(function() {
     skinMapFullScreen = !skinMapFullScreen;
 
-    var skin_dose_map_container = $("#skinDoseMapContainer");
+    var skinDoseMapContainer = $("#skinDoseMapContainer");
 
-    var otherHeight = skin_dose_map_container.height() - $("#skinDoseMap").height();
+    var otherHeight = skinDoseMapContainer.height() - $("#skinDoseMap").height();
 
-    skin_dose_map_container.toggleClass("fullscreen");
+    skinDoseMapContainer.toggleClass("fullscreen");
 
-    var skin_dose_map_group = $("#skinDoseMapGroup");
+    var skinDoseMapGroup = $("#skinDoseMapGroup");
 
     if (skinMapFullScreen) {
         var skinDoseMapGroupWidth = $(window).width();
@@ -513,7 +513,7 @@ $("#skinDoseMapFullscreenBtn").click(function() {
 
         skinDoseMapObj.mag = (maxMagHeight <= maxMagWidth) ? maxMagHeight : maxMagWidth;
         skinDoseMapObj.resizeSkinDoseMap();
-        skin_dose_map_group.width(skinDoseMapObj.skinDoseMapCanvas.width + 80 + "px").height(skinDoseMapObj.skinDoseMapCanvas.height + "px");
+        skinDoseMapGroup.width(skinDoseMapObj.skinDoseMapCanvas.width + 80 + "px").height(skinDoseMapObj.skinDoseMapCanvas.height + "px");
         skinDoseMapObj.draw();
         skinDoseMapObj.updateBoundaries();
         if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
@@ -531,7 +531,7 @@ $("#skinDoseMapFullscreenBtn").click(function() {
             skinDoseMap3dHUDObj.redraw();
         }
     } else {
-        skin_dose_map_group.width(skinDoseMapGroupOrigWidth).height(skinDoseMapGroupOrigHeight);
+        skinDoseMapGroup.width(skinDoseMapGroupOrigWidth).height(skinDoseMapGroupOrigHeight);
         skinDoseMapObj.mag = 6;
         skinDoseMapObj.resizeSkinDoseMap();
         skinDoseMapObj.draw();
