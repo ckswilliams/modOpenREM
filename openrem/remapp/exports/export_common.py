@@ -112,6 +112,7 @@ def common_headers(modality=None, pid=False, name=None, patid=None):
         u'Test patient?',
         u'Study description',
         u'Requested procedure',
+        u'Study Comments',
         u'No. events',
     ]
 
@@ -237,6 +238,7 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         except ObjectDoesNotExist:
             total_number_of_irradiation_events = None
             ct_dose_length_product_total = None
+            comment = None
         else:
             try:
                 total_number_of_irradiation_events = int(
@@ -245,6 +247,7 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
                 total_number_of_irradiation_events = None
             ct_dose_length_product_total = exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(
                 ).ct_dose_length_product_total
+            comment = exams.ctradiationdose_set.get().comment
     elif modality in u"DX":
         try:
             total_number_of_radiographic_frames = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
@@ -256,14 +259,18 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
                     ).accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
             else:
                 cgycm2 = None
+            comment = exams.projectionxrayradiationdose_set.get().comment
         except ObjectDoesNotExist:
             total_number_of_radiographic_frames = None
             cgycm2 = None
+            comment = None
     elif modality in [u"RF", u"MG"]:
         try:
             event_count = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
+            comment = exams.projectionxrayradiationdose_set.get().comment
         except ObjectDoesNotExist:
             event_count = None
+            comment = None
 
     examdata = []
     if pid and name:
@@ -298,6 +305,7 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         not_patient_indicator,
         exams.study_description,
         exams.requested_procedure_code_meaning,
+        comment,
     ]
     if modality in u"CT":
         examdata += [
