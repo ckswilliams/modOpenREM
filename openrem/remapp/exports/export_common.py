@@ -29,8 +29,12 @@
 
 """
 
+import logging
 import sys
 from django.core.exceptions import ObjectDoesNotExist
+
+
+logger = logging.getLogger(__name__)
 
 
 def text_and_date_formats(book, sheet, pid=False, name=None, patid=None):
@@ -188,18 +192,28 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     :return: the common data for that exam
     """
 
-    if pid and (name or patid):
-        try:
+    patient_birth_date = None
+    patient_name = None
+    patient_id = None
+    patient_sex = None
+    not_patient_indicator = None
+    try:
+        patient_sex = exams.patientmoduleattr_set.get().patient_sex
+        not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+        if pid and (name or patid):
             patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
             if name:
                 patient_name = exams.patientmoduleattr_set.get().patient_name
             if patid:
                 patient_id = exams.patientmoduleattr_set.get().patient_id
-        except ObjectDoesNotExist:
-            patient_birth_date = None
-            patient_name = None
-            patient_id = None
+    except ObjectDoesNotExist:
+        logger.debug("Export {0}; patientmoduleattr_set object does not exist".format(modality))
 
+    institution_name = None
+    manufacturer = None
+    manufacturer_model_name = None
+    station_name = None
+    display_name = None
     try:
         institution_name = exams.generalequipmentmoduleattr_set.get().institution_name
         manufacturer = exams.generalequipmentmoduleattr_set.get().manufacturer
@@ -207,50 +221,38 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         station_name = exams.generalequipmentmoduleattr_set.get().station_name
         display_name = exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
     except ObjectDoesNotExist:
-        institution_name = None
-        manufacturer = None
-        manufacturer_model_name = None
-        station_name = None
-        display_name = None
+        logger.debug("Export {0}; generalequipmentmoduleattr_set object does not exist".format(modality))
 
-    try:
-        patient_sex = exams.patientmoduleattr_set.get().patient_sex
-    except ObjectDoesNotExist:
-        patient_sex = None
-
+    patient_age_decimal = None
+    patient_size = None
+    patient_weight = None
     try:
         patient_age_decimal = exams.patientstudymoduleattr_set.get().patient_age_decimal
         patient_size = exams.patientstudymoduleattr_set.get().patient_size
         patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
     except ObjectDoesNotExist:
-        patient_age_decimal = None
-        patient_size = None
-        patient_weight = None
+        logger.debug("Export {0}; patientstudymoduleattr_set object does not exist".format(modality))
 
-    try:
-        not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
-    except ObjectDoesNotExist:
-        not_patient_indicator = None
-
+    event_count = None
+    cgycm2 = None
+    comment = None
+    ct_dose_length_product_total = None
     if modality in u"CT":
         try:
-            exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
-        except ObjectDoesNotExist:
-            total_number_of_irradiation_events = None
-            ct_dose_length_product_total = None
-            comment = None
-        else:
-            try:
-                total_number_of_irradiation_events = int(
-                    exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events)
-            except TypeError:
-                total_number_of_irradiation_events = None
+            comment = exams.ctradiationdose_set.get().comment
             ct_dose_length_product_total = exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(
                 ).ct_dose_length_product_total
-            comment = exams.ctradiationdose_set.get().comment
+            try:
+                event_count = int(
+                    exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events)
+            except TypeError:
+                logger.debug("Export CT; couldn't get number of irradiation events")
+        except ObjectDoesNotExist:
+            logger.debug("Export CT; ctradiationdose_set object does not exist")
+
     elif modality in u"DX":
         try:
-            total_number_of_radiographic_frames = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+            event_count = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
                 ).accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames
             dap_total = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
                 ).accumintegratedprojradiogdose_set.get().dose_area_product_total
@@ -261,16 +263,13 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
                 cgycm2 = None
             comment = exams.projectionxrayradiationdose_set.get().comment
         except ObjectDoesNotExist:
-            total_number_of_radiographic_frames = None
-            cgycm2 = None
-            comment = None
+            logger.debug("Export DX; projectionxrayradiationdose_set object does not exist")
     elif modality in [u"RF", u"MG"]:
         try:
             event_count = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
             comment = exams.projectionxrayradiationdose_set.get().comment
         except ObjectDoesNotExist:
-            event_count = None
-            comment = None
+            logger.debug("Export {0}; projectionxrayradiationdose_set object does not exist".format(modality))
 
     examdata = []
     if pid and name:
@@ -309,12 +308,12 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     ]
     if modality in u"CT":
         examdata += [
-            total_number_of_irradiation_events,
+            event_count,
             ct_dose_length_product_total,
         ]
     elif modality in u"DX":
         examdata += [
-            total_number_of_radiographic_frames,
+            event_count,
             cgycm2,
         ]
     elif modality in [u"RF", u"MG"]:
