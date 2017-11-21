@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
+* `#561`_  Imports: Patient orientation modifier now correctly extracted from RDSR
 * `#559`_  Interface: Date pickers inconsistent start day fixed
 * `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector postition are missing
 * `#557`_  Skin dose maps: Improved construction of patient orientation code
