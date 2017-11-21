@@ -73,10 +73,10 @@ skinDoseMap3dElement = $("#skinDoseMap3d");
 
 // jQuery mouse event handlers for the DIV that contains the 3D skin dose map
 skinDoseMap3dElement
-    .on('mousedown', function() {
+    .on("mousedown", function() {
         isDragging3d = true;
     })
-    .on('mousemove', function(e) {
+    .on("mousemove", function(e) {
         if (firstMouseMove === true) {
             var deltaMove = {
                 x: 0,
@@ -98,7 +98,7 @@ skinDoseMap3dElement
                     toRadians(deltaMove.y * 1),
                     toRadians(deltaMove.x * 1),
                     0,
-                    'XYZ'
+                    "XYZ"
                 ));
 
             skinDoseMap3dObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dObj.mesh.quaternion);
@@ -110,7 +110,7 @@ skinDoseMap3dElement
             y: e.offsetY
         };
     })
-    .on('touchstart', function(e) {
+    .on("touchstart", function(e) {
         isDragging3d = true;
 
         var changedTouches = e.originalEvent.changedTouches;
@@ -118,7 +118,7 @@ skinDoseMap3dElement
             ongoingTouches.push(copyTouch(changedTouches[i]));
         }
     })
-    .on('touchmove', function(e) {
+    .on("touchmove", function(e) {
         e.preventDefault();
 
         // If one pointer is down rotate the object based on the movement
@@ -152,7 +152,7 @@ skinDoseMap3dElement
                                 toRadians(deltaMove.y * 1),
                                 toRadians(deltaMove.x * 1),
                                 0,
-                                'XYZ'
+                                "XYZ"
                             ));
                         skinDoseMap3dObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dObj.mesh.quaternion);
                         skinDoseMap3dPersonObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dPersonObj.mesh.quaternion);
@@ -166,7 +166,7 @@ skinDoseMap3dElement
             }
         }
     })
-    .on('touchend', function(e) {
+    .on("touchend", function(e) {
         isDragging3d = false;
 
         var touches = e.originalEvent.changedTouches;
@@ -177,7 +177,7 @@ skinDoseMap3dElement
             }
         }
     })
-    .on('mousewheel', function(e) {
+    .on("mousewheel", function(e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -189,7 +189,7 @@ skinDoseMap3dElement
 
 
 $(document)
-    .on('mouseup touchend', function () {
+    .on("mouseup touchend", function () {
         isDragging3d = false
     });
 
@@ -231,10 +231,10 @@ function render() {
  */
 function webglAvailable() {
     try {
-        var canvas = document.createElement('canvas');
+        var canvas = document.createElement("canvas");
         return !!( window.WebGLRenderingContext && (
-            canvas.getContext('webgl') ||
-            canvas.getContext('experimental-webgl') )
+            canvas.getContext("webgl") ||
+            canvas.getContext("experimental-webgl") )
         );
     } catch (e) {
         return false;

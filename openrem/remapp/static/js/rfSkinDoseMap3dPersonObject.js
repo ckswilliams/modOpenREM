@@ -54,7 +54,7 @@ function skinDoseMap3dPersonObject() {
 
         var meshes = [], geometry; //, material;
 
-        THREE.ImageUtils.crossOrigin = 'anonymous';
+        THREE.ImageUtils.crossOrigin = "anonymous";
 
         var endMaterial = new THREE.MeshLambertMaterial( { color: 0x7092be } );
 

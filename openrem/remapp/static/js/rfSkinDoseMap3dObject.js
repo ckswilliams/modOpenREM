@@ -215,7 +215,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         var geometry;
         _this.meshes = [];
 
-        THREE.ImageUtils.crossOrigin = 'anonymous';
+        THREE.ImageUtils.crossOrigin = "anonymous";
 
         var endMaterial = new THREE.MeshLambertMaterial( { color: 0x7092be } );
         var materials = [materialBack, materialLeft, materialFront, materialRight, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial];

@@ -2,9 +2,9 @@
  * Function to draw the available colour scales
  */
 function colourScaleSelection() {
-    var colour_scales = ['OrRd','PuBu','BuPu','Oranges','BuGn','YlOrBr',
-        'YlGn','Reds','RdPu','Greens','YlGnBu','Purples','GnBu','Greys',
-        'YlOrRd','PuRd','Blues','PuBuGn'];
+    var colour_scales = ["OrRd","PuBu","BuPu","Oranges","BuGn","YlOrBr",
+        "YlGn","Reds","RdPu","Greens","YlGnBu","Purples","GnBu","Greys",
+        "YlOrRd","PuRd","Blues","PuBuGn"];
     var i, j;
     var colour_scale;
     var canvas, context;
@@ -12,8 +12,8 @@ function colourScaleSelection() {
     var num_shades = 11;
 
     for (i=0; i<colour_scales.length; i++) {
-        canvas = $('#' + colour_scales[i])[0];
-        context = canvas.getContext('2d');
+        canvas = $("#" + colour_scales[i])[0];
+        context = canvas.getContext("2d");
         canvas.height = side_length;
         canvas.width = side_length * num_shades;
         colour_scale = chroma.scale(colour_scales[i]);
@@ -91,7 +91,7 @@ function doseInGyToRGB(dose) {
     r = Math.floor(dose / 255);
     g = Math.round(dose % 255);
     b = 255;
-    return 'rgb(' + r.toString() + ',' + g.toString() + ',' + b.toString() + ')';
+    return "rgb(" + r.toString() + "," + g.toString() + "," + b.toString() + ")";
 }
 
 
@@ -123,17 +123,17 @@ function reset(skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_
         skin_dose_map_3d_person_obj.reset();
     }
 
-    $('input[name=currentWindowLevel]').val(skin_dose_map_obj.windowLevel.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $('input[name=currentWindowWidth]').val(skin_dose_map_obj.windowWidth.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentWindowLevel]").val(skin_dose_map_obj.windowLevel.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentWindowWidth]").val(skin_dose_map_obj.windowWidth.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
 
-    $('input[name=windowLevelSlider]').prop({'value': skin_dose_map_obj.windowLevel});
-    $('input[name=windowWidthSlider]').prop({'value': skin_dose_map_obj.windowWidth});
+    $("input[name=windowLevelSlider]").prop({"value": skin_dose_map_obj.windowLevel});
+    $("input[name=windowWidthSlider]").prop({"value": skin_dose_map_obj.windowWidth});
 
-    $('input[name=minDoseSlider]').prop({'value': skin_dose_map_obj.minDose});
-    $('input[name=maxDoseSlider]').prop({'value': skin_dose_map_obj.maxDose});
+    $("input[name=minDoseSlider]").prop({"value": skin_dose_map_obj.minDose});
+    $("input[name=maxDoseSlider]").prop({"value": skin_dose_map_obj.maxDose});
 
-    $('input[name=currentMinDisplayedDose]').val(skin_dose_map_obj.minDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $('input[name=currentMaxDisplayedDose]').val(skin_dose_map_obj.maxDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skin_dose_map_obj.minDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skin_dose_map_obj.maxDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
 }
 
 
@@ -149,8 +149,8 @@ function updateWindowLevel(newWindowLevel, skin_dose_map_obj, skin_dose_map_colo
     newWindowLevel = parseFloat(newWindowLevel);
     if (newWindowLevel < 0) newWindowLevel = 0;
 
-    $('input[name=currentWindowLevel]').val(newWindowLevel.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $('input[name=windowLevelSlider]').prop({'value': newWindowLevel});
+    $("input[name=currentWindowLevel]").val(newWindowLevel.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=windowLevelSlider]").prop({"value": newWindowLevel});
 
     skin_dose_map_obj.updateWindowLevel(newWindowLevel);
     skin_dose_map_obj.draw();
@@ -167,11 +167,11 @@ function updateWindowLevel(newWindowLevel, skin_dose_map_obj, skin_dose_map_colo
         skin_dose_map_3d_obj.draw();
     }
 
-    $('input[name=minDoseSlider]').prop({'value': skin_dose_map_obj.minDisplayedDose});
-    $('input[name=maxDoseSlider]').prop({'value': skin_dose_map_obj.maxDisplayedDose});
+    $("input[name=minDoseSlider]").prop({"value": skin_dose_map_obj.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skin_dose_map_obj.maxDisplayedDose});
 
-    $('input[name=currentMinDisplayedDose]').val(skin_dose_map_obj.minDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $('input[name=currentMaxDisplayedDose]').val(skin_dose_map_obj.maxDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skin_dose_map_obj.minDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skin_dose_map_obj.maxDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
 }
 
 
@@ -185,8 +185,8 @@ function updateWindowLevel(newWindowLevel, skin_dose_map_obj, skin_dose_map_colo
  */
 function updateWindowWidth(newWindowWidth, skin_dose_map_obj, skin_dose_map_colour_scale_obj, skin_dose_map_3d_obj, show_3d_skin_dose_map) {
     newWindowWidth = parseFloat(newWindowWidth);
-    $('input[name=currentWindowWidth]').val(newWindowWidth.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $('input[name=windowWidthSlider]').prop({'value': newWindowWidth});
+    $("input[name=currentWindowWidth]").val(newWindowWidth.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=windowWidthSlider]").prop({"value": newWindowWidth});
 
     skin_dose_map_obj.updateWindowWidth(newWindowWidth);
     skin_dose_map_obj.draw();
@@ -203,11 +203,11 @@ function updateWindowWidth(newWindowWidth, skin_dose_map_obj, skin_dose_map_colo
         skin_dose_map_3d_obj.draw();
     }
 
-    $('input[name=minDoseSlider]').prop({'value': skin_dose_map_obj.minDisplayedDose});
-    $('input[name=maxDoseSlider]').prop({'value': skin_dose_map_obj.maxDisplayedDose});
+    $("input[name=minDoseSlider]").prop({"value": skin_dose_map_obj.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skin_dose_map_obj.maxDisplayedDose});
 
-    $('input[name=currentMinDisplayedDose]').val(skin_dose_map_obj.minDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $('input[name=currentMaxDisplayedDose]').val(skin_dose_map_obj.maxDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skin_dose_map_obj.minDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skin_dose_map_obj.maxDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
 }
 
 
@@ -333,17 +333,17 @@ function updateMaxDisplayedDoseManual(maxDisplayedDose, skin_dose_map_obj, skin_
  * @param skin_dose_map_colour_scale_obj
  */
 function updateSlidersAndValues(skin_dose_map_obj, skin_dose_map_colour_scale_obj) {
-    $('input[name=minDoseSlider]').prop({'value': skin_dose_map_obj.minDisplayedDose});
-    $('input[name=maxDoseSlider]').prop({'value': skin_dose_map_obj.maxDisplayedDose});
+    $("input[name=minDoseSlider]").prop({"value": skin_dose_map_obj.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skin_dose_map_obj.maxDisplayedDose});
 
-    $('input[name=currentMinDisplayedDose]').val(skin_dose_map_obj.minDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $('input[name=currentMaxDisplayedDose]').val(skin_dose_map_obj.maxDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skin_dose_map_obj.minDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skin_dose_map_obj.maxDisplayedDose.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
 
-    $('input[name=currentWindowLevel]').val(skin_dose_map_obj.windowLevel.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
-    $('input[name=currentWindowWidth]').val(skin_dose_map_obj.windowWidth.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentWindowLevel]").val(skin_dose_map_obj.windowLevel.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
+    $("input[name=currentWindowWidth]").val(skin_dose_map_obj.windowWidth.toFixed(skin_dose_map_colour_scale_obj.decimalPlaces));
 
-    $('input[name=windowLevelSlider]').prop({'value': skin_dose_map_obj.windowLevel});
-    $('input[name=windowWidthSlider]').prop({'value': skin_dose_map_obj.windowWidth});
+    $("input[name=windowLevelSlider]").prop({"value": skin_dose_map_obj.windowLevel});
+    $("input[name=windowWidthSlider]").prop({"value": skin_dose_map_obj.windowWidth});
 }
 
 
@@ -355,13 +355,13 @@ var previousMousePosition = {
 
 // jQuery mouse event handlers for the DIV that contains the 2D skin dose map
 $("#skinDoseMap")
-    .on('mouseup', function () {
+    .on("mouseup", function () {
         isDragging = false;
     })
-    .on('mousedown', function () {
+    .on("mousedown", function () {
         isDragging = true;
     })
-    .on('mousemove', function (e) {
+    .on("mousemove", function (e) {
         var pos = findPos(this);
         var x = e.pageX - pos.x;
         var y = e.pageY - pos.y;
@@ -369,7 +369,7 @@ $("#skinDoseMap")
         var mag = skinDoseMapObj.mag;
         if (x <= this.width-1 && y <= this.height-1) {
             var current_dose = parseFloat(skinDoseMapObj.skinDoseMap[(Math.floor(y/mag)) * Math.floor(this.width/mag) + Math.floor(x/mag)]).toPrecision(2) + " Gy";
-            $('[data-tooltip="skin_dose_map"]').qtip('option', 'content.text', current_dose);
+            $("[data-tooltip='skin_dose_map']").qtip("option", "content.text", current_dose);
         }
 
         var deltaMove = {
@@ -378,16 +378,16 @@ $("#skinDoseMap")
         };
 
         if (isDragging) {
-            var maxWL = parseFloat($('#windowLevelSlider')[0].max);
+            var maxWL = parseFloat($("#windowLevelSlider")[0].max);
             var newWL = skinDoseMapObj.windowLevel * (100-deltaMove.y)/100;
-            if (newWL == 0) newWL += 0.01;
+            if (newWL === 0) newWL += 0.01;
             if (newWL < 0) newWL = 0;
             if (newWL > maxWL) newWL = maxWL;
             skinDoseMapObj.updateWindowLevel(newWL);
 
-            var maxWW = parseFloat($('#windowWidthSlider')[0].max);
+            var maxWW = parseFloat($("#windowWidthSlider")[0].max);
             var newWW = skinDoseMapObj.windowWidth + skinDoseMapObj.windowWidth * deltaMove.x/100;
-            if (newWW == 0) newWW += 0.01;
+            if (newWW === 0) newWW += 0.01;
             if (newWW < 0) newWW = 0;
             if (newWW > maxWW) newWW = maxWW;
             skinDoseMapObj.updateWindowWidth(newWW);
@@ -418,21 +418,21 @@ $("#skinDoseMap")
 
 var isDragging = false;
 
-colourScaleSelection('colour_scale_selection');
+colourScaleSelection("colour_scale_selection");
 
-$('[data-tooltip="skin_dose_map"]').qtip({
+$("[data-tooltip='skin_dose_map']").qtip({
     content: {
-        text: ''
+        text: ""
     },
     position: {
-        target: 'mouse',
+        target: "mouse",
         adjust: {
             mouse: true,
             x: 15,
             y: 15
         }
     },
-    style: { classes: 'qtip-bootstrap' }
+    style: { classes: "qtip-bootstrap" }
 });
 
 
@@ -443,7 +443,7 @@ $('[data-tooltip="skin_dose_map"]').qtip({
  * @param filename
  */
 function downloadCanvas(link, canvasId, filename) {
-    var canvas = $('#'+canvasId)[0];
+    var canvas = $("#"+canvasId)[0];
 
     if (canvas.msToBlob) { //for IE
         var blob = canvas.msToBlob();
@@ -465,44 +465,44 @@ function download3dCanvas(link, filename) {
         var blob = renderer.domElement.msToBlob();
         window.navigator.msSaveBlob(blob, filename);
     } else { //other browsers
-        link.href = renderer.domElement.toDataURL('image/png');
+        link.href = renderer.domElement.toDataURL("image/png");
         link.download = filename;
     }
 }
 
-$('#save2dSkinMap').click(function() {
-    downloadCanvas(this, 'skinDoseMap', '2dSkinMap.png');
+$("#save2dSkinMap").click(function() {
+    downloadCanvas(this, "skinDoseMap", "2dSkinMap.png");
 });
 
-$('#save3dSkinMap').click(function() {
-    download3dCanvas(this, '3dSkinMap.png');
+$("#save3dSkinMap").click(function() {
+    download3dCanvas(this, "3dSkinMap.png");
 });
 
-$('#skinDoseMapOverlayShow').click(function() {
-    $('#skinDoseMapOverlayHide').toggle();
-    $('#skinDoseMapOverlayShow').toggle();
+$("#skinDoseMapOverlayShow").click(function() {
+    $("#skinDoseMapOverlayHide").toggle();
+    $("#skinDoseMapOverlayShow").toggle();
     skinDoseMapObj.toggleOverlay();
 });
 
-$('#skinDoseMapOverlayHide').click(function() {
-    $('#skinDoseMapOverlayHide').toggle();
-    $('#skinDoseMapOverlayShow').toggle();
+$("#skinDoseMapOverlayHide").click(function() {
+    $("#skinDoseMapOverlayHide").toggle();
+    $("#skinDoseMapOverlayShow").toggle();
     skinDoseMapObj.toggleOverlay();
 });
 
 
 var skinMapFullScreen = false;
 var skinDoseMapGroupOrigWidth, skinDoseMapGroupOrigHeight;
-$('#skinDoseMapFullscreenBtn').click(function() {
+$("#skinDoseMapFullscreenBtn").click(function() {
     skinMapFullScreen = !skinMapFullScreen;
 
-    var skin_dose_map_container = $('#skinDoseMapContainer');
+    var skin_dose_map_container = $("#skinDoseMapContainer");
 
-    var otherHeight = skin_dose_map_container.height() - $('#skinDoseMap').height();
+    var otherHeight = skin_dose_map_container.height() - $("#skinDoseMap").height();
 
-    skin_dose_map_container.toggleClass('fullscreen');
+    skin_dose_map_container.toggleClass("fullscreen");
 
-    skin_dose_map_group = $('#skinDoseMapGroup');
+    var skin_dose_map_group = $("#skinDoseMapGroup");
 
     if (skinMapFullScreen) {
         var skinDoseMapGroupWidth = $(window).width();
@@ -513,7 +513,7 @@ $('#skinDoseMapFullscreenBtn').click(function() {
 
         skinDoseMapObj.mag = (maxMagHeight <= maxMagWidth) ? maxMagHeight : maxMagWidth;
         skinDoseMapObj.resizeSkinDoseMap();
-        skin_dose_map_group.width(skinDoseMapObj.skinDoseMapCanvas.width + 80 + 'px').height(skinDoseMapObj.skinDoseMapCanvas.height + 'px');
+        skin_dose_map_group.width(skinDoseMapObj.skinDoseMapCanvas.width + 80 + "px").height(skinDoseMapObj.skinDoseMapCanvas.height + "px");
         skinDoseMapObj.draw();
         skinDoseMapObj.updateBoundaries();
         if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
@@ -559,8 +559,8 @@ $('#skinDoseMapFullscreenBtn').click(function() {
  * @returns {boolean}
  */
 function isCanvasSupported(){
-    var elem = document.createElement('canvas');
-    return !!(elem.getContext && elem.getContext('2d'));
+    var elem = document.createElement("canvas");
+    return !!(elem.getContext && elem.getContext("2d"));
 }
 
 
@@ -568,14 +568,14 @@ function isCanvasSupported(){
  * Function to toggle between 2D and 3D skin dose map display
  */
 function switch2d3dSkinDoseMap() {
-    $('#save2dSkinMap').toggle();
-    $('#save3dSkinMap').toggle();
-    $('#skinDoseMap3d').toggle();
-    $('#skinDoseMap').toggle();
+    $("#save2dSkinMap").toggle();
+    $("#save3dSkinMap").toggle();
+    $("#skinDoseMap3d").toggle();
+    $("#skinDoseMap").toggle();
 
-    $('#maxDose').toggleClass('whiteText');
-    $('#phantomDimensions').toggleClass('whiteText');
-    $('#patientHeight').toggleClass('whiteText');
-    $('#patientMass').toggleClass('whiteText');
-    $('#patientOrientation').toggleClass('whiteText');
+    $("#maxDose").toggleClass("whiteText");
+    $("#phantomDimensions").toggleClass("whiteText");
+    $("#patientHeight").toggleClass("whiteText");
+    $("#patientMass").toggleClass("whiteText");
+    $("#patientOrientation").toggleClass("whiteText");
 }

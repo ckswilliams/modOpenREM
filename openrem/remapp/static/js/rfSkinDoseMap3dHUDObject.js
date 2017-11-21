@@ -8,17 +8,17 @@ function skinDoseMap3dHUDObject() {
     this.mesh = 0;
     this.width = 0;
     this.height = 0;
-    this.maxDoseLabel = '';
-    this.phantomDimensionsLabel = '70x34x20';
-    this.patientHeight = '1.79';
-    this.patientMass = '73.2';
-    this.patientOrientation = 'HFS';
-    this.patientHeightSource = 'Assumed';
-    this.patientMassSource = 'Assumed';
-    this.patientOrientationSource = 'Assumed';
+    this.maxDoseLabel = "";
+    this.phantomDimensionsLabel = "70x34x20";
+    this.patientHeight = "1.79";
+    this.patientMass = "73.2";
+    this.patientOrientation = "HFS";
+    this.patientHeightSource = "Assumed";
+    this.patientMassSource = "Assumed";
+    this.patientOrientationSource = "Assumed";
 
-    this.hudCanvas = document.createElement('canvas');
-    this.hudContext = this.hudCanvas.getContext('2d');
+    this.hudCanvas = document.createElement("canvas");
+    this.hudContext = this.hudCanvas.getContext("2d");
     this.hudTexture = new THREE.Texture(this.hudCanvas);
 
     /**
@@ -36,21 +36,21 @@ function skinDoseMap3dHUDObject() {
         _this.hudCanvas.height = _this.height;
 
         _this.hudContext.font = "8pt arial";
-        _this.hudContext.textAlign = 'left';
+        _this.hudContext.textAlign = "left";
         _this.hudContext.fillStyle = "rgba(255,255,255,1.0)";
-        _this.hudContext.fillText('Calculated peak skin dose:', 5, 15);
-        _this.hudContext.fillText('Phantom dimensions:', 5, 30);
-        _this.hudContext.fillText(_this.patientHeightSource + ' patient height:', 5, 45);
-        _this.hudContext.fillText(_this.patientMassSource + ' patient mass:', 5, 60);
-        _this.hudContext.fillText(_this.patientOrientationSource + ' patient orientation:', 5, 75);
+        _this.hudContext.fillText("Calculated peak skin dose:", 5, 15);
+        _this.hudContext.fillText("Phantom dimensions:", 5, 30);
+        _this.hudContext.fillText(_this.patientHeightSource + " patient height:", 5, 45);
+        _this.hudContext.fillText(_this.patientMassSource + " patient mass:", 5, 60);
+        _this.hudContext.fillText(_this.patientOrientationSource + " patient orientation:", 5, 75);
 
-        _this.hudContext.fillText(_this.phantomDimensionsLabel + ' (HxWxD)', 150, 30);
-        _this.hudContext.fillText(_this.patientHeight + ' m', 150, 45);
-        _this.hudContext.fillText(_this.patientMass + ' kg', 150, 60);
+        _this.hudContext.fillText(_this.phantomDimensionsLabel + " (HxWxD)", 150, 30);
+        _this.hudContext.fillText(_this.patientHeight + " m", 150, 45);
+        _this.hudContext.fillText(_this.patientMass + " kg", 150, 60);
         _this.hudContext.fillText(_this.patientOrientation, 150, 75);
 
         _this.hudContext.font = "bold 8pt arial";
-        _this.hudContext.fillText(_this.maxDoseLabel + ' Gy', 150, 15);
+        _this.hudContext.fillText(_this.maxDoseLabel + " Gy", 150, 15);
 
         _this.camera = new THREE.OrthographicCamera(
             -_this.width/2, _this.width/2,
@@ -82,21 +82,21 @@ function skinDoseMap3dHUDObject() {
         _this.hudContext.clearRect(0, 0, _this.width, _this.height);
 
         _this.hudContext.font = "8pt arial";
-        _this.hudContext.textAlign = 'left';
+        _this.hudContext.textAlign = "left";
         _this.hudContext.fillStyle = "rgba(255,255,255,1.0)";
-        _this.hudContext.fillText('Calculated peak skin dose:', 5, 15);
-        _this.hudContext.fillText('Phantom dimensions:', 5, 30);
-        _this.hudContext.fillText(_this.patientHeightSource + ' patient height:', 5, 45);
-        _this.hudContext.fillText(_this.patientMassSource + ' patient mass:', 5, 60);
-        _this.hudContext.fillText(_this.patientOrientationSource + ' patient orientation:', 5, 75);
+        _this.hudContext.fillText("Calculated peak skin dose:", 5, 15);
+        _this.hudContext.fillText("Phantom dimensions:", 5, 30);
+        _this.hudContext.fillText(_this.patientHeightSource + " patient height:", 5, 45);
+        _this.hudContext.fillText(_this.patientMassSource + " patient mass:", 5, 60);
+        _this.hudContext.fillText(_this.patientOrientationSource + " patient orientation:", 5, 75);
 
-        _this.hudContext.fillText(_this.phantomDimensionsLabel + ' (HxWxD)', 150, 30);
-        _this.hudContext.fillText(_this.patientHeight + ' m', 150, 45);
-        _this.hudContext.fillText(_this.patientMass + ' kg', 150, 60);
+        _this.hudContext.fillText(_this.phantomDimensionsLabel + " (HxWxD)", 150, 30);
+        _this.hudContext.fillText(_this.patientHeight + " m", 150, 45);
+        _this.hudContext.fillText(_this.patientMass + " kg", 150, 60);
         _this.hudContext.fillText(_this.patientOrientation, 150, 75);
 
         _this.hudContext.font = "bold 8pt arial";
-        _this.hudContext.fillText(_this.maxDoseLabel + ' Gy', 150, 15);
+        _this.hudContext.fillText(_this.maxDoseLabel + " Gy", 150, 15);
 
         _this.hudTexture.needsUpdate = true;
     };
