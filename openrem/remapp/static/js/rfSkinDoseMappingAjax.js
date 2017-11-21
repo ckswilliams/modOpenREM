@@ -1,3 +1,6 @@
+/*global skinDoseMapObj:true, skinDoseMapColourScaleObj, skinDoseMap3dPersonObj, skinDoseMap3dObj:true, skinDoseMap3dHUDObj:true*/
+/*eslint no-undef: "error"*/
+
 /**
  * Returns the logarithm of y with base x (ie. logxy). This is used as an alternative to Math.log10 which is not
  * supported in Internet Explorer

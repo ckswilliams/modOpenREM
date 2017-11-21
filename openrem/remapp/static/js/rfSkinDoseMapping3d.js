@@ -1,3 +1,6 @@
+/*global skinDoseMap3dPersonObj, skinDoseMap3dObj, skinDoseMap3dHUDObj*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to convert an angle in degrees into radians
  * @param angle

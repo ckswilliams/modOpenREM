@@ -23,11 +23,11 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
     /**
      * Internal function to use a new colour scale
-     * @param new_scale
+     * @param newScale
      */
-    this.useNewColourScale = function (new_scale) {
+    this.useNewColourScale = function (newScale) {
         var _this = this;
-        _this.colourScale = chroma.scale(new_scale);
+        _this.colourScale = chroma.scale(newScale);
     };
 
 

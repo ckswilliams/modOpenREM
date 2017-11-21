@@ -1,3 +1,6 @@
+/*global skinDoseMapObj:true, skinDoseMapColourScaleObj:true, skinDoseMap3dObj:true, skinDoseMap3dHUDObj:true*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to draw the available colour scales
  */
@@ -28,23 +31,23 @@ function colourScaleSelection() {
 /**
  * Function to set a new colour scale
  * @param newScale
- * @param skinDoseMapObj
- * @param skinDoseMapColourScaleObj
- * @param skinDoseMap3dObj
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
+ * @param skinDoseMap3d
  * @param show3dSkinDoseMap
  */
-function useNewColourScale(newScale, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
-    skinDoseMapObj.useNewColourScale(newScale);
-    skinDoseMapObj.draw();
-    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
-    skinDoseMapObj.writeInformation();
+function useNewColourScale(newScale, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
+    skinDoseMap.useNewColourScale(newScale);
+    skinDoseMap.draw();
+    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    skinDoseMap.writeInformation();
 
-    skinDoseMapColourScaleObj.useNewColourScale(newScale);
-    skinDoseMapColourScaleObj.draw();
+    skinDoseMapColourScale.useNewColourScale(newScale);
+    skinDoseMapColourScale.draw();
 
     if (show3dSkinDoseMap) {
-        skinDoseMap3dObj.useNewColourScale(newScale);
-        skinDoseMap3dObj.draw();
+        skinDoseMap3d.useNewColourScale(newScale);
+        skinDoseMap3d.draw();
     }
 }
 
@@ -97,253 +100,253 @@ function doseInGyToRGB(dose) {
 
 /**
  * Function to reset the skin dose maps to their default settings
- * @param skinDoseMapObj
- * @param skinDoseMapColourScaleObj
- * @param skinDoseMap3dObj
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
+ * @param skinDoseMap3d
  * @param show3dSkinDoseMap
- * @param skinDoseMap3dPersonObj
+ * @param skinDoseMap3dPerson
  */
-function reset(skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap, skinDoseMap3dPersonObj) {
-    skinDoseMapObj.updateWindowWidth(skinDoseMapObj.maxDose - skinDoseMapObj.minDose);
-    skinDoseMapObj.updateWindowLevel(skinDoseMapObj.minDose + (skinDoseMapObj.windowWidth/2.0));
-    skinDoseMapObj.draw();
-    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
-    skinDoseMapObj.writeInformation();
+function reset(skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap, skinDoseMap3dPerson) {
+    skinDoseMap.updateWindowWidth(skinDoseMap.maxDose - skinDoseMap.minDose);
+    skinDoseMap.updateWindowLevel(skinDoseMap.minDose + (skinDoseMap.windowWidth/2.0));
+    skinDoseMap.draw();
+    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    skinDoseMap.writeInformation();
 
-    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
-    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.redrawValues();
+    skinDoseMapColourScale.minDose = skinDoseMap.minDisplayedDose;
+    skinDoseMapColourScale.maxDose = skinDoseMap.maxDisplayedDose;
+    skinDoseMapColourScale.redrawValues();
 
     if (show3dSkinDoseMap) {
-        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
-        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
-        skinDoseMap3dObj.draw();
+        skinDoseMap3d.windowWidth = skinDoseMap.windowWidth;
+        skinDoseMap3d.windowLevel = skinDoseMap.windowLevel;
+        skinDoseMap3d.draw();
 
-        skinDoseMap3dObj.reset();
-        skinDoseMap3dPersonObj.reset();
+        skinDoseMap3d.reset();
+        skinDoseMap3dPerson.reset();
     }
 
-    $("input[name=currentWindowLevel]").val(skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
-    $("input[name=currentWindowWidth]").val(skinDoseMapObj.windowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentWindowLevel]").val(skinDoseMap.windowLevel.toFixed(skinDoseMapColourScale.decimalPlaces));
+    $("input[name=currentWindowWidth]").val(skinDoseMap.windowWidth.toFixed(skinDoseMapColourScale.decimalPlaces));
 
-    $("input[name=windowLevelSlider]").prop({"value": skinDoseMapObj.windowLevel});
-    $("input[name=windowWidthSlider]").prop({"value": skinDoseMapObj.windowWidth});
+    $("input[name=windowLevelSlider]").prop({"value": skinDoseMap.windowLevel});
+    $("input[name=windowWidthSlider]").prop({"value": skinDoseMap.windowWidth});
 
-    $("input[name=minDoseSlider]").prop({"value": skinDoseMapObj.minDose});
-    $("input[name=maxDoseSlider]").prop({"value": skinDoseMapObj.maxDose});
+    $("input[name=minDoseSlider]").prop({"value": skinDoseMap.minDose});
+    $("input[name=maxDoseSlider]").prop({"value": skinDoseMap.maxDose});
 
-    $("input[name=currentMinDisplayedDose]").val(skinDoseMapObj.minDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
-    $("input[name=currentMaxDisplayedDose]").val(skinDoseMapObj.maxDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skinDoseMap.minDose.toFixed(skinDoseMapColourScale.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skinDoseMap.maxDose.toFixed(skinDoseMapColourScale.decimalPlaces));
 }
 
 
 /**
  * Function to update the skin dose map when the window level has been changed with a slider or the mouse
  * @param newWindowLevel
- * @param skinDoseMapObj
- * @param skinDoseMapColourScaleObj
- * @param skinDoseMap3dObj
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
+ * @param skinDoseMap3d
  * @param show3dSkinDoseMap
  */
-function updateWindowLevel(newWindowLevel, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
+function updateWindowLevel(newWindowLevel, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
     newWindowLevel = parseFloat(newWindowLevel);
     if (newWindowLevel < 0) newWindowLevel = 0;
 
-    $("input[name=currentWindowLevel]").val(newWindowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentWindowLevel]").val(newWindowLevel.toFixed(skinDoseMapColourScale.decimalPlaces));
     $("input[name=windowLevelSlider]").prop({"value": newWindowLevel});
 
-    skinDoseMapObj.updateWindowLevel(newWindowLevel);
-    skinDoseMapObj.draw();
-    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
-    skinDoseMapObj.writeInformation();
+    skinDoseMap.updateWindowLevel(newWindowLevel);
+    skinDoseMap.draw();
+    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    skinDoseMap.writeInformation();
 
-    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
-    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.redrawValues();
+    skinDoseMapColourScale.minDose = skinDoseMap.minDisplayedDose;
+    skinDoseMapColourScale.maxDose = skinDoseMap.maxDisplayedDose;
+    skinDoseMapColourScale.redrawValues();
 
     if (show3dSkinDoseMap) {
-        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
-        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
-        skinDoseMap3dObj.draw();
+        skinDoseMap3d.windowWidth = skinDoseMap.windowWidth;
+        skinDoseMap3d.windowLevel = skinDoseMap.windowLevel;
+        skinDoseMap3d.draw();
     }
 
-    $("input[name=minDoseSlider]").prop({"value": skinDoseMapObj.minDisplayedDose});
-    $("input[name=maxDoseSlider]").prop({"value": skinDoseMapObj.maxDisplayedDose});
+    $("input[name=minDoseSlider]").prop({"value": skinDoseMap.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skinDoseMap.maxDisplayedDose});
 
-    $("input[name=currentMinDisplayedDose]").val(skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
-    $("input[name=currentMaxDisplayedDose]").val(skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skinDoseMap.minDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skinDoseMap.maxDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
 }
 
 
 /**
  * Function to update the skin dose map when the window width has been changed with a slider or the mouse
  * @param newWindowWidth
- * @param skinDoseMapObj
- * @param skinDoseMapColourScaleObj
- * @param skinDoseMap3dObj
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
+ * @param skinDoseMap3d
  * @param show3dSkinDoseMap
  */
-function updateWindowWidth(newWindowWidth, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
+function updateWindowWidth(newWindowWidth, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
     newWindowWidth = parseFloat(newWindowWidth);
-    $("input[name=currentWindowWidth]").val(newWindowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentWindowWidth]").val(newWindowWidth.toFixed(skinDoseMapColourScale.decimalPlaces));
     $("input[name=windowWidthSlider]").prop({"value": newWindowWidth});
 
-    skinDoseMapObj.updateWindowWidth(newWindowWidth);
-    skinDoseMapObj.draw();
-    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
-    skinDoseMapObj.writeInformation();
+    skinDoseMap.updateWindowWidth(newWindowWidth);
+    skinDoseMap.draw();
+    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    skinDoseMap.writeInformation();
 
-    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
-    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.redrawValues();
+    skinDoseMapColourScale.minDose = skinDoseMap.minDisplayedDose;
+    skinDoseMapColourScale.maxDose = skinDoseMap.maxDisplayedDose;
+    skinDoseMapColourScale.redrawValues();
 
     if (show3dSkinDoseMap) {
-        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
-        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
-        skinDoseMap3dObj.draw();
+        skinDoseMap3d.windowWidth = skinDoseMap.windowWidth;
+        skinDoseMap3d.windowLevel = skinDoseMap.windowLevel;
+        skinDoseMap3d.draw();
     }
 
-    $("input[name=minDoseSlider]").prop({"value": skinDoseMapObj.minDisplayedDose});
-    $("input[name=maxDoseSlider]").prop({"value": skinDoseMapObj.maxDisplayedDose});
+    $("input[name=minDoseSlider]").prop({"value": skinDoseMap.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skinDoseMap.maxDisplayedDose});
 
-    $("input[name=currentMinDisplayedDose]").val(skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
-    $("input[name=currentMaxDisplayedDose]").val(skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skinDoseMap.minDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skinDoseMap.maxDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
 }
 
 
 /**
  * Function to update the skin dose map when the minimum displayed dose has been changed using a slider or the mouse
  * @param minDisplayedDose
- * @param skinDoseMapObj
- * @param skinDoseMapColourScaleObj
- * @param skinDoseMap3dObj
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
+ * @param skinDoseMap3d
  * @param show3dSkinDoseMap
  */
-function updateMinDisplayedDose(minDisplayedDose, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
+function updateMinDisplayedDose(minDisplayedDose, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
     minDisplayedDose = parseFloat(minDisplayedDose);
 
-    skinDoseMapObj.updateMinDisplayedDose(minDisplayedDose);
-    skinDoseMapObj.draw();
-    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
-    skinDoseMapObj.writeInformation();
+    skinDoseMap.updateMinDisplayedDose(minDisplayedDose);
+    skinDoseMap.draw();
+    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    skinDoseMap.writeInformation();
 
-    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
-    skinDoseMapColourScaleObj.redrawValues();
+    skinDoseMapColourScale.minDose = skinDoseMap.minDisplayedDose;
+    skinDoseMapColourScale.redrawValues();
 
     if (show3dSkinDoseMap) {
-        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
-        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
-        skinDoseMap3dObj.draw();
+        skinDoseMap3d.windowWidth = skinDoseMap.windowWidth;
+        skinDoseMap3d.windowLevel = skinDoseMap.windowLevel;
+        skinDoseMap3d.draw();
     }
 
-    updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj);
+    updateSlidersAndValues(skinDoseMap, skinDoseMapColourScale);
 }
 
 
 /**
  * Function to update the skin dose map when the maximum displayed dose has been changed using a slider or the mouse
  * @param maxDisplayedDose
- * @param skinDoseMapObj
- * @param skinDoseMapColourScaleObj
- * @param skinDoseMap3dObj
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
+ * @param skinDoseMap3d
  * @param show3dSkinDoseMap
  */
-function updateMaxDisplayedDose(maxDisplayedDose, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
+function updateMaxDisplayedDose(maxDisplayedDose, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
     maxDisplayedDose = parseFloat(maxDisplayedDose);
 
-    skinDoseMapObj.updateMaxDisplayedDose(maxDisplayedDose);
-    skinDoseMapObj.draw();
-    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
-    skinDoseMapObj.writeInformation();
+    skinDoseMap.updateMaxDisplayedDose(maxDisplayedDose);
+    skinDoseMap.draw();
+    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    skinDoseMap.writeInformation();
 
-    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.redrawValues();
+    skinDoseMapColourScale.maxDose = skinDoseMap.maxDisplayedDose;
+    skinDoseMapColourScale.redrawValues();
 
     if (show3dSkinDoseMap) {
-        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
-        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
-        skinDoseMap3dObj.draw();
+        skinDoseMap3d.windowWidth = skinDoseMap.windowWidth;
+        skinDoseMap3d.windowLevel = skinDoseMap.windowLevel;
+        skinDoseMap3d.draw();
     }
 
-    updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj);
+    updateSlidersAndValues(skinDoseMap, skinDoseMapColourScale);
 }
 
 
 /**
  * Function to change the skin dose map when the minimum displayed dose has been changed manually
  * @param minDisplayedDose
- * @param skinDoseMapObj
- * @param skinDoseMapColourScaleObj
- * @param skinDoseMap3dObj
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
+ * @param skinDoseMap3d
  * @param show3dSkinDoseMap
  */
-function updateMinDisplayedDoseManual(minDisplayedDose, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
+function updateMinDisplayedDoseManual(minDisplayedDose, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
     minDisplayedDose = parseFloat(minDisplayedDose);
 
-    skinDoseMapObj.updateMinDisplayedDoseManual(minDisplayedDose);
-    skinDoseMapObj.draw();
-    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
-    skinDoseMapObj.writeInformation();
+    skinDoseMap.updateMinDisplayedDoseManual(minDisplayedDose);
+    skinDoseMap.draw();
+    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    skinDoseMap.writeInformation();
 
-    skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
-    skinDoseMapColourScaleObj.redrawValues();
+    skinDoseMapColourScale.minDose = skinDoseMap.minDisplayedDose;
+    skinDoseMapColourScale.redrawValues();
 
     if (show3dSkinDoseMap) {
-        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
-        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
-        skinDoseMap3dObj.draw();
+        skinDoseMap3d.windowWidth = skinDoseMap.windowWidth;
+        skinDoseMap3d.windowLevel = skinDoseMap.windowLevel;
+        skinDoseMap3d.draw();
     }
 
-    updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj);
+    updateSlidersAndValues(skinDoseMap, skinDoseMapColourScale);
 }
 
 
 /**
  * Function to update the skin dose map when the maximum displayed dose has been changed
  * @param maxDisplayedDose
- * @param skinDoseMapObj
- * @param skinDoseMapColourScaleObj
- * @param skinDoseMap3dObj
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
+ * @param skinDoseMap3d
  * @param show3dSkinDoseMap
  */
-function updateMaxDisplayedDoseManual(maxDisplayedDose, skinDoseMapObj, skinDoseMapColourScaleObj, skinDoseMap3dObj, show3dSkinDoseMap) {
+function updateMaxDisplayedDoseManual(maxDisplayedDose, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
     maxDisplayedDose = parseFloat(maxDisplayedDose);
 
-    skinDoseMapObj.updateMaxDisplayedDoseManual(maxDisplayedDose);
-    skinDoseMapObj.draw();
-    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
-    skinDoseMapObj.writeInformation();
+    skinDoseMap.updateMaxDisplayedDoseManual(maxDisplayedDose);
+    skinDoseMap.draw();
+    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    skinDoseMap.writeInformation();
 
-    skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.redrawValues();
+    skinDoseMapColourScale.maxDose = skinDoseMap.maxDisplayedDose;
+    skinDoseMapColourScale.redrawValues();
 
     if (show3dSkinDoseMap) {
-        skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
-        skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
-        skinDoseMap3dObj.draw();
+        skinDoseMap3d.windowWidth = skinDoseMap.windowWidth;
+        skinDoseMap3d.windowLevel = skinDoseMap.windowLevel;
+        skinDoseMap3d.draw();
     }
 
-    updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj);
+    updateSlidersAndValues(skinDoseMap, skinDoseMapColourScale);
 }
 
 
 /**
  * Function to update the HTML sliders and their displayed values
- * @param skinDoseMapObj
- * @param skinDoseMapColourScaleObj
+ * @param skinDoseMap
+ * @param skinDoseMapColourScale
  */
-function updateSlidersAndValues(skinDoseMapObj, skinDoseMapColourScaleObj) {
-    $("input[name=minDoseSlider]").prop({"value": skinDoseMapObj.minDisplayedDose});
-    $("input[name=maxDoseSlider]").prop({"value": skinDoseMapObj.maxDisplayedDose});
+function updateSlidersAndValues(skinDoseMap, skinDoseMapColourScale) {
+    $("input[name=minDoseSlider]").prop({"value": skinDoseMap.minDisplayedDose});
+    $("input[name=maxDoseSlider]").prop({"value": skinDoseMap.maxDisplayedDose});
 
-    $("input[name=currentMinDisplayedDose]").val(skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
-    $("input[name=currentMaxDisplayedDose]").val(skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentMinDisplayedDose]").val(skinDoseMap.minDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
+    $("input[name=currentMaxDisplayedDose]").val(skinDoseMap.maxDisplayedDose.toFixed(skinDoseMapColourScale.decimalPlaces));
 
-    $("input[name=currentWindowLevel]").val(skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
-    $("input[name=currentWindowWidth]").val(skinDoseMapObj.windowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
+    $("input[name=currentWindowLevel]").val(skinDoseMap.windowLevel.toFixed(skinDoseMapColourScale.decimalPlaces));
+    $("input[name=currentWindowWidth]").val(skinDoseMap.windowWidth.toFixed(skinDoseMapColourScale.decimalPlaces));
 
-    $("input[name=windowLevelSlider]").prop({"value": skinDoseMapObj.windowLevel});
-    $("input[name=windowWidthSlider]").prop({"value": skinDoseMapObj.windowWidth});
+    $("input[name=windowLevelSlider]").prop({"value": skinDoseMap.windowLevel});
+    $("input[name=windowWidthSlider]").prop({"value": skinDoseMap.windowWidth});
 }
 
 
