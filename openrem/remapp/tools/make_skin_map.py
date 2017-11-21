@@ -56,6 +56,7 @@ def make_skin_map(study_pk=None):
     import cPickle as pickle
     import gzip
     from remapp.version import __skin_map_version__
+    from django.core.exceptions import ObjectDoesNotExist
 
     if study_pk:
         study = GeneralStudyModuleAttr.objects.get(pk=study_pk)
@@ -131,37 +132,33 @@ def make_skin_map(study_pk=None):
                                              matt_thick=4.0)
 
         for irrad in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
-                                                                                        ).table_longitudinal_position:
+            try:
                 delta_x = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
                                                                                 ).table_longitudinal_position) / 10.0
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 delta_x = 0.0
-            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
-                                                                                        ).table_lateral_position:
+            try:
                 delta_y = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
                                                                                         ).table_lateral_position) / 10.0
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 delta_y = 0.0
-            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
-                                                                                        ).table_height_position:
+            try:
                 delta_z = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
                                                                                         ).table_height_position) / 10.0
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 delta_z = 0.0
             if irrad.irradeventxraymechanicaldata_set.get().positioner_primary_angle:
                 angle_x = float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_angle)
             else:
                 angle_x = 0.0
-            if irrad.irradeventxraymechanicaldata_set.get().positioner_secondary_angle:
+            try:
                 angle_y = float(irrad.irradeventxraymechanicaldata_set.get().positioner_secondary_angle)
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 angle_y = 0.0
-            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
-                                                                                        ).distance_source_to_isocenter:
+            try:
                 d_ref = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
                                                                         ).distance_source_to_isocenter) / 10.0 - 15.0
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 # This will result in failure to calculate skin dose map. Need a sensible default, or a lookup to a
                 # user-entered value
                 d_ref = None
@@ -169,13 +166,13 @@ def make_skin_map(study_pk=None):
                 dap = float(irrad.dose_area_product)
             else:
                 dap = None
-            if irrad.irradeventxraysourcedata_set.get().dose_rp:
+            try:
                 ref_ak = float(irrad.irradeventxraysourcedata_set.get().dose_rp)
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 ref_ak = None
-            if irrad.irradeventxraysourcedata_set.get().kvp_set.get().kvp:
+            try:
                 kvp = float(irrad.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 kvp = None
 
             filter_cu = 0.0
@@ -191,13 +188,13 @@ def make_skin_map(study_pk=None):
                 run_type = str(irrad.irradiation_event_type)
             else:
                 run_type = None
-            if irrad.irradeventxraysourcedata_set.get().number_of_pulses:
+            try:
                 frames = float(irrad.irradeventxraysourcedata_set.get().number_of_pulses)
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 frames = None
-            if irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle:
+            try:
                 end_angle = float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle)
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 end_angle = None
             if ref_ak and d_ref:
                 my_exp_map.add_view(delta_x=delta_x, delta_y=delta_y, delta_z=delta_z,
