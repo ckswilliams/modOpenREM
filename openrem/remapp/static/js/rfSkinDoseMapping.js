@@ -526,6 +526,9 @@ $('#skinDoseMapFullscreenBtn').click(function() {
             skinDoseMap3dObj.canvas.width = skinDoseMapObj.skinDoseMapCanvas.width;
             skinDoseMap3dObj.canvas.height = skinDoseMapObj.skinDoseMapCanvas.height;
             skinDoseMap3dObj.draw();
+            skinDoseMap3dHUDObj.width = skinDoseMapObj.skinDoseMapCanvas.width;
+            skinDoseMap3dHUDObj.height = skinDoseMapObj.skinDoseMapCanvas.height;
+            skinDoseMap3dHUDObj.redraw();
         }
     } else {
         skin_dose_map_group.width(skinDoseMapGroupOrigWidth).height(skinDoseMapGroupOrigHeight);
@@ -543,6 +546,9 @@ $('#skinDoseMapFullscreenBtn').click(function() {
             skinDoseMap3dObj.canvas.width = skinDoseMapObj.skinDoseMapCanvas.width;
             skinDoseMap3dObj.canvas.height = skinDoseMapObj.skinDoseMapCanvas.height;
             skinDoseMap3dObj.draw();
+            skinDoseMap3dHUDObj.width = skinDoseMapObj.skinDoseMapCanvas.width;
+            skinDoseMap3dHUDObj.height = skinDoseMapObj.skinDoseMapCanvas.height;
+            skinDoseMap3dHUDObj.redraw();
         }
     }
 });

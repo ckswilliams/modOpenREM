@@ -214,8 +214,13 @@ function render() {
     renderer.render(skinDoseMap3dObj.scene, skinDoseMap3dObj.camera);
 
     renderer.clearDepth();
+    renderer.setViewport(0, 0, skinDoseMap3dObj.canvas.width, skinDoseMap3dObj.canvas.height);
+    renderer.render(skinDoseMap3dHUDObj.scene, skinDoseMap3dHUDObj.camera);
+
+    renderer.clearDepth();
     renderer.setViewport(10, 10, 75, 75);
     renderer.render(skinDoseMap3dPersonObj.scene, skinDoseMap3dPersonObj.camera);
+
     requestAnimFrame(render);
 }
 

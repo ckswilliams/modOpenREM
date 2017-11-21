@@ -131,6 +131,17 @@ $(document).ready(function() {
                         skinDoseMap3dObj.initialise(json.skin_map, json.phantom_flat_dist, json.phantom_curved_dist, json.phantom_height, json.phantom_depth / 2);
                         skinDoseMap3dObj.draw();
                         skinDoseMap3dPersonObj.initialise(json.phantom_height);
+
+                        skinDoseMap3dHUDObj.maxDoseLabel = skinDoseMapObj.maxDose.toFixed(decimalPlaces);
+                        skinDoseMap3dHUDObj.phantomDimensionsLabel = json.phantom_height + 'x' + json.phantom_width + 'x' + json.phantom_depth;
+                        skinDoseMap3dHUDObj.patientHeight = (json.patient_height / 100).toFixed(2);
+                        skinDoseMap3dHUDObj.patientMass = json.patient_mass.toFixed(1);
+                        skinDoseMap3dHUDObj.patientOrientation = json.patient_orientation;
+                        if (json.patient_height_source.indexOf('extracted') >= 0) skinDoseMap3dHUDObj.patientHeightSource = 'Extracted';
+                        if (json.patient_mass_source.indexOf('extracted') >= 0) skinDoseMap3dHUDObj.patientMassSource = 'Extracted';
+                        if (json.patient_orientation_source.indexOf('extracted') >= 0) skinDoseMap3dHUDObj.patientOrientationSource = 'Extracted';
+                        skinDoseMap3dHUDObj.initialise(skinDoseMap3dObj.canvas.width, skinDoseMap3dObj.canvas.height);
+
                         render();
                     }
                     $(".ajax-progress-skin-dose").hide();

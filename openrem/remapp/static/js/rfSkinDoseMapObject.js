@@ -5,7 +5,6 @@
  */
 function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
-
     this.skinDoseMapCanvasName = skinDoseMapCanvasName;
     this.skinDoseMapCanvas = document.getElementById(this.skinDoseMapCanvasName);
     this.skinDoseMapContext = this.skinDoseMapCanvas.getContext('2d');
@@ -150,15 +149,15 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
         _this.skinDoseMapContext.fillStyle = 'rgba(0, 0, 0, 1.0)';
         _this.skinDoseMapContext.fillText('Calculated peak skin dose:', 5, 15);
         _this.skinDoseMapContext.fillText('Phantom dimensions:', 5, 30);
-        _this.skinDoseMapContext.fillText(this.patientHeightSource + ' patient height:', 5, 45);
-        _this.skinDoseMapContext.fillText(this.patientMassSource + ' patient mass:', 5, 60);
-        _this.skinDoseMapContext.fillText(this.patientOrientationSource + ' patient orientation:', 5, 75);
+        _this.skinDoseMapContext.fillText(_this.patientHeightSource + ' patient height:', 5, 45);
+        _this.skinDoseMapContext.fillText(_this.patientMassSource + ' patient mass:', 5, 60);
+        _this.skinDoseMapContext.fillText(_this.patientOrientationSource + ' patient orientation:', 5, 75);
 
-        _this.skinDoseMapContext.fillText(this.maxDoseLabel + ' Gy', 150, 15);
-        _this.skinDoseMapContext.fillText(this.phantomDimensionsLabel + ' (HxWxD)', 150, 30);
-        _this.skinDoseMapContext.fillText(this.patientHeight + ' m', 150, 45);
-        _this.skinDoseMapContext.fillText(this.patientMass + ' kg', 150, 60);
-        _this.skinDoseMapContext.fillText(this.patientOrientation, 150, 75);
+        _this.skinDoseMapContext.fillText(_this.maxDoseLabel + ' Gy', 150, 15);
+        _this.skinDoseMapContext.fillText(_this.phantomDimensionsLabel + ' (HxWxD)', 150, 30);
+        _this.skinDoseMapContext.fillText(_this.patientHeight + ' m', 150, 45);
+        _this.skinDoseMapContext.fillText(_this.patientMass + ' kg', 150, 60);
+        _this.skinDoseMapContext.fillText(_this.patientOrientation, 150, 75);
     };
 
 
