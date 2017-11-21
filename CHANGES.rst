@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
+* `#564`_  Skin dose maps: Text information on skin dose maps now embedded when saving the 2d or 3d map as a graphic
 * `#559`_  Interface: Date pickers inconsistent start day fixed
 * `#557`_  Skin dose maps: Improved construction of patient orientation code
 * `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
