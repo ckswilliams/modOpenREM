@@ -248,7 +248,7 @@ function updateMinDisplayedDose(minDisplayedDose, skinDoseMap, skinDoseMapColour
 
     skinDoseMap.updateMinDisplayedDose(minDisplayedDose);
     skinDoseMap.draw();
-    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    if (skinDoseMap.showOverlay) {skinDoseMap.drawOverlay();}
     skinDoseMap.writeInformation();
 
     skinDoseMapColourScale.minDose = skinDoseMap.minDisplayedDose;
