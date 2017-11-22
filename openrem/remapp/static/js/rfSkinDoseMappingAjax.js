@@ -1,4 +1,6 @@
-/*global skinDoseMapObj:true, skinDoseMapColourScaleObj, skinDoseMap3dPersonObj, skinDoseMap3dObj:true, skinDoseMap3dHUDObj:true*/
+/*global skinDoseMapObj:true, skinDoseMapColourScaleObj, skinDoseMap3dPersonObj, skinDoseMap3dObj:true,
+skinDoseMap3dHUDObj:true, skinDoseMapGroupHeight:true, skinDoseMapGroupWidth:true, show3dSkinDoseMap, render,
+isCanvasSupported*/
 /*eslint no-undef: "error"*/
 
 /**
@@ -23,8 +25,7 @@ function URLToArray(url) {
     var request = {};
     var pairs = url.substring(url.indexOf("?") + 1).split("&");
     for (var i = 0; i < pairs.length; i++) {
-        if(!pairs[i])
-            continue;
+        if(!pairs[i]) {continue;}
         var pair = pairs[i].split("=");
         request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]).replace(/\+/g, " ");
     }
@@ -41,22 +42,23 @@ function URLToArray(url) {
 function ArrayToURL(array) {
     var pairs = [];
     for (var key in array)
-        if (array.hasOwnProperty(key))
+        if (array.hasOwnProperty(key)) {
             pairs.push(encodeURIComponent(key) + "=" + encodeURIComponent(array[key]));
+        }
     return pairs.join("&");
 }
 
 
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
-    var request_data = ArrayToURL(URLToArray(this.URL));
+    var requestData = ArrayToURL(URLToArray(this.URL));
 
     $(".ajax-progress-skin-dose").show();
 
     $.ajax({
         type: "GET",
         url: this.URL + "skin_map/",
-        data: request_data,
+        data: requestData,
         dataType: "json",
         success: function( json ) {
             var skinDoseMapContainer = $("#skinDoseMapContainer");
@@ -71,7 +73,7 @@ $(document).ready(function() {
                     var openskinInfo = $("#openskin_info");
 
                     var decimalPlaces = Math.abs(Math.ceil(getBaseLog(10, skinDoseMapObj.maxDose))) + 2;
-                    if (!isFinite(decimalPlaces)) decimalPlaces = 0;
+                    if (!isFinite(decimalPlaces)) {decimalPlaces = 0;}
 
                     skinDoseMapGroup.width(skinDoseMapObj.skinDoseMapCanvas.width + 80).height(skinDoseMapObj.skinDoseMapCanvas.height);
                     openskinInfo.width(skinDoseMapGroup.width());

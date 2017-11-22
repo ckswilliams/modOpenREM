@@ -1,4 +1,5 @@
-/*global skinDoseMapObj:true, skinDoseMapColourScaleObj:true, skinDoseMap3dObj:true, skinDoseMap3dHUDObj:true, renderer*/
+/*global skinDoseMapObj:true, skinDoseMapColourScaleObj:true, skinDoseMap3dObj:true, skinDoseMap3dHUDObj:true,
+show3dSkinDoseMap, chroma, renderer*/
 /*eslint no-undef: "error"*/
 
 /**
@@ -39,7 +40,7 @@ function colourScaleSelection() {
 function useNewColourScale(newScale, skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDoseMap) {
     skinDoseMap.useNewColourScale(newScale);
     skinDoseMap.draw();
-    if (skinDoseMap.showOverlay) {skinDoseMap.drawOverlay()};
+    if (skinDoseMap.showOverlay) {skinDoseMap.drawOverlay();}
     skinDoseMap.writeInformation();
 
     skinDoseMapColourScale.useNewColourScale(newScale);
@@ -110,7 +111,7 @@ function reset(skinDoseMap, skinDoseMapColourScale, skinDoseMap3d, show3dSkinDos
     skinDoseMap.updateWindowWidth(skinDoseMap.maxDose - skinDoseMap.minDose);
     skinDoseMap.updateWindowLevel(skinDoseMap.minDose + (skinDoseMap.windowWidth/2.0));
     skinDoseMap.draw();
-    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    if (skinDoseMap.showOverlay) {skinDoseMap.drawOverlay();}
     skinDoseMap.writeInformation();
 
     skinDoseMapColourScale.minDose = skinDoseMap.minDisplayedDose;
@@ -355,6 +356,7 @@ var previousMousePosition = {
     y: 0
 };
 
+var isDragging = false;
 
 // jQuery mouse event handlers for the DIV that contains the 2D skin dose map
 $("#skinDoseMap")
@@ -396,7 +398,7 @@ $("#skinDoseMap")
             skinDoseMapObj.updateWindowWidth(newWW);
 
             skinDoseMapObj.draw();
-            if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+            if (skinDoseMapObj.showOverlay) {skinDoseMapObj.drawOverlay();}
             skinDoseMapObj.writeInformation();
 
             skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
@@ -417,9 +419,6 @@ $("#skinDoseMap")
             y: e.offsetY
         };
     });
-
-
-var isDragging = false;
 
 colourScaleSelection("colour_scale_selection");
 

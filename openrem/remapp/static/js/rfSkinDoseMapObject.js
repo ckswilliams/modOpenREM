@@ -1,3 +1,6 @@
+/*global chroma*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to create a 2D skin dose map object
  * @param skinDoseMapCanvasName

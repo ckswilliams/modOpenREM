@@ -1,3 +1,6 @@
+/*global chroma*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to create a skin dose map colour scale object
  * @param colourScaleCanvasName

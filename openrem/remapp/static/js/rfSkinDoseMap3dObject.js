@@ -1,3 +1,6 @@
+/*global chroma, THREE, animate, render*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to create a 3d skin dose map object
  * @param skinDoseMap3dCanvasName
@@ -64,8 +67,8 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
             for (j = 0; j < _this.phantomFlatWidth; j++) {
                 currentDose = _this.skinDoseMap[j * _this.phantomHeight + i];
                 scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
-                if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                if (scaledDose < 0) {scaledDose = 0;}
+                if (scaledDose > _this.windowWidth) {scaledDose = _this.windowWidth;}
                 newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureFront.image.data[k] = newColour[0];
@@ -139,15 +142,15 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
     this.mergeMeshes = function (meshes) {
         var combined = new THREE.Geometry();
 
-        var last_face = 0, j;
+        var lastFace = 0, j;
 
         for (var i = 0; i < meshes.length; i++) {
             meshes[i].updateMatrix();
             combined.merge(meshes[i].geometry, meshes[i].matrix);
-            for(j = last_face; j < combined.faces.length; j++) {
+            for(j = lastFace; j < combined.faces.length; j++) {
                 combined.faces[j].materialIndex = i;
             }
-            last_face = combined.faces.length;
+            lastFace = combined.faces.length;
         }
 
         return combined;

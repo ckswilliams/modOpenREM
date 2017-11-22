@@ -1,4 +1,4 @@
-/*global skinDoseMap3dPersonObj, skinDoseMap3dObj, skinDoseMap3dHUDObj*/
+/*global skinDoseMap3dPersonObj, skinDoseMap3dObj, skinDoseMap3dHUDObj, THREE*/
 /*eslint no-undef: "error"*/
 
 /**
@@ -46,10 +46,9 @@ function ongoingTouchIndexById(idToFind) {
   return -1;    // not found
 }
 
-function zoom_3d_map(d) {
+function zoom3dMap(d) {
     var cPos = skinDoseMap3dObj.camera.position;
-    if (isNaN(cPos.x) || isNaN(cPos.y) || isNaN(cPos.y))
-        return;
+    if (isNaN(cPos.x) || isNaN(cPos.y) || isNaN(cPos.y)) {return;}
 
     var r = cPos.x * cPos.x + cPos.y * cPos.y;
     var sqr = Math.sqrt(r);
@@ -59,11 +58,10 @@ function zoom_3d_map(d) {
     var ny = cPos.y + ((r === 0) ? 0 : (d * cPos.y / sqr));
     var nz = cPos.z + ((sqrZ === 0) ? 0 : (d * cPos.z / sqrZ));
 
-    if (isNaN(nx) || isNaN(ny) || isNaN(nz))
-        return;
+    if (isNaN(nx) || isNaN(ny) || isNaN(nz)) {return;}
 
-    var r_new = nx * nx + ny * ny;
-    if (r_new > 100) {
+    var rNew = nx * nx + ny * ny;
+    if (rNew > 100) {
         cPos.x = nx;
         cPos.y = ny;
         cPos.z = nz;
@@ -72,7 +70,7 @@ function zoom_3d_map(d) {
     skinDoseMap3dObj.camera.lookAt(skinDoseMap3dObj.scene.position);
 }
 
-skinDoseMap3dElement = $("#skinDoseMap3d");
+var skinDoseMap3dElement = $("#skinDoseMap3d");
 
 // jQuery mouse event handlers for the DIV that contains the 3D skin dose map
 skinDoseMap3dElement
@@ -80,15 +78,16 @@ skinDoseMap3dElement
         isDragging3d = true;
     })
     .on("mousemove", function(e) {
+        var deltaMove;
         if (firstMouseMove === true) {
-            var deltaMove = {
+            deltaMove = {
                 x: 0,
                 y: 0
             };
             firstMouseMove = false;
         }
         else {
-            var deltaMove = {
+            deltaMove = {
                 x: e.offsetX - previousMousePosition3d.x,
                 y: e.offsetY - previousMousePosition3d.y
             };
@@ -187,13 +186,13 @@ skinDoseMap3dElement
         var d = ((typeof e.originalEvent.wheelDelta !== "undefined")?(-e.originalEvent.wheelDelta):e.originalEvent.detail);
         d = 10 * ((d>0)?1:-1);
 
-        zoom_3d_map(d);
+        zoom3dMap(d);
     });
 
 
 $(document)
     .on("mouseup touchend", function () {
-        isDragging3d = false
+        isDragging3d = false;
     });
 
 
@@ -206,6 +205,12 @@ window.requestAnimFrame = (function(){
             window.setTimeout(callback, 1000 / 60);
         };
 })();
+
+
+var skinDoseMap3dCanvas = skinDoseMap3dElement[0]; // The first element is the HTML DOM Object
+renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true, antialias: true });
+renderer.autoClear = false;
+renderer.setClearColor( 0x000000, 0 );
 
 
 /**
@@ -244,11 +249,6 @@ function webglAvailable() {
     }
 }
 
-
-skinDoseMap3dCanvas = skinDoseMap3dElement[0]; // The first element is the HTML DOM Object
-renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true, antialias: true });
-renderer.autoClear = false;
-renderer.setClearColor( 0x000000, 0 );
 
 // http://stackoverflow.com/questions/29312123/how-does-the-double-exclamation-work-in-javascript
 var show3dSkinDoseMap = !!webglAvailable();

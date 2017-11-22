@@ -1,3 +1,6 @@
+/*global THREE*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to create a 2d text overlay on top of the 3d skin dose map
  */
