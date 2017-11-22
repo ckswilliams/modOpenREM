@@ -672,7 +672,10 @@ def rf_detail_view(request, pk=None):
     total_dose = 0
     # Iterate over the planes (for bi-plane systems, for single plane systems there is only one)
     projection_xray_dose_set = study.projectionxrayradiationdose_set.get()
-    accumxraydose_set_all_planes = projection_xray_dose_set.accumxraydose_set.all()
+    accumxraydose_set_all_planes = projection_xray_dose_set.accumxraydose_set.select_related('acquisition_plane').all()
+    events_all = projection_xray_dose_set.irradeventxraydata_set.select_related(
+        'irradiation_event_type', 'patient_table_relationship_cid', 'patient_orientation_cid',
+        'patient_orientation_modifier_cid', 'acquisition_plane').all()
     for dose_ds in accumxraydose_set_all_planes:
         accum_dose_ds = dose_ds.accumprojxraydose_set.get()
         stu_dose_totals[0] = tuple(map(operator.add, stu_dose_totals[0],
@@ -737,7 +740,8 @@ def rf_detail_view(request, pk=None):
         {'generalstudymoduleattr': study, 'admin': admin,
          'study_totals': study_totals,
          'projection_xray_dose_set': projection_xray_dose_set,
-         'accumxraydose_set_all_planes': accumxraydose_set_all_planes},
+         'accumxraydose_set_all_planes': accumxraydose_set_all_planes,
+         'events_all': events_all},
         context_instance=RequestContext(request)
     )
 

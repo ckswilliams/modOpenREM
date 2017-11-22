@@ -358,7 +358,7 @@
   <th>Detector size (mm)</th>
   <th>SDD (mm)</th>
   <th>Orientation</th>
-    {% for event in projection_xray_dose_set.irradeventxraydata_set.all %}
+    {% for event in events_all %}
       {% with sourcedata=event.irradeventxraysourcedata_set.get %}
         {% with mechanicaldata=event.irradeventxraymechanicaldata_set.get %}
     <tr>
@@ -385,7 +385,7 @@
         <td>{{ sourcedata.kvp_set.get.kvp|floatformat:0 }}</td>
         <td>{{ sourcedata.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
         <td>
-            {% for xrayfilt in sourcedata.xrayfilters_set.all %}
+            {% for xrayfilt in sourcedata.xrayfilters_set.select_related.all %}
                 {% if xrayfilt.xray_filter_material.code_value == 'C-120F9' %}
                     Al: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
                 {% elif xrayfilt.xray_filter_material.code_value == 'C-127F9' %}
