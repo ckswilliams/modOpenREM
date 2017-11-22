@@ -277,7 +277,7 @@ function updateMaxDisplayedDose(maxDisplayedDose, skinDoseMap, skinDoseMapColour
 
     skinDoseMap.updateMaxDisplayedDose(maxDisplayedDose);
     skinDoseMap.draw();
-    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    if (skinDoseMap.showOverlay) {skinDoseMap.drawOverlay();}
     skinDoseMap.writeInformation();
 
     skinDoseMapColourScale.maxDose = skinDoseMap.maxDisplayedDose;
@@ -306,7 +306,7 @@ function updateMinDisplayedDoseManual(minDisplayedDose, skinDoseMap, skinDoseMap
 
     skinDoseMap.updateMinDisplayedDoseManual(minDisplayedDose);
     skinDoseMap.draw();
-    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    if (skinDoseMap.showOverlay) {skinDoseMap.drawOverlay();}
     skinDoseMap.writeInformation();
 
     skinDoseMapColourScale.minDose = skinDoseMap.minDisplayedDose;
@@ -335,7 +335,7 @@ function updateMaxDisplayedDoseManual(maxDisplayedDose, skinDoseMap, skinDoseMap
 
     skinDoseMap.updateMaxDisplayedDoseManual(maxDisplayedDose);
     skinDoseMap.draw();
-    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    if (skinDoseMap.showOverlay) {skinDoseMap.drawOverlay();}
     skinDoseMap.writeInformation();
 
     skinDoseMapColourScale.maxDose = skinDoseMap.maxDisplayedDose;
