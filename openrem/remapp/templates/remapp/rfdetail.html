@@ -5,7 +5,7 @@
 {% block mainblock %}
     <div class="row">
         <div class="col-md-5">
-        {% with study=generalstudymoduleattr patientstudy=generalstudymoduleattr.patientstudymoduleattr_set.get %}
+        {% with study=generalstudymoduleattr patientstudy=generalstudymoduleattr.patientstudymoduleattr_set.get projections=generalstudymoduleattr.projectionxrayradiationdose_set.get%}
             <h1>Detail list of events</h1>
 
             <ul>
@@ -25,14 +25,14 @@
                 <li>Patient age: {{ patientstudy.patient_age_decimal|floatformat:1 }} years</li>
                 <li>Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m, {{ patientstudy.patient_weight|floatformat:1 }} kg</li>
                 <li>
-                    {% for record in study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                    {% for record in projections.accumxraydose_set.all %}
                         Total DAP, {{ record.acquisition_plane }}:
                         {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
                         <br>
                     {% endfor %}
                 </li>
                 <li>
-                    {% for record in study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                    {% for record in projections.accumxraydose_set.all %}
                         Total dose at RP, {{ record.acquisition_plane }}:
                         <script>document.write({{ record.accumintegratedprojradiogdose_set.get.dose_rp_total }}.toPrecision(3));</script> Gy
                         <br>
@@ -357,31 +357,32 @@
   <th>SDD (mm)</th>
   <th>Orientation</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
+      {% with sourcedata=event.irradeventxraysourcedata_set.get mechanicaldata=event.irradeventxraymechanicaldata_set.get %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
         <td>{{ event.irradiation_event_type }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.pulse_rate|floatformat:2 }}</td>
+        <td>{{ sourcedata.pulse_rate|floatformat:2 }}</td>
         <td>{{ event.acquisition_plane }}</td>
         <td><script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script></td>
-        <td><script>document.write({{ event.irradeventxraysourcedata_set.get.convert_gy_to_mgy }}.toPrecision(3));</script></td>
+        <td><script>document.write({{ sourcedata.convert_gy_to_mgy }}.toPrecision(3));</script></td>
         <td>
-        {% if event.irradeventxraysourcedata_set.get.irradiation_duration %}
-            {{ event.irradeventxraysourcedata_set.get.irradiation_duration|multiply:1000|floatformat:1 }}
+        {% if sourcedata.irradiation_duration %}
+            {{ sourcedata.irradiation_duration|multiply:1000|floatformat:1 }}
         {% else %}
             <i>n/a</i>
         {% endif %}
         <br>
-        {% if event.irradeventxraysourcedata_set.get.exposure_time %}
-            {{ event.irradeventxraysourcedata_set.get.exposure_time }}
+        {% if sourcedata.exposure_time %}
+            {{ sourcedata.exposure_time }}
         {% else %}
             <i>n/a</i>
         {% endif %}
         </td>
-        <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
+        <td>{{ sourcedata.kvp_set.get.kvp|floatformat:0 }}</td>
+        <td>{{ sourcedata.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
         <td>
-            {% for xrayfilt in event.irradeventxraysourcedata_set.get.xrayfilters_set.all %}
+            {% for xrayfilt in sourcedata.xrayfilters_set.all %}
                 {% if xrayfilt.xray_filter_material.code_value == 'C-120F9' %}
                     Al: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
                 {% elif xrayfilt.xray_filter_material.code_value == 'C-127F9' %}
@@ -391,12 +392,13 @@
                 {% endif %}
             {% endfor %}
         </td>
-        <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_primary_angle|floatformat:1 }}</td>
-        <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_secondary_angle|floatformat:1 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.ii_field_size }}</td>
-        <td>{{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
+        <td>{{ mechanicaldata.positioner_primary_angle|floatformat:1 }}</td>
+        <td>{{ mechanicaldata.positioner_secondary_angle|floatformat:1 }}</td>
+        <td>{{ sourcedata.ii_field_size }}</td>
+        <td>{{ mechanicaldata.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
 		    <td>{{ event.patient_table_relationship_cid|title }}, {{ event.patient_orientation_cid|title }}, {{ event.patient_orientation_modifier_cid|title }}
     </tr>
+      {% endwith %}
     {% endfor %}
 </table>
 
