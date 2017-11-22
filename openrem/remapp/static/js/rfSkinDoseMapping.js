@@ -194,7 +194,7 @@ function updateWindowWidth(newWindowWidth, skinDoseMap, skinDoseMapColourScale, 
 
     skinDoseMap.updateWindowWidth(newWindowWidth);
     skinDoseMap.draw();
-    if (skinDoseMap.showOverlay) skinDoseMap.drawOverlay();
+    if (skinDoseMap.showOverlay) {skinDoseMap.drawOverlay();}
     skinDoseMap.writeInformation();
 
     skinDoseMapColourScale.minDose = skinDoseMap.minDisplayedDose;
@@ -538,7 +538,7 @@ $("#skinDoseMapFullscreenBtn").click(function() {
         skinDoseMapObj.resizeSkinDoseMap();
         skinDoseMapObj.draw();
         skinDoseMapObj.updateBoundaries();
-        if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+        if (skinDoseMapObj.showOverlay) {skinDoseMapObj.drawOverlay();}
         skinDoseMapObj.writeInformation();
 
         skinDoseMapColourScaleObj.resizeColourScale(70, skinDoseMapObj.skinDoseMapCanvas.height);

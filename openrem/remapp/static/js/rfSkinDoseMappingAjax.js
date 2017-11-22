@@ -21,7 +21,7 @@ function getBaseLog(x, y) {
  * @returns {{}}
  * @constructor
  */
-function URLToArray(url) {
+function urlToArray(url) {
     var request = {};
     var pairs = url.substring(url.indexOf("?") + 1).split("&");
     for (var i = 0; i < pairs.length; i++) {
@@ -41,17 +41,18 @@ function URLToArray(url) {
  */
 function arrayToURL(array) {
     var pairs = [];
-    for (var key in array)
+    for (var key in array) {
         if (array.hasOwnProperty(key)) {
             pairs.push(encodeURIComponent(key) + "=" + encodeURIComponent(array[key]));
         }
+    }
     return pairs.join("&");
 }
 
 
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
-    var requestData = arrayToURL(URLToArray(this.URL));
+    var requestData = arrayToURL(urlToArray(this.URL));
 
     $(".ajax-progress-skin-dose").show();
 

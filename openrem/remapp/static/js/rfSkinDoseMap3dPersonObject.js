@@ -21,15 +21,15 @@ function skinDoseMap3dPersonObject() {
     this.mergeMeshes = function (meshes) {
         var combined = new THREE.Geometry();
 
-        var last_face = 0, j;
+        var lastFace = 0, j;
 
         for (var i = 0; i < meshes.length; i++) {
             meshes[i].updateMatrix();
             combined.merge(meshes[i].geometry, meshes[i].matrix);
-            for(j = last_face; j < combined.faces.length; j++) {
+            for(j = lastFace; j < combined.faces.length; j++) {
                 combined.faces[j].materialIndex = i;
             }
-            last_face = combined.faces.length;
+            lastFace = combined.faces.length;
         }
 
         return combined;

@@ -99,8 +99,8 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
             for (j = _this.phantomFlatWidth+_this.phantomCurvedEdgeWidth; j < _this.phantomFlatWidth*2+_this.phantomCurvedEdgeWidth; j++) {
                 currentDose = _this.skinDoseMap[(j * _this.phantomHeight) + i];
                 scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
-                if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                if (scaledDose < 0) {scaledDose = 0;}
+                if (scaledDose > _this.windowWidth) {scaledDose = _this.windowWidth;}
                 newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureBack.image.data[k] = newColour[0];

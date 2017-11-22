@@ -48,7 +48,7 @@ function resetSeriesButtons(buttonIDStub) {
 }
 
 
-function URLToArray(url) {
+function urlToArray(url) {
     var request = {};
     var pairs = url.substring(url.indexOf("?") + 1).split("&");
     for (var i = 0; i < pairs.length; i++) {
@@ -63,7 +63,7 @@ function URLToArray(url) {
 }
 
 
-function ArrayToURL(array) {
+function arrayToURL(array) {
     var pairs = [];
     for (var key in array) {
         if (array.hasOwnProperty(key)) {
