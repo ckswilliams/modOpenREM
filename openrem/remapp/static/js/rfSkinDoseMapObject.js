@@ -88,8 +88,8 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
             for (y = 0; y < _this.skinDoseMapHeight; y++) {
                 dose = _this.skinDoseMap[(y) * _this.skinDoseMapWidth + x];
                 scaledDose = dose - (_this.windowLevel - (_this.windowWidth / 2.0));
-                if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                if (scaledDose < 0) {scaledDose = 0;}
+                if (scaledDose > _this.windowWidth) {scaledDose = _this.windowWidth;}
                 _this.skinDoseMapContext.fillStyle = _this.colourScale(scaledDose / _this.windowWidth).hex();
                 _this.skinDoseMapContext.fillRect(x*_this.mag, y*_this.mag, _this.mag, _this.mag);
             }
@@ -208,7 +208,7 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
      */
     this.updateWindowLevel = function (newWindowLevel) {
         var _this = this;
-        if (newWindowLevel < 0) newWindowLevel = 0;
+        if (newWindowLevel < 0) {newWindowLevel = 0;}
         _this.windowLevel = parseFloat(newWindowLevel);
 
         _this.minDisplayedDose = _this.windowLevel - (_this.windowWidth / 2.0);

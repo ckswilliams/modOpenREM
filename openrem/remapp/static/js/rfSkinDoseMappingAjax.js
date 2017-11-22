@@ -1,5 +1,5 @@
 /*global skinDoseMapObj:true, skinDoseMapColourScaleObj, skinDoseMap3dPersonObj, skinDoseMap3dObj:true,
-skinDoseMap3dHUDObj:true, skinDoseMapGroupHeight:true, skinDoseMapGroupWidth:true, show3dSkinDoseMap, render,
+skinDoseMap3dHUDObj:true, skinDoseMapGroupOrigHeight:true, skinDoseMapGroupOrigWidth:true, show3dSkinDoseMap, render,
 isCanvasSupported*/
 /*eslint no-undef: "error"*/
 
@@ -39,7 +39,7 @@ function URLToArray(url) {
  * @returns {string}
  * @constructor
  */
-function ArrayToURL(array) {
+function arrayToURL(array) {
     var pairs = [];
     for (var key in array)
         if (array.hasOwnProperty(key)) {
@@ -51,7 +51,7 @@ function ArrayToURL(array) {
 
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
-    var requestData = ArrayToURL(URLToArray(this.URL));
+    var requestData = arrayToURL(URLToArray(this.URL));
 
     $(".ajax-progress-skin-dose").show();
 

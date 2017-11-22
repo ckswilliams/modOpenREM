@@ -1,4 +1,4 @@
-/*global skinDoseMap3dPersonObj, skinDoseMap3dObj, skinDoseMap3dHUDObj, THREE*/
+/*global skinDoseMap3dPersonObj, skinDoseMap3dObj, skinDoseMap3dHUDObj, THREE, requestAnimFrame*/
 /*eslint no-undef: "error"*/
 
 /**
@@ -127,16 +127,17 @@ skinDoseMap3dElement
         if (ongoingTouches.length === 1) {
 
             var touches = e.originalEvent.changedTouches;
+            var deltaMove;
 
             if (firstMouseMove === true) {
-                var deltaMove = {
+                deltaMove = {
                     x: 0,
                     y: 0
                 };
                 firstMouseMove = false;
             }
             else {
-                var deltaMove = {
+                deltaMove = {
                     x: touches[0].pageX - previousMousePosition3d.x,
                     y: touches[0].pageY - previousMousePosition3d.y
                 };
@@ -208,7 +209,7 @@ window.requestAnimFrame = (function(){
 
 
 var skinDoseMap3dCanvas = skinDoseMap3dElement[0]; // The first element is the HTML DOM Object
-renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true, antialias: true });
+var renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true, antialias: true });
 renderer.autoClear = false;
 renderer.setClearColor( 0x000000, 0 );
 
