@@ -359,7 +359,8 @@
   <th>SDD (mm)</th>
   <th>Orientation</th>
     {% for event in projection_xray_dose_set.irradeventxraydata_set.all %}
-      {% with sourcedata=event.irradeventxraysourcedata_set.get mechanicaldata=event.irradeventxraymechanicaldata_set.get %}
+      {% with sourcedata=event.irradeventxraysourcedata_set.get %}
+        {% with mechanicaldata=event.irradeventxraymechanicaldata_set.get %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
@@ -400,7 +401,7 @@
         <td>{{ mechanicaldata.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
 		    <td>{{ event.patient_table_relationship_cid|title }}, {{ event.patient_orientation_cid|title }}, {{ event.patient_orientation_modifier_cid|title }}
     </tr>
-      {% endwith %}
+      {% endwith %}{% endwith %}
     {% endfor %}
 </table>
 
