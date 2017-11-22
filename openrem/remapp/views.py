@@ -671,7 +671,9 @@ def rf_detail_view(request, pk=None):
     total_dap = 0
     total_dose = 0
     # Iterate over the planes (for bi-plane systems, for single plane systems there is only one)
-    for dose_ds in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+    projection_xray_dose_set = study.projectionxrayradiationdose_set.get()
+    accumxraydose_set_all_planes = projection_xray_dose_set.accumxraydose_set.all()
+    for dose_ds in accumxraydose_set_all_planes:
         accum_dose_ds = dose_ds.accumprojxraydose_set.get()
         stu_dose_totals[0] = tuple(map(operator.add, stu_dose_totals[0],
                                        (accum_dose_ds.fluoro_dose_area_product_total*1000000,
@@ -733,7 +735,9 @@ def rf_detail_view(request, pk=None):
     return render_to_response(
         'remapp/rfdetail.html',
         {'generalstudymoduleattr': study, 'admin': admin,
-         'study_totals': study_totals},
+         'study_totals': study_totals,
+         'projection_xray_dose_set': projection_xray_dose_set,
+         'accumxraydose_set_all_planes': accumxraydose_set_all_planes},
         context_instance=RequestContext(request)
     )
 

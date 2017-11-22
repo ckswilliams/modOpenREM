@@ -5,7 +5,9 @@
 {% block mainblock %}
     <div class="row">
         <div class="col-md-5">
-        {% with study=generalstudymoduleattr patientstudy=generalstudymoduleattr.patientstudymoduleattr_set.get projections=generalstudymoduleattr.projectionxrayradiationdose_set.get%}
+        {% with study=generalstudymoduleattr %}
+          {% with patientstudy=study.patientstudymoduleattr_set.get %}
+            {% with equipment=study.generalequipmentmoduleattr_set.get %}
             <h1>Detail list of events</h1>
 
             <ul>
@@ -24,28 +26,28 @@
                 <li>Requested procedure: {{ study.requested_procedure_code_meaning }}</li>
                 <li>Patient age: {{ patientstudy.patient_age_decimal|floatformat:1 }} years</li>
                 <li>Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m, {{ patientstudy.patient_weight|floatformat:1 }} kg</li>
-                <li>
-                    {% for record in projections.accumxraydose_set.all %}
+                {% for record in accumxraydose_set_all_planes %}
+                  {% with accumprojection=record.accumintegratedprojradiogdose_set.get %}
+                  <li>
                         Total DAP, {{ record.acquisition_plane }}:
-                        {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
+                        {{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
                         <br>
-                    {% endfor %}
-                </li>
-                <li>
-                    {% for record in projections.accumxraydose_set.all %}
+                  </li>
+                  <li>
                         Total dose at RP, {{ record.acquisition_plane }}:
-                        <script>document.write({{ record.accumintegratedprojradiogdose_set.get.dose_rp_total }}.toPrecision(3));</script> Gy
+                        <script>document.write({{ accumprojection.dose_rp_total }}.toPrecision(3));</script> Gy
                         <br>
-                    {% endfor %}
-                </li>
-                <li>Hospital: {{ study.generalequipmentmoduleattr_set.get.institution_name }}</li>
+                   </li>
+                  {% endwith %}
+                {% endfor %}
+                <li>Hospital: {{ equipment.institution_name }}</li>
                 <li>
                     Equipment:
-                    {{ study.generalequipmentmoduleattr_set.get.manufacturer }} |
-                    {{ study.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                    {{ study.generalequipmentmoduleattr_set.get.station_name }}
+                    {{ equipment.manufacturer }} |
+                    {{ equipment.manufacturer_model_name }} |
+                    {{ equipment.station_name }}
                 </li>
-                <li>Display name: {{ study.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</li>
+                <li>Display name: {{ equipment.unique_equipment_name.display_name }}</li>
                 <li>Study UID: {{ study.study_instance_uid }}</li>
                 <li>Performing physician(s): {{ study.performing_physician_name }}</li>
                 <li>Operator(s): {{ study.operator_name }}</li>
@@ -76,7 +78,7 @@
             </table>
             </ul>
         </div>
-    {% endwith %}
+    {% endwith %}{% endwith %}{% endwith %}
 
         {% if admin.enable_skin_dose_maps %}
         <div class="col-md-7" id="skinDoseMapContainer">
@@ -356,7 +358,7 @@
   <th>Detector size (mm)</th>
   <th>SDD (mm)</th>
   <th>Orientation</th>
-    {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
+    {% for event in projection_xray_dose_set.irradeventxraydata_set.all %}
       {% with sourcedata=event.irradeventxraysourcedata_set.get mechanicaldata=event.irradeventxraymechanicaldata_set.get %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
