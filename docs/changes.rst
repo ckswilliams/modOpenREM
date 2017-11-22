@@ -4,7 +4,10 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
+* `#561`_  Imports: Patient orientation modifier now correctly extracted from RDSR
+* `#560`_  Exports: Added study level comments
 * `#559`_  Interface: Date pickers inconsistent start day fixed
+* `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector postition are missing
 * `#557`_  Skin dose maps: Improved construction of patient orientation code
 * `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
@@ -20,6 +23,7 @@ OpenREM version history
 * `#524`_  Importing: Improved mammo import by checking anode exists before converting to DICOM terms
 * `#523`_  Importing: Changed mammo import to use del_no_match instead of del_mg_im if not mammo
 * `#521`_  Testing: Added tests for dual source CT imports
+* `#520`_  Imports: Removed XML styling from Philips legacy CT comment creation
 * `#518`_  Importing: Fixed imports where CT Target Region isn't specified
 * `#517`_  Interface: Operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
 * `#516`_  Imports: MultiValue person names are now stored as a decoded string, not a list
