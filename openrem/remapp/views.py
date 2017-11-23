@@ -1386,9 +1386,18 @@ def mg_detail_view(request, pk=None):
     for group in request.user.groups.all():
         admin[group.name] = True
 
+    projection_xray_dose_set = study.projectionxrayradiationdose_set.get()
+    accum_mammo_set = projection_xray_dose_set.accumxraydose_set.get().accummammographyxraydose_set.select_related(
+        'laterality').all()
+    events_all = projection_xray_dose_set.irradeventxraydata_set.select_related(
+        'laterality', 'image_view').all()
+
     return render_to_response(
         'remapp/mgdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin,
+         'projection_xray_dose_set': projection_xray_dose_set,
+         'accum_mammo_set': accum_mammo_set,
+         'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
