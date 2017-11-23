@@ -43,6 +43,7 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
@@ -1179,9 +1180,12 @@ def ct_detail_view(request, pk=None):
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
-    except:
+    except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/ct/')
+
+    events_all = study.ctradiationdose_set.get().ctirradiationeventdata_set.select_related(
+        'ct_acquisition_type', 'ctdiw_phantom_type').all()
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1190,7 +1194,7 @@ def ct_detail_view(request, pk=None):
 
     return render_to_response(
         'remapp/ctdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin, 'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
