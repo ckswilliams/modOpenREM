@@ -1,3 +1,6 @@
+/*global chroma*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to create a 2D skin dose map object
  * @param skinDoseMapCanvasName
@@ -5,10 +8,9 @@
  */
 function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
-
     this.skinDoseMapCanvasName = skinDoseMapCanvasName;
     this.skinDoseMapCanvas = document.getElementById(this.skinDoseMapCanvasName);
-    this.skinDoseMapContext = this.skinDoseMapCanvas.getContext('2d');
+    this.skinDoseMapContext = this.skinDoseMapCanvas.getContext("2d");
 
     this.colourScaleName = colourScaleName;
     this.colourScale = chroma.scale(colourScaleName);
@@ -18,6 +20,18 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     this.skinDoseMap = [];
     this.skinDoseMapWidth = 10;
     this.skinDoseMapHeight = 10;
+
+    this.minDose = 0.0;
+    this.maxDose = 10.0;
+
+    this.maxDoseLabel = this.maxDose.toFixed(3);
+    this.phantomDimensionsLabel = "70x34x20";
+    this.patientHeight = "1.79";
+    this.patientMass = "73.2";
+    this.patientOrientation = "HFS";
+    this.patientHeightSource = "Assumed";
+    this.patientMassSource = "Assumed";
+    this.patientOrientationSource = "Assumed";
 
     this.phantomFlatWidth = 14;
     this.phantomCurvedEdgeWidth = 31;
@@ -29,9 +43,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     this.backRightBoundary = this.leftBackBoundary + (this.phantomFlatWidth * this.mag);
     this.rightFrontBoundary = this.backRightBoundary + (this.phantomCurvedEdgeWidth * this.mag);
 
-    this.minDose = 0.0;
-    this.maxDose = 10.0;
-
     this.windowWidth = this.maxDose - this.minDose;
     this.windowLevel = this.minDose + (this.windowWidth / 2.0);
     this.minDisplayedDose = this.minDose;
@@ -40,11 +51,11 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
     /**
      * Internal function to create a new colour scale
-     * @param new_scale
+     * @param newScale
      */
-    this.useNewColourScale = function (new_scale) {
+    this.useNewColourScale = function (newScale) {
         var _this = this;
-        _this.colourScale = chroma.scale(new_scale);
+        _this.colourScale = chroma.scale(newScale);
     };
 
 
@@ -77,8 +88,8 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
             for (y = 0; y < _this.skinDoseMapHeight; y++) {
                 dose = _this.skinDoseMap[(y) * _this.skinDoseMapWidth + x];
                 scaledDose = dose - (_this.windowLevel - (_this.windowWidth / 2.0));
-                if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                if (scaledDose < 0) {scaledDose = 0;}
+                if (scaledDose > _this.windowWidth) {scaledDose = _this.windowWidth;}
                 _this.skinDoseMapContext.fillStyle = _this.colourScale(scaledDose / _this.windowWidth).hex();
                 _this.skinDoseMapContext.fillRect(x*_this.mag, y*_this.mag, _this.mag, _this.mag);
             }
@@ -91,27 +102,27 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
      */
     this.drawOverlay = function () {
         var _this = this;
-        _this.skinDoseMapContext.textAlign = 'center';
-        _this.skinDoseMapContext.font = '12pt arial';
+        _this.skinDoseMapContext.textAlign = "center";
+        _this.skinDoseMapContext.font = "12pt arial";
 
-        _this.skinDoseMapContext.fillStyle = 'rgba(0, 80, 0, 0.85)';
-        _this.skinDoseMapContext.fillText('Superior', _this.skinDoseMapCanvas.width/2, 15);
-        _this.skinDoseMapContext.fillText('Inferior', _this.skinDoseMapCanvas.width/2, _this.skinDoseMapCanvas.height-10);
+        _this.skinDoseMapContext.fillStyle = "rgba(0, 80, 0, 0.85)";
+        _this.skinDoseMapContext.fillText("Superior", _this.skinDoseMapCanvas.width/2, 15);
+        _this.skinDoseMapContext.fillText("Inferior", _this.skinDoseMapCanvas.width/2, _this.skinDoseMapCanvas.height-10);
 
         _this.skinDoseMapContext.save();
 
         _this.skinDoseMapContext.rotate(0.5*Math.PI);
-        _this.skinDoseMapContext.fillStyle = 'rgba(255, 0, 0, 0.85)';
-        _this.skinDoseMapContext.fillText('Anterior', _this.skinDoseMapCanvas.height/2, -_this.frontLeftBoundary/2);
-        _this.skinDoseMapContext.fillText('Posterior', _this.skinDoseMapCanvas.height/2, -_this.leftBackBoundary - (_this.backRightBoundary-_this.leftBackBoundary)/2);
-        _this.skinDoseMapContext.fillText('Left', _this.skinDoseMapCanvas.height/2, -_this.frontLeftBoundary - (_this.leftBackBoundary-_this.frontLeftBoundary)/2);
-        _this.skinDoseMapContext.fillText('Right', _this.skinDoseMapCanvas.height/2, -_this.rightFrontBoundary + (_this.rightFrontBoundary-_this.backRightBoundary)/2);
+        _this.skinDoseMapContext.fillStyle = "rgba(255, 0, 0, 0.85)";
+        _this.skinDoseMapContext.fillText("Anterior", _this.skinDoseMapCanvas.height/2, -_this.frontLeftBoundary/2);
+        _this.skinDoseMapContext.fillText("Posterior", _this.skinDoseMapCanvas.height/2, -_this.leftBackBoundary - (_this.backRightBoundary-_this.leftBackBoundary)/2);
+        _this.skinDoseMapContext.fillText("Left", _this.skinDoseMapCanvas.height/2, -_this.frontLeftBoundary - (_this.leftBackBoundary-_this.frontLeftBoundary)/2);
+        _this.skinDoseMapContext.fillText("Right", _this.skinDoseMapCanvas.height/2, -_this.rightFrontBoundary + (_this.rightFrontBoundary-_this.backRightBoundary)/2);
 
         _this.skinDoseMapContext.restore();
 
         _this.skinDoseMapContext.lineWidth = 1;
         _this.skinDoseMapContext.setLineDash([5, 15]);
-        _this.skinDoseMapContext.strokeStyle = 'rgba(255, 0, 0, 0.25)';
+        _this.skinDoseMapContext.strokeStyle = "rgba(255, 0, 0, 0.25)";
 
         _this.skinDoseMapContext.beginPath();
         _this.skinDoseMapContext.moveTo(_this.frontLeftBoundary, 0);
@@ -127,6 +138,31 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
         _this.skinDoseMapContext.moveTo(_this.backRightBoundary, 0);
         _this.skinDoseMapContext.lineTo(_this.backRightBoundary, _this.skinDoseMapCanvas.height-1);
         _this.skinDoseMapContext.stroke();
+    };
+
+
+    /**
+     * Internal function to write on the skin dose map information
+     */
+    this.writeInformation = function () {
+        var _this = this;
+        _this.skinDoseMapContext.font = "8pt arial";
+        _this.skinDoseMapContext.textAlign = "left";
+
+        _this.skinDoseMapContext.fillStyle = "rgba(0, 0, 0, 1.0)";
+        _this.skinDoseMapContext.fillText("Calculated peak skin dose:", 5, 15);
+        _this.skinDoseMapContext.fillText("Phantom dimensions:", 5, 30);
+        _this.skinDoseMapContext.fillText(_this.patientHeightSource + " patient height:", 5, 45);
+        _this.skinDoseMapContext.fillText(_this.patientMassSource + " patient mass:", 5, 60);
+        _this.skinDoseMapContext.fillText(_this.patientOrientationSource + " patient orientation:", 5, 75);
+
+        _this.skinDoseMapContext.fillText(_this.phantomDimensionsLabel + " (HxWxD)", 150, 30);
+        _this.skinDoseMapContext.fillText(_this.patientHeight + " m", 150, 45);
+        _this.skinDoseMapContext.fillText(_this.patientMass + " kg", 150, 60);
+        _this.skinDoseMapContext.fillText(_this.patientOrientation, 150, 75);
+
+        _this.skinDoseMapContext.font = "bold 8pt arial";
+        _this.skinDoseMapContext.fillText(_this.maxDoseLabel + " Gy", 150, 15);
     };
 
 
@@ -161,6 +197,7 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
             _this.drawOverlay();
         } else {
             _this.draw();
+            _this.writeInformation();
         }
     };
 
@@ -171,7 +208,7 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
      */
     this.updateWindowLevel = function (newWindowLevel) {
         var _this = this;
-        if (newWindowLevel < 0) newWindowLevel = 0;
+        if (newWindowLevel < 0) {newWindowLevel = 0;}
         _this.windowLevel = parseFloat(newWindowLevel);
 
         _this.minDisplayedDose = _this.windowLevel - (_this.windowWidth / 2.0);
@@ -199,7 +236,7 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     this.updateMinDisplayedDose = function (minDisplayedDose) {
         var _this = this;
         minDisplayedDose = parseFloat(minDisplayedDose);
-        
+
         if (minDisplayedDose <= _this.minDose) {
             minDisplayedDose = _this.minDose;
         }

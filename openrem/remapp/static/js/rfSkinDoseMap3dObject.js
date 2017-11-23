@@ -1,3 +1,6 @@
+/*global chroma, THREE, animate, render*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to create a 3d skin dose map object
  * @param skinDoseMap3dCanvasName
@@ -45,11 +48,11 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
     /**
      * Internal function to create a new colour scale
-     * @param new_scale
+     * @param newScale
      */
-    this.useNewColourScale = function (new_scale) {
+    this.useNewColourScale = function (newScale) {
         var _this = this;
-        _this.colourScale = chroma.scale(new_scale);
+        _this.colourScale = chroma.scale(newScale);
     };
 
 
@@ -64,8 +67,8 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
             for (j = 0; j < _this.phantomFlatWidth; j++) {
                 currentDose = _this.skinDoseMap[j * _this.phantomHeight + i];
                 scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
-                if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                if (scaledDose < 0) {scaledDose = 0;}
+                if (scaledDose > _this.windowWidth) {scaledDose = _this.windowWidth;}
                 newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureFront.image.data[k] = newColour[0];
@@ -80,8 +83,8 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
             for (j = _this.phantomFlatWidth; j < _this.phantomFlatWidth+_this.phantomCurvedEdgeWidth; j++) {
                 currentDose = _this.skinDoseMap[j * _this.phantomHeight + i];
                 scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
-                if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                if (scaledDose < 0) {scaledDose = 0;}
+                if (scaledDose > _this.windowWidth) {scaledDose = _this.windowWidth;}
                 newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureLeft.image.data[k] = newColour[0];
@@ -96,8 +99,8 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
             for (j = _this.phantomFlatWidth+_this.phantomCurvedEdgeWidth; j < _this.phantomFlatWidth*2+_this.phantomCurvedEdgeWidth; j++) {
                 currentDose = _this.skinDoseMap[(j * _this.phantomHeight) + i];
                 scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
-                if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                if (scaledDose < 0) {scaledDose = 0;}
+                if (scaledDose > _this.windowWidth) {scaledDose = _this.windowWidth;}
                 newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureBack.image.data[k] = newColour[0];
@@ -112,8 +115,8 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
             for (j = _this.phantomFlatWidth*2+_this.phantomCurvedEdgeWidth; j < _this.phantomFlatWidth*2+_this.phantomCurvedEdgeWidth*2; j++) {
                 currentDose = _this.skinDoseMap[j * _this.phantomHeight + i];
                 scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
-                if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                if (scaledDose < 0) {scaledDose = 0;}
+                if (scaledDose > _this.windowWidth) {scaledDose = _this.windowWidth;}
                 newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureRight.image.data[k] = newColour[0];
@@ -139,15 +142,15 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
     this.mergeMeshes = function (meshes) {
         var combined = new THREE.Geometry();
 
-        var last_face = 0, j;
+        var lastFace = 0, j;
 
         for (var i = 0; i < meshes.length; i++) {
             meshes[i].updateMatrix();
             combined.merge(meshes[i].geometry, meshes[i].matrix);
-            for(j = last_face; j < combined.faces.length; j++) {
+            for(j = lastFace; j < combined.faces.length; j++) {
                 combined.faces[j].materialIndex = i;
             }
-            last_face = combined.faces.length;
+            lastFace = combined.faces.length;
         }
 
         return combined;
@@ -215,7 +218,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         var geometry;
         _this.meshes = [];
 
-        THREE.ImageUtils.crossOrigin = 'anonymous';
+        THREE.ImageUtils.crossOrigin = "anonymous";
 
         var endMaterial = new THREE.MeshLambertMaterial( { color: 0x7092be } );
         var materials = [materialBack, materialLeft, materialFront, materialRight, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial];
