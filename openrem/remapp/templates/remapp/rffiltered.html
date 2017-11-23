@@ -128,9 +128,9 @@
             {% endif %}
         </tr>
         {% for exam in filter_list %}
-          {%  with equipment=exam.generalequipmentmoduleattr_set.get %}
-            {% with projection_set=exam.projectionxrayradiationdose_set.get %}
-              {% with accum_set=projection_set.accumxraydose_set.all %}
+          {% with equipment=exam.generalequipmentmoduleattr_set.get %}
+          {% with projection_set=exam.projectionxrayradiationdose_set.get %}
+          {% with accum_set=projection_set.accumxraydose_set.all %}
         <tr>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
