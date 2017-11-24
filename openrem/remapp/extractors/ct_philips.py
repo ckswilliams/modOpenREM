@@ -124,7 +124,7 @@ def _ctaccumulateddosedata(dataset, ct, ch):  # TID 10012
 
 
 def _ctradiationdose(dataset, g, ch):
-    from remapp.models import CtRadiationDose, ObserverContext
+    from remapp.models import CtRadiationDose
     from remapp.tools.get_values import get_value_kw, get_value_num, get_or_create_cid
     from datetime import timedelta
     from django.db.models import Min, Max
@@ -132,17 +132,17 @@ def _ctradiationdose(dataset, g, ch):
     proj.procedure_reported = get_or_create_cid('P5-08000', 'Computed Tomography X-Ray')
     proj.has_intent = get_or_create_cid('R-408C3', 'Diagnostic Intent')
     proj.scope_of_accumulation = get_or_create_cid('113014', 'Study')
-    commentdose = get_value_kw('CommentsOnRadiationDose', dataset)
-    commentprotocolfile = get_value_num(0x00e11061, dataset)
-    commentstudydescription = get_value_kw('StudyDescription', dataset)
-    if not commentdose:
-        commentdose = ''
-    if not commentprotocolfile:
-        commentprotocolfile = ''
-    if not commentstudydescription:
-        commentstudydescription = ''
-    proj.comment = (u'<DoseComment SRData="{0}" /> <ProtocolFilename SRData="{1}" /> <StudyDescription '
-                    u'SRData="{2}" />'.format(commentdose, commentprotocolfile, commentstudydescription))
+    comment_dose = get_value_kw('CommentsOnRadiationDose', dataset)
+    comment_protocol_file = get_value_num(0x00e11061, dataset)
+    comment_study_description = get_value_kw('StudyDescription', dataset)
+    if not comment_dose:
+        comment_dose = ''
+    if not comment_protocol_file:
+        comment_protocol_file = ''
+    if not comment_study_description:
+        comment_study_description = ''
+    proj.comment = (u"StudyDescription: {0}. Comments on radiation dose: {1}. ProtocolFilename: {2}".format(
+        comment_study_description, comment_dose, comment_protocol_file))
     proj.source_of_dose_information = get_or_create_cid('113866', 'Copied From Image Attributes')
     proj.save()
     _ctaccumulateddosedata(dataset, proj, ch)

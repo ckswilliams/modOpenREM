@@ -1,3 +1,6 @@
+/*global skinDoseMap3dPersonObj, skinDoseMap3dObj, skinDoseMap3dHUDObj, THREE, requestAnimFrame*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to convert an angle in degrees into radians
  * @param angle
@@ -43,10 +46,9 @@ function ongoingTouchIndexById(idToFind) {
   return -1;    // not found
 }
 
-function zoom_3d_map(d) {
+function zoom3dMap(d) {
     var cPos = skinDoseMap3dObj.camera.position;
-    if (isNaN(cPos.x) || isNaN(cPos.y) || isNaN(cPos.y))
-        return;
+    if (isNaN(cPos.x) || isNaN(cPos.y) || isNaN(cPos.y)) {return;}
 
     var r = cPos.x * cPos.x + cPos.y * cPos.y;
     var sqr = Math.sqrt(r);
@@ -56,11 +58,10 @@ function zoom_3d_map(d) {
     var ny = cPos.y + ((r === 0) ? 0 : (d * cPos.y / sqr));
     var nz = cPos.z + ((sqrZ === 0) ? 0 : (d * cPos.z / sqrZ));
 
-    if (isNaN(nx) || isNaN(ny) || isNaN(nz))
-        return;
+    if (isNaN(nx) || isNaN(ny) || isNaN(nz)) {return;}
 
-    var r_new = nx * nx + ny * ny;
-    if (r_new > 100) {
+    var rNew = nx * nx + ny * ny;
+    if (rNew > 100) {
         cPos.x = nx;
         cPos.y = ny;
         cPos.z = nz;
@@ -69,23 +70,24 @@ function zoom_3d_map(d) {
     skinDoseMap3dObj.camera.lookAt(skinDoseMap3dObj.scene.position);
 }
 
-skinDoseMap3dElement = $("#skinDoseMap3d");
+var skinDoseMap3dElement = $("#skinDoseMap3d");
 
 // jQuery mouse event handlers for the DIV that contains the 3D skin dose map
 skinDoseMap3dElement
-    .on('mousedown', function() {
+    .on("mousedown", function() {
         isDragging3d = true;
     })
-    .on('mousemove', function(e) {
+    .on("mousemove", function(e) {
+        var deltaMove;
         if (firstMouseMove === true) {
-            var deltaMove = {
+            deltaMove = {
                 x: 0,
                 y: 0
             };
             firstMouseMove = false;
         }
         else {
-            var deltaMove = {
+            deltaMove = {
                 x: e.offsetX - previousMousePosition3d.x,
                 y: e.offsetY - previousMousePosition3d.y
             };
@@ -98,7 +100,7 @@ skinDoseMap3dElement
                     toRadians(deltaMove.y * 1),
                     toRadians(deltaMove.x * 1),
                     0,
-                    'XYZ'
+                    "XYZ"
                 ));
 
             skinDoseMap3dObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dObj.mesh.quaternion);
@@ -110,7 +112,7 @@ skinDoseMap3dElement
             y: e.offsetY
         };
     })
-    .on('touchstart', function(e) {
+    .on("touchstart", function(e) {
         isDragging3d = true;
 
         var changedTouches = e.originalEvent.changedTouches;
@@ -118,23 +120,24 @@ skinDoseMap3dElement
             ongoingTouches.push(copyTouch(changedTouches[i]));
         }
     })
-    .on('touchmove', function(e) {
+    .on("touchmove", function(e) {
         e.preventDefault();
 
         // If one pointer is down rotate the object based on the movement
         if (ongoingTouches.length === 1) {
 
             var touches = e.originalEvent.changedTouches;
+            var deltaMove;
 
             if (firstMouseMove === true) {
-                var deltaMove = {
+                deltaMove = {
                     x: 0,
                     y: 0
                 };
                 firstMouseMove = false;
             }
             else {
-                var deltaMove = {
+                deltaMove = {
                     x: touches[0].pageX - previousMousePosition3d.x,
                     y: touches[0].pageY - previousMousePosition3d.y
                 };
@@ -152,7 +155,7 @@ skinDoseMap3dElement
                                 toRadians(deltaMove.y * 1),
                                 toRadians(deltaMove.x * 1),
                                 0,
-                                'XYZ'
+                                "XYZ"
                             ));
                         skinDoseMap3dObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dObj.mesh.quaternion);
                         skinDoseMap3dPersonObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dPersonObj.mesh.quaternion);
@@ -166,7 +169,7 @@ skinDoseMap3dElement
             }
         }
     })
-    .on('touchend', function(e) {
+    .on("touchend", function(e) {
         isDragging3d = false;
 
         var touches = e.originalEvent.changedTouches;
@@ -177,20 +180,20 @@ skinDoseMap3dElement
             }
         }
     })
-    .on('mousewheel', function(e) {
+    .on("mousewheel", function(e) {
         e.preventDefault();
         e.stopPropagation();
 
         var d = ((typeof e.originalEvent.wheelDelta !== "undefined")?(-e.originalEvent.wheelDelta):e.originalEvent.detail);
         d = 10 * ((d>0)?1:-1);
 
-        zoom_3d_map(d);
+        zoom3dMap(d);
     });
 
 
 $(document)
-    .on('mouseup touchend', function () {
-        isDragging3d = false
+    .on("mouseup touchend", function () {
+        isDragging3d = false;
     });
 
 
@@ -205,6 +208,12 @@ window.requestAnimFrame = (function(){
 })();
 
 
+var skinDoseMap3dCanvas = skinDoseMap3dElement[0]; // The first element is the HTML DOM Object
+var renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true, antialias: true });
+renderer.autoClear = false;
+renderer.setClearColor( 0x000000, 0 );
+
+
 /**
  * Function to render the 3D scene
  */
@@ -214,8 +223,13 @@ function render() {
     renderer.render(skinDoseMap3dObj.scene, skinDoseMap3dObj.camera);
 
     renderer.clearDepth();
+    renderer.setViewport(0, 0, skinDoseMap3dObj.canvas.width, skinDoseMap3dObj.canvas.height);
+    renderer.render(skinDoseMap3dHUDObj.scene, skinDoseMap3dHUDObj.camera);
+
+    renderer.clearDepth();
     renderer.setViewport(10, 10, 75, 75);
     renderer.render(skinDoseMap3dPersonObj.scene, skinDoseMap3dPersonObj.camera);
+
     requestAnimFrame(render);
 }
 
@@ -226,21 +240,16 @@ function render() {
  */
 function webglAvailable() {
     try {
-        var canvas = document.createElement('canvas');
+        var canvas = document.createElement("canvas");
         return !!( window.WebGLRenderingContext && (
-            canvas.getContext('webgl') ||
-            canvas.getContext('experimental-webgl') )
+            canvas.getContext("webgl") ||
+            canvas.getContext("experimental-webgl") )
         );
     } catch (e) {
         return false;
     }
 }
 
-
-skinDoseMap3dCanvas = skinDoseMap3dElement[0]; // The first element is the HTML DOM Object
-renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true, antialias: true });
-renderer.autoClear = false;
-renderer.setClearColor( 0x000000, 0 );
 
 // http://stackoverflow.com/questions/29312123/how-does-the-double-exclamation-work-in-javascript
 var show3dSkinDoseMap = !!webglAvailable();

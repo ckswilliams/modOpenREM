@@ -1,6 +1,6 @@
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
-    var request_data = ArrayToURL(URLToArray(this.URL));
+    var request_data = arrayToURL(urlToArray(this.URL));
     var i;
 
     $(".ajax-progress").show();

@@ -1,3 +1,6 @@
+/*global chroma*/
+/*eslint no-undef: "error"*/
+
 /**
  * Function to create a skin dose map colour scale object
  * @param colourScaleCanvasName
@@ -7,7 +10,7 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
     this.colourScaleCanvasName = colourScaleCanvasName;
     this.colourScaleCanvas = document.getElementById(this.colourScaleCanvasName);
-    this.colourScaleContext = this.colourScaleCanvas.getContext('2d');
+    this.colourScaleContext = this.colourScaleCanvas.getContext("2d");
 
     this.colourScaleName = colourScaleName;
     this.colourScale = chroma.scale(colourScaleName);
@@ -23,11 +26,11 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
     /**
      * Internal function to use a new colour scale
-     * @param new_scale
+     * @param newScale
      */
-    this.useNewColourScale = function (new_scale) {
+    this.useNewColourScale = function (newScale) {
         var _this = this;
-        _this.colourScale = chroma.scale(new_scale);
+        _this.colourScale = chroma.scale(newScale);
     };
 
 
@@ -96,7 +99,7 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
         }
         _this.colourScaleContext.putImageData(imageData, 0, heightOffset / 2);
 
-        _this.colourScaleContext.textBaseline = 'middle';
+        _this.colourScaleContext.textBaseline = "middle";
         var dose = _this.minDose;
         increment = (_this.maxDose - _this.minDose) / 10;
         for (i = 0; i < 11; i ++) {

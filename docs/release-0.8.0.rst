@@ -9,6 +9,7 @@ Headline changes
 * Imports: Can now create RDSR for import from legacy Toshiba CT studies using Offis DCMTK and Pixelmed
 * Imports: No longer tries to import non-dose report Enhanced Structured Reports
 * Imports: Hologic DBT proprietary projection images now have laterality and accumulated AGD extracted correctly
+* Imports: Format of comment field constructed when importing from Philips Dose Info series no longer uses XML styling
 * Charts: Added mammography scatter plot, thanks to `@rijkhorst`_
 * Exports: DX and RF exports work with multiple filters, and will be displayed to max 4 sf
 * Interface/Imports: Now possible to define a modality as DX or fluoro when RDSR is ambiguous

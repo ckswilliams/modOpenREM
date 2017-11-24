@@ -48,6 +48,11 @@ For CT dose summary files from Philips CT scanners
 
     openrem_ctphilips.py filename.dcm
 
+This extractor makes use of the information stored in the header data of the Philips Secondary Capture object with a
+series description of 'Dose Info'. The value inserted into 'Study description' in the OpenREM database is actually taken
+from the Protocol field. The value in Study description is inserted into the study level comment field in the database,
+along with the protocol file name and any 'comments on radiation dose'.
+
 .. _toshiba_legacy_imports:
 
 For CT dose summary files from older Toshiba CT scanners
