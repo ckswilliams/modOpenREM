@@ -6,16 +6,16 @@
 function sortChartDataToDefault(sortingField, sortingDirection, chartDiv) {
     switch(sortingField) {
         case "freq":
-            anySeriesSort("#"+chartDiv, "total_counts", sortingDirection, 0);
+            anySeriesSort("#"+chartDiv, "totalCounts", sortingDirection, 0);
             break;
         case "dlp":
-            anySeriesSort("#"+chartDiv, "avg_value", sortingDirection, 0);
+            anySeriesSort("#"+chartDiv, "avgValue", sortingDirection, 0);
             break;
         case "ctdi":
-            anySeriesSort("#"+chartDiv, "avg_value", sortingDirection, 0);
+            anySeriesSort("#"+chartDiv, "avgValue", sortingDirection, 0);
             break;
         case "dap":
-            anySeriesSort("#"+chartDiv, "avg_value", sortingDirection, 0);
+            anySeriesSort("#"+chartDiv, "avgValue", sortingDirection, 0);
             break;
         case "name":
             anySeriesSort("#"+chartDiv, "name", sortingDirection, 0);
@@ -238,8 +238,8 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
                     bins: dataBins[i][j],
                     tooltip: systemList[i] + "<br>" + nameList[j] + "<br>" + parseFloat(summaryData[i][j].mean).toFixed(1) + " mean<br>(n=" + summaryData[i][j].num + ")",
                     drilldown: calcHistograms ? systemList[i]+nameList[j] : null,
-                    total_counts: totalCountsPerName[j],
-                    avg_value: averageValuePerName[j]
+                    totalCounts: totalCountsPerName[j],
+                    avgValue: averageValuePerName[j]
                 });
             }
         }
@@ -256,8 +256,8 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
                     bins: dataBins[i][j],
                     tooltip: systemList[i] + "<br>" + nameList[j] + "<br>" + parseFloat(summaryData[i][j].median).toFixed(1) + " median<br>(n=" + summaryData[i][j].num + ")",
                     drilldown: calcHistograms ? systemList[i]+nameList[j] : null,
-                    total_counts: totalCountsPerName[j],
-                    avg_value: averageValuePerName[j]
+                    totalCounts: totalCountsPerName[j],
+                    avgValue: averageValuePerName[j]
                 });
             }
         }

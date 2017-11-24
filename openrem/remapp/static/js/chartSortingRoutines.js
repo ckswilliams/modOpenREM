@@ -45,8 +45,8 @@ function rebuildAnySeries(chartContainer, chartData, s) {
             category: chartData[0][i].name,
             tooltip: chartData[0][i].tooltip,
             bins: chartData[0][i].bins,
-            total_counts: chartData[0][i].total_counts,
-            avg_value: chartData[0][i].avg_value
+            totalCounts: chartData[0][i].totalCounts,
+            avgValue: chartData[0][i].avgValue
         }, false);
     }
     chart.xAxis[0].categories = newCategories;
@@ -73,8 +73,8 @@ function rebuildAnySeries(chartContainer, chartData, s) {
                             category: chartData[k][i].category,
                             tooltip: chartData[k][i].tooltip,
                             bins: chartData[k][i].bins,
-                            total_counts: chartData[k][i].total_counts,
-                            avg_value: chartData[k][i].avg_value
+                            totalCounts: chartData[k][i].totalCounts,
+                            avgValue: chartData[k][i].avgValue
                         }, false);
                         found = true;
                     }
@@ -111,8 +111,8 @@ function anySeriesSort(chartContainer, p, d, s) {
                         category: chart.series[i].data[j].name,
                         tooltip: chart.series[i].data[j].tooltip,
                         bins: chart.series[i].data[j].bins,
-                        total_counts: chart.series[i].data[j].total_counts,
-                        avg_value: chart.series[i].data[j].avg_value
+                        totalCounts: chart.series[i].data[j].totalCounts,
+                        avgValue: chart.series[i].data[j].avgValue
                     });
                 }
             }

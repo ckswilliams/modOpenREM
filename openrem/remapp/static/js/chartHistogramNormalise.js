@@ -15,19 +15,19 @@ function normaliseHistograms(chartContainer) {
             name: chart.options.drilldown.series[i].name,
             useHTML: true,
             data: [],
-            original_data: []
+            originalData: []
         });
 
         if (!chart.options.drilldown.normalise) {seriesMax = Math.max.apply(Math, chart.options.drilldown.series[i]["data"].map(function(v) {return v[1];}));}
 
         for (j = 0; j < chart.options.drilldown.series[i]["data"].length; j++) {
-            histogramData[i]["original_data"].push(
-                chart.options.drilldown.normalise ? chart.options.drilldown.series[i]["original_data"][j] : chart.options.drilldown.series[i]["data"][j][1]
+            histogramData[i]["originalData"].push(
+                chart.options.drilldown.normalise ? chart.options.drilldown.series[i]["originalData"][j] : chart.options.drilldown.series[i]["data"][j][1]
             );
 
             histogramData[i]["data"].push([
                 chart.options.drilldown.series[i]["data"][j][0],
-                chart.options.drilldown.normalise ? histogramData[i]["original_data"][j] : histogramData[i]["original_data"][j] / seriesMax
+                chart.options.drilldown.normalise ? histogramData[i]["originalData"][j] : histogramData[i]["originalData"][j] / seriesMax
             ]);
         }
     }

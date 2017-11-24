@@ -76,7 +76,7 @@ function chartAverageAndHistogram(defaultTitle, normBtnClass, instrClass, render
                         if (e.chart.options.drilldown.normalise) {
                             for (var i=0; i<e.chart.options.drilldown.series.length; i++) {
                                 if (e.chart.options.drilldown.series[i].id === this.series.name + name) {
-                                    maxValue = Math.max.apply(Math, e.chart.options.drilldown.series[i].original_data.map(function(v) {return v;}));
+                                    maxValue = Math.max.apply(Math, e.chart.options.drilldown.series[i].originalData.map(function(v) {return v;}));
                                 }
                             }
                             valueToWrite = maxValue * this.y;
