@@ -115,30 +115,6 @@
                     <a class="btn btn-default btn-sm" role="button" id="skinDoseMapFullscreenBtn">Toggle fullscreen</a>
                 </div>
 
-                <div class="skinDoseMapInformation" id="skinDoseMapInformation">
-                    <table>
-                        <tr>
-                            <td>Calculated peak skin dose:</td>
-                            <td style="font-weight: bold;"><a id="maxDose" class="no-decoration">0.000</a> Gy</td>
-                        </tr>
-                        <tr>
-                            <td>Phantom dimensions:</td>
-                            <td><a id="phantomDimensions" class="no-decoration"></a> cm (HxWxD)</td>
-                        </tr>
-                        <tr>
-                            <td id="patientHeightLabel">Assumed patient height: </td>
-                            <td><a id="patientHeight" class="no-decoration"></a> m</td>
-                        </tr>
-                        <tr>
-                            <td id="patientMassLabel">Assumed patient mass: </td>
-                            <td><a id="patientMass" class="no-decoration"></a> kg</td>
-                        </tr>
-                        <tr>
-                            <td id="patientOrientationLabel">Assumed patient orientation: </td>
-                            <td><a id="patientOrientation" class="no-decoration"></a></td>
-                        </tr>
-                    </table>
-                </div>
                 <div class="colourScale">
                     <canvas id="colourScale" width="70" height="420"></canvas>
                 </div>
@@ -275,6 +251,7 @@
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapObject.js"></script>
             <script src="{{ STATIC_URL }}js/rfSkinDoseMap3dObject.js"></script>
             <script src="{{ STATIC_URL }}js/rfSkinDoseMap3dPersonObject.js"></script>
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMap3dHUDObject.js"></script>
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapping.js"></script>
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapping3d.js"></script>
 
@@ -285,6 +262,7 @@
                     if (show3dSkinDoseMap) {
                         var skinDoseMap3dObj = new skinDoseMap3dObject('skinDoseMap3d', 'Greys');
                         var skinDoseMap3dPersonObj = new skinDoseMap3dPersonObject();
+                        var skinDoseMap3dHUDObj = new skinDoseMap3dHUDObject();
                     }
                     else {
                         $('#swap3dButton1').hide();
