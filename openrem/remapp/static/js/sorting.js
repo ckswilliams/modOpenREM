@@ -1,7 +1,7 @@
-function sort_by_y(a,b) {
+function sortByY(a, b) {
     return ((a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
 }
-function sort_by_name(a,b) {
+function sortByName(a, b) {
     // http://stackoverflow.com/questions/35289232/alphabetical-array-sort-lowercase-first
     if (typeof a.name[0] === 'undefined') return 1;
     if (typeof b.name[0] === 'undefined') return -1;

@@ -5,7 +5,7 @@ function bubbleSort(a, p, d) {
     do {
         swapped = false;
         for (var i=0; i < a.length-1; i++) {
-            if (d == 1) {
+            if (d === 1) {
                 if (a[i][p] > a[i + 1][p]) {
                     temp = a[i];
                     a[i] = a[i + 1];
@@ -56,11 +56,11 @@ function rebuildAnySeries(chartContainer, chartData, s) {
 
     for (i = 0; i < chartData[0].length; i++) {
         for (k = 0; k < chartData.length; k++) {
-            if (k != s) {
+            if (k !== s) {
                 var found = false;
                 j = 0;
                 while (found == false) {
-                    if (chartData[k][i].name == chartData[0][j].name) {
+                    if (chartData[k][i].name === chartData[0][j].name) {
                         chart.series[k].data[j].update({
                             index: j,
                             name: chartData[k][i].name,
@@ -90,8 +90,8 @@ function rebuildAnySeries(chartContainer, chartData, s) {
 // ascending, anything else for descending; s is the series index to sort: the rest are then sorted to match.
 function anySeriesSort(chartContainer, p, d, s) {
     var chart = $(chartContainer).highcharts();
-    if(chart.series.length != 0) {
-        if (typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
+    if(chart.series.length !== 0) {
+        if (typeof chart.series[0].chart.drilldownLevels === "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
 
             // Create an array to hold each series
             var chartDataNew = [];
@@ -117,7 +117,7 @@ function anySeriesSort(chartContainer, p, d, s) {
             bubbleSort(chartDataNew[0], p, d);
             rebuildAnySeries(chartContainer, chartDataNew, s);
             for (i = 1; i < chart.series.length; i++) {
-                bubbleSort(chartDataNew[i], 'x', 1);
+                bubbleSort(chartDataNew[i], "x", 1);
             }
             chart.xAxis[0].isDirty = true;
             chart.yAxis[0].isDirty = true;

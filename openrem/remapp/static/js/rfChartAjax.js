@@ -1,31 +1,35 @@
+/*global arrayToURL, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries, updateFrequencyChart,
+plotAverageChoice, updateWorkloadChart*/
+/*eslint no-undef: "error"*/
+
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
-    var request_data = arrayToURL(urlToArray(this.URL));
+    var requestData = arrayToURL(urlToArray(this.URL));
 
     $(".ajax-progress").show();
 
     $.ajax({
         type: "GET",
         url: "/openrem/rf/chart/",
-        data: request_data,
+        data: requestData,
         dataType: "json",
         success: function( json ) {
             // Initialise some colours to use for plotting
-            var colour_scale = chroma.scale("RdYlBu");
+            var colourScale = chroma.scale("RdYlBu");
 
             // Study workload chart data
             if(typeof plotRFStudyPerDayAndHour !== "undefined") {
-                updateWorkloadChart(json.studiesPerHourInWeekdays, "piechartStudyWorkloadDIV", colour_scale);
+                updateWorkloadChart(json.studiesPerHourInWeekdays, "piechartStudyWorkloadDIV", colourScale);
             }
 
             // Study description frequency chart data start
             if(typeof plotRFStudyFreq !== "undefined") {
-                updateFrequencyChart(json.studyNameList, json.studySystemList, json.studySummary, urlStartStudy, "piechartStudyDIV", colour_scale);
+                updateFrequencyChart(json.studyNameList, json.studySystemList, json.studySummary, urlStartStudy, "piechartStudyDIV", colourScale);
             }
 
             // DAP per study description data
             if( typeof plotRFStudyDAP !== "undefined") {
-                updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, "plotRFStudyDAPContainer", colour_scale);
+                updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, "plotRFStudyDAPContainer", colourScale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "plotRFStudyDAPContainer");
                 hideButtonsIfOneSeries("plotRFStudyDAPContainer", "study_dap_series_");
             }

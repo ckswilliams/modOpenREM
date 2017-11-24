@@ -1,13 +1,16 @@
+/*global arrayToURL, chroma, hideButtonsIfOneSeries, updateWorkloadChart, updateScatterChart*/
+/*eslint no-undef: "error"*/
+
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
-    var request_data = arrayToURL(urlToArray(this.URL));
+    var requestData = arrayToURL(urlToArray(this.URL));
 
     $(".ajax-progress").show();
 
     $.ajax({
         type: "GET",
         url: "/openrem/mg/chart/",
-        data: request_data,
+        data: requestData,
         dataType: "json",
         success: function( json ) {
             // Initialise some colours to use for plotting

@@ -1,14 +1,14 @@
 function normaliseHistograms(chartContainer) {
-    var chart, histogram_data, i, j, series_max;
+    var chart, histogramData, i, j, seriesMax;
 
     chart = $(chartContainer).highcharts();
 
-    if (typeof chart.options.drilldown.normalise == 'undefined') chart.options.drilldown.normalise = false;
+    if (typeof chart.options.drilldown.normalise == "undefined") {chart.options.drilldown.normalise = false;}
 
-    histogram_data = [];
+    histogramData = [];
 
     for (i = 0; i < chart.options.drilldown.series.length; i++) {
-        histogram_data.push({
+        histogramData.push({
             id: chart.options.drilldown.series[i].id,
             name: chart.options.drilldown.series[i].name,
             useHTML: true,
@@ -16,52 +16,52 @@ function normaliseHistograms(chartContainer) {
             original_data: []
         });
 
-        if (!chart.options.drilldown.normalise) series_max = Math.max.apply(Math, chart.options.drilldown.series[i]["data"].map(function(v) {return v[1];}));
+        if (!chart.options.drilldown.normalise) {seriesMax = Math.max.apply(Math, chart.options.drilldown.series[i]["data"].map(function(v) {return v[1];}));}
 
         for (j = 0; j < chart.options.drilldown.series[i]["data"].length; j++) {
-            histogram_data[i]["original_data"].push(
+            histogramData[i]["original_data"].push(
                 chart.options.drilldown.normalise ? chart.options.drilldown.series[i]["original_data"][j] : chart.options.drilldown.series[i]["data"][j][1]
             );
 
-            histogram_data[i]["data"].push([
+            histogramData[i]["data"].push([
                 chart.options.drilldown.series[i]["data"][j][0],
-                chart.options.drilldown.normalise ? histogram_data[i]["original_data"][j] : histogram_data[i]["original_data"][j] / series_max
+                chart.options.drilldown.normalise ? histogramData[i]["original_data"][j] : histogramData[i]["original_data"][j] / seriesMax
             ]);
         }
     }
 
-    chart.options.drilldown.series = histogram_data;
+    chart.options.drilldown.series = histogramData;
 
     // Update the displayed chart if the user is viewing a histogram
     if (typeof chart.drilldownLevels != "undefined") {
-        if (chart.drilldownLevels.length != 0) {
+        if (chart.drilldownLevels.length !== 0) {
             var index;
 
             chart.setTitle({
-                text: chart.options.drilldown.normalise ? chart.title.textStr.substring(0, chart.title.textStr.indexOf(' (normalised)')) : chart.title.textStr + ' (normalised)'
+                text: chart.options.drilldown.normalise ? chart.title.textStr.substring(0, chart.title.textStr.indexOf(" (normalised)")) : chart.title.textStr + " (normalised)"
             }, false);
 
             chart.yAxis[0].update({
                 title: {
-                    text: chart.options.drilldown.normalise ? 'Number' : 'Normalised'
+                    text: chart.options.drilldown.normalise ? "Number" : "Normalised"
                 },
                 labels: {
-                    format: chart.options.drilldown.normalise ? null : '{value:.2f}'
+                    format: chart.options.drilldown.normalise ? null : "{value:.2f}"
                 },
                 max: chart.options.drilldown.normalise ? null : 1.0
             }, false);
 
             for (i = 0; i < chart.series.length; i++) {
 
-                // Find the index of histogram_data that contains the matching id of the current series
-                index = histogram_data.map(function (element) {
+                // Find the index of histogramData that contains the matching id of the current series
+                index = histogramData.map(function (element) {
                     return element.id;
                 }).indexOf(chart.series[i].options.id);
 
-                // Use the appropriate histogram_data to update the series y values
+                // Use the appropriate histogramData to update the series y values
                 for (j = 0; j < chart.series[i].data.length; j++) {
                     chart.series[i].data[j].update({
-                        y: histogram_data[index].data[j][1]
+                        y: histogramData[index].data[j][1]
                     }, false);
                 }
 
