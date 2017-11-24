@@ -1,4 +1,4 @@
-/*eslint detect-object-injection: "off" */
+/*eslint security/detect-object-injection: "off" */
 
 // a is an array of objects; p is the property to sort on; d is the direction of sort: 1 for ascending, anything else
 // for descending.
