@@ -1,3 +1,5 @@
+/*eslint object-shorthand: "off" */
+
 function retrieveProgress(json ) {
     $.ajax({
         url: "/openrem/admin/moveupdate",

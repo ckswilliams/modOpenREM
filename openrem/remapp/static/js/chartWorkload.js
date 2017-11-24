@@ -1,5 +1,6 @@
 /*global Highcharts*/
 /*eslint no-undef: "error"*/
+/*eslint object-shorthand: "off" */
 
 function chartWorkload(renderDiv, categoryType) {
 

@@ -1,5 +1,6 @@
 /*global arrayToURL, urlToArray, chroma, hideButtonsIfOneSeries, updateWorkloadChart, updateScatterChart*/
 /*eslint no-undef: "error"*/
+/*eslint object-shorthand: "off" */
 
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {

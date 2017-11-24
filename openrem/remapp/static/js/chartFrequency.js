@@ -1,5 +1,6 @@
 /*global Highcharts*/
 /*eslint no-undef: "error"*/
+/*eslint object-shorthand: "off" */
 
 function chartFrequency(renderDiv, seriesName) {
     var chart = new Highcharts.Chart({

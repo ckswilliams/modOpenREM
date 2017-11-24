@@ -1,6 +1,7 @@
 /*global arrayToURL, urlToArray, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries,
 updateFrequencyChart, plotAverageChoice, updateWorkloadChart, urlStartStudy*/
 /*eslint no-undef: "error"*/
+/*eslint object-shorthand: "off" */
 
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
