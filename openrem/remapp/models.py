@@ -595,8 +595,10 @@ class IrradEventXRayData(models.Model):  # TID 10003
         return self.irradiation_event_uid
 
     def convert_gym2_to_cgycm2(self):
-        if self.dose_area_product:
-            return 1000000*self.dose_area_product
+        try:
+            return 1000000 * self.dose_area_product
+        except TypeError:
+            return None
 
 
 class ImageViewModifier(models.Model):  # EV 111032

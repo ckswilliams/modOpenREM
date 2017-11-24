@@ -162,9 +162,9 @@ def make_skin_map(study_pk=None):
                 # This will result in failure to calculate skin dose map. Need a sensible default, or a lookup to a
                 # user-entered value
                 d_ref = None
-            if irrad.dose_area_product:
+            try:
                 dap = float(irrad.dose_area_product)
-            else:
+            except (ObjectDoesNotExist, TypeError):
                 dap = None
             try:
                 ref_ak = float(irrad.irradeventxraysourcedata_set.get().dose_rp)
