@@ -158,12 +158,32 @@ def _doserelateddistancemeasurements(dataset, mech):  # CID 10008
              'Table Lateral Position': 'table_lateral_position',
              'Table Height Position': 'table_height_position',
              'Distance Source to Table Plane': 'distance_source_to_table_plane'}
+    # For Philips XPer systems you get the privately defined 'Table Height Position' with CodingSchemeDesignator
+    # '99PHI-IXR-XPER' instead of the DICOM defined 'Table Height Position'.
+    # So far I don't know if they are defined differently
     for cont in dataset.ContentSequence:
         try:
             setattr(distance, codes[cont.ConceptNameCodeSequence[0].CodeMeaning],
                     cont.MeasuredValueSequence[0].NumericValue)
         except KeyError:
+
             pass
+    # Maybe we have a Philips Xper system if table positions are not filled and we can use the
+    # privately defined information
+    if (distance.table_lateral_position is None) or (distance.table_longitudinal_position is None):
+        for cont in dataset.ContentSequence:
+            if (cont.ConceptNameCodeSequence[0].CodeMeaning == 'Beam Position') and \
+                      (cont.ConceptNameCodeSequence[0].CodingSchemeDesignator == '99PHI-IXR-XPER'):
+                try:
+                    for cont2 in cont.ContentSequence:
+                        if (distance.table_longitudinal_position is None) and \
+                                (cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Longitudinal Beam Position'):
+                            distance.table_longitudinal_position = cont2.MeasuredValueSequence[0].NumericValue
+                        if (distance.table_lateral_position is None) and \
+                                (cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Lateral Beam Position'):
+                            distance.table_lateral_position = cont2.MeasuredValueSequence[0].NumericValue
+                except AttributeError:
+                    pass
     distance.save()
 
 
