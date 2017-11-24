@@ -1,3 +1,5 @@
+/*eslint detect-object-injection: ["error", { allow: ["warn"] }] */
+
 function hideOrShowAllSeries(nameOfDIV, hideOrShow, buttonIDStub) {
     if (hideOrShow === "hide") {
         $($("#" + nameOfDIV).highcharts().series).each(function () {
