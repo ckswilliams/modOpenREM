@@ -1,4 +1,4 @@
-/*eslint detect-object-injection: ["error", { allow: ["warn"] }] */
+/*eslint detect-object-injection: "off" */
 
 function hideOrShowAllSeries(nameOfDIV, hideOrShow, buttonIDStub) {
     if (hideOrShow === "hide") {
