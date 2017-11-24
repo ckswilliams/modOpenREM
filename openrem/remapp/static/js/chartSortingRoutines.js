@@ -93,7 +93,7 @@ function rebuildAnySeries(chartContainer, chartData, s) {
 function anySeriesSort(chartContainer, p, d, s) {
     var chart = $(chartContainer).highcharts();
     if(chart.series.length !== 0) {
-        if (typeof chart.series[0].chart.drilldownLevels === "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel === "Object" || chart.series[0].chart.drilldownLevels.length === 0) {
+        if (typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "object" || chart.series[0].chart.drilldownLevels.length === 0) {
 
             // Create an array to hold each series
             var chartDataNew = [];
