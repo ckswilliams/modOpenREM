@@ -43,6 +43,7 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
@@ -450,9 +451,16 @@ def dx_detail_view(request, pk=None):
     for group in request.user.groups.all():
         admin[group.name] = True
 
+    projection_set = study.projectionxrayradiationdose_set.get()
+    events_all = projection_set.irradeventxraydata_set.select_related(
+        'anatomical_structure', 'laterality', 'target_region', 'image_view',
+        'patient_orientation_modifier_cid', 'acquisition_plane').all()
+    accum_integrated = projection_set.accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+
     return render_to_response(
         'remapp/dxdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin,
+         'projection_set': projection_set, 'events_all': events_all, 'accum_integrated': accum_integrated},
         context_instance=RequestContext(request)
     )
 
@@ -671,7 +679,12 @@ def rf_detail_view(request, pk=None):
     total_dap = 0
     total_dose = 0
     # Iterate over the planes (for bi-plane systems, for single plane systems there is only one)
-    for dose_ds in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+    projection_xray_dose_set = study.projectionxrayradiationdose_set.get()
+    accumxraydose_set_all_planes = projection_xray_dose_set.accumxraydose_set.select_related('acquisition_plane').all()
+    events_all = projection_xray_dose_set.irradeventxraydata_set.select_related(
+        'irradiation_event_type', 'patient_table_relationship_cid', 'patient_orientation_cid',
+        'patient_orientation_modifier_cid', 'acquisition_plane').all()
+    for dose_ds in accumxraydose_set_all_planes:
         accum_dose_ds = dose_ds.accumprojxraydose_set.get()
         stu_dose_totals[0] = tuple(map(operator.add, stu_dose_totals[0],
                                        (accum_dose_ds.fluoro_dose_area_product_total*1000000,
@@ -733,7 +746,10 @@ def rf_detail_view(request, pk=None):
     return render_to_response(
         'remapp/rfdetail.html',
         {'generalstudymoduleattr': study, 'admin': admin,
-         'study_totals': study_totals},
+         'study_totals': study_totals,
+         'projection_xray_dose_set': projection_xray_dose_set,
+         'accumxraydose_set_all_planes': accumxraydose_set_all_planes,
+         'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
@@ -1171,9 +1187,12 @@ def ct_detail_view(request, pk=None):
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
-    except:
+    except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/ct/')
+
+    events_all = study.ctradiationdose_set.get().ctirradiationeventdata_set.select_related(
+        'ct_acquisition_type', 'ctdiw_phantom_type').all()
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1182,7 +1201,7 @@ def ct_detail_view(request, pk=None):
 
     return render_to_response(
         'remapp/ctdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin, 'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
@@ -1374,9 +1393,18 @@ def mg_detail_view(request, pk=None):
     for group in request.user.groups.all():
         admin[group.name] = True
 
+    projection_xray_dose_set = study.projectionxrayradiationdose_set.get()
+    accum_mammo_set = projection_xray_dose_set.accumxraydose_set.get().accummammographyxraydose_set.select_related(
+        'laterality').all()
+    events_all = projection_xray_dose_set.irradeventxraydata_set.select_related(
+        'laterality', 'image_view').all()
+
     return render_to_response(
         'remapp/mgdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin,
+         'projection_xray_dose_set': projection_xray_dose_set,
+         'accum_mammo_set': accum_mammo_set,
+         'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
