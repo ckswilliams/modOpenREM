@@ -1,3 +1,5 @@
+/*eslint security/detect-object-injection: "off" */
+
 // a is an array of objects; p is the property to sort on; d is the direction of sort: 1 for ascending, anything else
 // for descending.
 function bubbleSort(a, p, d) {
@@ -5,7 +7,7 @@ function bubbleSort(a, p, d) {
     do {
         swapped = false;
         for (var i=0; i < a.length-1; i++) {
-            if (d == 1) {
+            if (d === 1) {
                 if (a[i][p] > a[i + 1][p]) {
                     temp = a[i];
                     a[i] = a[i + 1];
@@ -43,8 +45,8 @@ function rebuildAnySeries(chartContainer, chartData, s) {
             category: chartData[0][i].name,
             tooltip: chartData[0][i].tooltip,
             bins: chartData[0][i].bins,
-            total_counts: chartData[0][i].total_counts,
-            avg_value: chartData[0][i].avg_value
+            totalCounts: chartData[0][i].totalCounts,
+            avgValue: chartData[0][i].avgValue
         }, false);
     }
     chart.xAxis[0].categories = newCategories;
@@ -56,11 +58,11 @@ function rebuildAnySeries(chartContainer, chartData, s) {
 
     for (i = 0; i < chartData[0].length; i++) {
         for (k = 0; k < chartData.length; k++) {
-            if (k != s) {
+            if (k !== s) {
                 var found = false;
                 j = 0;
-                while (found == false) {
-                    if (chartData[k][i].name == chartData[0][j].name) {
+                while (found === false) {
+                    if (chartData[k][i].name === chartData[0][j].name) {
                         chart.series[k].data[j].update({
                             index: j,
                             name: chartData[k][i].name,
@@ -71,8 +73,8 @@ function rebuildAnySeries(chartContainer, chartData, s) {
                             category: chartData[k][i].category,
                             tooltip: chartData[k][i].tooltip,
                             bins: chartData[k][i].bins,
-                            total_counts: chartData[k][i].total_counts,
-                            avg_value: chartData[k][i].avg_value
+                            totalCounts: chartData[k][i].totalCounts,
+                            avgValue: chartData[k][i].avgValue
                         }, false);
                         found = true;
                     }
@@ -90,15 +92,16 @@ function rebuildAnySeries(chartContainer, chartData, s) {
 // ascending, anything else for descending; s is the series index to sort: the rest are then sorted to match.
 function anySeriesSort(chartContainer, p, d, s) {
     var chart = $(chartContainer).highcharts();
-    if(chart.series.length != 0) {
-        if (typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
+    if(chart.series.length !== 0) {
+        if (typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "object" || chart.series[0].chart.drilldownLevels.length === 0) {
 
             // Create an array to hold each series
             var chartDataNew = [];
-            for (var i = 0; i < chart.series.length; i++) {
+            var i, j;
+            for (i = 0; i < chart.series.length; i++) {
                 chartDataNew.push([]);
 
-                for (var j = 0; j < chart.series[0].data.length; j++) {
+                for (j = 0; j < chart.series[0].data.length; j++) {
                     chartDataNew[i].push({
                         name: chart.series[i].data[j].name,
                         y: chart.series[i].data[j].y,
@@ -108,8 +111,8 @@ function anySeriesSort(chartContainer, p, d, s) {
                         category: chart.series[i].data[j].name,
                         tooltip: chart.series[i].data[j].tooltip,
                         bins: chart.series[i].data[j].bins,
-                        total_counts: chart.series[i].data[j].total_counts,
-                        avg_value: chart.series[i].data[j].avg_value
+                        totalCounts: chart.series[i].data[j].totalCounts,
+                        avgValue: chart.series[i].data[j].avgValue
                     });
                 }
             }
@@ -117,7 +120,7 @@ function anySeriesSort(chartContainer, p, d, s) {
             bubbleSort(chartDataNew[0], p, d);
             rebuildAnySeries(chartContainer, chartDataNew, s);
             for (i = 1; i < chart.series.length; i++) {
-                bubbleSort(chartDataNew[i], 'x', 1);
+                bubbleSort(chartDataNew[i], "x", 1);
             }
             chart.xAxis[0].isDirty = true;
             chart.yAxis[0].isDirty = true;

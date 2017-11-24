@@ -1,37 +1,41 @@
-function chartFrequency(render_div, series_name) {
+/*global Highcharts*/
+/*eslint no-undef: "error"*/
+/*eslint object-shorthand: "off" */
+
+function chartFrequency(renderDiv, seriesName) {
     var chart = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
         chart: {
-            renderTo: render_div,
+            renderTo: renderDiv,
             plotBackgroundColor: null,
             plotShadow: false
         },
         title: {
-            text: ''
+            text: ""
         },
         tooltip: {
-            pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
+            pointFormat: "{point.percentage:.1f} %<br/>n={point.y}"
         },
         plotOptions: {
             pie: {
                 allowPointSelect: false,
-                cursor: 'pointer',
+                cursor: "pointer",
                 dataLabels: {
                     useHTML: true,
                     enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})',
+                    format: "<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})",
                     style: {
-                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || "black"
                     }
                 },
                 turboThreshold: 5000 // Greater than the 1000 default to enable large data series to be plotted
             }
         },
         series: [{
-            type: 'pie',
-            name: series_name,
+            type: "pie",
+            name: seriesName,
             point: {
                 events: {
                     click: function(e) {

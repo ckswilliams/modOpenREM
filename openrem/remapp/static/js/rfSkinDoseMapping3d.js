@@ -1,5 +1,6 @@
 /*global skinDoseMap3dPersonObj, skinDoseMap3dObj, skinDoseMap3dHUDObj, THREE, requestAnimFrame*/
 /*eslint no-undef: "error"*/
+/*eslint security/detect-object-injection: "off" */
 
 /**
  * Function to convert an angle in degrees into radians
