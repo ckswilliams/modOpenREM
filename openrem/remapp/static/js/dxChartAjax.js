@@ -1,5 +1,6 @@
-/*global arrayToURL, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries, updateFrequencyChart,
-sortByY, sortByName, plotAverageChoice, updateWorkloadChart, updateOverTimeChart*/
+/*global arrayToURL, urlToArray, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries,
+updateFrequencyChart, sortByY, sortByName, plotAverageChoice, updateWorkloadChart, updateOverTimeChart, urlStartAcq,
+urlStartReq, urlStartStudy*/
 /*eslint no-undef: "error"*/
 
 // Code to update the page and chart data on initial page load.
@@ -117,9 +118,9 @@ $(document).ready(function() {
                     }
                     piechartProtocolDiv.highcharts().series[0].data.sort(sortByY);
                 }
-                else protocolMasLineColours = colourScale.colors(json.acquisition_mas_names.length);
+                else {protocolMasLineColours = colourScale.colors(json.acquisition_mas_names.length);}
 
-                var acqMasOverTime = (plotAverageChoice == "mean") ? json.acquisitionMeanmAsoverTime : json.acquisitionMedianmAsoverTime;
+                var acqMasOverTime = (plotAverageChoice === "mean") ? json.acquisitionMeanmAsoverTime : json.acquisitionMedianmAsoverTime;
                 updateOverTimeChart(json.acquisition_mas_names, acqMasOverTime, protocolMasLineColours, urlStartAcq, "AcquisitionMeanmAsOverTimeDIV");
                 hideButtonsIfOneSeries("AcquisitionMeanmAsOverTimeDIV", "acq_mas_over_time_series_");
             }

@@ -1,4 +1,4 @@
-/*global Highcharts, hideSeriesButtons*/
+/*global Highcharts, hideSeriesButtons, resetSeriesButtons*/
 /*eslint no-undef: "error"*/
 
 function chartAverageAndHistogram(defaultTitle, normBtnClass, instrClass, renderDiv,
@@ -33,7 +33,7 @@ function chartAverageAndHistogram(defaultTitle, normBtnClass, instrClass, render
                     bins = e.point.bins;
                     name = (e.point.name).replace("&amp;", "%26");
 
-                    if (typeof this.options.drilldown.normalise == "undefined") this.options.drilldown.normalise = false;
+                    if (typeof this.options.drilldown.normalise === "undefined") {this.options.drilldown.normalise = false;}
 
                     var drilldownTitle;
                     if (!e.points) {
@@ -69,18 +69,18 @@ function chartAverageAndHistogram(defaultTitle, normBtnClass, instrClass, render
                         var linkText = fldMin + "=" + (bins[this.x])*fldMultiplier + "&" + fldMax + "=" + (bins[this.x + 1])*fldMultiplier + "&" + fldCatName + "=" + name;
                         if (this.series.name !== "All systems") {linkText += "&display_name=" + this.series.name;}
 
-                        var value_to_write;
+                        var valueToWrite;
                         if (e.chart.options.drilldown.normalise) {
                             for (var i=0; i<e.chart.options.drilldown.series.length; i++) {
                                 if (e.chart.options.drilldown.series[i].id === this.series.name + name) {
-                                    var max_value = Math.max.apply(Math, e.chart.options.drilldown.series[i].original_data.map(function(v) {return v;}));
+                                    var maxValue = Math.max.apply(Math, e.chart.options.drilldown.series[i].original_data.map(function(v) {return v;}));
                                 }
                             }
-                            value_to_write = max_value * this.y;
+                            valueToWrite = maxValue * this.y;
                         } else {
-                            value_to_write = this.y;
+                            valueToWrite = this.y;
                         }
-                        return "<table style='text-align: center'><tr><td>" + value_to_write.toFixed(0) + " " + catCounter + "</td></tr><tr><td><a href='" + encodeURI(hrefStart + linkText + tooltipFilters).replace("+", encodeURIComponent("+")) + "'>Click to view</a></td></tr></table>";
+                        return "<table style='text-align: center'><tr><td>" + valueToWrite.toFixed(0) + " " + catCounter + "</td></tr><tr><td><a href='" + encodeURI(hrefStart + linkText + tooltipFilters).replace("+", encodeURIComponent("+")) + "'>Click to view</a></td></tr></table>";
                     };
                 },
                 drillup: function (e) {

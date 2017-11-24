@@ -3,7 +3,7 @@ function normaliseHistograms(chartContainer) {
 
     chart = $(chartContainer).highcharts();
 
-    if (typeof chart.options.drilldown.normalise == "undefined") {chart.options.drilldown.normalise = false;}
+    if (typeof chart.options.drilldown.normalise === "undefined") {chart.options.drilldown.normalise = false;}
 
     histogramData = [];
 

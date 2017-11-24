@@ -1,5 +1,6 @@
-/*global arrayToURL, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries, updateFrequencyChart,
-sortByY, sortByName, plotAverageChoice, updateWorkloadChart*/
+/*global arrayToURL, urlToArray, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries,
+updateFrequencyChart, sortByY, sortByName, plotAverageChoice, updateWorkloadChart, chartSorting, urlStartAcq,
+urlStartReq, urlStartStudy, updateOverTimeChart, chartSortingDirection*/
 /*eslint no-undef: "error"*/
 
 // Code to update the page and chart data on initial page load.
@@ -94,7 +95,7 @@ $(document).ready(function() {
                     }
                     piechartStudyDiv.highcharts().series[0].data.sort(sortByY);
                 }
-                else studyLineColours = colourScale.colors(json.studyNameList.length);
+                else {studyLineColours = colourScale.colors(json.studyNameList.length);}
 
                 var studyDlpOverTime = (plotAverageChoice === "mean") ? json.studyMeanDLPoverTime : json.studyMedianDLPoverTime;
                 updateOverTimeChart(json.studyNameList, studyDlpOverTime, studyLineColours, urlStartStudyOverTime, "studyMeanDLPOverTimeDIV");

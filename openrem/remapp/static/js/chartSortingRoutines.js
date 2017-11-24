@@ -59,7 +59,7 @@ function rebuildAnySeries(chartContainer, chartData, s) {
             if (k !== s) {
                 var found = false;
                 j = 0;
-                while (found == false) {
+                while (found === false) {
                     if (chartData[k][i].name === chartData[0][j].name) {
                         chart.series[k].data[j].update({
                             index: j,
@@ -91,7 +91,7 @@ function rebuildAnySeries(chartContainer, chartData, s) {
 function anySeriesSort(chartContainer, p, d, s) {
     var chart = $(chartContainer).highcharts();
     if(chart.series.length !== 0) {
-        if (typeof chart.series[0].chart.drilldownLevels === "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
+        if (typeof chart.series[0].chart.drilldownLevels === "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel === "Object" || chart.series[0].chart.drilldownLevels.length === 0) {
 
             // Create an array to hold each series
             var chartDataNew = [];

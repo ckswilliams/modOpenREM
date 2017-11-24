@@ -1,5 +1,5 @@
-/*global arrayToURL, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries, updateFrequencyChart,
-plotAverageChoice, updateWorkloadChart*/
+/*global arrayToURL, urlToArray, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries,
+updateFrequencyChart, plotAverageChoice, updateWorkloadChart, urlStartStudy*/
 /*eslint no-undef: "error"*/
 
 // Code to update the page and chart data on initial page load.

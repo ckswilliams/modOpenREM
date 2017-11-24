@@ -1,4 +1,4 @@
-/*global anySeriesSort*/
+/*global anySeriesSort, formatDate, sortByName, sortByY*/
 /*eslint no-undef: "error"*/
 
 function sortChartDataToDefault(sortingField, sortingDirection, chartDiv) {
@@ -72,7 +72,7 @@ function updateOverTimeChart(nameList, overTimeData, seriesColours, urlStart, ch
     var chart = $("#"+chartDiv).highcharts();
 
     var index = nameList.indexOf(null);
-    if (index !== -1) nameList[index] = "Blank";
+    if (index !== -1) {nameList[index] = "Blank";}
 
     dateAxis = [];
     for (i = 0; i < overTimeData[0].length; i++) {
@@ -90,7 +90,7 @@ function updateOverTimeChart(nameList, overTimeData, seriesColours, urlStart, ch
             dateBefore = formatDate(new Date((new Date((tempDate).setMonth((tempDate).getMonth() + 1))).setDate((new Date((tempDate).setMonth((tempDate).getMonth() + 1))).getDate() - 1)));
 
             currentValue = parseFloat(overTimeData[i][j][1]);
-            if (currentValue == 0 || isNaN(currentValue)) currentValue = null;
+            if (currentValue === 0 || isNaN(currentValue)) {currentValue = null;}
 
             temp.push({
                 y: currentValue,
@@ -131,7 +131,7 @@ function updateFrequencyChart(nameList, systemList, summaryData, urlStart, chart
     for (i = 0; i < nameList.length; i++) {
         dataCounts = 0;
         for (j = 0; j < systemList.length; j++) {
-            dataCounts += parseInt(summaryData[j][i].num)
+            dataCounts += parseInt(summaryData[j][i].num);
         }
         piechartData[i] = {
             name: nameList[i],
@@ -143,7 +143,7 @@ function updateFrequencyChart(nameList, systemList, summaryData, urlStart, chart
     piechartData.sort(sortByName);
     piechartData.sort(sortByY);
 
-    var colourMax = nameList.length == 1 ? nameList.length : nameList.length - 1;
+    var colourMax = nameList.length === 1 ? nameList.length : nameList.length - 1;
 
     for (i = 0; i < nameList.length; i++) {
         piechartData[i].color = colourScale(i / colourMax).hex();
@@ -179,19 +179,19 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
             for (i = 0; i < systemList.length; i++) {
                 (dataCounts[i]).push(histogramData[i][j][0]);
                 (dataBins[i]).push(histogramData[i][j][1]);
-                if (summaryData[i][j].num == null) {summaryData[i][j].num = 0;}
+                if (summaryData[i][j].num === null) {summaryData[i][j].num = 0;}
                 currentCounts += parseFloat(summaryData[i][j].num);
-                if (averageChoice == "mean") {
-                    if (summaryData[i][j].mean == null) {summaryData[i][j].mean = 0;}
+                if (averageChoice === "mean") {
+                    if (summaryData[i][j].mean === null) {summaryData[i][j].mean = 0;}
                     currentValue += parseFloat(summaryData[i][j].num) * parseFloat(summaryData[i][j].mean);
                 }
-                else if (averageChoice == "median") {
-                    if (summaryData[i][j].median == null) {summaryData[i][j].median = 0;}
+                else if (averageChoice === "median") {
+                    if (summaryData[i][j].median === null) {summaryData[i][j].median = 0;}
                     currentValue += parseFloat(summaryData[i][j].num) * parseFloat(summaryData[i][j].median);
                 }
                 else {
-                    if (summaryData[i][j].mean == null) {summaryData[i][j].mean = 0;}
-                    if (summaryData[i][j].median == null) {summaryData[i][j].median = 0;}
+                    if (summaryData[i][j].mean === null) {summaryData[i][j].mean = 0;}
+                    if (summaryData[i][j].median === null) {summaryData[i][j].median = 0;}
                     currentValue += parseFloat(summaryData[i][j].num) * parseFloat(summaryData[i][j].mean);
                 }
             }
@@ -206,17 +206,17 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
             for (i = 0; i < systemList.length; i++) {
                 if (summaryData[i][j].num === null) {summaryData[i][j].num = 0;}
                 currentCounts += parseFloat(summaryData[i][j].num);
-                if (averageChoice == "mean") {
-                    if (summaryData[i][j].mean == null) {summaryData[i][j].mean = 0;}
+                if (averageChoice === "mean") {
+                    if (summaryData[i][j].mean === null) {summaryData[i][j].mean = 0;}
                     currentValue += parseFloat(summaryData[i][j].num) * parseFloat(summaryData[i][j].mean);
                 }
-                else if (averageChoice == "median") {
-                    if (summaryData[i][j].median == null) {summaryData[i][j].median = 0;}
+                else if (averageChoice === "median") {
+                    if (summaryData[i][j].median === null) {summaryData[i][j].median = 0;}
                     currentValue += parseFloat(summaryData[i][j].num) * parseFloat(summaryData[i][j].median);
                 }
                 else {
-                    if (summaryData[i][j].mean == null) {summaryData[i][j].mean = 0;}
-                    if (summaryData[i][j].median == null) {summaryData[i][j].median = 0;}
+                    if (summaryData[i][j].mean === null) {summaryData[i][j].mean = 0;}
+                    if (summaryData[i][j].median === null) {summaryData[i][j].median = 0;}
                     currentValue += parseFloat(summaryData[i][j].num) * parseFloat(summaryData[i][j].mean);
                 }
             }
@@ -225,7 +225,7 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
         }
     }
 
-    if (averageChoice == "mean" || averageChoice == "both") {
+    if (averageChoice === "mean" || averageChoice === "both") {
         var meanData = []; while(meanData.push([]) < systemList.length);
         for (i = 0; i < systemList.length; i++) {
             for (j = 0; j < nameList.length; j++) {
@@ -243,7 +243,7 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
         }
     }
 
-    if (averageChoice == "median" || averageChoice == "both") {
+    if (averageChoice === "median" || averageChoice === "both") {
         var medianData = []; while(medianData.push([]) < systemList.length);
         for (i = 0; i < systemList.length; i++) {
             for (j = 0; j < nameList.length; j++) {
@@ -291,8 +291,8 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
     chart.options.exporting.sourceHeight = $(window).height();
 
     var colourMax;
-    if (averageChoice == "mean") {
-        colourMax = systemList.length == 1 ? systemList.length : systemList.length - 1;
+    if (averageChoice === "mean") {
+        colourMax = systemList.length === 1 ? systemList.length : systemList.length - 1;
         for (i = 0; i < systemList.length; i++) {
             if (chart.series.length > i) {
                 chart.series[i].update({
@@ -310,8 +310,8 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
             }
         }
     }
-    else if (averageChoice == "median") {
-        colourMax = systemList.length == 1 ? systemList.length : systemList.length - 1;
+    else if (averageChoice === "median") {
+        colourMax = systemList.length === 1 ? systemList.length : systemList.length - 1;
         for (i = 0; i < systemList.length; i++) {
             if (chart.series.length > i) {
                 chart.series[i].update({
