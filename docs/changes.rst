@@ -4,17 +4,28 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
+* `#564`_  Skin dose maps: Text information on skin dose maps now embedded when saving the 2d or 3d map as a graphic
+* `#561`_  Imports: Patient orientation modifier now correctly extracted from RDSR
+* `#560`_  Exports: Added study level comments
+* `#559`_  Interface: Date pickers inconsistent start day fixed
+* `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector postition are missing
+* `#557`_  Skin dose maps: Improved construction of patient orientation code
+* `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
+* `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
 * `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
+* `#543`_  Interface: Added drop-down box to choose how many studies are displayed on filtered pages
 * `#542`_  Interface: Added display name to all detailed html pages
 * `#535`_  Interface: Fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
+* `#529`_  Charts: Added CT charts of number of irradiation events per study description and requested procedure
 * `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#526`_  Code quality: Addressed some of the code quality/style issues raised by `Codacy`_
 * `#525`_  Importing: Improved mammo import by checking compression force before converting to float
 * `#524`_  Importing: Improved mammo import by checking anode exists before converting to DICOM terms
 * `#523`_  Importing: Changed mammo import to use del_no_match instead of del_mg_im if not mammo
 * `#521`_  Testing: Added tests for dual source CT imports
+* `#520`_  Imports: Removed XML styling from Philips legacy CT comment creation
 * `#518`_  Importing: Fixed imports where CT Target Region isn't specified
 * `#517`_  Interface: Operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
 * `#516`_  Imports: MultiValue person names are now stored as a decoded string, not a list
@@ -32,13 +43,15 @@ OpenREM version history
 * `#498`_  Exports: Missing units added to header fields
 * `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
-* `#494`_  Charts: Charts now ignore non-zero data when calculating mean, median and number of events
+* `#494`_  Charts: Charts now ignore blank and zero-value data when calculating mean, median and number of events
 * `#493`_  Charts: Added user option to made chart categories all lower case
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
+* `#488`_  Exports: All exports now include study time
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
 * `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
 * `#485`_  Imports: CT RDSR now imports 'target region' correctly
+* `#484`_  Exports: Most exports now more efficient use of queries and are therefore faster. More to do!
 * `#482`_  Imports: DX extractor now extracts acquisition protocol, requested procedure name and study name for Fuji Go mobile; extracts acquisition protocol for Toshiba Radrex equipment; extracts requested procedure name from Carestream DRX-Revolution mobiles
 * `#476`_  Imports: Mixed latin-1 and UTF8 characters now imported, but need to be handled better if possible
 * `#475`_  Query Retrieve: Made -sr a stand-alone option - it has a very niche use-case!

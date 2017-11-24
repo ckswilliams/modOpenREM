@@ -48,4 +48,57 @@ For CT dose summary files from Philips CT scanners
 
     openrem_ctphilips.py filename.dcm
 
+This extractor makes use of the information stored in the header data of the Philips Secondary Capture object with a
+series description of 'Dose Info'. The value inserted into 'Study description' in the OpenREM database is actually taken
+from the Protocol field. The value in Study description is inserted into the study level comment field in the database,
+along with the protocol file name and any 'comments on radiation dose'.
 
+.. _toshiba_legacy_imports:
+
+For CT dose summary files from older Toshiba CT scanners
+--------------------------------------------------------
+.. sourcecode:: bash
+
+    openrem_rdsr_toshiba_ct_from_dose_images.py path_to_files
+
+This extractor is designed to create a DICOM radiation dose structured report
+from the information contained in secondary capture dose summary images,
+supplemented by data stored in image tags. It requires a folder of DICOM
+objects as input (suitable data can be retrieved from a DICOM node using the
+`qrscu.py` command with the `-toshiba` switch - see :ref:`qrcommandlineinterface`).
+It creates an initial RDSR from the secondary capture dose summary, and then
+tries to enrich this with additional information contained in image tags. The
+routine attempts to extract the following information from the image tags and
+insert it into the initial RDSR:
+
+Study-level information
+'''''''''''''''''''''''
+
+    * Study description
+    * Requested procedure description
+    * Software versions
+    * Device serial number
+
+Series-level information
+''''''''''''''''''''''''
+
+    * Protocol name
+    * Exposure time (per rotation)
+    * kVp
+    * Spiral pitch factor
+    * Nominal total collimation width
+    * Nominal single collimation width
+    * Exposure modulation type
+
+The routine was developed for older Toshiba CT scanners that
+cannot create RDSR objects themselves. It is known to work with:
+
+    * Toshiba CX, software version V4.40ER011
+    * Toshiba CXL, software version V4.51ER014
+    * Toshiba CXL, software version V4.86ER008 (this software version can
+      produce RDSR objects directly, but may not populate some fields, such as
+      requested procedure name and study description)
+
+This extractor has also been used successfully on images from a GE LightSpeed
+Plus scanner, although in this case no supplementary data is extracted from
+image tags.

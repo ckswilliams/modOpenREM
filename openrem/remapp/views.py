@@ -43,6 +43,7 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
@@ -94,7 +95,7 @@ def logout_page(request):
 @login_required
 def dx_summary_list_filter(request):
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.forms import DXChartOptionsForm
+    from remapp.forms import DXChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
     if request.user.groups.filter(name='pidgroup'):
@@ -175,12 +176,27 @@ def dx_summary_list_filter(request):
                          'plotHistograms': user_profile.plotHistograms}
             chart_options_form = DXChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/dxfiltered.html',
@@ -450,9 +466,16 @@ def dx_detail_view(request, pk=None):
     for group in request.user.groups.all():
         admin[group.name] = True
 
+    projection_set = study.projectionxrayradiationdose_set.get()
+    events_all = projection_set.irradeventxraydata_set.select_related(
+        'anatomical_structure', 'laterality', 'target_region', 'image_view',
+        'patient_orientation_modifier_cid', 'acquisition_plane').all()
+    accum_integrated = projection_set.accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+
     return render_to_response(
         'remapp/dxdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin,
+         'projection_set': projection_set, 'events_all': events_all, 'accum_integrated': accum_integrated},
         context_instance=RequestContext(request)
     )
 
@@ -461,7 +484,7 @@ def dx_detail_view(request, pk=None):
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
-    from remapp.forms import RFChartOptionsForm
+    from remapp.forms import RFChartOptionsForm, itemsPerPageForm
 
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(
@@ -518,6 +541,21 @@ def rf_summary_list_filter(request):
                          'plotHistograms': user_profile.plotHistograms}
             chart_options_form = RFChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     # # Calculate skin dose map for all objects in the database
@@ -558,7 +596,7 @@ def rf_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/rffiltered.html',
@@ -671,7 +709,12 @@ def rf_detail_view(request, pk=None):
     total_dap = 0
     total_dose = 0
     # Iterate over the planes (for bi-plane systems, for single plane systems there is only one)
-    for dose_ds in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+    projection_xray_dose_set = study.projectionxrayradiationdose_set.get()
+    accumxraydose_set_all_planes = projection_xray_dose_set.accumxraydose_set.select_related('acquisition_plane').all()
+    events_all = projection_xray_dose_set.irradeventxraydata_set.select_related(
+        'irradiation_event_type', 'patient_table_relationship_cid', 'patient_orientation_cid',
+        'patient_orientation_modifier_cid', 'acquisition_plane').all()
+    for dose_ds in accumxraydose_set_all_planes:
         accum_dose_ds = dose_ds.accumprojxraydose_set.get()
         stu_dose_totals[0] = tuple(map(operator.add, stu_dose_totals[0],
                                        (accum_dose_ds.fluoro_dose_area_product_total*1000000,
@@ -733,7 +776,10 @@ def rf_detail_view(request, pk=None):
     return render_to_response(
         'remapp/rfdetail.html',
         {'generalstudymoduleattr': study, 'admin': admin,
-         'study_totals': study_totals},
+         'study_totals': study_totals,
+         'projection_xray_dose_set': projection_xray_dose_set,
+         'accumxraydose_set_all_planes': accumxraydose_set_all_planes,
+         'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
@@ -822,7 +868,7 @@ def rf_detail_view_skin_map(request, pk=None):
 @login_required
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import ct_acq_filter
-    from remapp.forms import CTChartOptionsForm
+    from remapp.forms import CTChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
     if request.user.groups.filter(name='pidgroup'):
@@ -865,8 +911,10 @@ def ct_summary_list_filter(request):
             user_profile.plotCTStudyMeanDLP = chart_options_form.cleaned_data['plotCTStudyMeanDLP']
             user_profile.plotCTStudyMeanCTDI = chart_options_form.cleaned_data['plotCTStudyMeanCTDI']
             user_profile.plotCTStudyFreq = chart_options_form.cleaned_data['plotCTStudyFreq']
+            user_profile.plotCTStudyNumEvents = chart_options_form.cleaned_data['plotCTStudyNumEvents']
             user_profile.plotCTRequestMeanDLP = chart_options_form.cleaned_data['plotCTRequestMeanDLP']
             user_profile.plotCTRequestFreq = chart_options_form.cleaned_data['plotCTRequestFreq']
+            user_profile.plotCTRequestNumEvents = chart_options_form.cleaned_data['plotCTRequestNumEvents']
             user_profile.plotCTStudyPerDayAndHour = chart_options_form.cleaned_data['plotCTStudyPerDayAndHour']
             user_profile.plotCTStudyMeanDLPOverTime = chart_options_form.cleaned_data['plotCTStudyMeanDLPOverTime']
             user_profile.plotCTStudyMeanDLPOverTimePeriod = chart_options_form.cleaned_data[
@@ -885,8 +933,10 @@ def ct_summary_list_filter(request):
                          'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
                          'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                          'plotCTStudyFreq': user_profile.plotCTStudyFreq,
+                         'plotCTStudyNumEvents': user_profile.plotCTStudyNumEvents,
                          'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
                          'plotCTRequestFreq': user_profile.plotCTRequestFreq,
+                         'plotCTRequestNumEvents': user_profile.plotCTRequestNumEvents,
                          'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
                          'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
                          'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,
@@ -895,12 +945,27 @@ def ct_summary_list_filter(request):
                          'plotHistograms': user_profile.plotHistograms}
             chart_options_form = CTChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/ctfiltered.html',
@@ -942,8 +1007,8 @@ def ct_summary_chart_data(request):
 
     return_structure =\
         ct_plot_calculations(f, user_profile.plotCTAcquisitionFreq, user_profile.plotCTAcquisitionMeanCTDI, user_profile.plotCTAcquisitionMeanDLP,
-                             user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP,
-                             user_profile.plotCTStudyMeanCTDI,
+                             user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTRequestNumEvents,
+                             user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP, user_profile.plotCTStudyMeanCTDI, user_profile.plotCTStudyNumEvents,
                              user_profile.plotCTStudyMeanDLPOverTime, user_profile.plotCTStudyMeanDLPOverTimePeriod, user_profile.plotCTStudyPerDayAndHour,
                              median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
                              user_profile.plotHistogramBins, user_profile.plotHistograms, user_profile.plotCaseInsensitiveCategories)
@@ -952,8 +1017,8 @@ def ct_summary_chart_data(request):
 
 
 def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, plot_acquisition_mean_dlp,
-                         plot_request_freq, plot_request_mean_dlp, plot_study_freq, plot_study_mean_dlp,
-                         plot_study_mean_ctdi,
+                         plot_request_freq, plot_request_mean_dlp, plot_request_num_events,
+                         plot_study_freq, plot_study_mean_dlp, plot_study_mean_ctdi, plot_study_num_events,
                          plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
                          plot_histograms, plot_case_insensitive_categories):
@@ -962,7 +1027,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
     return_structure = {}
 
-    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq:
+    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
         try:
             if f.form.data['acquisition_protocol']:
                 exp_include = [o.study_instance_uid for o in f]
@@ -971,7 +1036,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         except KeyError:
             pass
 
-    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
+    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
         try:
             if f.form.data['acquisition_protocol']:
                 # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
@@ -988,7 +1053,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         except KeyError:
             study_events = f.qs
 
-    if plot_request_mean_dlp or plot_request_freq:
+    if plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
         try:
             if f.form.data['acquisition_protocol']:
                 # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
@@ -1080,6 +1145,25 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         if plot_histograms:
             return_structure['studyHistogramDataCTDI'] = result['histogram_data']
 
+    if plot_study_num_events:
+        result = average_chart_inc_histogram_data(study_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'study_description',
+                                                  'ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events',
+                                                  1,
+                                                  plot_study_num_events, 0,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
+
+        return_structure['studySummaryNumEvents'] = result['summary']
+        if not plot_study_mean_dlp and not plot_study_freq:
+            return_structure['studySystemList'] = result['system_list']
+            return_structure['studyNameList'] = result['series_names']
+        if plot_study_num_events and plot_histograms:
+            return_structure['studyHistogramDataNumEvents'] = result['histogram_data']
+
     if plot_request_mean_dlp or plot_request_freq:
         result = average_chart_inc_histogram_data(request_events,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
@@ -1097,6 +1181,25 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         return_structure['requestSummary'] = result['summary']
         if plot_request_mean_dlp and plot_histograms:
             return_structure['requestHistogramData'] = result['histogram_data']
+
+    if plot_request_num_events:
+        result = average_chart_inc_histogram_data(request_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'requested_procedure_code_meaning',
+                                                  'ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events',
+                                                  1,
+                                                  plot_request_num_events, 0,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
+
+        return_structure['requestSummaryNumEvents'] = result['summary']
+        if not plot_request_mean_dlp and not plot_request_freq:
+            return_structure['requestSystemList'] = result['system_list']
+            return_structure['requestNameList'] = result['series_names']
+        if plot_request_num_events and plot_histograms:
+            return_structure['requestHistogramDataNumEvents'] = result['histogram_data']
 
     if plot_study_mean_dlp_over_time:
         result = average_chart_over_time_data(study_events,
@@ -1129,9 +1232,12 @@ def ct_detail_view(request, pk=None):
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
-    except:
+    except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/ct/')
+
+    events_all = study.ctradiationdose_set.get().ctirradiationeventdata_set.select_related(
+        'ct_acquisition_type', 'ctdiw_phantom_type').all()
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1140,7 +1246,7 @@ def ct_detail_view(request, pk=None):
 
     return render_to_response(
         'remapp/ctdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin, 'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
@@ -1149,7 +1255,7 @@ def ct_detail_view(request, pk=None):
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from openremproject import settings
-    from remapp.forms import MGChartOptionsForm
+    from remapp.forms import MGChartOptionsForm, itemsPerPageForm
 
     filter_data = request.GET.copy()
     if 'page' in filter_data:
@@ -1207,12 +1313,27 @@ def mg_summary_list_filter(request):
                          #'plotHistograms': user_profile.plotHistograms}
             chart_options_form = MGChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/mgfiltered.html',
@@ -1332,9 +1453,18 @@ def mg_detail_view(request, pk=None):
     for group in request.user.groups.all():
         admin[group.name] = True
 
+    projection_xray_dose_set = study.projectionxrayradiationdose_set.get()
+    accum_mammo_set = projection_xray_dose_set.accumxraydose_set.get().accummammographyxraydose_set.select_related(
+        'laterality').all()
+    events_all = projection_xray_dose_set.irradeventxraydata_set.select_related(
+        'laterality', 'image_view').all()
+
     return render_to_response(
         'remapp/mgdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin,
+         'projection_xray_dose_set': projection_xray_dose_set,
+         'accum_mammo_set': accum_mammo_set,
+         'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
@@ -1909,8 +2039,10 @@ def chart_options_view(request):
             user_profile.plotCTStudyMeanDLP = ct_form.cleaned_data['plotCTStudyMeanDLP']
             user_profile.plotCTStudyMeanCTDI = ct_form.cleaned_data['plotCTStudyMeanCTDI']
             user_profile.plotCTStudyFreq = ct_form.cleaned_data['plotCTStudyFreq']
+            user_profile.plotCTStudyNumEvents = ct_form.cleaned_data['plotCTStudyNumEvents']
             user_profile.plotCTRequestMeanDLP = ct_form.cleaned_data['plotCTRequestMeanDLP']
             user_profile.plotCTRequestFreq = ct_form.cleaned_data['plotCTRequestFreq']
+            user_profile.plotCTRequestNumEvents = ct_form.cleaned_data['plotCTRequestNumEvents']
             user_profile.plotCTStudyPerDayAndHour = ct_form.cleaned_data['plotCTStudyPerDayAndHour']
             user_profile.plotCTStudyMeanDLPOverTime = ct_form.cleaned_data['plotCTStudyMeanDLPOverTime']
             user_profile.plotCTStudyMeanDLPOverTimePeriod = ct_form.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
@@ -1973,8 +2105,10 @@ def chart_options_view(request):
                     'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
                     'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                     'plotCTStudyFreq': user_profile.plotCTStudyFreq,
+                    'plotCTStudyNumEvents': user_profile.plotCTStudyNumEvents,
                     'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
                     'plotCTRequestFreq': user_profile.plotCTRequestFreq,
+                    'plotCTRequestNumEvents': user_profile.plotCTRequestNumEvents,
                     'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
                     'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
                     'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,

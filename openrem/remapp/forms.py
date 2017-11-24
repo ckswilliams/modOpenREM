@@ -55,6 +55,15 @@ SORTING_DIRECTION = (
     (DESCENDING, 'Descending'),
 )
 
+ITEMS_PER_PAGE = (
+    (10, '10'),
+    (25, '25'),
+    (50, '50'),
+    (100, '100'),
+    (200, '200'),
+    (400, '400'),
+)
+
 
 class SizeUploadForm(forms.Form):
     """Form for patient size csv file upload
@@ -87,6 +96,10 @@ class SizeHeadersForm(forms.Form):
                 choices=ID_TYPES, widget=forms.Select(attrs={"class": "form-control"}))
 
 
+class itemsPerPageForm(forms.Form):
+    itemsPerPage = forms.ChoiceField(label='Items per page', choices=ITEMS_PER_PAGE, required=False)
+
+
 class DXChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition', required=False)
@@ -117,8 +130,10 @@ class CTChartOptionsForm(forms.Form):
     plotCTStudyMeanDLP = forms.BooleanField(label='DLP per study', required=False)
     plotCTStudyMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per study'), required=False)
     plotCTStudyFreq = forms.BooleanField(label='Study frequency', required=False)
+    plotCTStudyNumEvents = forms.BooleanField(label='# events per study', required=False)
     plotCTRequestMeanDLP = forms.BooleanField(label='DLP per requested procedure', required=False)
     plotCTRequestFreq = forms.BooleanField(label='Requested procedure frequency', required=False)
+    plotCTRequestNumEvents = forms.BooleanField(label='# events per requested procedure', required=False)
     plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Study DLP over time', required=False)
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
@@ -192,8 +207,10 @@ class CTChartOptionsDisplayForm(forms.Form):
     plotCTStudyMeanDLP = forms.BooleanField(label='DLP per study', required=False)
     plotCTStudyMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per study'), required=False)
     plotCTStudyFreq = forms.BooleanField(label='Study frequency', required=False)
+    plotCTStudyNumEvents = forms.BooleanField(label='# events per study', required=False)
     plotCTRequestMeanDLP = forms.BooleanField(label='DLP per requested procedure', required=False)
     plotCTRequestFreq = forms.BooleanField(label='Requested procedure frequency', required=False)
+    plotCTRequestNumEvents = forms.BooleanField(label='# events per requested procedure', required=False)
     plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Study DLP over time', required=False)
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)

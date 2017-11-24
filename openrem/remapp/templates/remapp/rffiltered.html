@@ -86,23 +86,27 @@
                 </table>
                 <input class="btn btn-default" name="submit" type="submit" />
             </div>
+            <div class="panel-heading">
+                <h3 class="panel-title">Table options</h3>
+            </div>
+            <div class="panel-body">
+                <table>
+                    {{ itemsPerPageForm }}
+                </table>
+                <input class="btn btn-default" name="submit" type="submit" />
+            </div>
           </div>
     </form>
 
-<script>
-$('.datepicker').datepicker({
-    format: "yyyy-mm-dd",
-    autoclose: true,
-    todayHighlight: true
-    });
-</script>
+    <script src="{{ STATIC_URL }}js/datepicker.js"></script>
+    <script src="{{ STATIC_URL }}js/formatDate.js"></script>
 
-    
+
 {% endblock %}
 
 {% block col1 %}
 
-    {% autopaginate filter.qs 20 as filter_list %}
+    {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
     {% paginate %}
 
     <table class="table table-bordered table-hover row-clickable small">
@@ -133,18 +137,21 @@ $('.datepicker').datepicker({
             {% endif %}
         </tr>
         {% for exam in filter_list %}
+          {% with equipment=exam.generalequipmentmoduleattr_set.get %}
+          {% with projection_set=exam.projectionxrayradiationdose_set.get %}
+          {% with accum_set=projection_set.accumxraydose_set.all %}
         <tr>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
-                    {{ exam.generalequipmentmoduleattr_set.get.institution_name }}
+                    {{ equipment.institution_name }}
                 </a>
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
                     <table onclick="window.location='/openrem/rf/{{ exam.id }}/';">
-                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
-                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
-                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
+                        <tr><td class="nowrap">{{ equipment.manufacturer }}</td></tr>
+                        <tr><td class="nowrap">{{ equipment.manufacturer_model_name }}</td></tr>
+                        <tr><td class="nowrap">{{ equipment.unique_equipment_name.display_name }}</td></tr>
                     </table>
                 </a>
             </td>
@@ -167,28 +174,28 @@ $('.datepicker').datepicker({
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
-                    {{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}
+                    {{ projection_set.irradeventxraydata_set.count }}
                 </a>
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
-                    {% for record in exam.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
-                        {% if exam.projectionxrayradiationdose_set.get.accumxraydose_set.all.count > 1 %}
+                    {% for record in accum_set %}
+                      {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
+                        {% if accum_set.count > 1 %}
                             {{ record.acquisition_plane }}:
                         {% endif %}
-                        {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+                        {{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }}
                         <br>
-                    {% endfor %}
                 </a>
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
-                    {% for record in exam.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
-                        {% if exam.projectionxrayradiationdose_set.get.accumxraydose_set.all.count > 1 %}
+                        {% if accum_set.count > 1 %}
                             {{ record.acquisition_plane }}:
                         {% endif %}
-                        <script>document.write({{ record.accumintegratedprojradiogdose_set.get.dose_rp_total }}.toPrecision(3));</script>
+                        <script>document.write({{ accum_integrated.dose_rp_total }}.toPrecision(3));</script>
                         <br>
+                      {% endwith %}
                     {% endfor %}
                 </a>
             </td>
@@ -203,12 +210,13 @@ $('.datepicker').datepicker({
             </td>
             {% endif %}
         </tr>
+          {% endwith %}{% endwith %}{% endwith %}
         {% endfor %}
     </table>
 
     {% paginate %}
 
- 
+
 {% endblock %}
 
 {% block plotdata %}
@@ -297,13 +305,13 @@ $('.datepicker').datepicker({
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'avgValue', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'totalCounts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'avgValue', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'totalCounts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                                     </tr>
                                 </table>

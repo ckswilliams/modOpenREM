@@ -1,16 +1,19 @@
-function chartScatter(default_title, render_div, x_axis_title, y_axis_title) {
+/*global Highcharts*/
+/*eslint no-undef: "error"*/
+
+function chartScatter(defaultTitle, renderDiv, xAxisTitle, yAxisTitle) {
     var chart = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
         chart: {
-            zoomType: 'xy',
-            type: 'column',
-            renderTo: render_div
+            zoomType: "xy",
+            type: "column",
+            renderTo: renderDiv
         },
         title: {
             useHTML: true,
-            text: default_title
+            text: defaultTitle
         },
         legend: {
             enabled: true
@@ -31,7 +34,7 @@ function chartScatter(default_title, render_div, x_axis_title, y_axis_title) {
             gridLineWidth: 1,
             title: {
                 useHTML: true,
-                text: x_axis_title
+                text: xAxisTitle
             }
         },
         yAxis: {
@@ -41,10 +44,10 @@ function chartScatter(default_title, render_div, x_axis_title, y_axis_title) {
             maxPadding: 0,
             title: {
                 useHTML: true,
-                text: y_axis_title
+                text: yAxisTitle
             },
             labels: {
-                format: '{value:.1f}'
+                format: "{value:.1f}"
             }
 
         },

@@ -70,6 +70,8 @@ side at this stage will have no effect.
 
 The progress of the retrieve is displayed in the same place until the retrieve is complete.
 
+.. _qrcommandlineinterface:
+
 ***********************************************
 Query-retrieve using the command line interface
 ***********************************************
@@ -79,7 +81,7 @@ In a command window/shell, ``qrscu.py -h`` should present you with the following
 .. sourcecode:: console
 
     usage: qrscu.py [-h] [-ct] [-mg] [-fl] [-dx] [-f yyyy-mm-dd] [-t yyyy-mm-dd]
-                    [-e string] [-i string] [-sr] [-dup] qrid storeid
+                    [-e string] [-i string] [-sr] [-dup] [-toshiba] qrid storeid
 
     Query remote server and retrieve to OpenREM
 
@@ -105,6 +107,7 @@ In a command window/shell, ``qrscu.py -h`` should present you with the following
                             quote whole string
       -sr                   Advanced: Query for structured report only studies
       -dup                  Advanced: Retrieve studies that are already in database
+      -toshiba              Advanced: Attempt to retrieve CT dose summary objects and one image from each series
 
 As an example, if you wanted to query the PACS for DX images on the 5th April 2010 with any study descriptions including
 ``imported`` excluded, first you need to know the database IDs of the remote node and the local node you want the images
@@ -133,7 +136,20 @@ If you want to do this regularly to catch new studies, you might like to use a s
 This script could be run once an hour using a cron job. By asking for the date an hour ago, you shouldn't miss exams
 taking place in the last hour of the day.
 
-A similar script could be created as a batch file on Windows and run using the scheduler.
+A similar script could be created as a batch file or PowerShell script on Windows and run using the scheduler. An
+example PowerShell script is shown below:
+
+.. sourcecode:: powershell
+
+    # Script to obtain all CT studies from a DICOM node on the day prior to the
+    # date the script is run and import them into OpenREM.
+    # Get yesterday's date
+    $dateString = "{0:yyyy-MM-dd}" -f (get-date).AddDays(-1)
+    # Run the openrem_qr.py script with yesterday's date as the to and from date
+    python D:\Server_Apps\python27\Scripts\openrem_qr.py 2 1 -ct -f $dateString -t $dateString
+
+The above PowerShell script could be run on a regular basis by adding a task to the Windows `Task Scheduler` that
+executes the `powershell` program with an argument of `-file C:\\path\\to\\script.ps1`.
 
 .. _qrtroubleshooting:
 

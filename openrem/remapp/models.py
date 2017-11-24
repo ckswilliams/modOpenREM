@@ -13,8 +13,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -28,7 +28,7 @@
 
 """
 
-# Following two lines added so that sphinx autodocumentation works. 
+# Following two lines added so that sphinx autodocumentation works.
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 import json
@@ -260,6 +260,19 @@ class UserProfile(models.Model):
         (DESCENDING, 'Descending'),
     )
 
+    ITEMS_PER_PAGE = (
+        (10, '10'),
+        (25, '25'),
+        (50, '50'),
+        (100, '100'),
+        (200, '200'),
+        (400, '400'),
+    )
+
+    itemsPerPage = models.IntegerField(null=True,
+                                       choices=ITEMS_PER_PAGE,
+                                       default=25)
+
     # This field is required.
     user = models.OneToOneField(User)
 
@@ -302,8 +315,10 @@ class UserProfile(models.Model):
     plotCTStudyMeanDLP = models.BooleanField(default=True)
     plotCTStudyMeanCTDI = models.BooleanField(default=True)
     plotCTStudyFreq = models.BooleanField(default=False)
+    plotCTStudyNumEvents = models.BooleanField(default=False)
     plotCTRequestMeanDLP = models.BooleanField(default=False)
     plotCTRequestFreq = models.BooleanField(default=False)
+    plotCTRequestNumEvents = models.BooleanField(default=False)
     plotCTStudyPerDayAndHour = models.BooleanField(default=False)
     plotCTStudyMeanDLPOverTime = models.BooleanField(default=False)
     plotCTStudyMeanDLPOverTimePeriod = models.CharField(max_length=6,
