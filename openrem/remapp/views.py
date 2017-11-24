@@ -95,7 +95,7 @@ def logout_page(request):
 @login_required
 def dx_summary_list_filter(request):
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.forms import DXChartOptionsForm
+    from remapp.forms import DXChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
     if request.user.groups.filter(name='pidgroup'):
@@ -176,12 +176,27 @@ def dx_summary_list_filter(request):
                          'plotHistograms': user_profile.plotHistograms}
             chart_options_form = DXChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/dxfiltered.html',
@@ -469,7 +484,7 @@ def dx_detail_view(request, pk=None):
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
-    from remapp.forms import RFChartOptionsForm
+    from remapp.forms import RFChartOptionsForm, itemsPerPageForm
 
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(
@@ -526,6 +541,21 @@ def rf_summary_list_filter(request):
                          'plotHistograms': user_profile.plotHistograms}
             chart_options_form = RFChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     # # Calculate skin dose map for all objects in the database
@@ -566,7 +596,7 @@ def rf_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/rffiltered.html',
@@ -838,7 +868,7 @@ def rf_detail_view_skin_map(request, pk=None):
 @login_required
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import ct_acq_filter
-    from remapp.forms import CTChartOptionsForm
+    from remapp.forms import CTChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
     if request.user.groups.filter(name='pidgroup'):
@@ -915,12 +945,27 @@ def ct_summary_list_filter(request):
                          'plotHistograms': user_profile.plotHistograms}
             chart_options_form = CTChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/ctfiltered.html',
@@ -1210,7 +1255,7 @@ def ct_detail_view(request, pk=None):
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from openremproject import settings
-    from remapp.forms import MGChartOptionsForm
+    from remapp.forms import MGChartOptionsForm, itemsPerPageForm
 
     filter_data = request.GET.copy()
     if 'page' in filter_data:
@@ -1268,12 +1313,27 @@ def mg_summary_list_filter(request):
                          #'plotHistograms': user_profile.plotHistograms}
             chart_options_form = MGChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/mgfiltered.html',

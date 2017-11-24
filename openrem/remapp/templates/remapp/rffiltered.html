@@ -86,6 +86,15 @@
                 </table>
                 <input class="btn btn-default" name="submit" type="submit" />
             </div>
+            <div class="panel-heading">
+                <h3 class="panel-title">Table options</h3>
+            </div>
+            <div class="panel-body">
+                <table>
+                    {{ itemsPerPageForm }}
+                </table>
+                <input class="btn btn-default" name="submit" type="submit" />
+            </div>
           </div>
     </form>
 
@@ -97,7 +106,7 @@
 
 {% block col1 %}
 
-    {% autopaginate filter.qs 20 as filter_list %}
+    {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
     {% paginate %}
 
     <table class="table table-bordered table-hover row-clickable small">
