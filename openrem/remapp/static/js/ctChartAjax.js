@@ -2,7 +2,7 @@
 updateFrequencyChart, sortByY, sortByName, plotAverageChoice, updateWorkloadChart, chartSorting, urlStartAcq,
 urlStartReq, urlStartStudy, updateOverTimeChart, chartSortingDirection*/
 /*eslint no-undef: "error"*/
-/*eslint detect-object-injection: "off" */
+/*eslint security/detect-object-injection: "off" */
 
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {

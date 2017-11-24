@@ -1,6 +1,6 @@
 /*global THREE*/
 /*eslint no-undef: "error"*/
-/*eslint detect-object-injection: "off" */
+/*eslint security/detect-object-injection: "off" */
 
 /**
  * Function to create a 3d person object to orientate the 3d skin dose map

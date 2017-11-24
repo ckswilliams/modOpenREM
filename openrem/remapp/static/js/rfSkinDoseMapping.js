@@ -1,7 +1,7 @@
 /*global skinDoseMapObj:true, skinDoseMapColourScaleObj:true, skinDoseMap3dObj:true, skinDoseMap3dHUDObj:true,
 show3dSkinDoseMap, chroma, renderer*/
 /*eslint no-undef: "error"*/
-/*eslint detect-object-injection: "off" */
+/*eslint security/detect-object-injection: "off" */
 
 /**
  * Function to draw the available colour scales
