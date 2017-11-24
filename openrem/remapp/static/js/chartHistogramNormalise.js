@@ -1,3 +1,5 @@
+/*eslint detect-object-injection: "off" */
+
 function normaliseHistograms(chartContainer) {
     var chart, histogramData, i, j, seriesMax;
 

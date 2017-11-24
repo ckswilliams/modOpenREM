@@ -1,5 +1,6 @@
 /*global chroma*/
 /*eslint no-undef: "error"*/
+/*eslint detect-object-injection: "off" */
 
 /**
  * Function to create a 2D skin dose map object

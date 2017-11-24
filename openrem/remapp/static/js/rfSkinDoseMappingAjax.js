@@ -2,6 +2,7 @@
 skinDoseMap3dHUDObj:true, skinDoseMapGroupOrigHeight:true, skinDoseMapGroupOrigWidth:true, show3dSkinDoseMap, render,
 isCanvasSupported*/
 /*eslint no-undef: "error"*/
+/*eslint detect-object-injection: "off" */
 
 /**
  * Returns the logarithm of y with base x (ie. logxy). This is used as an alternative to Math.log10 which is not

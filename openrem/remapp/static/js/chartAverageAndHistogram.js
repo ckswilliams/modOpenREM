@@ -1,5 +1,6 @@
 /*global Highcharts, hideSeriesButtons, resetSeriesButtons*/
 /*eslint no-undef: "error"*/
+/*eslint detect-object-injection: "off" */
 
 function chartAverageAndHistogram(defaultTitle, normBtnClass, instrClass, renderDiv,
                                   valueLabel, valueUnits, avgLabel, catLabel, catCounter,

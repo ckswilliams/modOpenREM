@@ -1,5 +1,6 @@
 /*global anySeriesSort, formatDate, sortByName, sortByY*/
 /*eslint no-undef: "error"*/
+/*eslint detect-object-injection: "off" */
 
 function sortChartDataToDefault(sortingField, sortingDirection, chartDiv) {
     switch(sortingField) {
