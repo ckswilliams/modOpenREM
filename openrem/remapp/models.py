@@ -13,8 +13,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -28,7 +28,7 @@
 
 """
 
-# Following two lines added so that sphinx autodocumentation works. 
+# Following two lines added so that sphinx autodocumentation works.
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 import json
@@ -582,8 +582,10 @@ class IrradEventXRayData(models.Model):  # TID 10003
         return self.irradiation_event_uid
 
     def convert_gym2_to_cgycm2(self):
-        if self.dose_area_product:
-            return 1000000*self.dose_area_product
+        try:
+            return 1000000 * self.dose_area_product
+        except TypeError:
+            return None
 
 
 class ImageViewModifier(models.Model):  # EV 111032
