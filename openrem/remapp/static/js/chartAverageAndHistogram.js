@@ -1,100 +1,106 @@
-function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, render_div,
-                                  value_label, value_units, avg_label, cat_label, cat_counter,
-                                  fld_min, fld_max, fld_multiplier, fld_cat_name,
-                                  tooltip_filters, href_start, hide_btn_stub) {
+/*global Highcharts, hideSeriesButtons, resetSeriesButtons*/
+/*eslint no-undef: "error"*/
+/*eslint security/detect-object-injection: "off" */
+/*eslint object-shorthand: "off" */
+
+function chartAverageAndHistogram(defaultTitle, normBtnClass, instrClass, renderDiv,
+                                  valueLabel, valueUnits, avgLabel, catLabel, catCounter,
+                                  fldMin, fldMax, fldMultiplier, fldCatName,
+                                  tooltipFilters, hrefStart, hideBtnStub) {
     var bins = [];
-    var name = '';
+    var name = "";
 
     var chart = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
         lang: {
-            drillUpText: '◁ Back to ' + default_title.charAt(0).toLowerCase() + default_title.slice(1)
+            drillUpText: "◁ Back to " + defaultTitle.charAt(0).toLowerCase() + defaultTitle.slice(1)
         },
         chart: {
-            type: 'column',
-            zoomType: 'x',
+            type: "column",
+            zoomType: "x",
             resetZoomButton: {
                 theme: {
-                    display: 'none'
+                    display: "none"
                 }
             },
-            renderTo: render_div,
+            renderTo: renderDiv,
             events: {
                 drilldown: function (e) {
-                    $(norm_btn_class).css('display','inline-block');
-                    $(instr_class).css('display','none');
+                    $(normBtnClass).css("display","inline-block");
+                    $(instrClass).css("display","none");
                     this.viewData(false, false, true);
 
                     bins = e.point.bins;
-                    name = (e.point.name).replace('&amp;', '%26');
+                    name = (e.point.name).replace("&amp;", "%26");
 
-                    if (typeof this.options.drilldown.normalise == 'undefined') this.options.drilldown.normalise = false;
+                    if (typeof this.options.drilldown.normalise === "undefined") {this.options.drilldown.normalise = false;}
 
                     var drilldownTitle;
                     if (!e.points) {
-                        drilldownTitle = 'Histogram of ';
-                        hideSeriesButtons(hide_btn_stub);
+                        drilldownTitle = "Histogram of ";
+                        hideSeriesButtons(hideBtnStub);
                     }
                     else {
-                        drilldownTitle = 'Histograms of ';
+                        drilldownTitle = "Histograms of ";
                     }
-                    drilldownTitle += e.point.name + ' ' + value_label + ' values';
-                    if (this.options.drilldown.normalise) drilldownTitle += ' (normalised)';
+                    drilldownTitle += e.point.name + " " + valueLabel + " values";
+                    if (this.options.drilldown.normalise) {drilldownTitle += " (normalised)";}
 
                     this.setTitle({
                         text: drilldownTitle
                     }, false);
                     this.yAxis[0].update({
                         title: {
-                            text: (this.options.drilldown.normalise ? 'Normalised' : 'Number')
+                            text: (this.options.drilldown.normalise ? "Normalised" : "Number")
                         },
                         max: (this.options.drilldown.normalise ? 1.0 : null),
                         labels: {
-                            format: (this.options.drilldown.normalise ? '{value:.2f}' : null)
+                            format: (this.options.drilldown.normalise ? "{value:.2f}" : null)
                         }
                     }, false);
                     this.xAxis[0].update({
                         title: {
-                            text: value_label + ' range (' + value_units + ')'
+                            text: valueLabel + " range (" + valueUnits + ")"
                         },
                         categories: [],
-                        max: (typeof(e.seriesOptions) !== 'undefined') ? e.seriesOptions.data.length - 1 : this.xAxis[0].max
+                        max: (typeof(e.seriesOptions) !== "undefined") ? e.seriesOptions.data.length - 1 : this.xAxis[0].max
                     }, false);
                     this.tooltip.options.formatter = function (e) {
-                        var linkText = fld_min + '=' + (bins[this.x])*fld_multiplier + '&' + fld_max + '=' + (bins[this.x + 1])*fld_multiplier + '&' + fld_cat_name + '=' + name;
-                        if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
+                        var linkText = fldMin + "=" + (bins[this.x])*fldMultiplier + "&" + fldMax + "=" + (bins[this.x + 1])*fldMultiplier + "&" + fldCatName + "=" + name;
+                        if (this.series.name !== "All systems") {linkText += "&display_name=" + this.series.name;}
 
-                        var value_to_write;
+                        var valueToWrite;
+                        var maxValue;
                         if (e.chart.options.drilldown.normalise) {
                             for (var i=0; i<e.chart.options.drilldown.series.length; i++) {
-                                if (e.chart.options.drilldown.series[i].id == this.series.name + name) {
-                                    var max_value = Math.max.apply(Math, e.chart.options.drilldown.series[i].original_data.map(function(v) {return v;}));
+                                if (e.chart.options.drilldown.series[i].id === this.series.name + name) {
+                                    maxValue = Math.max.apply(Math, e.chart.options.drilldown.series[i].originalData.map(function(v) {return v;}));
                                 }
                             }
-                            value_to_write = max_value * this.y;
+                            valueToWrite = maxValue * this.y;
                         } else {
-                            value_to_write = this.y;
+                            valueToWrite = this.y;
                         }
-                        return '<table style="text-align: center"><tr><td>' + value_to_write.toFixed(0) + ' ' + cat_counter + '</td></tr><tr><td><a href="' + encodeURI(href_start + linkText + tooltip_filters).replace("+", encodeURIComponent("+")) + '">Click to view</a></td></tr></table>';
+                        return "<table style='text-align: center'><tr><td>" + valueToWrite.toFixed(0) + " " + catCounter + "</td></tr><tr><td><a href='" + encodeURI(hrefStart + linkText + tooltipFilters).replace("+", encodeURIComponent("+")) + "'>Click to view</a></td></tr></table>";
                     };
                 },
                 drillup: function (e) {
-                    $(norm_btn_class).css('display','none');
-                    $(instr_class).css('display','block');
+                    $(normBtnClass).css("display","none");
+                    $(instrClass).css("display","block");
                     this.viewData(false, false, true);
 
                     if (this.series.length > 2) {
-                        resetSeriesButtons(hide_btn_stub);
+                        resetSeriesButtons(hideBtnStub);
                     }
 
                     this.setTitle({
-                        text: default_title
+                        text: defaultTitle
                     }, false);
                     this.yAxis[0].update({
                         title: {
-                            text: avg_label + ' ' + value_label + ' (' + value_units + ')'
+                            text: avgLabel + " " + valueLabel + " (" + valueUnits + ")"
                         },
                         max: null,
                         labels: {
@@ -103,7 +109,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                     }, false);
                     this.xAxis[0].update({
                         title: {
-                            text: cat_label
+                            text: catLabel
                         },
                         categories: {
                             formatter: function () {
@@ -120,7 +126,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
         },
         title: {
             useHTML: true,
-            text: default_title
+            text: defaultTitle
         },
         legend: {
             enabled: true
@@ -129,7 +135,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
-                text: cat_label
+                text: catLabel
             },
             labels: {
                 useHTML: true,
@@ -142,7 +148,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             min: 0,
             title: {
                 useHTML: true,
-                text: avg_label + ' ' + value_label + ' (' + value_units + ')'
+                text: avgLabel + " " + valueLabel + " (" + valueUnits + ")"
             }
         },
         tooltip: {
@@ -155,7 +161,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             column: {
                 pointPadding: 0,
                 borderWidth: 1,
-                borderColor: '#999999',
+                borderColor: "#999999",
                 turboThreshold: 5000 // Greater than the 1000 default to enable large data series to be plotted
             }
         },

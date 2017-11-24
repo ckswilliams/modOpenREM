@@ -43,6 +43,7 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
@@ -94,7 +95,7 @@ def logout_page(request):
 @login_required
 def dx_summary_list_filter(request):
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.forms import DXChartOptionsForm
+    from remapp.forms import DXChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
     if request.user.groups.filter(name='pidgroup'):
@@ -175,12 +176,27 @@ def dx_summary_list_filter(request):
                          'plotHistograms': user_profile.plotHistograms}
             chart_options_form = DXChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/dxfiltered.html',
@@ -450,9 +466,16 @@ def dx_detail_view(request, pk=None):
     for group in request.user.groups.all():
         admin[group.name] = True
 
+    projection_set = study.projectionxrayradiationdose_set.get()
+    events_all = projection_set.irradeventxraydata_set.select_related(
+        'anatomical_structure', 'laterality', 'target_region', 'image_view',
+        'patient_orientation_modifier_cid', 'acquisition_plane').all()
+    accum_integrated = projection_set.accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+
     return render_to_response(
         'remapp/dxdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin,
+         'projection_set': projection_set, 'events_all': events_all, 'accum_integrated': accum_integrated},
         context_instance=RequestContext(request)
     )
 
@@ -461,7 +484,7 @@ def dx_detail_view(request, pk=None):
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
-    from remapp.forms import RFChartOptionsForm
+    from remapp.forms import RFChartOptionsForm, itemsPerPageForm
 
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(
@@ -518,6 +541,21 @@ def rf_summary_list_filter(request):
                          'plotHistograms': user_profile.plotHistograms}
             chart_options_form = RFChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     # # Calculate skin dose map for all objects in the database
@@ -558,7 +596,7 @@ def rf_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/rffiltered.html',
@@ -671,7 +709,12 @@ def rf_detail_view(request, pk=None):
     total_dap = 0
     total_dose = 0
     # Iterate over the planes (for bi-plane systems, for single plane systems there is only one)
-    for dose_ds in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+    projection_xray_dose_set = study.projectionxrayradiationdose_set.get()
+    accumxraydose_set_all_planes = projection_xray_dose_set.accumxraydose_set.select_related('acquisition_plane').all()
+    events_all = projection_xray_dose_set.irradeventxraydata_set.select_related(
+        'irradiation_event_type', 'patient_table_relationship_cid', 'patient_orientation_cid',
+        'patient_orientation_modifier_cid', 'acquisition_plane').all()
+    for dose_ds in accumxraydose_set_all_planes:
         accum_dose_ds = dose_ds.accumprojxraydose_set.get()
         stu_dose_totals[0] = tuple(map(operator.add, stu_dose_totals[0],
                                        (accum_dose_ds.fluoro_dose_area_product_total*1000000,
@@ -733,7 +776,10 @@ def rf_detail_view(request, pk=None):
     return render_to_response(
         'remapp/rfdetail.html',
         {'generalstudymoduleattr': study, 'admin': admin,
-         'study_totals': study_totals},
+         'study_totals': study_totals,
+         'projection_xray_dose_set': projection_xray_dose_set,
+         'accumxraydose_set_all_planes': accumxraydose_set_all_planes,
+         'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
@@ -822,7 +868,7 @@ def rf_detail_view_skin_map(request, pk=None):
 @login_required
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import ct_acq_filter
-    from remapp.forms import CTChartOptionsForm
+    from remapp.forms import CTChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
     if request.user.groups.filter(name='pidgroup'):
@@ -899,12 +945,27 @@ def ct_summary_list_filter(request):
                          'plotHistograms': user_profile.plotHistograms}
             chart_options_form = CTChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/ctfiltered.html',
@@ -1171,9 +1232,12 @@ def ct_detail_view(request, pk=None):
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
-    except:
+    except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/ct/')
+
+    events_all = study.ctradiationdose_set.get().ctirradiationeventdata_set.select_related(
+        'ct_acquisition_type', 'ctdiw_phantom_type').all()
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1182,7 +1246,7 @@ def ct_detail_view(request, pk=None):
 
     return render_to_response(
         'remapp/ctdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin, 'events_all': events_all},
         context_instance=RequestContext(request)
     )
 
@@ -1191,7 +1255,7 @@ def ct_detail_view(request, pk=None):
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from openremproject import settings
-    from remapp.forms import MGChartOptionsForm
+    from remapp.forms import MGChartOptionsForm, itemsPerPageForm
 
     filter_data = request.GET.copy()
     if 'page' in filter_data:
@@ -1249,12 +1313,27 @@ def mg_summary_list_filter(request):
                          #'plotHistograms': user_profile.plotHistograms}
             chart_options_form = MGChartOptionsForm(form_data)
 
+    # Obtain the number of items per page from the request
+    items_per_page_form = itemsPerPageForm(request.GET)
+    # check whether the form data is valid
+    if items_per_page_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.itemsPerPage = items_per_page_form.cleaned_data['itemsPerPage']
+            user_profile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            form_data = {'itemsPerPage': user_profile.itemsPerPage}
+            items_per_page_form = itemsPerPageForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/mgfiltered.html',
@@ -1374,9 +1453,18 @@ def mg_detail_view(request, pk=None):
     for group in request.user.groups.all():
         admin[group.name] = True
 
+    projection_xray_dose_set = study.projectionxrayradiationdose_set.get()
+    accum_mammo_set = projection_xray_dose_set.accumxraydose_set.get().accummammographyxraydose_set.select_related(
+        'laterality').all()
+    events_all = projection_xray_dose_set.irradeventxraydata_set.select_related(
+        'laterality', 'image_view').all()
+
     return render_to_response(
         'remapp/mgdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin,
+         'projection_xray_dose_set': projection_xray_dose_set,
+         'accum_mammo_set': accum_mammo_set,
+         'events_all': events_all},
         context_instance=RequestContext(request)
     )
 

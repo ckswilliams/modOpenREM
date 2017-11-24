@@ -1,5 +1,6 @@
 /*global chroma*/
 /*eslint no-undef: "error"*/
+/*eslint security/detect-object-injection: "off" */
 
 /**
  * Function to create a skin dose map colour scale object

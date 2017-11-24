@@ -14,6 +14,7 @@ OpenREM version history
 * `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
 * `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
+* `#543`_  Interface: Added drop-down box to choose how many studies are displayed on filtered pages
 * `#542`_  Interface: Added display name to all detailed html pages
 * `#535`_  Interface: Fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
