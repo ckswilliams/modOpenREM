@@ -71,10 +71,11 @@ function chartAverageAndHistogram(defaultTitle, normBtnClass, instrClass, render
                         if (this.series.name !== "All systems") {linkText += "&display_name=" + this.series.name;}
 
                         var valueToWrite;
+                        var maxValue;
                         if (e.chart.options.drilldown.normalise) {
                             for (var i=0; i<e.chart.options.drilldown.series.length; i++) {
                                 if (e.chart.options.drilldown.series[i].id === this.series.name + name) {
-                                    var maxValue = Math.max.apply(Math, e.chart.options.drilldown.series[i].original_data.map(function(v) {return v;}));
+                                    maxValue = Math.max.apply(Math, e.chart.options.drilldown.series[i].original_data.map(function(v) {return v;}));
                                 }
                             }
                             valueToWrite = maxValue * this.y;

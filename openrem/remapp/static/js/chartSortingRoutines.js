@@ -97,10 +97,11 @@ function anySeriesSort(chartContainer, p, d, s) {
 
             // Create an array to hold each series
             var chartDataNew = [];
-            for (var i = 0; i < chart.series.length; i++) {
+            var i, j;
+            for (i = 0; i < chart.series.length; i++) {
                 chartDataNew.push([]);
 
-                for (var j = 0; j < chart.series[0].data.length; j++) {
+                for (j = 0; j < chart.series[0].data.length; j++) {
                     chartDataNew[i].push({
                         name: chart.series[i].data[j].name,
                         y: chart.series[i].data[j].y,
