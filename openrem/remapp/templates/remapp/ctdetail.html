@@ -149,8 +149,8 @@
                 {% if dose_check_person_alert.person_name %}
                   Person authorizing irradiation: {{ dose_check_person_alert.person_name }}
                 {% endif %}
+                <br>
               {% endif %}
-              <br>
               {% if dose_check.dlp_notification_value_configured or dose_check.ctdivol_notification_value_configured %}
                 <strong>Dose Check Alerts</strong>
                 {% if dose_check.dlp_notification_value_configured %}
