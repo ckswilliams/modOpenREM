@@ -71,8 +71,10 @@
     {% for event in events_all %}
       {% with source=event.ctxraysourceparameters_set.all %}
       {% with dose_check=event.ctdosecheckdetails_set.get %}
-        {% with source_zero=source.0 %}
-          {% with num_sources=event.number_of_xray_sources %}
+      {% with dose_check_person_alert=dose_check.tid1020_alert.get %}
+      {% with dose_check_person_notification=dose_check.tid1020_notification.get %}
+      {% with source_zero=source.0 %}
+      {% with num_sources=event.number_of_xray_sources %}
 
       <tr>
         <td rowspan="2">{{ event.acquisition_protocol }}</td>
@@ -142,9 +144,13 @@
                   {% endif %}
                 {% endif %}
                 {% if dose_check.alert_reason_for_proceeding %}
-                  dose_check.alert_reason_for_proceeding
+                  Reason for proceeding: {{ dose_check.alert_reason_for_proceeding }}
                 {% endif %}
-              {% endif %}<br>
+                {% if dose_check_person_alert.person_name %}
+                  Person authorizing irradiation: {{ dose_check_person_alert.person_name }}
+                {% endif %}
+              {% endif %}
+              <br>
               {% if dose_check.dlp_notification_value_configured or dose_check.ctdivol_notification_value_configured %}
                 <strong>Dose Check Alerts</strong>
                 {% if dose_check.dlp_notification_value_configured %}
@@ -166,14 +172,15 @@
                   {% endif %}
                 {% endif %}
                 {% if dose_check.notification_reason_for_proceeding %}
-                  dose_check.notification_reason_for_proceeding
+                  Reason for proceeding: {{dose_check.notification_reason_for_proceeding }}
+                {% endif %}
+                {% if dose_check_person_notification.person_name %}
+                  Person authorizing irradiation: {{ dose_check_person_notification.person_name }}
                 {% endif %}
               {% endif %}
-
             </td>
         </tr>
-
-      {% endwith %}{% endwith %}{% endwith %}{% endwith %}
+      {% endwith %}{% endwith %}{% endwith %}{% endwith %}{% endwith %}{% endwith %}
     {% endfor %}
 </table>
 
