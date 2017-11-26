@@ -367,7 +367,7 @@ def _ct_get_series_data(s):
             u'n/a',
             ]
     try:
-        dose_check =s.ctdosecheckdetails_set.get()
+        dose_check = s.ctdosecheckdetails_set.get()
         dose_check_string = []
         if dose_check.dlp_alert_value_configured or dose_check.ctdivol_alert_value_configured:
             dose_check_string += [u"Dose Check Alerts: "]
@@ -379,6 +379,23 @@ def _ct_get_series_data(s):
                         dose_check.accumulated_dlp_forward_estimate)]
                 else:
                     dose_check_string += [u"no accumulated forward estimate recorded. "]
+            if dose_check.ctdivol_alert_value_configured:
+                dose_check_string += [
+                    u"CTDIvol alert is configured at {0:.2f} mGy with ".format(dose_check.ctdivol_alert_value)]
+                if dose_check.accumulated_ctdivol_forward_estimate:
+                    dose_check_string += [u"an accumulated forward estimate of {0:.2f} mGy. ".format(
+                        dose_check.accumulated_ctdivol_forward_estimate)]
+                else:
+                    dose_check_string += [u"no accumulated forward estimate recorded. "]
+            if dose_check.alert_reason_for_proceeding:
+                dose_check_string += [u"Reason for proceeding: {0}. ".format(dose_check.alert_reason_for_proceeding)]
+            try:
+                dose_check_person_alert = dose_check.tid1020_alert.get()
+                if dose_check_person_alert.person_name:
+                    dose_check_string += [
+                        u"Person authorizing irradiation: {0}. ".format(dose_check_person_alert.person_name)]
+            except ObjectDoesNotExist:
+                pass
         dose_check_string = ''.join(dose_check_string)
     except ObjectDoesNotExist:
         dose_check_string = ""
