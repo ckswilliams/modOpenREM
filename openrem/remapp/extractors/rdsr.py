@@ -166,7 +166,6 @@ def _doserelateddistancemeasurements(dataset, mech):  # CID 10008
             setattr(distance, codes[cont.ConceptNameCodeSequence[0].CodeMeaning],
                     cont.MeasuredValueSequence[0].NumericValue)
         except KeyError:
-
             pass
     # Maybe we have a Philips Xper system if table positions are not filled and we can use the
     # privately defined information
@@ -224,6 +223,11 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
     from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_or_create_cid, safe_strings
     from xml.etree import ElementTree as ET
+    # Variables below are used if privately defined parameters are available
+    private_collimated_field_height = None
+    private_collimated_field_width = None
+    private_collimated_field_area = None
+
     source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         try:
@@ -277,6 +281,48 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                 _exposure(cont.MeasuredValueSequence[0].NumericValue, source)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filters':
                 _xrayfilters(cont.ContentSequence, source)
+            # Maybe we have a Philips Xper system and we can use the privately defined information
+            elif (cont.ConceptNameCodeSequence[0].CodeMeaning == 'Wedges and Shutters') and \
+                    (cont.ConceptNameCodeSequence[0].CodingSchemeDesignator == '99PHI-IXR-XPER'):
+                # According to DICOM Conformance statement:
+                # http://incenter.medical.philips.com/doclib/enc/fetch/2000/4504/577242/577256/588723/5144873/5144488/
+                # 5144772/DICOM_Conformance_Allura_8.2.pdf%3fnodeid%3d10125540%26vernum%3d-2
+                # "Actual shutter distance from centerpoint of collimator specified in the plane at 1 meter.
+                # Unit: mm. End of run value is used."
+                bottom_shutter_pos = None
+                left_shutter_pos = None
+                right_shutter_pos = None
+                top_shutter_pos = None
+                try:
+                    for cont2 in cont.ContentSequence:
+                        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Bottom Shutter':
+                            bottom_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
+                        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Left Shutter':
+                            left_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
+                        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Right Shutter':
+                            right_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
+                        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Top Shutter':
+                            top_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
+                    # Get distance_source_to_detector (Sdd) in meters
+                    # Problem is that Philips only notes distance_source_to_detector if it changes compared to last
+                    # event
+                    try:
+                        Sdd = float(event.irradeventxraymechanicaldata_set.get().
+                                    doserelateddistancemeasurements_set.get().distance_source_to_detector) / 1000
+                    except (ObjectDoesNotExist, TypeError):
+                        Sdd = None
+                    if bottom_shutter_pos and left_shutter_pos and right_shutter_pos and top_shutter_pos \
+                            and Sdd:
+                        # calculate collimated field area, collimated Field Height and Collimated Field Width
+                        # at image receptor (positions are defined at 1 meter)
+                        # TODO: get confirmed that left-right is defined in DICOM width direction and
+                        #       top-bottom in DICOM height dir.
+                        private_collimated_field_height = (right_shutter_pos + left_shutter_pos) * (Sdd*Sdd)  # in mm
+                        private_collimated_field_width = (bottom_shutter_pos + top_shutter_pos) * (Sdd*Sdd)  # in mm
+                        private_collimated_field_area = (private_collimated_field_height *
+                                                         private_collimated_field_width) / 1000000  # in m2
+                except AttributeError:
+                    pass
         except IndexError:
             pass
     _deviceparticipant(dataset, 'source', source, ch)
@@ -286,6 +332,12 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
     except:
         pass
     source.save()
+    if (not source.collimated_field_height) and private_collimated_field_height:
+        source.collimated_field_height = private_collimated_field_height
+    if (not source.collimated_field_width) and private_collimated_field_width:
+        source.collimated_field_width = private_collimated_field_width
+    if (not source.collimated_field_area) and private_collimated_field_area:
+        source.collimated_field_area = private_collimated_field_area
     if not source.exposure_time and source.number_of_pulses:
         try:
             avg_pulse_width = source.pulsewidth_set.all().aggregate(Avg('pulse_width'))['pulse_width__avg']
@@ -436,8 +488,9 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
             event.save()
     # needs include for optional multiple person participant
     _irradiationeventxraydetectordata(dataset, event, ch)
-    _irradiationeventxraysourcedata(dataset, event, ch)
     _irradiationeventxraymechanicaldata(dataset, event)
+    # in some cases we need mechanical data before x-ray source data
+    _irradiationeventxraysourcedata(dataset, event, ch)
 
     event.save()
 
