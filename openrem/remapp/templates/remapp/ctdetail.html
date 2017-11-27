@@ -152,9 +152,9 @@
                 <br>
               {% endif %}
               {% if dose_check.dlp_notification_value_configured or dose_check.ctdivol_notification_value_configured %}
-                <strong>Dose Check Alerts</strong>
+                <strong>Dose Check Notifications</strong>
                 {% if dose_check.dlp_notification_value_configured %}
-                  DLP alert is configured at {{ dose_check.dlp_notification_value|floatformat:2 }} mGy&middot;cm with
+                  DLP notification is configured at {{ dose_check.dlp_notification_value|floatformat:2 }} mGy&middot;cm with
                   {% if dose_check.dlp_forward_estimate %}
                     an accumulated forward estimate of
                     {{ dose_check.dlp_forward_estimate|floatformat:2 }} mGy&middot;cm.
@@ -163,12 +163,12 @@
                   {% endif %}
                 {% endif %}
                 {% if dose_check.ctdivol_notification_value_configured %}
-                  CTDIvol alert is configured at {{ dose_check.ctdivol_notification_value|floatformat:2 }} mGy with
+                  CTDIvol notification is configured at {{ dose_check.ctdivol_notification_value|floatformat:2 }} mGy with
                   {% if dose_check.ctdivol_forward_estimate %}
-                    an accumulated forward estimate of
+                    a forward estimate of
                     {{ dose_check.ctdivol_forward_estimate|floatformat:2 }} mGy.
                   {% else %}
-                    no accumulated forward estimate recorded.
+                    no forward estimate recorded.
                   {% endif %}
                 {% endif %}
                 {% if dose_check.notification_reason_for_proceeding %}
