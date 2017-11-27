@@ -65,21 +65,18 @@ def make_skin_map(study_pk=None):
         try:
             pat_mass = float(study.patientstudymoduleattr_set.get().patient_weight)
             pat_mass_source = u'extracted'
-        except ValueError:
-            pat_mass = 73.2
-        except TypeError:
+        except (ValueError, TypeError):
             pat_mass = 73.2
 
         if pat_mass == 0.0:
             pat_mass = 73.2
+            pat_mass_source = u'assumed'
 
         pat_height_source = u'assumed'
         try:
             pat_height = float(study.patientstudymoduleattr_set.get().patient_size) * 100
             pat_height_source = u'extracted'
-        except ValueError:
-            pat_height = 178.6
-        except TypeError:
+        except (ValueError, TypeError):
             pat_height = 178.6
 
         if pat_height == 0.0:

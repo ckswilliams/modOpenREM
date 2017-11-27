@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
+* `#566`_  Interface: Correctly show "assumed patient mass" in case of set value of zero
 * `#565`_  Interface: Correctly handle dose area product with zero value
 * `#564`_  Skin dose maps: Text information on skin dose maps now embedded when saving the 2d or 3d map as a graphic
 * `#561`_  Imports: Patient orientation modifier now correctly extracted from RDSR
