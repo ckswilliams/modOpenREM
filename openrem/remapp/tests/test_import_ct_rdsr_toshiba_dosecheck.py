@@ -8,8 +8,6 @@
 ..  moduleauthor:: Ed McDonagh
 """
 
-
-import datetime
 import os
 from decimal import Decimal
 from django.test import TestCase
