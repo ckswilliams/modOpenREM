@@ -21,7 +21,7 @@ class ImportToshibaWithDoseCheck(TestCase):
     """
     def test_dose_check_import(self):
         """Imports a known RDSR and checks the dose check details
-        
+
         """
         PatientIDSettings.objects.create()
 
