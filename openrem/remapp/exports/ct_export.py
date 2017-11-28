@@ -117,6 +117,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         u'S2 mA',
         u'S2 Exposure time/rotation',
         u'mA Modulation type',
+        u'Dose check details',
         u'Comments',
         ]
 
@@ -291,6 +292,7 @@ def _generate_all_data_headers_ct(max_events):
             u'E' + str(h+1) + u' S2 mA',
             u'E' + str(h+1) + u' S2 Exposure time/rotation',
             u'E' + str(h+1) + u' mA Modulation type',
+            u'E' + str(h+1) + u' Dose check details',
             u'E' + str(h+1) + u' Comments',
             ]
 
@@ -364,8 +366,70 @@ def _ct_get_series_data(s):
             u'n/a',
             u'n/a',
             ]
+    try:
+        dose_check = s.ctdosecheckdetails_set.get()
+        dose_check_string = []
+        if dose_check.dlp_alert_value_configured or dose_check.ctdivol_alert_value_configured:
+            dose_check_string += [u"Dose Check Alerts: "]
+            if dose_check.dlp_alert_value_configured:
+                dose_check_string += [
+                    u"DLP alert is configured at {0:.2f} mGy.cm with ".format(dose_check.dlp_alert_value)]
+                if dose_check.accumulated_dlp_forward_estimate:
+                    dose_check_string += [u"an accumulated forward estimate of {0:.2f} mGy.cm. ".format(
+                        dose_check.accumulated_dlp_forward_estimate)]
+                else:
+                    dose_check_string += [u"no accumulated forward estimate recorded. "]
+            if dose_check.ctdivol_alert_value_configured:
+                dose_check_string += [
+                    u"CTDIvol alert is configured at {0:.2f} mGy with ".format(dose_check.ctdivol_alert_value)]
+                if dose_check.accumulated_ctdivol_forward_estimate:
+                    dose_check_string += [u"an accumulated forward estimate of {0:.2f} mGy. ".format(
+                        dose_check.accumulated_ctdivol_forward_estimate)]
+                else:
+                    dose_check_string += [u"no accumulated forward estimate recorded. "]
+            if dose_check.alert_reason_for_proceeding:
+                dose_check_string += [u"Reason for proceeding: {0}. ".format(dose_check.alert_reason_for_proceeding)]
+            try:
+                dose_check_person_alert = dose_check.tid1020_alert.get()
+                if dose_check_person_alert.person_name:
+                    dose_check_string += [
+                        u"Person authorizing irradiation: {0}. ".format(dose_check_person_alert.person_name)]
+            except ObjectDoesNotExist:
+                pass
+        if dose_check.dlp_notification_value_configured or dose_check.ctdivol_notification_value_configured:
+            dose_check_string += [u"Dose Check Notifications: "]
+            if dose_check.dlp_notification_value_configured:
+                dose_check_string += [
+                    u"DLP notification is configured at {0:.2f} mGy.cm with ".format(dose_check.dlp_notification_value)]
+                if dose_check.dlp_forward_estimate:
+                    dose_check_string += [
+                        u"an accumulated forward estimate of {0:.2f} mGy.cm. ".format(dose_check.dlp_forward_estimate)]
+                else:
+                    dose_check_string += [u"no accumulated forward estimate recorded. "]
+            if dose_check.ctdivol_notification_value_configured:
+                dose_check_string += [u"CTDIvol notification is configured at {0:.2f} mGy with ".format(
+                    dose_check.ctdivol_notification_value)]
+                if dose_check.ctdivol_forward_estimate:
+                    dose_check_string += [
+                        u"a forward estimate of {0:.2f} mGy. ".format(dose_check.ctdivol_forward_estimate)]
+                else:
+                    dose_check_string += [u"no forward estimate recorded. "]
+            if dose_check.notification_reason_for_proceeding:
+                dose_check_string += [
+                    u"Reason for proceeding: {0}. ".format(dose_check.notification_reason_for_proceeding)]
+            try:
+                dose_check_person_notification = dose_check.tid1020_notification.get()
+                if dose_check_person_notification.person_name:
+                    dose_check_string += [
+                        u"Person authorizing irradiation: {0}. ".format(dose_check_person_notification.person_name)]
+            except ObjectDoesNotExist:
+                pass
+        dose_check_string = ''.join(dose_check_string)
+    except ObjectDoesNotExist:
+        dose_check_string = ""
     seriesdata += [
         s.xray_modulation_type,
+        dose_check_string,
         str(s.comment),
         ]
     return seriesdata

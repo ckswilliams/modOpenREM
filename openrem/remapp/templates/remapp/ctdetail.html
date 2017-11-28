@@ -70,8 +70,11 @@
     <th>X-ray modulation type</th>
     {% for event in events_all %}
       {% with source=event.ctxraysourceparameters_set.all %}
-        {% with source_zero=source.0 %}
-          {% with num_sources=event.number_of_xray_sources %}
+      {% with dose_check=event.ctdosecheckdetails_set.get %}
+      {% with dose_check_person_alert=dose_check.tid1020_alert.get %}
+      {% with dose_check_person_notification=dose_check.tid1020_notification.get %}
+      {% with source_zero=source.0 %}
+      {% with num_sources=event.number_of_xray_sources %}
 
       <tr>
         <td rowspan="2">{{ event.acquisition_protocol }}</td>
@@ -116,12 +119,68 @@
         <tr></tr>
       {% endif %}
 
-        {% if event.comment != "" %}
+
         <tr>
-            <td colspan="14"><strong>Comment</strong> {{ event.comment }}</td>
+            <td colspan="14">
+              <strong>Comment</strong> {{ event.comment }}<br>
+              {% if dose_check.dlp_alert_value_configured or dose_check.ctdivol_alert_value_configured %}
+                <strong>Dose Check Alerts</strong>
+                {% if dose_check.dlp_alert_value_configured %}
+                  DLP alert is configured at {{ dose_check.dlp_alert_value|floatformat:2 }} mGy&middot;cm with
+                  {% if dose_check.accumulated_dlp_forward_estimate %}
+                    an accumulated forward estimate of
+                    {{ dose_check.accumulated_dlp_forward_estimate|floatformat:2 }} mGy&middot;cm.
+                  {% else %}
+                    no accumulated forward estimate recorded.
+                  {% endif %}
+                {% endif %}
+                {% if dose_check.ctdivol_alert_value_configured %}
+                  CTDIvol alert is configured at {{ dose_check.ctdivol_alert_value|floatformat:2 }} mGy with
+                  {% if dose_check.accumulated_ctdivol_forward_estimate %}
+                    an accumulated forward estimate of
+                    {{ dose_check.accumulated_ctdivol_forward_estimate|floatformat:2 }} mGy.
+                  {% else %}
+                    no accumulated forward estimate recorded.
+                  {% endif %}
+                {% endif %}
+                {% if dose_check.alert_reason_for_proceeding %}
+                  Reason for proceeding: {{ dose_check.alert_reason_for_proceeding }}
+                {% endif %}
+                {% if dose_check_person_alert.person_name %}
+                  Person authorizing irradiation: {{ dose_check_person_alert.person_name }}
+                {% endif %}
+                <br>
+              {% endif %}
+              {% if dose_check.dlp_notification_value_configured or dose_check.ctdivol_notification_value_configured %}
+                <strong>Dose Check Notifications</strong>
+                {% if dose_check.dlp_notification_value_configured %}
+                  DLP notification is configured at {{ dose_check.dlp_notification_value|floatformat:2 }} mGy&middot;cm with
+                  {% if dose_check.dlp_forward_estimate %}
+                    an accumulated forward estimate of
+                    {{ dose_check.dlp_forward_estimate|floatformat:2 }} mGy&middot;cm.
+                  {% else %}
+                    no accumulated forward estimate recorded.
+                  {% endif %}
+                {% endif %}
+                {% if dose_check.ctdivol_notification_value_configured %}
+                  CTDIvol notification is configured at {{ dose_check.ctdivol_notification_value|floatformat:2 }} mGy with
+                  {% if dose_check.ctdivol_forward_estimate %}
+                    a forward estimate of
+                    {{ dose_check.ctdivol_forward_estimate|floatformat:2 }} mGy.
+                  {% else %}
+                    no forward estimate recorded.
+                  {% endif %}
+                {% endif %}
+                {% if dose_check.notification_reason_for_proceeding %}
+                  Reason for proceeding: {{dose_check.notification_reason_for_proceeding }}
+                {% endif %}
+                {% if dose_check_person_notification.person_name %}
+                  Person authorizing irradiation: {{ dose_check_person_notification.person_name }}
+                {% endif %}
+              {% endif %}
+            </td>
         </tr>
-        {% endif %}
-      {% endwith %}{% endwith %}{% endwith %}
+      {% endwith %}{% endwith %}{% endwith %}{% endwith %}{% endwith %}{% endwith %}
     {% endfor %}
 </table>
 

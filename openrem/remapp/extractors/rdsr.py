@@ -71,6 +71,39 @@ def _observercontext(dataset, obs, ch):  # TID 1002
     obs.save()
 
 
+def _person_participant(dataset, event_data_type, foreign_key):
+    """Function to record people involved with study
+
+    :param dataset: DICOM data being parsed
+    :param event_data_type: Which function has called this function
+    :param foreign_key: object of model this modal will link to
+    :return: None
+    """
+    from remapp.models import PersonParticipant
+    from remapp.tools.get_values import get_or_create_cid
+    if event_data_type == 'ct_dose_check_alert':
+        person = PersonParticipant.objects.create(ct_dose_check_details_alert=foreign_key)
+    elif event_data_type == 'ct_dose_check_notification':
+        person = PersonParticipant.objects.create(ct_dose_check_details_notification=foreign_key)
+    else:
+        return
+    person.person_name = dataset.PersonName
+    for cont in dataset.ContentSequence:
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Person Role in Procedure':
+            person.person_role_in_procedure_cid = get_or_create_cid(
+                cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Person ID':
+            person.person_id = cont.TextValue
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Person ID Issue':
+            person.person_id_issuer = cont.TextValue
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Organization Name':
+            person.organization_name = cont.TextValue
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Person Role in Organization':
+            person.person_role_in_organization_cid = get_or_create_cid(
+                cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+    person.save()
+
+
 def _deviceparticipant(dataset, eventdatatype, foreignkey, ch):
     from remapp.models import DeviceParticipant
     from remapp.tools.get_values import get_or_create_cid, safe_strings
@@ -621,10 +654,54 @@ def _ctxraysourceparameters(dataset, event):
     param.save()
 
 
+def _ctdosecheckdetails(dataset, dosecheckdetails, ch, isalertdetails): # TID 10015
+    # PARTLY TESTED CODE (no DSR available that has Reason For Proceeding and/or Forward Estimate)
+    from remapp.tools.get_values import safe_strings
+
+    if isalertdetails:
+        for cont in dataset.ContentSequence:
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Alert Value Configured':
+                dosecheckdetails.dlp_alert_value_configured = (cont.ConceptCodeSequence[0].CodeMeaning == 'Yes')
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Alert Value':
+                dosecheckdetails.dlp_alert_value = cont.MeasuredValueSequence[0].NumericValue
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Alert Value Configured':
+                dosecheckdetails.ctdivol_alert_value_configured = (cont.ConceptCodeSequence[0].CodeMeaning == 'Yes')
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Alert Value':
+                dosecheckdetails.ctdivol_alert_value = cont.MeasuredValueSequence[0].NumericValue
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated DLP Forward Estimate':
+                dosecheckdetails.accumulated_dlp_forward_estimate = cont.MeasuredValueSequence[0].NumericValue
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated CTDIvol Forward Estimate':
+                dosecheckdetails.accumulated_ctdivol_forward_estimate = cont.MeasuredValueSequence[0].NumericValue
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reason For Proceeding':
+                dosecheckdetails.alert_reason_for_proceeding = safe_strings(cont.TextValue, ch)
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Person Name':
+                _person_participant(cont, 'ct_dose_check_alert', dosecheckdetails)
+    else:
+        for cont in dataset.ContentSequence:
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Notification Value Configured':
+                dosecheckdetails.dlp_notification_value_configured = (cont.ConceptCodeSequence[0].CodeMeaning == 'Yes')
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Notification Value':
+                dosecheckdetails.dlp_notification_value = cont.MeasuredValueSequence[0].NumericValue
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Notification Value Configured':
+                dosecheckdetails.ctdivol_notification_value_configured = (cont.ConceptCodeSequence[0].CodeMeaning == 'Yes')
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Notification Value':
+                dosecheckdetails.ctdivol_notification_value = cont.MeasuredValueSequence[0].NumericValue
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Forward Estimate':
+                dosecheckdetails.dlp_forward_estimate = cont.MeasuredValueSequence[0].NumericValue
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Forward Estimate':
+                dosecheckdetails.ctdivol_forward_estimate = cont.MeasuredValueSequence[0].NumericValue
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reason For Proceeding':
+                dosecheckdetails.notification_reason_for_proceeding = safe_strings(cont.TextValue, ch)
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Person Name':
+                _person_participant(cont, 'ct_dose_check_notification', dosecheckdetails)
+    dosecheckdetails.save()
+
+
 def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
-    from remapp.models import CtIrradiationEventData
+    from remapp.models import CtIrradiationEventData, CtDoseCheckDetails
     from remapp.tools.get_values import get_or_create_cid, safe_strings
     event = CtIrradiationEventData.objects.create(ct_radiation_dose=ct)
+    ctdosecheckdetails = None
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
             event.acquisition_protocol = safe_strings(cont.TextValue, char_set=ch)
@@ -686,7 +763,16 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
                     elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Effective Dose':
                         event.effective_dose = cont2.MeasuredValueSequence[0].NumericValue
                         ## Effective dose measurement method and conversion factor
-                        ## CT Dose Check details here
+                    ## CT Dose Check Details
+                    ## Dose Check Alert Details and Notifications Details can appear indepently
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Check Alert Details':
+                        if ctdosecheckdetails is None:
+                            ctdosecheckdetails = CtDoseCheckDetails.objects.create(ct_irradiation_event_data=event)
+                        _ctdosecheckdetails(cont2, ctdosecheckdetails, ch, True)
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Check Notification Details':
+                        if ctdosecheckdetails is None:
+                            ctdosecheckdetails = CtDoseCheckDetails.objects.create(ct_irradiation_event_data=event)
+                        _ctdosecheckdetails(cont2, ctdosecheckdetails, ch, False)
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray modulation type':
             event.xray_modulation_type = safe_strings(cont.TextValue)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
@@ -700,6 +786,8 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
 
     ## personparticipant here
     _deviceparticipant(dataset, 'ct_event', event, ch)
+    if ctdosecheckdetails is not None:
+        ctdosecheckdetails.save()
     event.save()
 
 

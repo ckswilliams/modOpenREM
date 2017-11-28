@@ -48,6 +48,7 @@ OpenREM version history
 * `#494`_  Charts: Charts now ignore blank and zero-value data when calculating mean, median and number of events
 * `#493`_  Charts: Added user option to made chart categories all lower case
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
+* `#491`_  Imports, Interface and Exports: CT Dose Check alerts and notifications are now extracted, displayed and exported
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
 * `#488`_  Exports: All exports now include study time
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
