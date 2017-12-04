@@ -167,22 +167,6 @@ def _doserelateddistancemeasurements(dataset, mech):  # CID 10008
                     cont.MeasuredValueSequence[0].NumericValue)
         except KeyError:
             pass
-    # Maybe we have a Philips Xper system if table positions are not filled and we can use the
-    # privately defined information
-    if (distance.table_lateral_position is None) or (distance.table_longitudinal_position is None):
-        for cont in dataset.ContentSequence:
-            if (cont.ConceptNameCodeSequence[0].CodeMeaning == 'Beam Position') and \
-                      (cont.ConceptNameCodeSequence[0].CodingSchemeDesignator == '99PHI-IXR-XPER'):
-                try:
-                    for cont2 in cont.ContentSequence:
-                        if (distance.table_longitudinal_position is None) and \
-                                (cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Longitudinal Beam Position'):
-                            distance.table_longitudinal_position = cont2.MeasuredValueSequence[0].NumericValue
-                        if (distance.table_lateral_position is None) and \
-                                (cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Lateral Beam Position'):
-                            distance.table_lateral_position = cont2.MeasuredValueSequence[0].NumericValue
-                except AttributeError:
-                    pass
     distance.save()
 
 
@@ -304,8 +288,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                         if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Top Shutter':
                             top_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
                     # Get distance_source_to_detector (Sdd) in meters
-                    # Problem is that Philips only notes distance_source_to_detector if it changes compared to last
-                    # event
+                    # Philips Allura only notes distance_source_to_detector if it changed compared to last event
                     try:
                         Sdd = float(event.irradeventxraymechanicaldata_set.get().
                                     doserelateddistancemeasurements_set.get().distance_source_to_detector) / 1000
@@ -314,11 +297,9 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                     if bottom_shutter_pos and left_shutter_pos and right_shutter_pos and top_shutter_pos \
                             and Sdd:
                         # calculate collimated field area, collimated Field Height and Collimated Field Width
-                        # at image receptor (positions are defined at 1 meter)
-                        # TODO: get confirmed that left-right is defined in DICOM width direction and
-                        #       top-bottom in DICOM height dir.
-                        private_collimated_field_height = (right_shutter_pos + left_shutter_pos) * (Sdd*Sdd)  # in mm
-                        private_collimated_field_width = (bottom_shutter_pos + top_shutter_pos) * (Sdd*Sdd)  # in mm
+                        # at image receptor (shutter positions are defined at 1 meter)
+                        private_collimated_field_height = (right_shutter_pos + left_shutter_pos) * Sdd  # in mm
+                        private_collimated_field_width = (bottom_shutter_pos + top_shutter_pos) * Sdd  # in mm
                         private_collimated_field_area = (private_collimated_field_height *
                                                          private_collimated_field_width) / 1000000  # in m2
                 except AttributeError:

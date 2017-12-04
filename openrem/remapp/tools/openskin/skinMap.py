@@ -131,7 +131,6 @@ def rotational(xRay, startAngle, endAngle, frames, phantom, area, refAK, kV, fil
         # -45 (roll mode) and endAngle is not available.
         if (endAngle is None) and (startAngle > -120.5) and (startAngle < -119.5):
             endAngle = 120
-        # TODO: This one we need to confirm.
         elif (endAngle is None) and (startAngle > -45.5) and (startAngle < -44.5):
             endAngle = 135
         else:
