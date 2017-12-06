@@ -78,7 +78,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                             Case(
                                 When(
                                     ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
-                                default=db_value_name, output_field=FloatField()
+                                    default=db_value_name, output_field=FloatField()
                             )
                         ) * value_multiplier
                     if plot_average_choice == 'both' or plot_average_choice == 'median':
@@ -86,7 +86,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                             Case(
                                 When(
                                     ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
-                                default=db_value_name, output_field=FloatField()
+                                    default=db_value_name, output_field=FloatField()
                             )
                         ) * value_multiplier
                 if plot_average or plot_freq:
@@ -149,6 +149,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                 return_structure['summary'][index] = summary_temp
 
     if plot_average and calculate_histograms:
+        histogram_annotations = {}
         # Calculate histogram data for each series from each system
         return_structure['histogram_data'] =\
             [[[None for k in xrange(2)] for j in xrange(len(return_structure['series_names']))]
@@ -156,25 +157,25 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
 
         if exclude_constant_angle:
             # Exclude "Constant Angle Acquisitions" from the calculations
-            value_ranges = database_events.values('db_series_names_to_use').annotate(
-                min_value=Min(
-                    Case(
-                        When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
-                        default=db_value_name, output_field=FloatField()
-                    )
-                ),
-                max_value=Max(
+            histogram_annotations['min_value'] = Min(
                     Case(
                         When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
                         default=db_value_name, output_field=FloatField()
                     )
                 )
-            ).order_by('db_series_names_to_use')
+            histogram_annotations['max_value'] = Max(
+                    Case(
+                        When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
+                        default=db_value_name, output_field=FloatField()
+                    )
+                )
         else:
             # Don't exclude "Constant Angle Acquisitions" from the calculations
-            value_ranges = database_events.values('db_series_names_to_use').annotate(
-                    min_value=Min(db_value_name, output_field=FloatField()),
-                    max_value=Max(db_value_name, output_field=FloatField())).order_by('db_series_names_to_use')
+            histogram_annotations['min_value'] = Min(db_value_name, output_field=FloatField())
+            histogram_annotations['max_value'] = Max(db_value_name, output_field=FloatField())
+
+        value_ranges = database_events.values('db_series_names_to_use').annotate(
+            **histogram_annotations).order_by('db_series_names_to_use')
 
         for system_i, system in enumerate(return_structure['system_list']):
             for series_i, series_name in enumerate(return_structure['series_names']):
