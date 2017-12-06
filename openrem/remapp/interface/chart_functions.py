@@ -82,7 +82,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                             )
                         ) * value_multiplier
                     if plot_average_choice == 'both' or plot_average_choice == 'median':
-                        summary_annotations['median'] = median = Median(
+                        summary_annotations['median'] = Median(
                             Case(
                                 When(
                                     ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
