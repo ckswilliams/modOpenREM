@@ -45,11 +45,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+import json
+import logging
 import remapp
 from openremproject.settings import MEDIA_ROOT
 from remapp.forms import SizeUploadForm
@@ -65,6 +67,9 @@ except ImportError:
 
 
 from django.template.defaultfilters import register
+
+
+logger = logging.getLogger(__name__)
 
 
 @register.filter
@@ -1471,7 +1476,7 @@ def mg_detail_view(request, pk=None):
 
 
 def openrem_home(request):
-    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
+    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions, UniqueEquipmentNames
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
     from datetime import datetime
     from collections import OrderedDict
@@ -1513,10 +1518,14 @@ def openrem_home(request):
     allstudies = GeneralStudyModuleAttr.objects.all()
     homedata = {
         'total': allstudies.count(),
-        'mg': allstudies.filter(modality_type__exact='MG').count(),
-        'ct': allstudies.filter(modality_type__exact='CT').count(),
-        'rf': allstudies.filter(modality_type__contains='RF').count(),
-        'dx': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count(),
+        # 'mg_count': allstudies.filter(modality_type__exact='MG').count(),
+        # 'ct_count': allstudies.filter(modality_type__exact='CT').count(),
+        # 'rf_count': allstudies.filter(modality_type__contains='RF').count(),
+        # 'dx_count': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count(),
+        'mg_count': True,
+        'ct_count': True,
+        'rf_count': True,
+        'dx_count': True,
     }
 
     try:
@@ -1529,10 +1538,10 @@ def openrem_home(request):
             user_profile = request.user.userprofile
 
     if request.user.is_authenticated():
-        user_profile.displayMG = bool(homedata['mg'])
-        user_profile.displayCT = bool(homedata['ct'])
-        user_profile.displayRF = bool(homedata['rf'])
-        user_profile.displayDX = bool(homedata['dx'])
+        user_profile.displayMG = bool(homedata['mg_count'])
+        user_profile.displayCT = bool(homedata['ct_count'])
+        user_profile.displayRF = bool(homedata['rf_count'])
+        user_profile.displayDX = bool(homedata['dx_count'])
         user_profile.save()
 
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)
@@ -1540,42 +1549,46 @@ def openrem_home(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    modalities = ('MG', 'CT', 'RF', 'DX')
-    for modality in modalities:
-        # 10/10/2014, DJP: added code to combine DX with CR
-        if modality == 'DX':
-            # studies = allstudies.filter(modality_type__contains = modality).all()
-            studies = allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
-        else:
-            studies = allstudies.filter(modality_type__contains=modality).all()
-        # End of 10/10/2014 DJP code changes
+    # display_names = allstudies.values_list(
+    #                 'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
+    display_names = UniqueEquipmentNames.objects.values_list('display_name').distinct()
 
-        display_names = studies.values_list(
-            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
-        modalitydata = {}
-        for display_name in display_names:
-            latestdate = studies.filter(
-                generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-            ).latest('study_date').study_date
-            latestuid = studies.filter(
-                generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-                ).filter(study_date__exact=latestdate).latest('study_time')
-            latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
-
-            try:
-                displayname = (display_name[0]).encode('utf-8')
-            except AttributeError:
-                displayname = "Error has occurred - import probably unsuccessful"
-
-            modalitydata[display_name[0]] = {
-                'total': studies.filter(
-                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-                ).count(),
-                'latest': latestdatetime,
-                'displayname': displayname
-            }
-        ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
-        homedata[modality] = ordereddata
+    # modalities = ('MG', 'CT', 'RF', 'DX')
+    # for modality in modalities:
+    #     # 10/10/2014, DJP: added code to combine DX with CR
+    #     if modality == 'DX':
+    #         # studies = allstudies.filter(modality_type__contains = modality).all()
+    #         studies = allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
+    #     else:
+    #         studies = allstudies.filter(modality_type__contains=modality).all()
+    #     # End of 10/10/2014 DJP code changes
+    #
+    #     display_names = studies.values_list(
+    #         'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
+    #     modalitydata = {}
+    #     for display_name in display_names:
+        #     latestdate = studies.filter(
+        #         generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
+        #     ).latest('study_date').study_date
+        #     latestuid = studies.filter(
+        #         generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
+        #         ).filter(study_date__exact=latestdate).latest('study_time')
+        #     latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
+        #
+            # try:
+            #     displayname = (display_name[0]).encode('utf-8')
+            # except AttributeError:
+            #     displayname = "Error has occurred - import probably unsuccessful"
+            #
+            # modalitydata[display_name[0]] = {
+        #         'total': studies.filter(
+        #             generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
+        #         ).count(),
+        #         'latest': latestdatetime,
+        #         'displayname': displayname
+        #     }
+        # ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
+        # homedata[modality] = ordereddata
 
     admin_questions = {}
     admin_questions_true = False
@@ -1589,7 +1602,23 @@ def openrem_home(request):
 
     return render(request, "remapp/home.html",
                   {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
-                   'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true})
+                   'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true,
+                   'display_names': display_names})
+
+@csrf_exempt
+def update_modality_totals(request):
+    from django.db.models import Q
+
+    allstudies = GeneralStudyModuleAttr.objects.all()
+    resp = {
+        'total': allstudies.count(),
+        'total_mg': allstudies.filter(modality_type__exact='MG').count(),
+        'total_ct': allstudies.filter(modality_type__exact='CT').count(),
+        'total_rf': allstudies.filter(modality_type__contains='RF').count(),
+        'total_dx': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count(),
+    }
+    logger.debug("in pdate modality totals. resp is {0}".format(resp))
+    return HttpResponse(json.dumps(resp), content_type="application/json")
 
 
 @login_required

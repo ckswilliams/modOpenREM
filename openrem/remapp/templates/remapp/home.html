@@ -89,126 +89,177 @@
       {% block mainblock %}
 {% load humanize %}
 
-<table class="table table-bordered">
-    <tr>
-        {% if homedata.CT %}<th><a href="/openrem/ct/">CT</a></th>{% endif %}{% if homedata.RF %}<th><a href="/openrem/rf/">Fluoroscopy</a></th>{% endif %}{% if homedata.MG %}<th><a href="/openrem/mg/">Mammography</a></th>{% endif %}{% if homedata.DX %}<th><a href="/openrem/dx/">Radiography</a></th>{% endif %}
-    </tr>
-    <tr>
-        {% if homedata.CT %}<td style="width:25%">{{ homedata.ct }}</td>{% endif %}{% if homedata.RF %}<td style="width:25%">{{ homedata.rf }}</td>{% endif %}{% if homedata.MG %}<td style="width:25%">{{ homedata.mg }}</td>{% endif %}{% if homedata.DX %}<td style="width:25%">{{ homedata.dx }}</td>{% endif %}
-    </tr>
-</table>
+{#<table class="table table-bordered">#}
+{#    <tr>#}
+{#      {% if homedata.ct_count %}<th><a href="/openrem/ct/">CT</a></th>{% endif %}#}
+{#      {% if homedata.rf_count %}<th><a href="/openrem/rf/">Fluoroscopy</a></th>{% endif %}#}
+{#      {% if homedata.mg_count %}<th><a href="/openrem/mg/">Mammography</a></th>{% endif %}#}
+{#      {% if homedata.dx_count %}<th><a href="/openrem/dx/">Radiography</a></th>{% endif %}#}
+{#    </tr>#}
+{#    <tr>#}
+{#      {% if homedata.ct_count %}<td style="width:25%">{{ homedata.ct_count }}</td>{% endif %}#}
+{#      {% if homedata.rf_count %}<td style="width:25%">{{ homedata.rf_count }}</td>{% endif %}#}
+{#      {% if homedata.mg_count %}<td style="width:25%">{{ homedata.mg_count }}</td>{% endif %}#}
+{#      {% if homedata.dx_count %}<td style="width:25%">{{ homedata.dx_count }}</td>{% endif %}#}
+{#    </tr>#}
+{#</table>#}
 
-{% if homedata.CT %}
-<h4>CT summary table</h4>
-<table class="table table-bordered table-hover row-clickable">
-    <tr>
-        <th>Scanner</th><th>Number of studies</th><th>Latest study</th>
-    </tr>
-    {% for key,value in homedata.CT.items %}
+        <script>
+        $(document).ready(
+            function get_modality_numbers( json ) {
+                $.ajax(
+                    {
+                        url: "/openrem/hometotals/",
+                        type: "POST",
+                        dataType: "json",
+                        success: function ( json ) {
+                            $( '#total-ct' ).html( json.total_ct );
+                            $( '#total-rf' ).html( json.total_rf );
+                            $( '#total-mg' ).html( json.total_mg );
+                            $( '#total-dx' ).html( json.total_dx );
+                            setTimeout(function () {
+                                get_modality_numbers();
+                            }, 20000)
+                        }
+                    }
+                )
+            }
+        )
+        </script>
+        <table class="table table-bordered">
         <tr>
-            <td style="width:33%">
-                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
-                    {{ value.displayname }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
-                {{ value.total }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
-                {{ value.latest|naturaltime }}
-                </a>
-            </td>
+          <th><a href="/openrem/ct/">CT</a></th>
+          <th><a href="/openrem/rf/">Fluoroscopy</a> </th>
+          <th><a href="/openrem/mg/">Mammography</a></th>
+          <th><a href="/openrem/dx/">Radiography</a></th>
         </tr>
-    {% endfor %}
-</table>
-{% endif %}
+        <tr>
+          <td><div id="total-ct">Loading</div></td>
+          <td><div id="total-rf">Loading</div></td>
+          <td><div id="total-mg">Loading</div></td>
+          <td><div id="total-dx">Loading</div></td>
+        </tr>
+        </table>
 
-{% if homedata.RF %}
-<h4>Fluoroscopy summary table</h4>
-<table class="table table-bordered table-hover row-clickable">
-    <tr>
-        <th>Room</th><th>Number of studies</th><th>Latest study</th>
-    </tr>
-    {% for key,value in homedata.RF.items %}
-        <tr>
-            <td style="width:33%">
-                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
-                    {{ value.displayname }}
-                </a>
-            </td style="width:33%">
-            <td>
-                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
-                    {{ value.total }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
-                    {{ value.latest|naturaltime }}
-                </a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-{% endif %}
 
-{% if homedata.MG %}
-<h4>Mammography summary table</h4>
-<table class="table table-bordered table-hover row-clickable">
-    <tr>
-        <th>Room</th><th>Number of studies</th><th>Latest study</th>
-    </tr>
-    {% for key,value in homedata.MG.items %}
-        <tr>
-            <td style="width:33%">
-                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
-                    {{ value.displayname }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
-                    {{ value.total }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
-                    {{ value.latest|naturaltime }}
-                </a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-{% endif %}
 
-{% if homedata.DX %}
-<h4>Radiography summary table</h4>
-<table class="table table-bordered table-hover row-clickable">
-    <tr>
-        <th>Room</th><th>Number of studies</th><th>Latest study</th>
-    </tr>
-    {% for key,value in homedata.DX.items %}
-        <tr>
-            <td style="width:33%">
-                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
-                    {{ value.displayname }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
-                    {{ value.total }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
-                    {{ value.latest|naturaltime }}
-                </a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-{% endif %}
+        <ul>
+{%  for name in display_names %}
+        <li>{{ name.0 }}</li>
+        {%  endfor %}
+        </ul>
+
+{#{% if homedata.CT %}#}
+{#<h4>CT summary table</h4>#}
+{#<table class="table table-bordered table-hover row-clickable">#}
+{#    <tr>#}
+{#        <th>Scanner</th><th>Number of studies</th><th>Latest study</th>#}
+{#    </tr>#}
+{#    {% for key,value in homedata.CT.items %}#}
+{#        <tr>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.displayname }}#}
+{#                </a>#}
+{#            </td>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">#}
+{#                {{ value.total }}#}
+{#                </a>#}
+{#            </td>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">#}
+{#                {{ value.latest|naturaltime }}#}
+{#                </a>#}
+{#            </td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{#</table>#}
+{#{% endif %}#}
+{##}
+{#{% if homedata.RF %}#}
+{#<h4>Fluoroscopy summary table</h4>#}
+{#<table class="table table-bordered table-hover row-clickable">#}
+{#    <tr>#}
+{#        <th>Room</th><th>Number of studies</th><th>Latest study</th>#}
+{#    </tr>#}
+{#    {% for key,value in homedata.RF.items %}#}
+{#        <tr>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.displayname }}#}
+{#                </a>#}
+{#            </td style="width:33%">#}
+{#            <td>#}
+{#                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.total }}#}
+{#                </a>#}
+{#            </td>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.latest|naturaltime }}#}
+{#                </a>#}
+{#            </td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{#</table>#}
+{#{% endif %}#}
+{##}
+{#{% if homedata.MG %}#}
+{#<h4>Mammography summary table</h4>#}
+{#<table class="table table-bordered table-hover row-clickable">#}
+{#    <tr>#}
+{#        <th>Room</th><th>Number of studies</th><th>Latest study</th>#}
+{#    </tr>#}
+{#    {% for key,value in homedata.MG.items %}#}
+{#        <tr>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.displayname }}#}
+{#                </a>#}
+{#            </td>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.total }}#}
+{#                </a>#}
+{#            </td>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.latest|naturaltime }}#}
+{#                </a>#}
+{#            </td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{#</table>#}
+{#{% endif %}#}
+{##}
+{#{% if homedata.DX %}#}
+{#<h4>Radiography summary table</h4>#}
+{#<table class="table table-bordered table-hover row-clickable">#}
+{#    <tr>#}
+{#        <th>Room</th><th>Number of studies</th><th>Latest study</th>#}
+{#    </tr>#}
+{#    {% for key,value in homedata.DX.items %}#}
+{#        <tr>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.displayname }}#}
+{#                </a>#}
+{#            </td>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.total }}#}
+{#                </a>#}
+{#            </td>#}
+{#            <td style="width:33%">#}
+{#                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">#}
+{#                    {{ value.latest|naturaltime }}#}
+{#                </a>#}
+{#            </td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{#</table>#}
+{#{% endif %}#}
 
 {% if not homedata.CT and not homedata.RF and not homedata.MG and not homedata.DX %}
 <h4>No data to display in the system</h4>
