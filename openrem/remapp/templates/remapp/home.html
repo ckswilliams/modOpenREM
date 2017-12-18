@@ -150,12 +150,11 @@
                   url: "/openrem/homestudies/",
                   data: {modality: 'CT'},
                   type: "POST",
-                  dataType: "json",
-                  success: function( json ) {
-                      var studiesCT = data;
+                  success: function( data ) {
+                      $( '#CT-table' ).html( data );
                       setTimeout(function () {
-                          get_modality_numbers();
-                      }, 20000)
+                          get_latest_studies();
+                      }, 60000)
                   }
               }
           )
@@ -164,22 +163,17 @@
   </script>
 {#{% endfor %}#}
 
-{#        <ul>#}
-{#        {%  for name in display_names %}#}
-{#        <li>{{ name.0 }}</li>#}
-{#        {%  endfor %}#}
-{#        </ul>#}
-
+<h4>CT summary table</h4>
+<div id="CT-table">
         <table class="table table-bordered table-hover row-clickable">
           <tr>
             <th>Scanner</th><th>Number of studies</th><th>Latest study</th>
           </tr>
-          {% for key,value in studiesCT %}
             <tr>
-              <td>key value</td>
+              <td colspan="3">populating</td>
             </tr>
-          {% endfor %}
         </table>
+</div>
 
 {#{% if homedata.CT %}#}
 {#<h4>CT summary table</h4>#}

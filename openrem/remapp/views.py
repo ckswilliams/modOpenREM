@@ -1644,7 +1644,7 @@ def update_latest_studies(request):
         latestuid = studies.filter(
             generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
         ).filter(study_date__exact=latestdate).latest('study_time')
-        latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time).isoformat(' ')
+        latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
 
         try:
             displayname = (display_name[0]).encode('utf-8')

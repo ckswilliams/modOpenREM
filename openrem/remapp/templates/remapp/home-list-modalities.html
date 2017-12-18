@@ -1,13 +1,27 @@
+{% load humanize %}
 <table class="table table-bordered table-hover row-clickable">
   <tr>
     <th>Scanner</th>
     <th>Number of studies</th>
     <th>Latest study</th>
   </tr>
-  {% for key,value in data %}
-    <tr>
-      <td>{{ key }} {{ value }}</td>
-    </tr>
+  {% for key,value in data.items %}
+        <tr>
+            <td style="width:33%">
+                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
+                    {{ value.displayname }}
+                </a>
+            </td>
+            <td style="width:33%">
+                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
+                {{ value.total }}
+                </a>
+            </td>
+            <td style="width:33%">
+                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
+                {{ value.latest|naturaltime }}
+                </a>
+            </td>
+        </tr>
   {% endfor %}
 </table>
-{{ data }}
