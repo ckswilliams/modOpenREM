@@ -87,22 +87,6 @@
 
 
       {% block mainblock %}
-{% load humanize %}
-
-{#<table class="table table-bordered">#}
-{#    <tr>#}
-{#      {% if homedata.ct_count %}<th><a href="/openrem/ct/">CT</a></th>{% endif %}#}
-{#      {% if homedata.rf_count %}<th><a href="/openrem/rf/">Fluoroscopy</a></th>{% endif %}#}
-{#      {% if homedata.mg_count %}<th><a href="/openrem/mg/">Mammography</a></th>{% endif %}#}
-{#      {% if homedata.dx_count %}<th><a href="/openrem/dx/">Radiography</a></th>{% endif %}#}
-{#    </tr>#}
-{#    <tr>#}
-{#      {% if homedata.ct_count %}<td style="width:25%">{{ homedata.ct_count }}</td>{% endif %}#}
-{#      {% if homedata.rf_count %}<td style="width:25%">{{ homedata.rf_count }}</td>{% endif %}#}
-{#      {% if homedata.mg_count %}<td style="width:25%">{{ homedata.mg_count }}</td>{% endif %}#}
-{#      {% if homedata.dx_count %}<td style="width:25%">{{ homedata.dx_count }}</td>{% endif %}#}
-{#    </tr>#}
-{#</table>#}
 
         <script>
         $(document).ready(
@@ -128,21 +112,18 @@
         </script>
         <table class="table table-bordered">
         <tr>
-          <th><a href="/openrem/ct/">CT</a></th>
-          <th><a href="/openrem/rf/">Fluoroscopy</a> </th>
-          <th><a href="/openrem/mg/">Mammography</a></th>
-          <th><a href="/openrem/dx/">Radiography</a></th>
+          {% for modality, details in modalities.items %}
+          <th style="width:25%"><a href="/openrem/{{ modality|lower }}/">{{ details.name }}</a></th>
+          {% endfor %}
         </tr>
         <tr>
-          <td><div id="total-ct">Loading</div></td>
-          <td><div id="total-rf">Loading</div></td>
-          <td><div id="total-mg">Loading</div></td>
-          <td><div id="total-dx">Loading</div></td>
+          {% for modality, details in modalities.items %}
+          <td><div id="total-{{ modality|lower }}">{{ details.count }}</div></td>
+          {% endfor %}
         </tr>
         </table>
 
-{% for modality in modalities %}
-
+{% for modality, details in modalities.items %}
   <script>
   $(document).ready(
       function get_latest_studies( json ) {
@@ -164,11 +145,11 @@
   </script>
 
 
-<h4>{{ modality }} summary table</h4>
+<h4>{{ details.name }} summary table</h4>
 <div id="{{ modality }}-table">
         <table class="table table-bordered table-hover row-clickable">
           <tr>
-            <th>Scanner</th><th>Number of studies</th><th>Latest study</th>
+            <th style="width:33%">Scanner</th><th style="width:33%">Number of studies</th><th style="width:33%">Latest study</th>
           </tr>
             <tr>
               <td colspan="3">populating</td>

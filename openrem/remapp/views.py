@@ -1516,16 +1516,15 @@ def openrem_home(request):
                 users_in_groups['admin'] = True
 
     allstudies = GeneralStudyModuleAttr.objects.all()
+    modalities = OrderedDict()
+    modalities['CT'] = {'name': 'CT', 'count': allstudies.filter(modality_type__exact='CT').count()}
+    modalities['MG'] = {'name': 'Mammography', 'count': allstudies.filter(modality_type__exact='MG').count()}
+    modalities['RF'] = {'name': 'Fluoroscopy', 'count': allstudies.filter(modality_type__exact='RF').count()}
+    modalities[
+        'DX'] = {'name': 'Radiography', 'count': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count()}
+
     homedata = {
         'total': allstudies.count(),
-        # 'mg_count': allstudies.filter(modality_type__exact='MG').count(),
-        # 'ct_count': allstudies.filter(modality_type__exact='CT').count(),
-        # 'rf_count': allstudies.filter(modality_type__contains='RF').count(),
-        # 'dx_count': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count(),
-        'mg_count': True,
-        'ct_count': True,
-        'rf_count': True,
-        'dx_count': True,
     }
 
     try:
@@ -1538,10 +1537,10 @@ def openrem_home(request):
             user_profile = request.user.userprofile
 
     if request.user.is_authenticated():
-        user_profile.displayMG = bool(homedata['mg_count'])
-        user_profile.displayCT = bool(homedata['ct_count'])
-        user_profile.displayRF = bool(homedata['rf_count'])
-        user_profile.displayDX = bool(homedata['dx_count'])
+        user_profile.displayMG = bool(modalities['MG']['count'])
+        user_profile.displayCT = bool(modalities['CT']['count'])
+        user_profile.displayRF = bool(modalities['RF']['count'])
+        user_profile.displayDX = bool(modalities['DX']['count'])
         user_profile.save()
 
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)
@@ -1549,46 +1548,6 @@ def openrem_home(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    # display_names = allstudies.values_list(
-    #                 'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
-    display_names = UniqueEquipmentNames.objects.values_list('display_name').distinct()
-
-    modalities = ('CT', 'MG', 'RF', 'DX')
-    # for modality in modalities:
-    #     # 10/10/2014, DJP: added code to combine DX with CR
-    #     if modality == 'DX':
-    #         # studies = allstudies.filter(modality_type__contains = modality).all()
-    #         studies = allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
-    #     else:
-    #         studies = allstudies.filter(modality_type__contains=modality).all()
-    #     # End of 10/10/2014 DJP code changes
-    #
-    #     display_names = studies.values_list(
-    #         'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
-    #     modalitydata = {}
-    #     for display_name in display_names:
-    #         latestdate = studies.filter(
-    #             generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-    #         ).latest('study_date').study_date
-    #         latestuid = studies.filter(
-    #             generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-    #             ).filter(study_date__exact=latestdate).latest('study_time')
-    #         latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
-    #
-    #         try:
-    #             displayname = (display_name[0]).encode('utf-8')
-    #         except AttributeError:
-    #             displayname = "Error has occurred - import probably unsuccessful"
-    #
-    #         modalitydata[display_name[0]] = {
-    #             'total': studies.filter(
-    #                 generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-    #             ).count(),
-    #             'latest': latestdatetime,
-    #             'displayname': displayname
-    #         }
-    #     ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
-        # homedata[modality] = ordereddata
 
     admin_questions = {}
     admin_questions_true = False
@@ -1603,7 +1562,7 @@ def openrem_home(request):
     return render(request, "remapp/home.html",
                   {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
                    'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true,
-                   'display_names': display_names, 'modalities': modalities})
+                   'modalities': modalities})
 
 @csrf_exempt
 def update_modality_totals(request):
@@ -1635,7 +1594,7 @@ def update_latest_studies(request):
         studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
     display_names = studies.values_list(
                             'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
-    modalitydata =  {}
+    modalitydata = {}
 
     for display_name in display_names:
         latestdate = studies.filter(
@@ -1663,7 +1622,7 @@ def update_latest_studies(request):
     template = 'remapp/home-list-modalities.html'
     data = ordereddata
     return render(request, template, {'data': data})
-    # return HttpResponse(json.dumps(ordereddata), content_type="application/json")
+
 
 @login_required
 def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
