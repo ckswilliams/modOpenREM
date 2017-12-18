@@ -1553,7 +1553,7 @@ def openrem_home(request):
     #                 'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
     display_names = UniqueEquipmentNames.objects.values_list('display_name').distinct()
 
-    modalities = ('MG', 'CT', 'RF', 'DX')
+    modalities = ('CT', 'MG', 'RF', 'DX')
     # for modality in modalities:
     #     # 10/10/2014, DJP: added code to combine DX with CR
     #     if modality == 'DX':

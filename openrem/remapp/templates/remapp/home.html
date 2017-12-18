@@ -119,7 +119,7 @@
                             $( '#total-dx' ).html( json.total_dx );
                             setTimeout(function () {
                                 get_modality_numbers();
-                            }, 20000)
+                            }, 120000)
                         }
                     }
                 )
@@ -141,30 +141,31 @@
         </tr>
         </table>
 
-{#{% for modality in modalities %}#}
+{% for modality in modalities %}
+
   <script>
   $(document).ready(
       function get_latest_studies( json ) {
           $.ajax(
               {
                   url: "/openrem/homestudies/",
-                  data: {modality: 'CT'},
+                  data: {modality: '{{ modality }}'},
                   type: "POST",
                   success: function( data ) {
-                      $( '#CT-table' ).html( data );
+                      $( '#{{ modality }}-table' ).html( data );
                       setTimeout(function () {
                           get_latest_studies();
-                      }, 60000)
+                      }, 120000)
                   }
               }
           )
       }
   )
   </script>
-{#{% endfor %}#}
 
-<h4>CT summary table</h4>
-<div id="CT-table">
+
+<h4>{{ modality }} summary table</h4>
+<div id="{{ modality }}-table">
         <table class="table table-bordered table-hover row-clickable">
           <tr>
             <th>Scanner</th><th>Number of studies</th><th>Latest study</th>
@@ -174,7 +175,7 @@
             </tr>
         </table>
 </div>
-
+{% endfor %}
 {#{% if homedata.CT %}#}
 {#<h4>CT summary table</h4>#}
 {#<table class="table table-bordered table-hover row-clickable">#}
