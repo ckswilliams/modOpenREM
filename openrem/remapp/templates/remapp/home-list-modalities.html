@@ -1,0 +1,13 @@
+<table class="table table-bordered table-hover row-clickable">
+  <tr>
+    <th>Scanner</th>
+    <th>Number of studies</th>
+    <th>Latest study</th>
+  </tr>
+  {% for key,value in data %}
+    <tr>
+      <td>{{ key }} {{ value }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{{ data }}

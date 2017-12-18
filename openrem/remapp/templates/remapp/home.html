@@ -141,13 +141,45 @@
         </tr>
         </table>
 
+{#{% for modality in modalities %}#}
+  <script>
+  $(document).ready(
+      function get_latest_studies( json ) {
+          $.ajax(
+              {
+                  url: "/openrem/homestudies/",
+                  data: {modality: 'CT'},
+                  type: "POST",
+                  dataType: "json",
+                  success: function( json ) {
+                      var studiesCT = data;
+                      setTimeout(function () {
+                          get_modality_numbers();
+                      }, 20000)
+                  }
+              }
+          )
+      }
+  )
+  </script>
+{#{% endfor %}#}
 
+{#        <ul>#}
+{#        {%  for name in display_names %}#}
+{#        <li>{{ name.0 }}</li>#}
+{#        {%  endfor %}#}
+{#        </ul>#}
 
-        <ul>
-{%  for name in display_names %}
-        <li>{{ name.0 }}</li>
-        {%  endfor %}
-        </ul>
+        <table class="table table-bordered table-hover row-clickable">
+          <tr>
+            <th>Scanner</th><th>Number of studies</th><th>Latest study</th>
+          </tr>
+          {% for key,value in studiesCT %}
+            <tr>
+              <td>key value</td>
+            </tr>
+          {% endfor %}
+        </table>
 
 {#{% if homedata.CT %}#}
 {#<h4>CT summary table</h4>#}
