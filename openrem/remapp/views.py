@@ -1571,6 +1571,7 @@ def openrem_home(request):
                    'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true,
                    'modalities': modalities})
 
+
 @csrf_exempt
 def update_modality_totals(request):
     """AJAX function to update study numbers automatically
@@ -1608,11 +1609,12 @@ def update_latest_studies(request):
         data = request.POST
         modality = data.get('modality')
         if modality == 'DX':
-            studies = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
+            studies = GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
         else:
             studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
         display_names = studies.values_list(
-                                'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
+            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
         modalitydata = {}
 
         for display_name in display_names:
