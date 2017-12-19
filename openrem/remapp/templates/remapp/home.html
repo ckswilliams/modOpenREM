@@ -158,7 +158,7 @@
 </div>
 {% endfor %}
 
-{% if not homedata.CT and not homedata.RF and not homedata.MG and not homedata.DX %}
+{% if not modalities %}
 <h4>No data to display in the system</h4>
 <p>There are currently no studies from any modality stored in the database. Add some to see a summary of each on this page.</p>
 {% endif %}
