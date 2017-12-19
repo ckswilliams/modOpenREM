@@ -147,11 +147,15 @@ def _get_series_data(event):
         ii_field_size = None
         exposure_time = None
         dose_rp = None
+        number_of_pulses = None
+        irradiation_duration = None
     else:
         pulse_rate = _get_db_value(event.irradeventxraysourcedata_set.get(), 'pulse_rate')
         ii_field_size = _get_db_value(event.irradeventxraysourcedata_set.get(), 'ii_field_size')
         exposure_time = _get_db_value(event.irradeventxraysourcedata_set.get(), 'exposure_time')
         dose_rp = _get_db_value(event.irradeventxraysourcedata_set.get(), 'dose_rp')
+        number_of_pulses = _get_db_value(event.irradeventxraysourcedata_set.get(), 'number_of_pulses')
+        irradiation_duration = _get_db_value(event.irradeventxraysourcedata_set.get(), 'irradiation_duration')
         filter_material, filter_thick = get_xray_filter_info(event.irradeventxraysourcedata_set.get())
         try:
             event.irradeventxraysourcedata_set.get().kvp_set.get()
@@ -188,14 +192,16 @@ def _get_series_data(event):
         event.irradiation_event_type.code_meaning,
         event.acquisition_protocol,
         event.acquisition_plane.code_meaning,
-        pulse_rate,
         ii_field_size,
         filter_material,
         filter_thick,
         kVp,
         xray_tube_current,
         pulse_width,
+        pulse_rate,
+        number_of_pulses,
         exposure_time,
+        irradiation_duration,
         str(event.convert_gym2_to_cgycm2()),
         dose_rp,
         pos_primary_angle,
@@ -218,19 +224,19 @@ def _all_data_headers(pid=False, name=None, patid=None):
         u'A Dose RP total (Gy)',
         u'A Fluoro DAP total (Gy.m^2)',
         u'A Fluoro dose RP total (Gy)',
-        u'A Fluoro time total (ms)',
+        u'A Fluoro duration total (s)',
         u'A Acq. DAP total (Gy.m^2)',
         u'A Acq. dose RP total (Gy)',
-        u'A Acq. time total (ms)',
+        u'A Acq. duration total (s)',
         u'A Number of events',
         u'B DAP total (Gy.m^2)',
         u'B Dose RP total (Gy)',
         u'B Fluoro DAP total (Gy.m^2)',
         u'B Fluoro dose RP total (Gy)',
-        u'B Fluoro time total (ms)',
+        u'B Fluoro duration total (s)',
         u'B Acq. DAP total (Gy.m^2)',
         u'B Acq. dose RP total (Gy)',
-        u'B Acq. time total (ms)',
+        u'B Acq. duration total (s)',
         u'B Number of events',
     ]
     return all_data_headers
@@ -302,14 +308,16 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         u'Type',
         u'Protocol',
         u'Plane',
-        u'Pulse rate',
         u'Field size',
         u'Filter material',
         u'Mean filter thickness (mm)',
         u'kVp',
         u'mA',
         u'Pulse width (ms)',
+        u'Pulse rate',
+        u'Number of pulses',
         u'Exposure time (ms)',
+        u'Exposure duration (s)',
         u'DAP (cGy.cm^2)',
         u'Ref point dose (Gy)',
         u'Primary angle',
