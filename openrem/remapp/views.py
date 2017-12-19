@@ -38,7 +38,6 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 
 import csv
-import sys
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -1476,9 +1475,8 @@ def mg_detail_view(request, pk=None):
 
 
 def openrem_home(request):
-    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions, UniqueEquipmentNames
+    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
-    from datetime import datetime
     from collections import OrderedDict
 
     test_dicom_store_settings = DicomDeleteSettings.objects.all()
@@ -1889,7 +1887,6 @@ def size_download(request, task_id):
     from django.contrib import messages
     from openremproject.settings import MEDIA_ROOT
     from remapp.models import SizeUpload
-    from django.http import HttpResponse
 
     importperm = False
     if request.user.groups.filter(name="importsizegroup"):
