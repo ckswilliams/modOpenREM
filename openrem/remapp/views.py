@@ -1515,18 +1515,6 @@ def openrem_home(request):
             if g.name == 'admingroup':
                 users_in_groups['admin'] = True
 
-    allstudies = GeneralStudyModuleAttr.objects.all()
-    modalities = OrderedDict()
-    modalities['CT'] = {'name': 'CT', 'count': allstudies.filter(modality_type__exact='CT').count()}
-    modalities['MG'] = {'name': 'Mammography', 'count': allstudies.filter(modality_type__exact='MG').count()}
-    modalities['RF'] = {'name': 'Fluoroscopy', 'count': allstudies.filter(modality_type__exact='RF').count()}
-    modalities[
-        'DX'] = {'name': 'Radiography', 'count': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count()}
-
-    homedata = {
-        'total': allstudies.count(),
-    }
-
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
@@ -1536,18 +1524,36 @@ def openrem_home(request):
             create_user_profile(sender=request.user, instance=request.user, created=True)
             user_profile = request.user.userprofile
 
-    if request.user.is_authenticated():
-        user_profile.displayMG = bool(modalities['MG']['count'])
-        user_profile.displayCT = bool(modalities['CT']['count'])
-        user_profile.displayRF = bool(modalities['RF']['count'])
-        user_profile.displayDX = bool(modalities['DX']['count'])
-        user_profile.save()
+    allstudies = GeneralStudyModuleAttr.objects.all()
+    modalities = OrderedDict()
+    modalities['CT'] = {'name': 'CT', 'count': allstudies.filter(modality_type__exact='CT').count()}
+    modalities['MG'] = {'name': 'Mammography', 'count': allstudies.filter(modality_type__exact='MG').count()}
+    modalities['RF'] = {'name': 'Fluoroscopy', 'count': allstudies.filter(modality_type__exact='RF').count()}
+    modalities['DX'] = {'name': 'Radiography', 'count': allstudies.filter(
+        Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count()}
+
+    mods_to_delete = []
+    for modality in modalities:
+        if not modalities[modality]['count']:
+            mods_to_delete += [modality,]
+            if request.user.is_authenticated():
+                setattr(user_profile, "display{0}".format(modality), False)
+        else:
+            if request.user.is_authenticated():
+                setattr(user_profile, "display{0}".format(modality), True)
+    user_profile.save()
+
+    for modality in mods_to_delete:
+        del modalities[modality]
+
+    homedata = {
+        'total': allstudies.count(),
+    }
 
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)
 
     for group in request.user.groups.all():
         admin[group.name] = True
-
 
     admin_questions = {}
     admin_questions_true = False
