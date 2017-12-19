@@ -1541,7 +1541,8 @@ def openrem_home(request):
         else:
             if request.user.is_authenticated():
                 setattr(user_profile, "display{0}".format(modality), True)
-    user_profile.save()
+    if request.user.is_authenticated():
+        user_profile.save()
 
     for modality in mods_to_delete:
         del modalities[modality]
@@ -1627,7 +1628,7 @@ def update_latest_studies(request):
 
     template = 'remapp/home-list-modalities.html'
     data = ordereddata
-    return render(request, template, {'data': data})
+    return render(request, template, {'data': data, 'modality': modality.lower()})
 
 
 @login_required
