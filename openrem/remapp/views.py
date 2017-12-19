@@ -1573,62 +1573,74 @@ def openrem_home(request):
 
 @csrf_exempt
 def update_modality_totals(request):
+    """AJAX function to update study numbers automatically
+
+    :param request: request object
+    :return: dictionary of totals
+    """
     from django.db.models import Q
 
-    allstudies = GeneralStudyModuleAttr.objects.all()
-    resp = {
-        'total': allstudies.count(),
-        'total_mg': allstudies.filter(modality_type__exact='MG').count(),
-        'total_ct': allstudies.filter(modality_type__exact='CT').count(),
-        'total_rf': allstudies.filter(modality_type__contains='RF').count(),
-        'total_dx': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count(),
-    }
+    if request.is_ajax():
+        allstudies = GeneralStudyModuleAttr.objects.all()
+        resp = {
+            'total': allstudies.count(),
+            'total_mg': allstudies.filter(modality_type__exact='MG').count(),
+            'total_ct': allstudies.filter(modality_type__exact='CT').count(),
+            'total_rf': allstudies.filter(modality_type__contains='RF').count(),
+            'total_dx': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count(),
+        }
 
-    return HttpResponse(json.dumps(resp), content_type="application/json")
+        return HttpResponse(json.dumps(resp), content_type="application/json")
 
 
 @csrf_exempt
 def update_latest_studies(request):
+    """AJAX function to calculate the latest studies for each display name for a particular modality.
+
+    :param request: Request object
+    :return: HTML table of modalities
+    """
     from django.db.models import Q
     from datetime import datetime
     from collections import OrderedDict
 
-    data = request.POST
-    modality = data.get('modality')
-    if modality == 'DX':
-        studies = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
-    else:
-        studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
-    display_names = studies.values_list(
-                            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
-    modalitydata = {}
+    if request.is_ajax():
+        data = request.POST
+        modality = data.get('modality')
+        if modality == 'DX':
+            studies = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
+        else:
+            studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
+        display_names = studies.values_list(
+                                'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
+        modalitydata = {}
 
-    for display_name in display_names:
-        latestdate = studies.filter(
-            generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-        ).latest('study_date').study_date
-        latestuid = studies.filter(
-            generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-        ).filter(study_date__exact=latestdate).latest('study_time')
-        latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
-
-        try:
-            displayname = (display_name[0]).encode('utf-8')
-        except AttributeError:
-            displayname = "Error has occurred - import probably unsuccessful"
-
-        modalitydata[display_name[0]] = {
-            'total': studies.filter(
+        for display_name in display_names:
+            latestdate = studies.filter(
                 generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-            ).count(),
-            'latest': latestdatetime,
-            'displayname': displayname
-        }
-    ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
+            ).latest('study_date').study_date
+            latestuid = studies.filter(
+                generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
+            ).filter(study_date__exact=latestdate).latest('study_time')
+            latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
 
-    template = 'remapp/home-list-modalities.html'
-    data = ordereddata
-    return render(request, template, {'data': data, 'modality': modality.lower()})
+            try:
+                displayname = (display_name[0]).encode('utf-8')
+            except AttributeError:
+                displayname = "Error has occurred - import probably unsuccessful"
+
+            modalitydata[display_name[0]] = {
+                'total': studies.filter(
+                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
+                ).count(),
+                'latest': latestdatetime,
+                'displayname': displayname
+            }
+        ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
+
+        template = 'remapp/home-list-modalities.html'
+        data = ordereddata
+        return render(request, template, {'data': data, 'modality': modality.lower()})
 
 
 @login_required
