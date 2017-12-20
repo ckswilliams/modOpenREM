@@ -1,24 +1,25 @@
 {% extends "remapp/base.html" %}
 
 {% block exportnav %}
-            <li class="active">
+  <li class="active">
 {% endblock %}
 
 {% block navhelp %}
-        <li>
-            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_exporting.html" target="_blank" data-toggle="tooltip" title="Study export documentation - opens in a new tab">
-                Study export
-            </a>
-        </li>
+  <li>
+    <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_exporting.html" target="_blank" data-toggle="tooltip"
+       title="Study export documentation - opens in a new tab">
+      Study export
+    </a>
+  </li>
 {% endblock %}
 
 
 
-{% block mainblock %}		
-   {% load humanize %}
-   {% load remappduration %}
- 
-    {% if admin.exportgroup %}
+{% block mainblock %}
+  {% load humanize %}
+  {% load remappduration %}
+
+  {% if admin.exportgroup %}
 
     <script>
         $(document).ready(
@@ -38,7 +39,7 @@
             }
         )
     </script>
-      <div id="current"></div>
+    <div id="current"></div>
 
     <script>
         $(document).ready(
@@ -58,12 +59,12 @@
             }
         )
     </script>
-      <div id="error"></div>
+    <div id="error"></div>
 
 
     <h4>Completed export tasks</h4>
     <form action="/openrem/deletefile/" method="POST">
-    <table class="table table-striped">
+      <table class="table table-striped">
         <th>Exported</th>
         <th>Modality</th>
         <th>Export type</th>
@@ -73,49 +74,49 @@
         <th>Download</th>
         <th>Delete?</th>
         {% for tsk in complete %}
-            {% if not tsk.includes_pid or tsk.includes_pid and admin.pidgroup %}
-                <tr>
-                    <td>{{ tsk.export_date|naturaltime }}</td>
-                    <td>{{ tsk.modality }}</td>
-                    <td>{{ tsk.export_type }}</td>
-                    <td>{{ tsk.num_records }}</td>
-                    <td>{{ tsk.processtime|naturalduration }} </td>
-                    <td>{{ tsk.export_user }}</td>
-                    <td><a href="/openrem/download/{{ tsk.task_id }}">{{ tsk.filename }}</a></td>
-                    <td>
-                        <div class = "checkbox">
-                            <label>
-                                <input type="checkbox" name="tsk{{ tsk.task_id }}" value="{{ tsk.task_id }}">
-                            </label>
-                        </div>
-                    </td>
-                </tr>
-            {% endif %}
+          {% if not tsk.includes_pid or tsk.includes_pid and admin.pidgroup %}
+            <tr>
+              <td>{{ tsk.export_date|naturaltime }}</td>
+              <td>{{ tsk.modality }}</td>
+              <td>{{ tsk.export_type }}</td>
+              <td>{{ tsk.num_records }}</td>
+              <td>{{ tsk.processtime|naturalduration }} </td>
+              <td>{{ tsk.export_user }}</td>
+              <td><a href="/openrem/download/{{ tsk.task_id }}">{{ tsk.filename }}</a></td>
+              <td>
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" name="tsk{{ tsk.task_id }}" value="{{ tsk.task_id }}">
+                  </label>
+                </div>
+              </td>
+            </tr>
+          {% endif %}
         {% endfor %}
         <tr>
-            <td colspan="7"></td>
-            <td>
+          <td colspan="7"></td>
+          <td>
             {% if complete.count > 0 %}
-                <button type="submit" class = "btn btn-default">Delete</button>
+              <button type="submit" class="btn btn-default">Delete</button>
             {% endif %}
-            </td>
+          </td>
         </tr>
-    </table>
+      </table>
     </form>
 
-        {% else %}
-        <p>
-          Sorry, you don't have enough permissions to enable study export.
-        </p>
-        {% endif %}
-    
+  {% else %}
+    <p>
+      Sorry, you don't have enough permissions to enable study export.
+    </p>
+  {% endif %}
 
 
-{% endblock %}	
+
+{% endblock %}
 
 {% block jsblock %}
 
 
- 
- 
+
+
 {% endblock %}
