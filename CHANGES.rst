@@ -5,7 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 * `#573`_  Exports: corrected and clarified exposure time and duration units, added number of pulses
-* `#572`_  Interface: Homepage now populates as AJAX to increase responsiveness. Also auto-updates every 2 minutes
+* `#572`_  Interface: Homepage now populates as AJAX to increase responsiveness
 * `#566`_  Interface: Correctly show "assumed patient mass" in case of set value of zero
 * `#565`_  Interface: Correctly handle dose area product with zero value
 * `#564`_  Skin dose maps: Text information on skin dose maps now embedded when saving the 2d or 3d map as a graphic
