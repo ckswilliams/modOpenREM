@@ -119,6 +119,7 @@ urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^download/(?P<task_id>[a-f0-9-]{36})$', 'download'),
     url(r'^deletefile/$', 'deletefile'),
     url(r'^export/abort/(?P<pk>\d+)$', 'export_abort'),
+    url(r'^export/updateactive$', 'update_active', name='update_active'),
 )
 
 urlpatterns += patterns('remapp.exports',

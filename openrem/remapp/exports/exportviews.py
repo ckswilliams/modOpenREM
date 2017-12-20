@@ -33,10 +33,12 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
+import json
 import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.shortcuts import render
 import remapp
 
 logger = logging.getLogger(__name__)
@@ -287,6 +289,7 @@ def mgnhsbsp(request):
 
     return redirect('/openrem/export/')
 
+
 @csrf_exempt
 @login_required
 def export(request):
@@ -416,3 +419,19 @@ def export_abort(request, pk):
         export_task.delete()
 
     return HttpResponseRedirect("/openrem/export/")
+
+
+@csrf_exempt
+@login_required
+def update_active(request):
+    """AJAX function to return active exports
+
+    :param request: Request object
+    :return: HTML table of active exports
+    """
+    from remapp.models import Exports
+
+    current_export_tasks = Exports.objects.filter(status__contains = u'CURRENT').order_by('-export_date')
+    template = "remapp/exports-active.html"
+
+    return render(request, template, {'current': current_export_tasks})

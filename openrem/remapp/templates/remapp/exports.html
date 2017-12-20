@@ -44,6 +44,25 @@
     </table>
     {% endif %}
 
+          <script>
+        $(document).ready(
+            function get_current_exports(json) {
+                $.ajax(
+                    {
+                        url: "/openrem/export/updateactive",
+                        type: "POST",
+                        success: function (data) {
+                            $('#current').html(data);
+                            setTimeout(function () {
+                                get_current_exports();
+                            }, 1500)
+                        }
+                    }
+                )
+            }
+        )
+    </script>
+      <div id="current"></div>
 
     {% if errors %}
     <h4>Export tasks in error state</h4>
