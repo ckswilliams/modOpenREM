@@ -120,7 +120,8 @@ urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^deletefile/$', 'deletefile'),
     url(r'^export/abort/(?P<pk>\d+)$', 'export_abort'),
     url(r'^export/updateactive$', 'update_active', name='update_active'),
-)
+    url(r'^export/updateerror$', 'update_error', name='update_error'),
+    )
 
 urlpatterns += patterns('remapp.exports',
                         url(r'^xlsx/openrem/ct/',

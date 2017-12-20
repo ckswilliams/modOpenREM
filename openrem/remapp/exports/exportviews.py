@@ -435,3 +435,20 @@ def update_active(request):
     template = "remapp/exports-active.html"
 
     return render(request, template, {'current': current_export_tasks})
+
+
+
+@csrf_exempt
+@login_required
+def update_error(request):
+    """AJAX function to return exports in error state
+
+    :param request: Request object
+    :return: HTML table of exports in error state
+    """
+    from remapp.models import Exports
+
+    error_export_tasks = Exports.objects.filter(status__contains = u'ERROR').order_by('-export_date')
+    template = "remapp/exports-error.html"
+
+    return render(request, template, {'errors': error_export_tasks})
