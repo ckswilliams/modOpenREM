@@ -103,9 +103,6 @@
                           $('#total-rf').html(json.total_rf);
                           $('#total-mg').html(json.total_mg);
                           $('#total-dx').html(json.total_dx);
-                          setTimeout(function () {
-                              get_modality_numbers();
-                          }, 120000)
                       }
                   }
               )
@@ -138,9 +135,6 @@
                         type: "POST",
                         success: function (data) {
                             $('#{{ modality }}-table').html(data);
-                            setTimeout(function () {
-                                get_latest_studies();
-                            }, 120000)
                         }
                     }
                 )
