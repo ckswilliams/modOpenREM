@@ -38,18 +38,19 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 
 import csv
-import sys
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+import json
+import logging
 import remapp
 from openremproject.settings import MEDIA_ROOT
 from remapp.forms import SizeUploadForm
@@ -65,6 +66,9 @@ except ImportError:
 
 
 from django.template.defaultfilters import register
+
+
+logger = logging.getLogger(__name__)
 
 
 @register.filter
@@ -1473,7 +1477,6 @@ def mg_detail_view(request, pk=None):
 def openrem_home(request):
     from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
-    from datetime import datetime
     from collections import OrderedDict
 
     test_dicom_store_settings = DicomDeleteSettings.objects.all()
@@ -1510,15 +1513,6 @@ def openrem_home(request):
             if g.name == 'admingroup':
                 users_in_groups['admin'] = True
 
-    allstudies = GeneralStudyModuleAttr.objects.all()
-    homedata = {
-        'total': allstudies.count(),
-        'mg': allstudies.filter(modality_type__exact='MG').count(),
-        'ct': allstudies.filter(modality_type__exact='CT').count(),
-        'rf': allstudies.filter(modality_type__contains='RF').count(),
-        'dx': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count(),
-    }
-
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
@@ -1528,38 +1522,106 @@ def openrem_home(request):
             create_user_profile(sender=request.user, instance=request.user, created=True)
             user_profile = request.user.userprofile
 
+    allstudies = GeneralStudyModuleAttr.objects.all()
+    modalities = OrderedDict()
+    modalities['CT'] = {'name': 'CT', 'count': allstudies.filter(modality_type__exact='CT').count()}
+    modalities['MG'] = {'name': 'Mammography', 'count': allstudies.filter(modality_type__exact='MG').count()}
+    modalities['RF'] = {'name': 'Fluoroscopy', 'count': allstudies.filter(modality_type__exact='RF').count()}
+    modalities['DX'] = {'name': 'Radiography', 'count': allstudies.filter(
+        Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count()}
+
+    mods_to_delete = []
+    for modality in modalities:
+        if not modalities[modality]['count']:
+            mods_to_delete += [modality,]
+            if request.user.is_authenticated():
+                setattr(user_profile, "display{0}".format(modality), False)
+        else:
+            if request.user.is_authenticated():
+                setattr(user_profile, "display{0}".format(modality), True)
     if request.user.is_authenticated():
-        user_profile.displayMG = bool(homedata['mg'])
-        user_profile.displayCT = bool(homedata['ct'])
-        user_profile.displayRF = bool(homedata['rf'])
-        user_profile.displayDX = bool(homedata['dx'])
         user_profile.save()
+
+    for modality in mods_to_delete:
+        del modalities[modality]
+
+    homedata = {
+        'total': allstudies.count(),
+    }
 
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    modalities = ('MG', 'CT', 'RF', 'DX')
-    for modality in modalities:
-        # 10/10/2014, DJP: added code to combine DX with CR
-        if modality == 'DX':
-            # studies = allstudies.filter(modality_type__contains = modality).all()
-            studies = allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
-        else:
-            studies = allstudies.filter(modality_type__contains=modality).all()
-        # End of 10/10/2014 DJP code changes
+    admin_questions = {}
+    admin_questions_true = False
+    if request.user.groups.filter(name="admingroup"):
+        not_patient_indicator_question = AdminTaskQuestions.get_solo().ask_revert_to_074_question
+        admin_questions['not_patient_indicator_question'] = not_patient_indicator_question
+        # if any(value for value in admin_questions.itervalues()):
+        #     admin_questions_true = True  # Don't know why this doesn't work
+        if not_patient_indicator_question:
+            admin_questions_true = True  # Doing this instead
 
+    return render(request, "remapp/home.html",
+                  {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
+                   'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true,
+                   'modalities': modalities})
+
+
+@csrf_exempt
+def update_modality_totals(request):
+    """AJAX function to update study numbers automatically
+
+    :param request: request object
+    :return: dictionary of totals
+    """
+    from django.db.models import Q
+
+    if request.is_ajax():
+        allstudies = GeneralStudyModuleAttr.objects.all()
+        resp = {
+            'total': allstudies.count(),
+            'total_mg': allstudies.filter(modality_type__exact='MG').count(),
+            'total_ct': allstudies.filter(modality_type__exact='CT').count(),
+            'total_rf': allstudies.filter(modality_type__contains='RF').count(),
+            'total_dx': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count(),
+        }
+
+        return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@csrf_exempt
+def update_latest_studies(request):
+    """AJAX function to calculate the latest studies for each display name for a particular modality.
+
+    :param request: Request object
+    :return: HTML table of modalities
+    """
+    from django.db.models import Q
+    from datetime import datetime
+    from collections import OrderedDict
+
+    if request.is_ajax():
+        data = request.POST
+        modality = data.get('modality')
+        if modality == 'DX':
+            studies = GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
+        else:
+            studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
         display_names = studies.values_list(
             'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
         modalitydata = {}
+
         for display_name in display_names:
             latestdate = studies.filter(
                 generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
             ).latest('study_date').study_date
             latestuid = studies.filter(
                 generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-                ).filter(study_date__exact=latestdate).latest('study_time')
+            ).filter(study_date__exact=latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
 
             try:
@@ -1575,21 +1637,10 @@ def openrem_home(request):
                 'displayname': displayname
             }
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
-        homedata[modality] = ordereddata
 
-    admin_questions = {}
-    admin_questions_true = False
-    if request.user.groups.filter(name="admingroup"):
-        not_patient_indicator_question = AdminTaskQuestions.get_solo().ask_revert_to_074_question
-        admin_questions['not_patient_indicator_question'] = not_patient_indicator_question
-        # if any(value for value in admin_questions.itervalues()):
-        #     admin_questions_true = True  # Don't know why this doesn't work
-        if not_patient_indicator_question:
-            admin_questions_true = True  # Doing this instead
-
-    return render(request, "remapp/home.html",
-                  {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
-                   'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true})
+        template = 'remapp/home-list-modalities.html'
+        data = ordereddata
+        return render(request, template, {'data': data, 'modality': modality.lower()})
 
 
 @login_required
@@ -1836,7 +1887,6 @@ def size_download(request, task_id):
     from django.contrib import messages
     from openremproject.settings import MEDIA_ROOT
     from remapp.models import SizeUpload
-    from django.http import HttpResponse
 
     importperm = False
     if request.user.groups.filter(name="importsizegroup"):
