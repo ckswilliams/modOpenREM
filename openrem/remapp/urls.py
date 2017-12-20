@@ -121,6 +121,7 @@ urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^export/abort/(?P<pk>\d+)$', 'export_abort'),
     url(r'^export/updateactive$', 'update_active', name='update_active'),
     url(r'^export/updateerror$', 'update_error', name='update_error'),
+    url(r'^export/updatecomplete$', 'update_complete', name='update_complete'),
     )
 
 urlpatterns += patterns('remapp.exports',

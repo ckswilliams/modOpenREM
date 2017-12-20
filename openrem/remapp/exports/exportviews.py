@@ -437,7 +437,6 @@ def update_active(request):
     return render(request, template, {'current': current_export_tasks})
 
 
-
 @csrf_exempt
 @login_required
 def update_error(request):
@@ -452,3 +451,19 @@ def update_error(request):
     template = "remapp/exports-error.html"
 
     return render(request, template, {'errors': error_export_tasks})
+
+
+@csrf_exempt
+@login_required
+def update_complete(request):
+    """AJAX function to return completed exports
+
+    :param request: Request object
+    :return: HTML table of completed exports
+    """
+    from remapp.models import Exports
+
+    complete_export_tasks = Exports.objects.filter(status__contains = u'COMPLETE').order_by('-export_date')
+    template = "remapp/exports-complete.html"
+
+    return render(request, template, {'complete': complete_export_tasks})
