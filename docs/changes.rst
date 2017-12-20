@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
+* `#573`_  Exports: corrected and clarified exposure time and duration units, added number of pulses
 * `#572`_  Interface: Homepage now populates as AJAX to increase responsiveness. Also auto-updates every 2 minutes
 * `#566`_  Interface: Correctly show "assumed patient mass" in case of set value of zero
 * `#565`_  Interface: Correctly handle dose area product with zero value
@@ -50,6 +51,7 @@ OpenREM version history
 * `#493`_  Charts: Added user option to made chart categories all lower case
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#491`_  Imports, Interface and Exports: CT Dose Check alerts and notifications are now extracted, displayed and exported
+* `#490`_  Exports: Response object included for messages - removed as now asynchronous
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
 * `#488`_  Exports: All exports now include study time
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
