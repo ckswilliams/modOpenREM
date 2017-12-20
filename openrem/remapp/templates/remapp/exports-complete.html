@@ -1,5 +1,8 @@
 {% load humanize %}
 {% load remappduration %}
+{% if complete %}
+    <h4>Recently completed export tasks</h4>
+
 <form action="/openrem/deletefile/" method="POST">
   <table class="table table-striped">
     <th>Exported</th>
@@ -9,7 +12,6 @@
     <th>Export time</th>
     <th>User</th>
     <th>Download</th>
-    <th>Delete?</th>
     {% for tsk in complete %}
       {% if not tsk.includes_pid or tsk.includes_pid and admin.pidgroup %}
         <tr>
@@ -20,23 +22,10 @@
           <td>{{ tsk.processtime|naturalduration }} </td>
           <td>{{ tsk.export_user }}</td>
           <td><a href="/openrem/download/{{ tsk.task_id }}">{{ tsk.filename }}</a></td>
-          <td>
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" name="tsk{{ tsk.task_id }}" value="{{ tsk.task_id }}">
-              </label>
-            </div>
-          </td>
         </tr>
       {% endif %}
     {% endfor %}
-    <tr>
-      <td colspan="7"></td>
-      <td>
-        {% if complete.count > 0 %}
-          <button type="submit" class="btn btn-default">Delete</button>
-        {% endif %}
-      </td>
-    </tr>
   </table>
 </form>
+
+{% endif %}

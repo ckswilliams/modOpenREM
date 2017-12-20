@@ -304,8 +304,9 @@ def export(request):
     exptsks = Exports.objects.all().order_by('-export_date')
 
     current = exptsks.filter(status__contains = u'CURRENT')
-    complete = exptsks.filter(status__contains = u'COMPLETE')
+    complete = Exports.objects.filter(status__contains = u'COMPLETE').order_by('-export_date')
     errors = exptsks.filter(status__contains = u'ERROR')
+    latest_complete_pk = complete[0].pk
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -314,7 +315,7 @@ def export(request):
 
     # if 'task_id' in request.session.keys() and request.session['task_id']:
     #     task_id = request.session['task_id']
-    return render_to_response('remapp/exports.html', {'admin': admin,
+    return render_to_response('remapp/exports.html', {'admin': admin, 'latest_complete_pk': latest_complete_pk,
                                                       'current': current, 'complete': complete, 'errors': errors},
                               context_instance=RequestContext(request))
 
@@ -463,7 +464,9 @@ def update_complete(request):
     """
     from remapp.models import Exports
 
-    complete_export_tasks = Exports.objects.filter(status__contains = u'COMPLETE').order_by('-export_date')
+    data = request.POST
+    latest_complete_pk = int(data.get('latest_complete_pk'))
+    complete_export_tasks = Exports.objects.filter(status__contains = u'COMPLETE').filter(pk__gt=latest_complete_pk)
     template = "remapp/exports-complete.html"
 
     return render(request, template, {'complete': complete_export_tasks})
