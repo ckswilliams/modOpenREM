@@ -242,13 +242,11 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     ct_dose_length_product_total = None
     if modality in u"CT":
         try:
-
             comment = exams.ctradiationdose_set.get().comment
-            ct_dose_length_product_total = exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(
-                ).ct_dose_length_product_total
+            ct_accumulated = exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
+            ct_dose_length_product_total = ct_accumulated.ct_dose_length_product_total
             try:
-                event_count = int(
-                    exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events)
+                event_count = int(ct_accumulated.total_number_of_irradiation_events)
             except TypeError:
                 logger.debug("Export CT; couldn't get number of irradiation events")
         except ObjectDoesNotExist:
@@ -256,16 +254,15 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
 
     elif modality in u"DX":
         try:
-            event_count = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                ).accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames
-            dap_total = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                ).accumintegratedprojradiogdose_set.get().dose_area_product_total
+            comment = exams.projectionxrayradiationdose_set.get().comment
+            dx_accumulated = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                            ).accumintegratedprojradiogdose_set.get()
+            event_count = dx_accumulated.total_number_of_radiographic_frames
+            dap_total = dx_accumulated.dose_area_product_total
             if dap_total:
-                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                    ).accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+                cgycm2 = dx_accumulated.convert_gym2_to_cgycm2()
             else:
                 cgycm2 = None
-            comment = exams.projectionxrayradiationdose_set.get().comment
         except ObjectDoesNotExist:
             logger.debug("Export DX; projectionxrayradiationdose_set object does not exist")
     elif modality in [u"RF", u"MG"]:
