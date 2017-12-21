@@ -198,14 +198,15 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     patient_sex = None
     not_patient_indicator = None
     try:
-        patient_sex = exams.patientmoduleattr_set.get().patient_sex
-        not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+        patient_module = exams.patientmoduleattr_set.get()
+        patient_sex = patient_module.patient_sex
+        not_patient_indicator = patient_module.not_patient_indicator
         if pid and (name or patid):
-            patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
+            patient_birth_date = patient_module.patient_birth_date
             if name:
-                patient_name = exams.patientmoduleattr_set.get().patient_name
+                patient_name = patient_module.patient_name
             if patid:
-                patient_id = exams.patientmoduleattr_set.get().patient_id
+                patient_id = patient_module.patient_id
     except ObjectDoesNotExist:
         logger.debug("Export {0}; patientmoduleattr_set object does not exist".format(modality))
 
@@ -215,11 +216,12 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     station_name = None
     display_name = None
     try:
-        institution_name = exams.generalequipmentmoduleattr_set.get().institution_name
-        manufacturer = exams.generalequipmentmoduleattr_set.get().manufacturer
-        manufacturer_model_name = exams.generalequipmentmoduleattr_set.get().manufacturer_model_name
-        station_name = exams.generalequipmentmoduleattr_set.get().station_name
-        display_name = exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
+        equipment_module = exams.generalequipmentmoduleattr_set.get()
+        institution_name = equipment_module.institution_name
+        manufacturer = equipment_module.manufacturer
+        manufacturer_model_name = equipment_module.manufacturer_model_name
+        station_name = equipment_module.station_name
+        display_name = equipment_module.unique_equipment_name.display_name
     except ObjectDoesNotExist:
         logger.debug("Export {0}; generalequipmentmoduleattr_set object does not exist".format(modality))
 
@@ -227,9 +229,10 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     patient_size = None
     patient_weight = None
     try:
-        patient_age_decimal = exams.patientstudymoduleattr_set.get().patient_age_decimal
-        patient_size = exams.patientstudymoduleattr_set.get().patient_size
-        patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
+        patient_study_module = exams.patientstudymoduleattr_set.get()
+        patient_age_decimal = patient_study_module.patient_age_decimal
+        patient_size = patient_study_module.patient_size
+        patient_weight = patient_study_module.patient_weight
     except ObjectDoesNotExist:
         logger.debug("Export {0}; patientstudymoduleattr_set object does not exist".format(modality))
 
@@ -239,6 +242,7 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     ct_dose_length_product_total = None
     if modality in u"CT":
         try:
+
             comment = exams.ctradiationdose_set.get().comment
             ct_dose_length_product_total = exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(
                 ).ct_dose_length_product_total
