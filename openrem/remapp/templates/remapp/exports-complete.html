@@ -1,0 +1,33 @@
+{% load humanize %}
+{% load remappduration %}
+{% if complete %}
+  <h4>Recently completed export tasks</h4>
+
+  <form action="/openrem/deletefile/" method="POST">
+    <table class="table table-striped">
+      <th>Exported</th>
+      <th>Modality</th>
+      <th>Export type</th>
+      <th>No. records</th>
+      <th>Export time</th>
+      <th>User</th>
+      <th>Download</th>
+      {% for tsk in complete %}
+        <tr>
+          <td>{{ tsk.export_date|naturaltime }}</td>
+          <td>{{ tsk.modality }}</td>
+          <td>{{ tsk.export_type }}</td>
+          <td>{{ tsk.num_records }}</td>
+          <td>{{ tsk.processtime|naturalduration }} </td>
+          <td>{{ tsk.export_user }}</td>
+          {% if not tsk.includes_pid or tsk.includes_pid and in_pid_group %}
+            <td><a href="/openrem/download/{{ tsk.task_id }}">{{ tsk.filename }}</a></td>
+          {% else %}
+            <td>You don't have sufficient privileges to download this export</td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </table>
+  </form>
+
+{% endif %}
