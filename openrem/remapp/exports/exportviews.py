@@ -31,12 +31,14 @@
 
 # Following two lines added so that sphinx autodocumentation works.
 import os
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.shortcuts import render
 import remapp
 
 logger = logging.getLogger(__name__)
@@ -109,7 +111,7 @@ def ctxlsx1(request, name=None, pat_id=None):
 
     if request.user.groups.filter(name="exportgroup"):
         job = ctxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
-                                   pid['include_pat_id'], request.user.id)
+                           pid['include_pat_id'], request.user.id)
         logger.debug(u'Export CT to XLSX job is {0}'.format(job))
 
     return redirect('/openrem/export/')
@@ -137,6 +139,7 @@ def dxcsv1(request, name=None, pat_id=None):
 
     return redirect('/openrem/export/')
 
+
 @csrf_exempt
 @login_required
 def dxxlsx1(request, name=None, pat_id=None):
@@ -154,10 +157,11 @@ def dxxlsx1(request, name=None, pat_id=None):
 
     if request.user.groups.filter(name="exportgroup"):
         job = dxxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
-                                   pid['include_pat_id'], request.user.id)
+                           pid['include_pat_id'], request.user.id)
         logger.debug(u'Export DX to XLSX job is {0}'.format(job))
 
     return redirect('/openrem/export/')
+
 
 @csrf_exempt
 @login_required
@@ -181,6 +185,7 @@ def flcsv1(request, name=None, pat_id=None):
 
     return redirect('/openrem/export/')
 
+
 @csrf_exempt
 @login_required
 def rfxlsx1(request, name=None, pat_id=None):
@@ -198,10 +203,11 @@ def rfxlsx1(request, name=None, pat_id=None):
 
     if request.user.groups.filter(name="exportgroup"):
         job = rfxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
-                                   pid['include_pat_id'], request.user.id)
+                           pid['include_pat_id'], request.user.id)
         logger.debug(u'Export Fluoro to XLSX job is {0}'.format(job))
 
     return redirect('/openrem/export/')
+
 
 @csrf_exempt
 @login_required
@@ -287,6 +293,7 @@ def mgnhsbsp(request):
 
     return redirect('/openrem/export/')
 
+
 @csrf_exempt
 @login_required
 def export(request):
@@ -294,26 +301,17 @@ def export(request):
 
     :param request: Used to get user group.
     """
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
     from remapp.models import Exports
 
-    exptsks = Exports.objects.all().order_by('-export_date')
-
-    current = exptsks.filter(status__contains = u'CURRENT')
-    complete = exptsks.filter(status__contains = u'COMPLETE')
-    errors = exptsks.filter(status__contains = u'ERROR')
+    complete = Exports.objects.filter(status__contains=u'COMPLETE').order_by('-export_date')
+    latest_complete_pk = complete[0].pk
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
-
     for group in request.user.groups.all():
         admin[group.name] = True
+    template = 'remapp/exports.html'
 
-    # if 'task_id' in request.session.keys() and request.session['task_id']:
-    #     task_id = request.session['task_id']
-    return render_to_response('remapp/exports.html', {'admin': admin,
-                                                      'current': current, 'complete': complete, 'errors': errors},
-                              context_instance=RequestContext(request))
+    return render(request, template, {'admin': admin, 'latest_complete_pk': latest_complete_pk, 'complete': complete})
 
 
 @login_required
@@ -360,7 +358,7 @@ def download(request, task_id):
     file_path = os.path.join(MEDIA_ROOT, exp.filename.name)
     file_wrapper = FileWrapper(file(file_path, 'rb'))
     file_mimetype = mimetypes.guess_type(file_path)
-    response = HttpResponse(file_wrapper, content_type=file_mimetype )
+    response = HttpResponse(file_wrapper, content_type=file_mimetype)
     response['X-Sendfile'] = file_path
     response['Content-Length'] = os.stat(file_path).st_size
     response['Content-Disposition'] = u'attachment; filename=%s' % smart_str(exp.filename)
@@ -390,9 +388,12 @@ def deletefile(request):
                 export_object.delete()
                 messages.success(request, u"Export file and database entry deleted successfully.")
             except OSError as e:
-                messages.error(request, u"Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
+                messages.error(request,
+                               u"Export file delete failed - please contact an administrator. Error({0}): {1}".format(
+                                   e.errno, e.strerror))
             except Exception:
-                messages.error(request, u"Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+                messages.error(request,
+                               u"Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
     return HttpResponseRedirect(reverse(exportviews.export))
 
@@ -416,3 +417,57 @@ def export_abort(request, pk):
         export_task.delete()
 
     return HttpResponseRedirect("/openrem/export/")
+
+
+@csrf_exempt
+@login_required
+def update_active(request):
+    """AJAX function to return active exports
+
+    :param request: Request object
+    :return: HTML table of active exports
+    """
+    from remapp.models import Exports
+
+    if request.is_ajax():
+        current_export_tasks = Exports.objects.filter(status__contains=u'CURRENT').order_by('-export_date')
+        template = "remapp/exports-active.html"
+
+        return render(request, template, {'current': current_export_tasks})
+
+
+@csrf_exempt
+@login_required
+def update_error(request):
+    """AJAX function to return exports in error state
+
+    :param request: Request object
+    :return: HTML table of exports in error state
+    """
+    from remapp.models import Exports
+
+    if request.is_ajax():
+        error_export_tasks = Exports.objects.filter(status__contains=u'ERROR').order_by('-export_date')
+        template = "remapp/exports-error.html"
+
+        return render(request, template, {'errors': error_export_tasks})
+
+
+@csrf_exempt
+@login_required
+def update_complete(request):
+    """AJAX function to return recently completed exports
+
+    :param request: Request object, including pk of latest complete export at initial page load
+    :return: HTML table of completed exports
+    """
+    from remapp.models import Exports
+
+    if request.is_ajax():
+        data = request.POST
+        latest_complete_pk = data.get('latest_complete_pk')
+        in_pid_group = data.get('in_pid_group')
+        complete_export_tasks = Exports.objects.filter(status__contains=u'COMPLETE').filter(pk__gt=latest_complete_pk)
+        template = "remapp/exports-complete.html"
+
+        return render(request, template, {'complete': complete_export_tasks, 'in_pid_group': in_pid_group})
