@@ -68,7 +68,10 @@
                 $.ajax(
                     {
                         url: "/openrem/export/updatecomplete",
-                        data: {latest_complete_pk: '{{latest_complete_pk}}'},
+                        data: {
+                            latest_complete_pk: '{{latest_complete_pk}}',
+                            in_pid_group: '{{ admin.pidgroup }}'
+                        },
                         type: "POST",
                         success: function (data) {
                             $('#complete').html(data);
@@ -85,45 +88,47 @@
 
     <h4>Completed export tasks</h4>
     <form action="/openrem/deletefile/" method="POST">
-  <table class="table table-striped">
-    <th>Exported</th>
-    <th>Modality</th>
-    <th>Export type</th>
-    <th>No. records</th>
-    <th>Export time</th>
-    <th>User</th>
-    <th>Download</th>
-    <th><input type="checkbox" id="select_all"/> Delete? </th>
-    {% for tsk in complete %}
-      {% if not tsk.includes_pid or tsk.includes_pid and admin.pidgroup %}
+      <table class="table table-striped">
+        <th>Exported</th>
+        <th>Modality</th>
+        <th>Export type</th>
+        <th>No. records</th>
+        <th>Export time</th>
+        <th>User</th>
+        <th>Download</th>
+        <th><input type="checkbox" id="select_all"/> Delete?</th>
+        {% for tsk in complete %}
+          <tr>
+            <td>{{ tsk.export_date|naturaltime }}</td>
+            <td>{{ tsk.modality }}</td>
+            <td>{{ tsk.export_type }}</td>
+            <td>{{ tsk.num_records }}</td>
+            <td>{{ tsk.processtime|naturalduration }} </td>
+            <td>{{ tsk.export_user }}</td>
+            {% if not tsk.includes_pid or tsk.includes_pid and admin.pidgroup %}
+              <td><a href="/openrem/download/{{ tsk.task_id }}">{{ tsk.filename }}</a></td>
+            {% else %}
+              <td>You don't have sufficient privileges to download this export</td>
+            {% endif %}
+            <td>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" class="checkbox" name="tsk{{ tsk.task_id }}" value="{{ tsk.task_id }}">
+                </label>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
         <tr>
-          <td>{{ tsk.export_date|naturaltime }}</td>
-          <td>{{ tsk.modality }}</td>
-          <td>{{ tsk.export_type }}</td>
-          <td>{{ tsk.num_records }}</td>
-          <td>{{ tsk.processtime|naturalduration }} </td>
-          <td>{{ tsk.export_user }}</td>
-          <td><a href="/openrem/download/{{ tsk.task_id }}">{{ tsk.filename }}</a></td>
+          <td colspan="7"></td>
           <td>
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" class="checkbox" name="tsk{{ tsk.task_id }}" value="{{ tsk.task_id }}">
-              </label>
-            </div>
+            {% if complete.count > 0 %}
+              <button type="submit" class="btn btn-default">Delete</button>
+            {% endif %}
           </td>
         </tr>
-      {% endif %}
-    {% endfor %}
-    <tr>
-      <td colspan="7"></td>
-      <td>
-        {% if complete.count > 0 %}
-          <button type="submit" class="btn btn-default">Delete</button>
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-</form>
+      </table>
+    </form>
 
   {% else %}
     <p>
@@ -137,22 +142,22 @@
 
 {% block jsblock %}
   <script>
-//select all checkboxes
-$("#select_all").change(function(){  //"select all" change
-    $(".checkbox").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
-});
+      //select all checkboxes
+      $("#select_all").change(function () {  //"select all" change
+          $(".checkbox").prop('checked', $(this).prop("checked")); //change all ".checkbox" checked status
+      });
 
-//".checkbox" change
-$('.checkbox').change(function(){
-    //uncheck "select all", if one of the listed checkbox item is unchecked
-    if(false === $(this).prop("checked")){ //if this item is unchecked
-        $("#select_all").prop('checked', false); //change "select all" checked status to false
-    }
-    //check "select all" if all checkbox items are checked
-    if ($('.checkbox:checked').length === $('.checkbox').length ){
-        $("#select_all").prop('checked', true);
-    }
-});  
+      //".checkbox" change
+      $('.checkbox').change(function () {
+          //uncheck "select all", if one of the listed checkbox item is unchecked
+          if (false === $(this).prop("checked")) { //if this item is unchecked
+              $("#select_all").prop('checked', false); //change "select all" checked status to false
+          }
+          //check "select all" if all checkbox items are checked
+          if ($('.checkbox:checked').length === $('.checkbox').length) {
+              $("#select_all").prop('checked', true);
+          }
+      });
   </script>
 
 
