@@ -33,7 +33,6 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
-import json
 import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -297,27 +296,17 @@ def export(request):
 
     :param request: Used to get user group.
     """
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
     from remapp.models import Exports
 
-    exptsks = Exports.objects.all().order_by('-export_date')
-
-    current = exptsks.filter(status__contains = u'CURRENT')
     complete = Exports.objects.filter(status__contains = u'COMPLETE').order_by('-export_date')
-    errors = exptsks.filter(status__contains = u'ERROR')
     latest_complete_pk = complete[0].pk
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
-
     for group in request.user.groups.all():
         admin[group.name] = True
+    template = 'remapp/exports.html'
 
-    # if 'task_id' in request.session.keys() and request.session['task_id']:
-    #     task_id = request.session['task_id']
-    return render_to_response('remapp/exports.html', {'admin': admin, 'latest_complete_pk': latest_complete_pk,
-                                                      'current': current, 'complete': complete, 'errors': errors},
-                              context_instance=RequestContext(request))
+    return render(request, template, {'admin': admin, 'latest_complete_pk': latest_complete_pk, 'complete': complete})
 
 
 @login_required
