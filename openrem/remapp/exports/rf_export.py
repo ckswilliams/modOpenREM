@@ -58,32 +58,24 @@ def _get_accumulated_data(accumXrayDose):
     accum = {}
     accum['plane'] = accumXrayDose.acquisition_plane.code_meaning
     try:
-        accum['dose_area_product_total'] = string_to_float(return_for_export(
-            accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_area_product_total'))
-        accum['dose_rp_total'] = string_to_float(return_for_export(
-            accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_rp_total'))
-        accum['reference_point_definition'] = return_for_export(
-            accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
+        accumulated_integrated_projection_dose = accumXrayDose.accumintegratedprojradiogdose_set.get()
+        accum['dose_area_product_total'] = accumulated_integrated_projection_dose.dose_area_product_total
+        accum['dose_rp_total'] = accumulated_integrated_projection_dose.dose_rp_total
+        accum['reference_point_definition'] = accumulated_integrated_projection_dose.reference_point_definition_code
         if not accum['reference_point_definition']:
-            accum['reference_point_definition'] = return_for_export(
-                accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition')
+            accum['reference_point_definition'] = accumulated_integrated_projection_dose.reference_point_definition
     except ObjectDoesNotExist:
         accum['dose_area_product_total'] = None
         accum['dose_rp_total'] = None
         accum['reference_point_definition_code'] = None
     try:
-        accum['fluoro_dose_area_product_total'] = string_to_float(return_for_export(
-            accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_area_product_total'))
-        accum['fluoro_dose_rp_total'] = string_to_float(return_for_export(
-            accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_rp_total'))
-        accum['total_fluoro_time'] = string_to_float(return_for_export(
-            accumXrayDose.accumprojxraydose_set.get(), 'total_fluoro_time'))
-        accum['acquisition_dose_area_product_total'] = string_to_float(return_for_export(
-            accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_area_product_total'))
-        accum['acquisition_dose_rp_total'] = string_to_float(return_for_export(
-            accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_rp_total'))
-        accum['total_acquisition_time'] = string_to_float(return_for_export(
-            accumXrayDose.accumprojxraydose_set.get(), 'total_acquisition_time'))
+        accumulated_projection_dose = accumXrayDose.accumprojxraydose_set.get()
+        accum['fluoro_dose_area_product_total'] = accumulated_projection_dose.fluoro_dose_area_product_total
+        accum['fluoro_dose_rp_total'] = accumulated_projection_dose.fluoro_dose_rp_total
+        accum['total_fluoro_time'] = accumulated_projection_dose.total_fluoro_time
+        accum['acquisition_dose_area_product_total'] = accumulated_projection_dose.acquisition_dose_area_product_total
+        accum['acquisition_dose_rp_total'] = accumulated_projection_dose.acquisition_dose_rp_total
+        accum['total_acquisition_time'] = accumulated_projection_dose.total_acquisition_time
     except ObjectDoesNotExist:
         accum['fluoro_dose_area_product_total'] = None
         accum['fluoro_dose_rp_total'] = None
@@ -93,12 +85,10 @@ def _get_accumulated_data(accumXrayDose):
         accum['total_acquisition_time'] = None
 
     try:
-        accumXrayDose.projection_xray_radiation_dose.irradeventxraydata_set.all()
+        accum['eventcount'] = int(accumXrayDose.projection_xray_radiation_dose.irradeventxraydata_set.filter(
+            acquisition_plane__code_meaning__exact=accum['plane']).count())
     except ObjectDoesNotExist:
         accum['eventcount'] = None
-    else:
-        accum['eventcount'] = int(accumXrayDose.projection_xray_radiation_dose.irradeventxraydata_set.filter(
-            acquisition_plane__code_meaning__exact = accum['plane']).count())
 
     return accum
 
@@ -141,7 +131,26 @@ def _get_series_data(event):
     :return: list of data
     """
     try:
-        event.irradeventxraysourcedata_set.get()
+        source_data = event.irradeventxraysourcedata_set.get()
+        pulse_rate = source_data.pulse_rate
+        ii_field_size = source_data.ii_field_size
+        exposure_time = source_data.exposure_time
+        dose_rp = source_data.dose_rp
+        number_of_pulses = source_data.number_of_pulses
+        irradiation_duration = source_data.irradiation_duration
+        filter_material, filter_thick = get_xray_filter_info(source_data)
+        try:
+            kVp = source_data.kvp_set.get().kvp
+        except ObjectDoesNotExist:
+            kVp = None
+        try:
+            xray_tube_current = source_data.xraytubecurrent_set.get().xray_tube_current
+        except ObjectDoesNotExist:
+            xray_tube_current = None
+        try:
+            pulse_width = source_data.pulsewidth_set.get().pulse_width
+        except ObjectDoesNotExist:
+            pulse_width = None
     except ObjectDoesNotExist:
         pulse_rate = None
         ii_field_size = None
@@ -149,43 +158,18 @@ def _get_series_data(event):
         dose_rp = None
         number_of_pulses = None
         irradiation_duration = None
-    else:
-        pulse_rate = _get_db_value(event.irradeventxraysourcedata_set.get(), 'pulse_rate')
-        ii_field_size = _get_db_value(event.irradeventxraysourcedata_set.get(), 'ii_field_size')
-        exposure_time = _get_db_value(event.irradeventxraysourcedata_set.get(), 'exposure_time')
-        dose_rp = _get_db_value(event.irradeventxraysourcedata_set.get(), 'dose_rp')
-        number_of_pulses = _get_db_value(event.irradeventxraysourcedata_set.get(), 'number_of_pulses')
-        irradiation_duration = _get_db_value(event.irradeventxraysourcedata_set.get(), 'irradiation_duration')
-        filter_material, filter_thick = get_xray_filter_info(event.irradeventxraysourcedata_set.get())
-        try:
-            event.irradeventxraysourcedata_set.get().kvp_set.get()
-        except ObjectDoesNotExist:
-            kVp = None
-        else:
-            kVp = _get_db_value(event.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
-        try:
-            event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get()
-        except ObjectDoesNotExist:
-            xray_tube_current = None
-        else:
-            xray_tube_current = _get_db_value(event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get(),
-                                              'xray_tube_current')
-        try:
-            event.irradeventxraysourcedata_set.get().pulsewidth_set.get()
-        except ObjectDoesNotExist:
-            pulse_width = None
-        else:
-            pulse_width = _get_db_value(event.irradeventxraysourcedata_set.get().pulsewidth_set.get(), 'pulse_width')
+        filter_material = None
+        filter_thick = None
+        kVp = None
+        xray_tube_current = None
+        pulse_width = None
     try:
-        event.irradeventxraymechanicaldata_set.get()
+        mechanical_data = event.irradeventxraymechanicaldata_set.get()
+        pos_primary_angle = mechanical_data.positioner_primary_angle
+        pos_secondary_angle = mechanical_data.positioner_secondary_angle
     except ObjectDoesNotExist:
         pos_primary_angle = None
         pos_secondary_angle = None
-    else:
-        pos_primary_angle = _get_db_value(event.irradeventxraymechanicaldata_set.get(), 'positioner_primary_angle')
-        pos_secondary_angle = _get_db_value(event.irradeventxraymechanicaldata_set.get(), 'positioner_secondary_angle')
-        # It seems all() never throws an exception (emperically and search on internet)
-        # "After calling all() on either object, you'll definitely have a QuerySet to work with." (https://docs.djangoproject.com/en/1.10/ref/models/querysets/#all)
 
     series_data = [
         str(event.date_time_started),
@@ -348,46 +332,36 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         num_groups_this_exam = 0
         while inst:  # ie while there are events still left that haven't been matched into a group
             num_groups_this_exam += 1
-            plane = _get_db_value(_get_db_value(inst[0], "acquisition_plane"), "code_meaning")
+            plane = inst[0].acquisition_plane.code_meaning
             try:
-                inst[0].irradeventxraymechanicaldata_set.get()
+                mechanical_data = inst[0].irradeventxraymechanicaldata_set.get()
+                anglei = mechanical_data.positioner_primary_angle
+                angleii = mechanical_data.positioner_secondary_angle
             except ObjectDoesNotExist:
                 anglei = None
                 angleii = None
-            else:
-                anglei = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_primary_angle")
-                angleii = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_secondary_angle")
-
             try:
-                inst[0].irradeventxraysourcedata_set.get()
-            except ObjectDoesNotExist:
-                pulse_rate = None
-                fieldsize = None
-            else:
-                pulse_rate = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "pulse_rate")
-                fieldsize = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "ii_field_size")
+                source_data = inst[0].irradeventxraysourcedata_set.get()
+                pulse_rate = source_data.pulse_rate
+                fieldsize = source_data.ii_field_size
                 try:
-                    inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.all()
+                    filter_material, filter_thick = get_xray_filter_info(source_data)
                 except ObjectDoesNotExist:
                     filter_material = None
                     filter_thick = None
-                else:
-                    filter_material, filter_thick = get_xray_filter_info(
-                        inst[0].irradeventxraysourcedata_set.get())
+            except ObjectDoesNotExist:
+                pulse_rate = None
+                fieldsize = None
+                filter_material = None
+                filter_thick = None
 
-            protocol = _get_db_value(inst[0], "acquisition_protocol")
-            event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
+            protocol = inst[0].acquisition_protocol
+            event_type = inst[0].irradiation_event_type.code_meaning
 
             similarexposures = inst
             if plane:
                 similarexposures = similarexposures.filter(
                     acquisition_plane__code_meaning__exact = plane)
-            if anglei:
-                similarexposures = similarexposures.filter(
-                    irradeventxraymechanicaldata__positioner_primary_angle__range=(float(anglei) - angle_range, float(anglei) + angle_range))
-            if angleii:
-                similarexposures = similarexposures.filter(
-                    irradeventxraymechanicaldata__positioner_secondary_angle__range=(float(angleii) - angle_range, float(angleii) + angle_range))
             if protocol:
                 similarexposures = similarexposures.filter(
                     acquisition_protocol__exact = protocol)
@@ -403,6 +377,12 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                         irradeventxraysourcedata__xrayfilters__xray_filter_material__code_meaning__exact = xray_filter.xray_filter_material)
                     similarexposures = similarexposures.filter(
                         irradeventxraysourcedata__xrayfilters__xray_filter_thickness_maximum__exact = xray_filter.xray_filter_thickness_maximum)
+            if anglei:
+                similarexposures = similarexposures.filter(
+                    irradeventxraymechanicaldata__positioner_primary_angle__range=(float(anglei) - angle_range, float(anglei) + angle_range))
+            if angleii:
+                similarexposures = similarexposures.filter(
+                    irradeventxraymechanicaldata__positioner_secondary_angle__range=(float(angleii) - angle_range, float(angleii) + angle_range))
             if event_type:
                 similarexposures = similarexposures.filter(
                     irradiation_event_type__code_meaning__exact = event_type)
