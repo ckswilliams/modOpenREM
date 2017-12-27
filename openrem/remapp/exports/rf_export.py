@@ -124,7 +124,7 @@ def _add_plane_summary_data(exam):
     return exam_data
 
 
-def _get_series_data(event):
+def _get_series_data(event, filter_data):
     """Return series level data for protocol sheets
 
     :param event: evnt in question
@@ -138,7 +138,6 @@ def _get_series_data(event):
         dose_rp = source_data.dose_rp
         number_of_pulses = source_data.number_of_pulses
         irradiation_duration = source_data.irradiation_duration
-        filter_material, filter_thick = get_xray_filter_info(source_data)
         try:
             kVp = source_data.kvp_set.get().kvp
         except ObjectDoesNotExist:
@@ -158,8 +157,6 @@ def _get_series_data(event):
         dose_rp = None
         number_of_pulses = None
         irradiation_duration = None
-        filter_material = None
-        filter_thick = None
         kVp = None
         xray_tube_current = None
         pulse_width = None
@@ -177,8 +174,8 @@ def _get_series_data(event):
         event.acquisition_protocol,
         event.acquisition_plane.code_meaning,
         ii_field_size,
-        filter_material,
-        filter_thick,
+        filter_data['filter_material'],
+        filter_data['filter_thick'],
         kVp,
         xray_tube_current,
         pulse_width,
@@ -462,8 +459,12 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             if not protocol:
                 protocol = u'Unknown'
             tab_text = sheet_name(protocol)
+            filter_data = {
+                'filter_material': filter_material,
+                'filter_thick': filter_thick,
+            }
             for exposure in similarexposures:
-                series_data = _get_series_data(exposure)
+                series_data = _get_series_data(exposure, filter_data)
                 sheetlist[tab_text]['count'] += 1
                 sheetlist[tab_text]['sheet'].write_row(sheetlist[tab_text]['count'], 0, common_exam_data + series_data)
 
