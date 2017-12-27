@@ -313,7 +313,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     num_groups_max = 0
     for row, exams in enumerate(e):
 
-        tsk.progress = u'Writing study {0} of {1} to All data sheet'.format(row + 1, e.count())
+        tsk.progress = u'Writing study {0} of {1}'.format(row + 1, e.count())
         tsk.save()
 
         examdata = get_common_data(u"RF", exams, pid=pid, name=name, patid=patid)
@@ -328,6 +328,9 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
         num_groups_this_exam = 0
         while inst:  # ie while there are events still left that haven't been matched into a group
+            tsk.progress = u'Writing study {0} of {1}; {2} events remaining to group and write.'.format(
+                row + 1, e.count(), inst.count())
+            tsk.save()
             num_groups_this_exam += 1
             plane = inst[0].acquisition_plane.code_meaning
             try:
