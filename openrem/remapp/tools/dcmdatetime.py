@@ -14,8 +14,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -157,7 +157,7 @@ def make_dcm_date(pythondate):
     :returns:           DICOM date as string
     """
     import datetime
-    if type(pythondate) is not datetime.date:
+    if not isinstance(pythondate, datetime.date):
         return None
 
     try:
@@ -178,11 +178,11 @@ def make_dcm_date_range(date1=None, date2=None):
 
     try:
         date1 = datetime.datetime.strptime(date1, "%Y-%m-%d").date()
-    except:
+    except ValueError:
         date1 = None
     try:
         date2 = datetime.datetime.strptime(date2, "%Y-%m-%d").date()
-    except:
+    except ValueError:
         date2 = None
 
     if date1 and date2:
