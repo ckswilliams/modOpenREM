@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
+* `#578`_  Exports: Fixed NHSBSP export that was excluding RDSR imported Hologic studies
 * `#575`_  Exports: export page now updates using AJAX and has a select all button
 * `#573`_  Exports: corrected and clarified exposure time and duration units, added number of pulses
 * `#572`_  Interface: Homepage now populates as AJAX to increase responsiveness

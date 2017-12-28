@@ -30,6 +30,10 @@
 """
 
 from celery import shared_task
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 @shared_task
 def mg_csv_nhsbsp(filterdict, user=None):
@@ -65,19 +69,9 @@ def mg_csv_nhsbsp(filterdict, user=None):
         exit()
 
     # Get the data!
-
-    s = GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG')
-    f = MGSummaryListFilter.base_filters
-
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != u'':
-                s = s.filter(**{f[filt].name + u'__' + f[filt].lookup_type: filterstring})
+    studies_qs = MGSummaryListFilter(filterdict,
+                                         queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact=u'MG'))
+    s = studies_qs.qs
 
     tsk.progress = u'Required study filter complete.'
     tsk.save()
@@ -114,6 +108,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 exp.nccpm_view = None
                 continue
             exp.nccpm_view = laterality[:1]
+
             views = {u'cranio-caudal': u'CC',
                      u'medio-lateral oblique': u'OB',
                      u'medio-lateral': u'ML',
@@ -133,20 +128,27 @@ def mg_csv_nhsbsp(filterdict, user=None):
             except AttributeError:
                 exp.nccpm_view = None
                 continue  # Avoid exporting exposures with no image_view recorded
+
             if u'specimen' in exp.image_view.code_meaning:
+                logger.debug("Exposure excluded due to image_view containing specimen: {0}".format(
+                    exp.image_view.code_meaning))
                 exp.nccpm_view = None
                 continue  # No point including these in the export
+
             bad_acq_words = [
                 u'scout', u'postclip', u'prefire', u'biopsy', u'postfire', u'stereo', u'specimen', u'artefact']
             try:
                 if any(word in exp.acquisition_protocol.lower() for word in bad_acq_words):
+                    logger.debug("Exposure excluded due to biopsy word in {0}".format(exp.acquisition_protocol.lower()))
                     exp.nccpm_view = None
                     continue  # Avoid exporting biopsy related exposures
             except AttributeError:
-                exp.nccpm_view = None
+                logger.debug("No protocol information. Carrying on.")
+
             try:
                 target = exp.irradeventxraysourcedata_set.get().anode_target_material.code_meaning
             except AttributeError:
+                logger.debug("Exposure excluded due to attribute error on target information")
                 exp.nccpm_view = None
                 continue  # Avoid exporting exposures with no anode material recorded
             if u"TUNGSTEN" in target.upper():
@@ -155,9 +157,11 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 target = u'Mo'
             elif u"RHOD" in target.upper():
                 target = u'Rh'
+
             try:
                 filter_mat = exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
             except AttributeError:
+                logger.debug("Exposure excluded due to attribute error on filter material")
                 exp.nccpm_view = None
                 continue  # Avoid exporting exposures with no filter material recorded
             if u"ALUM" in filter_mat.upper():
@@ -168,6 +172,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 filter_mat = u'Rh'
             elif u"SILV" in filter_mat.upper():
                 filter_mat = u'Ag'
+
         unique_views = set()
         for exp in exposures:
             if exp.nccpm_view:
@@ -181,15 +186,17 @@ def mg_csv_nhsbsp(filterdict, user=None):
                             break
         for exp in exposures:
             if not exp.nccpm_view:
+                logger.debug("Exposure excluded due to no generated nncp_view")
                 continue  # Avoid exporting exposures with no view code
             try:
                 automan = exp.irradeventxraysourcedata_set.get().exposure_control_mode
                 if u"AUTO" in automan.upper():
-                    automan = u'AUTO'
+                    automan_short = u'AUTO'
                 elif u"MAN" in automan.upper():
-                    automan = u"MANUAL"
+                    automan_short = u"MANUAL"
             except AttributeError:
                 automan = None
+                automan_short = None
 
             writer.writerow([
                 u'1',
@@ -201,8 +208,8 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 exp.irradeventxraymechanicaldata_set.get().compression_thickness,
                 exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure / 1000,
                 u'',  # not applicable to FFDM
+                automan_short,
                 automan,
-                exp.irradeventxraysourcedata_set.get().exposure_control_mode,
                 u'',  # no consistent behaviour for recording density setting on FFDM units
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get().patient_age_decimal,
                 u'',  # not in DICOM headers
