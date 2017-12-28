@@ -63,9 +63,9 @@ def get_time(tag, dataset):
         if '+' in dicomtime or '-' in dicomtime:
             import re
             dicomtime = re.split('\+|-', dicomtime)[0]
-        if '.' in dicomtime:
-            return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
         try:
+            if '.' in dicomtime:
+                return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
             return datetime.datetime.strptime(dicomtime, "%H%M%S")
         except ValueError:
             return None
@@ -86,9 +86,9 @@ def get_date_time(tag, dataset):
         if '+' in dicomdatetime or '-' in dicomdatetime:
             import re
             dicomdatetime = re.split('\+|-', dicomdatetime)[0]
-        if '.' in dicomdatetime:
-            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
         try:
+            if '.' in dicomdatetime:
+                return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
             return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
         except ValueError:
             return None
@@ -119,9 +119,9 @@ def make_time(dicomtime):
     if '+' in dicomtime or '-' in dicomtime:
         import re
         dicomtime = re.split('\+|-', dicomtime)[0]
-    if '.' in dicomtime:
-        return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
     try:
+        if '.' in dicomtime:
+            return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
         return datetime.datetime.strptime(dicomtime, "%H%M%S")
     except ValueError:
         return None
