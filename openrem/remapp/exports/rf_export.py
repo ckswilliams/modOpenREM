@@ -33,7 +33,7 @@ from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
     get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet
-from remapp.tools.get_values import return_for_export, string_to_float
+from remapp.tools.get_values import return_for_export
 
 logger = logging.getLogger(__name__)
 

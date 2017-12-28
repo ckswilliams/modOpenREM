@@ -301,7 +301,6 @@ def _generate_all_data_headers_ct(max_events):
 
 def _ct_get_series_data(s):
     from collections import OrderedDict
-    from remapp.tools.get_values import return_for_export, string_to_float
 
     try:
         if s.ctdiw_phantom_type.code_value == u'113691':
