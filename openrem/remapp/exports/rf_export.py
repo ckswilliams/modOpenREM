@@ -38,17 +38,6 @@ from remapp.tools.get_values import return_for_export
 logger = logging.getLogger(__name__)
 
 
-def _get_db_value(qs, location):
-    """Get value from database, testing to see if it exists
-    :rtype : attribute or queryset
-    """
-    try:
-        v = getattr(qs, location)
-        return v
-    except Exception as e:
-        logger.error("qs {0} not in location {1}. Exception {2}".format(qs, location, e))
-
-
 def _get_accumulated_data(accumXrayDose):
     """Extract all the summary level data
 
