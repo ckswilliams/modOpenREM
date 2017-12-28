@@ -135,16 +135,16 @@ def make_date_time(dicomdatetime):
     :returns:           Python date time value
     """
     import datetime
-    if dicomdatetime == '':
+    if not dicomdatetime:
         return None
     if '+' in dicomdatetime or '-' in dicomdatetime:
         import re
         dicomdatetime = re.split('\+|-', dicomdatetime)[0]
-    if '.' in dicomdatetime:
-        return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
-    elif len(dicomdatetime) <= 8:
-        return datetime.datetime.strptime(dicomdatetime, "%Y%m%d")
     try:
+        if '.' in dicomdatetime:
+            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
+        elif len(dicomdatetime) <= 8:
+            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d")
         return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
     except ValueError:
         return None
