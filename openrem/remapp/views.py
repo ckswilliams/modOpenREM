@@ -1941,23 +1941,27 @@ def display_names_view(request):
 
     f = UniqueEquipmentNames.objects.order_by('display_name')
 
-    #if user_defined_modality is filled, we should use this value, otherwise the value of modality type in the general_study module
-    #so we look if the concatenation of the user_defined_modality (empty if not used) and modality_type starts with a specific modality type
+    # if user_defined_modality is filled, we should use this value, otherwise the value of modality type in the general_study module
+    # so we look if the concatenation of the user_defined_modality (empty if not used) and modality_type starts with a specific modality type
     ct_names = f.filter(Q(user_defined_modality="CT") | (
-                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT"))).distinct()
+            Q(user_defined_modality__isnull=True) &
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT"))).distinct()
     mg_names = f.filter(Q(user_defined_modality="MG") | (
-                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG"))).distinct()
+            Q(user_defined_modality__isnull=True) &
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG"))).distinct()
     dx_names = f.filter(Q(user_defined_modality="DX") | (
-                        Q(user_defined_modality__isnull=True) & (Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
-                                                                 Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
+            Q(user_defined_modality__isnull=True) & (
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
     rf_names = f.filter(Q(user_defined_modality="RF") | (
-                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
+            Q(user_defined_modality__isnull=True) &
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
     ot_names = f.filter(~Q(user_defined_modality__isnull=True) | (
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR"))).distinct()
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR"))).distinct()
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -2006,20 +2010,28 @@ def display_name_update(request):
             if new_display_name:
                 display_name_data.display_name = new_display_name
             if new_user_defined_modality and (not display_name_data.user_defined_modality == new_user_defined_modality):
-                #See if change is valid otherwise return validation error
-                #Assuming modality is always the same, so we take the first
+                # See if change is valid otherwise return validation error
+                # Assuming modality is always the same, so we take the first
                 try:
-                    modality = GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)[0].modality_type
+                    modality = \
+                    GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)[
+                        0].modality_type
                 except:
                     modality = ''
                 if (modality == 'DX') or (modality == 'CR') or (modality == 'RF'):
                     display_name_data.user_defined_modality = new_user_defined_modality
                     # We can't reimport as new modality type, instead we just change the modality type value
-                    GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk).update(modality_type=new_user_defined_modality)
+                    GeneralStudyModuleAttr.objects.filter(
+                        generalequipmentmoduleattr__unique_equipment_name__pk=pk).update(
+                        modality_type=new_user_defined_modality)
                 elif not modality:
-                    error_message = error_message + 'Can\'t determine modality type for ' + display_name_data.display_name + ', user defined modality type not set.\n'
+                    error_message = error_message + 'Can\'t determine modality type for' \
+                                                    ' ' + display_name_data.display_name + ', ' \
+                                                    'user defined modality type not set.\n'
                 else:
-                    error_message = error_message + 'Modality type change is not allowed for ' + display_name_data.display_name + ' (only changing from DX to RF and vice versa is allowed).\n'
+                    error_message = error_message + 'Modality type change is not allowed for' \
+                                                    ' ' + display_name_data.display_name + ' (only changing from DX ' \
+                                                    'to RF and vice versa is allowed).\n'
             display_name_data.save()
 
         if error_message:
@@ -2037,7 +2049,9 @@ def display_name_update(request):
 
         f = UniqueEquipmentNames.objects.filter(pk__in=map(int, request.GET.values()))
 
-        form = UpdateDisplayNamesForm(initial={'display_names': [x.encode('utf-8') for x in f.values_list('display_name', flat=True)]}, auto_id=False)
+        form = UpdateDisplayNamesForm(
+            initial={'display_names': [x.encode('utf-8') for x in f.values_list('display_name', flat=True)]},
+            auto_id=False)
 
         admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
