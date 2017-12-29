@@ -2018,7 +2018,7 @@ def display_name_update(request):
                         0].modality_type
                 except:
                     modality = ''
-                if (modality == 'DX') or (modality == 'CR') or (modality == 'RF'):
+                if modality in {'DX', 'CR', 'RF'}:
                     display_name_data.user_defined_modality = new_user_defined_modality
                     # We can't reimport as new modality type, instead we just change the modality type value
                     GeneralStudyModuleAttr.objects.filter(
