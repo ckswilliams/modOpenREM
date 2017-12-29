@@ -40,7 +40,7 @@ def get_date(tag, dataset):
     :returns:           Python date value
     """
     import datetime
-    if (tag in dataset):
+    if tag in dataset:
         dicomdate = getattr(dataset, tag)
         try:
             return datetime.datetime.strptime(dicomdate, "%Y%m%d")
