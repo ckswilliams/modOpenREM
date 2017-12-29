@@ -39,13 +39,9 @@ def get_date(tag, dataset):
     :type dataset:      dataset
     :returns:           Python date value
     """
-    import datetime
     if tag in dataset:
         dicomdate = getattr(dataset, tag)
-        try:
-            return datetime.datetime.strptime(dicomdate, "%Y%m%d")
-        except ValueError:
-            return None
+        return make_date(dicomdate)
 
 
 def get_time(tag, dataset):
@@ -57,18 +53,9 @@ def get_time(tag, dataset):
     :type dataset:      dataset
     :returns:           python time value
     """
-    import datetime
     if tag in dataset:
         dicomtime = getattr(dataset, tag)
-        if '+' in dicomtime or '-' in dicomtime:
-            import re
-            dicomtime = re.split('\+|-', dicomtime)[0]
-        if '.' in dicomtime:
-            return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
-        try:
-            return datetime.datetime.strptime(dicomtime, "%H%M%S")
-        except ValueError:
-            return None
+        return make_time(dicomtime)
 
 
 def get_date_time(tag, dataset):
@@ -80,18 +67,9 @@ def get_date_time(tag, dataset):
     :type dataset:      dataset
     :returns:           Python date time value
     """
-    import datetime
-    if (tag in dataset):
+    if tag in dataset:
         dicomdatetime = getattr(dataset, tag)
-        if '+' in dicomdatetime or '-' in dicomdatetime:
-            import re
-            dicomdatetime = re.split('\+|-', dicomdatetime)[0]
-        if '.' in dicomdatetime:
-            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
-        try:
-            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
-        except ValueError:
-            return None
+        return make_date_time(dicomdatetime)
 
 
 def make_date(dicomdate):
@@ -119,9 +97,9 @@ def make_time(dicomtime):
     if '+' in dicomtime or '-' in dicomtime:
         import re
         dicomtime = re.split('\+|-', dicomtime)[0]
-    if '.' in dicomtime:
-        return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
     try:
+        if '.' in dicomtime:
+            return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
         return datetime.datetime.strptime(dicomtime, "%H%M%S")
     except ValueError:
         return None
