@@ -152,36 +152,41 @@ def make_dcm_date_range(date1=None, date2=None):
     """
     import datetime
 
-    date_single = None
+    date_single = bool(date2 is None)
+    date1_python = None
+    date2_python = None
 
-    try:
-        date1 = datetime.datetime.strptime(date1, "%Y-%m-%d").date()
-    except ValueError:
-        date1 = None
-    try:
-        date2 = datetime.datetime.strptime(date2, "%Y-%m-%d").date()
-    except ValueError:
-        date2 = None
+    if date1:
+        try:
+            date1_python = datetime.datetime.strptime(date1, "%Y-%m-%d").date()
+        except ValueError:
+            date1_python = None
+    if date2:
+        try:
+            date2_python = datetime.datetime.strptime(date2, "%Y-%m-%d").date()
+        except ValueError:
+            date2_python = None
 
-    if date1 and date2:
-        if date1 < date2:
-            date_from = make_dcm_date(date1)
-            date_until = make_dcm_date(date2)
-        elif date1 == date2:
-            date_single = make_dcm_date(date1)
-        elif date1 > date2:
-            date_until = make_dcm_date(date1)
-            date_from = make_dcm_date(date2)
-    elif date1:
-        date_from = make_dcm_date(date1)
+    if date1_python == date2_python:
+        date_single = True
+
+    if date_single and date1_python:
+        return make_dcm_date(date1_python)
+
+    if date1_python and date2_python:
+        if date1_python < date2_python:
+            date_from = make_dcm_date(date1_python)
+            date_until = make_dcm_date(date2_python)
+        elif date1_python > date2_python:
+            date_until = make_dcm_date(date1_python)
+            date_from = make_dcm_date(date2_python)
+    elif date1_python and not date_single:
+        date_from = make_dcm_date(date1_python)
         date_until = make_dcm_date(datetime.date.today())
-    elif date2:
+    elif date2_python:
         date_from = '19000101'
-        date_until = make_dcm_date(date2)
+        date_until = make_dcm_date(date2_python)
     else:
         return None
 
-    if date_single:
-        return date_single
-    else:
-        return '{0}-{1}'.format(date_from, date_until)
+    return '{0}-{1}'.format(date_from, date_until)
