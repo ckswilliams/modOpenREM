@@ -55,11 +55,12 @@ class DCMDateTimeConversionTests(TestCase):
         get_time should return the datetime object
         """
         ds = Dataset()
-        ds.StudyTime = "130426.214"
+        ds.StudyTime = "130426.214000-0600"
         ds.SeriesTime = "130426"
         time_object_decimal = get_time("StudyTime", ds)
         time_object_seconds = get_time("SeriesTime", ds)
         ref_time_decimal = datetime.datetime(1900, 1, 1, 13, 4, 26, 214000)  # Again object is datetime rather than time
+        # Optional offset from UTC is currently ignored. Not sure how much TZ aware dates are used
         ref_time_seconds = datetime.datetime(1900, 1, 1, 13, 4, 26)
 
         self.assertIsInstance(time_object_decimal, datetime.datetime)
@@ -104,9 +105,9 @@ class DCMDateTimeConversionTests(TestCase):
         time_date_object_date_only = get_date_time("FrameReferenceDateTime", ds)
         time_date_object_date_time = get_date_time("StartAcquisitionDateTime", ds)
         ref_date_time_millisecond_object = datetime.datetime(2018, 6, 29, 17, 23, 4, 23000)
+        # Optional offset from UTC is currently ignored. Not sure how much TZ aware dates are used
         ref_date_object = datetime.datetime(2018, 6, 29)
         ref_date_time_object = datetime.datetime(2018, 6, 29, 17, 23, 4)
-        # Optional offset from UTC is currently ignored. Not sure how much TZ aware dates are used
 
         self.assertIsInstance(time_date_object_tz, datetime.datetime)
         self.assertIsInstance(time_date_object_millisecond, datetime.datetime)
