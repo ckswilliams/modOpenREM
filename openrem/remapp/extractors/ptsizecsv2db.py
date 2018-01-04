@@ -27,7 +27,7 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
-
+from celery import shared_task
 
 
 def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *args, **kwargs): # C.7.2.2
@@ -103,7 +103,6 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
 
     db.reset_queries()
 
-from celery import shared_task
 
 @shared_task
 def websizeimport(csv_pk = None, *args, **kwargs):
@@ -175,9 +174,8 @@ def websizeimport(csv_pk = None, *args, **kwargs):
                 csvrecord.processtime = (datetime.datetime.now() - datestamp).total_seconds()
                 csvrecord.status = 'COMPLETE'
                 csvrecord.save()
-       
 
-    
+
 def csv2db(*args, **kwargs):
     """ Import patient height and weight data from csv RIS exports. Can be called from ``openrem_ptsizecsv.py`` script
         
