@@ -526,8 +526,7 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
             pass
     if accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type == \
             'RF,DX':
-        if (accumproj.fluoro_dose_area_product_total != "" and accumproj.fluoro_dose_area_product_total is not None) \
-                or (accumproj.total_fluoro_time != "" and accumproj.total_fluoro_time is not None):
+        if not accumproj.fluoro_dose_area_product_total and not accumproj.total_fluoro_time:
             accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
                 modality_type = 'RF'
         else:
@@ -838,7 +837,8 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
                                                             cont2.ConceptCodeSequence[0].CodeMeaning)
             if 'Mammography' in proj.procedure_reported.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'MG'
-            elif (not proj.general_study_module_attributes.modality_type) and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
+            elif (not proj.general_study_module_attributes.modality_type) and (
+                    'Projection X-Ray' in proj.procedure_reported.code_meaning):
                 proj.general_study_module_attributes.modality_type = 'RF,DX'
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'acquisition device type':
             proj.acquisition_device_type_cid = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
