@@ -688,13 +688,11 @@ def _dx2db(dataset):
     from random import random
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-    from django.db import models
 
     openrem_settings.add_project_to_path()
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
-    from remapp.tools.dcmdatetime import make_date_time
 
     study_uid = get_value_kw('StudyInstanceUID', dataset)
     if not study_uid:
@@ -717,7 +715,7 @@ def _dx2db(dataset):
         elif not study_in_db:
             sys.exit(u"Something went wrong, GeneralStudyModuleAttr wasn't created")
         elif study_in_db > 1:
-            sleep(random())
+            sleep(random())  # nosec - not being used for cryptography
             # Check if other instance(s) has deleted the study yet
             study_in_db = check_uid.check_uid(study_uid)
             if study_in_db == 1:
@@ -727,7 +725,7 @@ def _dx2db(dataset):
                 study_in_db = check_uid.check_uid(study_uid)
                 if not study_in_db:
                     # both must have been deleted simultaneously!
-                    sleep(random())
+                    sleep(random())  # nosec - not being used for cryptography
                     # Check if other instance has created the study again yet
                     study_in_db = check_uid.check_uid(study_uid)
                     if study_in_db == 1:
@@ -743,7 +741,7 @@ def _dx2db(dataset):
                             _generalstudymoduleattributes(dataset, g)
                         elif study_in_db > 1:
                             g.delete()
-                            sleep(random())
+                            sleep(random())  # nosec - not being used for cryptography
                             study_in_db = check_uid.check_uid(study_uid)
                             if study_in_db == 1:
                                 sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
