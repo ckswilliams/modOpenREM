@@ -1945,11 +1945,11 @@ def display_names_view(request):
     # so we look if the concatenation of the user_defined_modality (empty if not used) and modality_type starts with a specific modality type
     ct_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT").distinct()
     mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
-    dx_names = f.filter(Q(user_defined_modality="DX") | (
+    dx_names = f.filter(Q(user_defined_modality="DX") | Q(user_defined_modality="dual") | (
             Q(user_defined_modality__isnull=True) & (
             Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
             Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
-    rf_names = f.filter(Q(user_defined_modality="RF") | (
+    rf_names = f.filter(Q(user_defined_modality="RF") | Q(user_defined_modality="dual") | (
             Q(user_defined_modality__isnull=True) &
             Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
     ot_names = f.filter(~Q(user_defined_modality__isnull=True) | (
@@ -2010,8 +2010,8 @@ def display_name_update(request):
                 # Assuming modality is always the same, so we take the first
                 try:
                     modality = \
-                    GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)[
-                        0].modality_type
+                        GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)[
+                            0].modality_type
                 except:
                     modality = ''
                 if modality in {'DX', 'CR', 'RF'}:
