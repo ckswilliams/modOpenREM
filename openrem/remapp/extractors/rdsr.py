@@ -526,7 +526,7 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
             pass
     if accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type == \
             'RF,DX':
-        if not accumproj.fluoro_dose_area_product_total and not accumproj.total_fluoro_time:
+        if accumproj.fluoro_dose_area_product_total or accumproj.total_fluoro_time:
             accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
                 modality_type = 'RF'
         else:
@@ -868,15 +868,16 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
                 reporttype == 'projection') and proj.acquisition_device_type_cid:
             if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'RF'
-            elif proj.acquisition_device_type_cid.code_meaning in {'Integrated', 'Cassette-based'}:
+            elif any(x in proj.acquisition_device_type_cid.code_meaning for x in ['Integrated', 'Cassette-based']):
                 proj.general_study_module_attributes.modality_type = 'DX'
             else:
                 logging.error(u"Acquisition device type code exists, but the value wasn't matched. Study UID: {0}, "
-                              u"Station name: {1}, Study date, time: {2}, {3} ".format(
+                              u"Station name: {1}, Study date, time: {2}, {3}, device type: {4} ".format(
                     proj.general_study_module_attributes.study_instance_uid,
                     proj.general_study_module_attributes.generalequipmentmoduleattr_set.get().station_name,
                     proj.general_study_module_attributes.study_date,
-                    proj.general_study_module_attributes.study_time
+                    proj.general_study_module_attributes.study_time,
+                    proj.acquisition_device_type_cid.code_meaning
                 ))
 
         proj.save()
@@ -884,7 +885,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Observer Type':
             if reporttype == 'projection':
                 obs = ObserverContext.objects.create(projection_xray_radiation_dose=proj)
-            elif reporttype == 'ct':
+            else:
                 obs = ObserverContext.objects.create(ct_radiation_dose=proj)
             _observercontext(dataset, obs, ch)
 
