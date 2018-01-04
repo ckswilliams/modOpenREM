@@ -550,7 +550,7 @@ def _mammo2db(dataset):
                     _create_event(dataset)
 
 
-@shared_task
+@shared_task(name="remapp.extractors.mam.mam")
 def mam(mg_file):
     """Extract radiation dose structured report related data from mammography images
     

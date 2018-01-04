@@ -782,7 +782,7 @@ def _fix_kodak_filters(dataset):
             dict.__setitem__(dataset, 0x187054, thick2)
 
 
-@shared_task
+@shared_task(name="remapp.extractors.dx.dx")
 def dx(dig_file):
     """Extract radiation dose structured report related data from DX radiographic images
 
