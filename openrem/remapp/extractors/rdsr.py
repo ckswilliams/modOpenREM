@@ -867,9 +867,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         if (not equip.unique_equipment_name.user_defined_modality) and (reporttype == 'projection') and (proj.acquisition_device_type_cid):
             if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'RF'
-            elif 'Integrated' in proj.acquisition_device_type_cid.code_meaning:
-                proj.general_study_module_attributes.modality_type = 'DX'
-            elif 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
+            elif proj.acquisition_device_type_cid.code_meaning in {'Integrated', 'Cassette-based'}:
                 proj.general_study_module_attributes.modality_type = 'DX'
             else:
                 logging.error(u"Acquisition device type code exists, but the value wasn't matched. Study UID: {0}, "
