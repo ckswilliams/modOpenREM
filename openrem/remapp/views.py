@@ -2014,9 +2014,14 @@ def display_name_update(request):
                             0].modality_type
                 except:
                     modality = ''
-                if modality in {'DX', 'CR', 'RF'}:
+                if modality in {'DX', 'CR', 'RF', 'dual'}:
                     display_name_data.user_defined_modality = new_user_defined_modality
                     # We can't reimport as new modality type, instead we just change the modality type value
+                    if new_user_defined_modality == 'dual':
+                        status_message = reset_dual(pk=pk)
+                        messages.info(request, status_message)
+                        display_name_data.save()
+                        continue
                     GeneralStudyModuleAttr.objects.filter(
                         generalequipmentmoduleattr__unique_equipment_name__pk=pk).update(
                         modality_type=new_user_defined_modality)
@@ -2061,6 +2066,87 @@ def display_name_update(request):
                               context_instance=RequestContext(request))
 
 
+def reset_dual(pk=None):
+    """function to set modality to DX or RF depending on presence of fluoro information.
+
+    :param pk: Unique equipment names table prmary key
+    :return: status message
+    """
+
+    if not pk:
+        logger.error("Reset dual called with no primary key")
+        return
+
+    studies = GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)
+    message_start = "Reprocessing dual for {0}. Number of studies is {1}, of which {2} are " \
+                    "DX, {3} are CR, {4} are RF and {5} are 'dual' before processing,".format(
+                        studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+                        studies.count(),
+                        studies.filter(modality_type__exact='DX').count(),
+                        studies.filter(modality_type__exact='CR').count(),
+                        studies.filter(modality_type__exact='RF').count(),
+                        studies.filter(modality_type__exact='dual').count()
+                        )
+    not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
+        modality_type__exact='RF').exclude(modality_type__exact='CR').exclude(modality_type__exact='dual')
+
+    logger.debug(
+        "Reprocessed dual for {0}. Number of studies is {1}, of which {2} are DX, {3} are "
+        "CR, {4} are RF and {5} are 'dual', leaving {6} that are not.".format(
+            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
+            studies.filter(modality_type__exact='DX').count(),
+            studies.filter(modality_type__exact='CR').count(),
+            studies.filter(modality_type__exact='RF').count(),
+            studies.filter(modality_type__exact='dual').count(),
+            not_dx_rf_cr.count(),
+        )
+    )
+    for study in studies:
+        try:
+            projection_xray_dose = study.projectionxrayradiationdose_set.get()
+            if projection_xray_dose.acquisition_device_type_cid:
+                device_type = projection_xray_dose.acquisition_device_type_cid.code_meaning
+                if 'Fluoroscopy-Guided' in device_type:
+                    study.modality_type = 'RF'
+                    study.save()
+                    continue
+                elif any(x in device_type for x in ['Integrated', 'Cassette-based']):
+                    study.modality_type = 'DX'
+                    study.save()
+                    continue
+            try:
+                accum_projection = projection_xray_dose.accumxraydose_set.get().accumprojxraydose_set.get()
+                if accum_projection.fluoro_dose_area_product_total or accum_projection.total_fluoro_time:
+                    study.modality_type = 'RF'
+                    study.save()
+                    continue
+                else:
+                    study.modality_type = 'DX'
+                    study.save()
+                    continue
+            except ObjectDoesNotExist:
+                logger.debug("Unable to reprocess study - no device type or accumulated data to go on.")
+        except ObjectDoesNotExist:
+            pass
+    logger.debug(
+        "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
+        "{3} are CR, {4} are RF and {5} are 'dual'.".format(
+            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
+            studies.filter(modality_type='DX').count(), studies.filter(modality_type='CR').count(),
+            studies.filter(modality_type='RF').count(), studies.filter(modality_type__exact='dual').count())
+    )
+    message_finish = "and after processing  {2} are DX, {3} are CR, {4} are RF and {5} are 'dual'.".format(
+                        studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+                        studies.count(),
+                        studies.filter(modality_type='DX').count(),
+                        studies.filter(modality_type='CR').count(),
+                        studies.filter(modality_type='RF').count(),
+                        studies.filter(modality_type__exact='dual').count(),
+    )
+    return " ".join([message_start, message_finish])
+
+
+
 @login_required
 def reprocess_dual(request, pk=None):
     """View to reprocess the studies from a modality that produces planar radiography and fluoroscopy to recategorise
@@ -2081,17 +2167,31 @@ def reprocess_dual(request, pk=None):
         studies = GeneralStudyModuleAttr.objects.filter(
             generalequipmentmoduleattr__unique_equipment_name__display_name=display_name)
         message_start = "Reprocessing dual for {0}. Number of studies is {1}, of which {2} are " \
-                        "DX, {3} are CR and {4} are RF before processing,".format(
+                        "DX, {3} are CR, {4} are RF and {5} are 'dual' before processing,".format(
                             studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
                             studies.count(),
-                            studies.filter(modality_type='DX').count(),
-                            studies.filter(modality_type='CR').count(),
-                            studies.filter(modality_type='RF').count())
+                            studies.filter(modality_type__exact='DX').count(),
+                            studies.filter(modality_type__exact='CR').count(),
+                            studies.filter(modality_type__exact='RF').count(),
+                            studies.filter(modality_type__exact='dual').count()
+                            )
+        not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
+            modality_type__exact='RF').exclude(modality_type__exact='CR').exclude(modality_type__exact='dual')
+        not_dx_rf_cr_list = []
+        for study in not_dx_rf_cr:
+            not_dx_rf_cr_list += study.modality_type
+
         logger.debug(
-            "Reprocessed dual for {0}. Number of studies is {1}, of which {2} are DX, {3} are CR and {4} are RF,".format(
+            "Reprocessed dual for {0}. Number of studies is {1}, of which {2} are DX, {3} are "
+            "CR, {4} are RF and {5} are 'dual', leaving {6} that are not, such as {7}".format(
                 studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
-                studies.filter(modality_type='DX').count(), studies.filter(modality_type='CR').count(),
-                studies.filter(modality_type='RF').count())
+                studies.filter(modality_type__exact='DX').count(),
+                studies.filter(modality_type__exact='CR').count(),
+                studies.filter(modality_type__exact='RF').count(),
+                studies.filter(modality_type__exact='dual').count(),
+                not_dx_rf_cr.count(),
+                not_dx_rf_cr_list
+            )
         )
         for study in studies:
             try:
@@ -2122,17 +2222,19 @@ def reprocess_dual(request, pk=None):
                 pass
         logger.debug(
             "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
-            "{3} are CR and {4} are RF.".format(
+            "{3} are CR, {4} are RF and {5} are 'dual'.".format(
                 studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
                 studies.filter(modality_type='DX').count(), studies.filter(modality_type='CR').count(),
-                studies.filter(modality_type='RF').count())
+                studies.filter(modality_type='RF').count(), studies.filter(modality_type__exact='dual').count())
         )
-        message_finish = "and after processing  {2} are DX, {3} are CR and {4} are RF.".format(
+        message_finish = "and after processing  {2} are DX, {3} are CR, {4} are RF and {5} are 'dual'.".format(
                             studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
                             studies.count(),
                             studies.filter(modality_type='DX').count(),
                             studies.filter(modality_type='CR').count(),
-                            studies.filter(modality_type='RF').count())
+                            studies.filter(modality_type='RF').count(),
+                            studies.filter(modality_type__exact='dual').count(),
+        )
         messages.info(request, " ".join([message_start, message_finish]))
 
     return HttpResponseRedirect('/openrem/viewdisplaynames/')
