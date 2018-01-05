@@ -1115,7 +1115,7 @@ def _rsdr2db(dataset):
         make_skin_map.delay(g.pk)
 
 
-@shared_task
+@shared_task(name='remapp.extractors.rdsr.rdsr')
 def rdsr(rdsr_file):
     """Extract radiation dose related data from DICOM Radiation SR objects.
 
