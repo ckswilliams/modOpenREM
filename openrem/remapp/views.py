@@ -2062,6 +2062,83 @@ def display_name_update(request):
 
 
 @login_required
+def reprocess_dual(request, pk=None):
+    """View to reprocess the studies from a modality that produces planar radiography and fluoroscopy to recategorise
+    them to DX or RF.
+
+    :param request: Request object
+    :return: Redirect back to display names view
+    """
+    from remapp.models import UniqueEquipmentNames
+
+    if not request.user.groups.filter(name="admingroup"):
+        messages.error(request, "You are not in the administrator group - please contact your administrator")
+        return redirect('/openrem/viewdisplaynames/')
+
+    if request.method == 'GET' and pk:
+        display_name = UniqueEquipmentNames.objects.get(pk=pk).display_name
+
+        studies = GeneralStudyModuleAttr.objects.filter(
+            generalequipmentmoduleattr__unique_equipment_name__display_name=display_name)
+        message_start = "Reprocessing dual for {0}. Number of studies is {1}, of which {2} are " \
+                        "DX, {3} are CR and {4} are RF before processing,".format(
+                            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+                            studies.count(),
+                            studies.filter(modality_type='DX').count(),
+                            studies.filter(modality_type='CR').count(),
+                            studies.filter(modality_type='RF').count())
+        logger.debug(
+            "Reprocessed dual for {0}. Number of studies is {1}, of which {2} are DX, {3} are CR and {4} are RF,".format(
+                studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
+                studies.filter(modality_type='DX').count(), studies.filter(modality_type='CR').count(),
+                studies.filter(modality_type='RF').count())
+        )
+        for study in studies:
+            try:
+                projection_xray_dose = study.projectionxrayradiationdose_set.get()
+                if projection_xray_dose.acquisition_device_type_cid:
+                    device_type = projection_xray_dose.acquisition_device_type_cid.code_meaning
+                    if 'Fluoroscopy-Guided' in device_type:
+                        study.modality_type = 'RF'
+                        study.save()
+                        continue
+                    elif any(x in device_type for x in ['Integrated', 'Cassette-based']):
+                        study.modality_type = 'DX'
+                        study.save()
+                        continue
+                try:
+                    accum_projection = projection_xray_dose.accumxraydose_set.get().accumprojxraydose_set.get()
+                    if accum_projection.fluoro_dose_area_product_total or accum_projection.total_fluoro_time:
+                        study.modality_type = 'RF'
+                        study.save()
+                        continue
+                    else:
+                        study.modality_type = 'DX'
+                        study.save()
+                        continue
+                except ObjectDoesNotExist:
+                    logger.debug("Unable to reprocess study - no device type or accumulated data to go on.")
+            except ObjectDoesNotExist:
+                pass
+        logger.debug(
+            "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
+            "{3} are CR and {4} are RF.".format(
+                studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
+                studies.filter(modality_type='DX').count(), studies.filter(modality_type='CR').count(),
+                studies.filter(modality_type='RF').count())
+        )
+        message_finish = "and after processing  {2} are DX, {3} are CR and {4} are RF.".format(
+                            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+                            studies.count(),
+                            studies.filter(modality_type='DX').count(),
+                            studies.filter(modality_type='CR').count(),
+                            studies.filter(modality_type='RF').count())
+        messages.info(request, " ".join([message_start, message_finish]))
+
+    return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+
+@login_required
 def chart_options_view(request):
     from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm,\
         RFChartOptionsDisplayForm, MGChartOptionsDisplayForm

@@ -156,7 +156,13 @@
                                                                        value="{{ eachrow.id }}"/></td>
       {% endif %}
       <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
-      <td><a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a></td>
+      <td>
+        {% if admin.admingroup and eachrow.user_defined_modality == 'dual' %}
+          <a href="/admin/reprocessdual/{{ eachrow.pk }}/">Dual: reprocess</a>
+        {% else %}
+          <a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a>
+        {% endif %}
+      </td>
       <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
@@ -199,7 +205,13 @@
                                                                        value="{{ eachrow.id }}"/></td>
       {% endif %}
       <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
-      <td><a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a></td>
+      <td>
+        {% if admin.admingroup and eachrow.user_defined_modality == 'dual' %}
+          <a href="/admin/reprocessdual/{{ eachrow.pk }}/">Dual: reprocess</a>
+        {% else %}
+          <a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a>
+        {% endif %}
+      </td>
       <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
