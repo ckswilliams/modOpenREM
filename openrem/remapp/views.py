@@ -2105,6 +2105,50 @@ def display_name_update(request):
                               context_instance=RequestContext(request))
 
 
+def display_names_count(request):
+    """AJAX view to return the number of studies associated with an entry in the equipment database
+
+    :param request: Request object containing modality and equipment table ID
+    :return: HTML table data element
+    """
+
+    if request.is_ajax():
+        logger.debug("Request is AJAX")
+        data = request.POST
+        modality = data.get('modality')
+        equip_name_pk = data.get('equip_name_pk')
+        if modality != 'OT':
+            studies = GeneralStudyModuleAttr.objects.filter(
+                generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
+                modality_type__exact=modality)
+            count = studies.count()
+            latest = studies.latest('study_date').study_date
+        else:
+            studies = GeneralStudyModuleAttr.objects.filter(
+                generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).exclude(
+                modality_type__exact='CT'
+            ).exclude(
+                modality_type__exact='MG'
+            ).exclude(
+                modality_type__exact='DX'
+            ).exclude(
+                modality_type__exact='CR'
+            ).exclude(
+                modality_type__exact='RF'
+            )
+            count = studies.count()
+            if count:
+                latest = studies.latest('study_date').study_date
+            else:
+                latest = None
+        template = 'remapp/displayname-count.html'
+        return render(request, template, {
+            'count': count,
+            'latest': latest
+        })
+
+
+
 def reset_dual(pk=None):
     """function to set modality to DX or RF depending on presence of fluoro information.
 

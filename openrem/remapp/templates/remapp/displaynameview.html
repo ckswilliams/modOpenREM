@@ -1,28 +1,30 @@
 {% extends "remapp/base.html" %}
 
 {% block headextras %}
-    <script src="{{ STATIC_URL }}js/sorttable.js"></script>
+  <script src="{{ STATIC_URL }}js/sorttable.js"></script>
 {% endblock %}
 
-{% block confnav %}<li class="dropdown active">{% endblock %}
+{% block confnav %}
+  <li class="dropdown active">{% endblock %}
 
 {% block navhelp %}
-        <li>
-            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_displaynames.html" target="_blank" data-toggle="tooltip" title="Display name documentation - opens in a new tab">
-                Display name documentation
-            </a>
-        </li>
+  <li>
+    <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_displaynames.html" target="_blank"
+       data-toggle="tooltip" title="Display name documentation - opens in a new tab">
+      Display name documentation
+    </a>
+  </li>
 {% endblock %}
 
 {% block toprow %}
   {% load pagination_tags %}
   <a name="#top"></a>
   <p>{% if admin.admingroup %}Check one or more boxes and click an Update button to be taken to a page where you can
-      update all of the selected systems to the same display name and / or set a user defined modality type.</p>
-      <p>The boxes can be checked or unchecked by clicking anywhere on the row. Tables can be sorted by clicking on
-  column headers.{% endif %}</p>
+    update all of the selected systems to the same display name and / or set a user defined modality type.</p>
+    <p>The boxes can be checked or unchecked by clicking anywhere on the row. Tables can be sorted by clicking on
+    column headers.{% endif %}</p>
   <p>
-  Jump to <a href="#ct">CT</a> | <a href="#mammo">Mammography</a> | <a href="#dx">DX and CR</a> |
+    Jump to <a href="#ct">CT</a> | <a href="#mammo">Mammography</a> | <a href="#dx">DX and CR</a> |
     <a href="#fluoro">Fluoroscopy</a> | <a href="#others">Others</a>
   </p>
 {% endblock %}
@@ -32,20 +34,20 @@
 
   {% paginate %}
 
-{% if admin.admingroup %}
-<form action="/openrem/updatedisplaynames/" method="get">
-<script>
-    jQuery(document).ready(function($) {
-        $(".clickable-row").click(function() {
-            var row_name = $(this).attr('row_name');
-            $('input[name='+row_name+']').prop("checked", !$('input[name='+row_name+']').prop("checked"));
+  {% if admin.admingroup %}
+    <form action="/openrem/updatedisplaynames/" method="get">
+    <script>
+        jQuery(document).ready(function ($) {
+            $(".clickable-row").click(function () {
+                var row_name = $(this).attr('row_name');
+                $('input[name=' + row_name + ']').prop("checked", !$('input[name=' + row_name + ']').prop("checked"));
+            });
+            $('input').click(function () {
+                $(this).prop("checked", !$(this).prop("checked"));
+            });
         });
-        $('input').click(function() {
-            $(this).prop("checked", !$(this).prop("checked"));
-        });
-    });
-</script>
-{% endif %}
+    </script>
+  {% endif %}
 
 <a name="ct" class="vert-offset">
   <h3>CT</h3>
@@ -65,6 +67,7 @@
     <th>Serial no.</th>
     <th>Software version</th>
     <th>Gantry ID</th>
+    <th>How many studies</th>
   </tr>
   {% for eachrow in ct_names %}
     <tr class="clickable-row" row_name="{{ eachrow.id }}">
@@ -81,6 +84,28 @@
       <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
+      <td id="ct-count-{{ eachrow.pk }}">
+        <script>
+            $(document).ready(
+                function get_latest_studies(json) {
+                    $.ajax(
+                        {
+                            url: "/admin/equipmentcount",
+                            data: {
+                                modality: 'CT',
+                                equip_name_pk: '{{ eachrow.pk }}',
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            type: "POST",
+                            success: function (data) {
+                                $('#ct-count-{{ eachrow.pk }}').html(data);
+                            }
+                        }
+                    )
+                }
+            )
+        </script>
+      </td>
     </tr>
   {% endfor %}
 </table>
@@ -245,6 +270,7 @@
     <th>Serial no.</th>
     <th>Software version</th>
     <th>Gantry ID</th>
+    <th>How many studies</th>
     <th>Review studies</th>
   </tr>
   {% for eachrow in ot_names %}
@@ -262,7 +288,29 @@
       <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
-      <td><a href="/admin/ot/{{ eachrow.pk }}/">Review</a> </td>
+      <td id="ot-count-{{ eachrow.pk }}">
+        <script>
+            $(document).ready(
+                function get_latest_studies(json) {
+                    $.ajax(
+                        {
+                            url: "/admin/equipmentcount",
+                            data: {
+                                modality: 'OT',
+                                equip_name_pk: '{{ eachrow.pk }}',
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            type: "POST",
+                            success: function (data) {
+                                $('#ot-count-{{ eachrow.pk }}').html(data);
+                            }
+                        }
+                    )
+                }
+            )
+        </script>
+      </td>
+      <td><a href="/admin/ot/{{ eachrow.pk }}/">Review</a></td>
     </tr>
   {% endfor %}
 </table>
@@ -271,7 +319,7 @@
 {% endif %}
 
 {% if admin.admingroup %}
-</form>
+  </form>
 {% endif %}
 
 {% endblock %}
