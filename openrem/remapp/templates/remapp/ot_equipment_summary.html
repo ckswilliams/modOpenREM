@@ -1,0 +1,78 @@
+{% extends "remapp/base.html" %}
+
+{% block headextras %}
+  <script src="{{ STATIC_URL }}js/sorttable.js"></script>
+{% endblock %}
+
+{% block confnav %}
+  <li class="dropdown active">{% endblock %}
+
+{% block navhelp %}
+  <li>
+    <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_displaynames.html" target="_blank"
+       data-toggle="tooltip" title="Display name documentation - opens in a new tab">
+      Display name documentation
+    </a>
+  </li>
+{% endblock %}
+
+{% block toprow %}
+
+  {% load pagination_tags %}
+
+  <p>
+    These are the studies that are <em>not assigned</em> with a modality type of
+  <ul>
+    <li>CT</li>
+    <li>RF</li>
+    <li>MG</li>
+    <li>DX</li>
+    <li>CR</li>
+  </ul>
+  </p>
+  <p>The entry in the unique equipment names table for these studies looks like this
+  </p>
+
+  <table class="table table-bordered">
+    <tr>
+      <th>Display name</th>
+      <th>User defined modality</th>
+      <th>Institution</th>
+      <th>Department</th>
+      <th>Manufacturer</th>
+      <th>Model</th>
+      <th>Station name</th>
+      <th>Serial no.</th>
+      <th>Software version</th>
+      <th>Gantry ID</th>
+    </tr>
+    <tr>
+      <td>{{ equipment.display_name }}</td>
+      <td>{{ equipment.user_defined_modality }}</td>
+      <td>{{ equipment.institution_name }}</td>
+      <td>{{ equipment.institutional_department_name }}</td>
+      <td>{{ equipment.manufacturer }}</td>
+      <td>{{ equipment.manufacturer_model_name }}</td>
+      <td>{{ equipment.station_name }}</td>
+      <td>{{ equipment.device_serial_number }}</td>
+      <td>{{ equipment.software_versions }}</td>
+      <td>{{ equipment.gantry_id }}</td>
+    </tr>
+  </table>
+
+  <p>
+    There are {{ studies.count }} studies in this list.
+  </p>
+
+{% endblock %}
+
+
+{% block mainblock %}
+
+{% for study in studies %}
+
+  {{  study }}
+
+  {% endfor %}
+
+{% endblock %}

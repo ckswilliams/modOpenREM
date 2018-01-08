@@ -1473,6 +1473,45 @@ def mg_detail_view(request, pk=None):
     )
 
 
+@login_required
+def ot_summary_list_filter(request, equip_name_pk=None):
+    """View to list partial and broken studies
+
+    :param request:
+    :param equip_name_pk: UniqueEquipmentNames primary key
+    :return:
+    """
+    from remapp.models import UniqueEquipmentNames
+
+    if not equip_name_pk:
+        logger.error("Attempt to load ot_summary_list_filter without equip_name_pk")
+        messages.error(request,
+                       "Partial and broken imports can only be reviewed with the correct "
+                       "link from the display name page")
+        return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+    if not request.user.groups.filter(name="admingroup"):
+        messages.error(request, "You are not in the administrator group - please contact your administrator")
+        return redirect('/openrem/viewdisplaynames/')
+
+    if request.method == 'GET':
+        equipment = UniqueEquipmentNames.objects.get(pk=equip_name_pk)
+        studies = GeneralStudyModuleAttr.objects.filter(
+            generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk)
+        messages.info(request, "studies.count is {0} after equip_name_pk filter".format(studies.count()))
+        studies = studies.exclude(
+            modality_type__exact='CT').exclude(
+            modality_type__exact='RF').exclude(
+            modality_type__exact='MG').exclude(
+            modality_type__exact='DX').exclude(
+            modality_type__exact='CR')
+
+        template = 'remapp/ot_equipment_summary.html'
+        return render(request, template, {'equipment': equipment, 'studies': studies})
+
+    # messages.error("Something went wrong in rendering OT review page :-(")
+    # render
+
 
 def openrem_home(request):
     from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
@@ -1931,7 +1970,7 @@ def charts_off(request):
     messages.success(request, "Chart plotting has been turned off for {0}".format(name))
 
     # Redirect to the calling page, removing '&plotCharts=on' from the url
-    return redirect((request.META['HTTP_REFERER']).replace('&plotCharts=on',''))
+    return redirect((request.META['HTTP_REFERER']).replace('&plotCharts=on', ''))
 
 
 @login_required
@@ -2014,7 +2053,7 @@ def display_name_update(request):
                             0].modality_type
                 except:
                     modality = ''
-                if modality in {'DX', 'CR', 'RF', 'dual'}:
+                if modality in {'DX', 'CR', 'RF', 'dual', 'OT'}:
                     display_name_data.user_defined_modality = new_user_defined_modality
                     # We can't reimport as new modality type, instead we just change the modality type value
                     if new_user_defined_modality == 'dual':
@@ -2079,25 +2118,25 @@ def reset_dual(pk=None):
 
     studies = GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)
     message_start = "Reprocessing dual for {0}. Number of studies is {1}, of which {2} are " \
-                    "DX, {3} are CR, {4} are RF and {5} are 'dual' before processing,".format(
+                    "DX, {3} are CR, {4} are RF and {5} are OT before processing,".format(
                         studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
                         studies.count(),
                         studies.filter(modality_type__exact='DX').count(),
                         studies.filter(modality_type__exact='CR').count(),
                         studies.filter(modality_type__exact='RF').count(),
-                        studies.filter(modality_type__exact='dual').count()
+                        studies.filter(modality_type__exact='OT').count()
                         )
     not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
-        modality_type__exact='RF').exclude(modality_type__exact='CR').exclude(modality_type__exact='dual')
+        modality_type__exact='RF').exclude(modality_type__exact='CR').exclude(modality_type__exact='OT')
 
     logger.debug(
         "Reprocessed dual for {0}. Number of studies is {1}, of which {2} are DX, {3} are "
-        "CR, {4} are RF and {5} are 'dual', leaving {6} that are not.".format(
+        "CR, {4} are RF and {5} are OT, leaving {6} that are not.".format(
             studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
             studies.filter(modality_type__exact='DX').count(),
             studies.filter(modality_type__exact='CR').count(),
             studies.filter(modality_type__exact='RF').count(),
-            studies.filter(modality_type__exact='dual').count(),
+            studies.filter(modality_type__exact='OT').count(),
             not_dx_rf_cr.count(),
         )
     )
@@ -2125,23 +2164,25 @@ def reset_dual(pk=None):
                     study.save()
                     continue
             except ObjectDoesNotExist:
-                logger.debug("Unable to reprocess study - no device type or accumulated data to go on.")
+                study.modality_type = 'OT'
+                logger.debug("Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
         except ObjectDoesNotExist:
-            pass
+            study.modality_type = 'OT'
+            logger.debug("Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
     logger.debug(
         "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
-        "{3} are CR, {4} are RF and {5} are 'dual'.".format(
+        "{3} are CR, {4} are RF and {5} are 'OT'.".format(
             studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
             studies.filter(modality_type='DX').count(), studies.filter(modality_type='CR').count(),
-            studies.filter(modality_type='RF').count(), studies.filter(modality_type__exact='dual').count())
+            studies.filter(modality_type='RF').count(), studies.filter(modality_type__exact='OT').count())
     )
-    message_finish = "and after processing  {2} are DX, {3} are CR, {4} are RF and {5} are 'dual'.".format(
+    message_finish = "and after processing  {2} are DX, {3} are CR, {4} are RF and {5} are OT because they are incomplete.".format(
                         studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
                         studies.count(),
                         studies.filter(modality_type='DX').count(),
                         studies.filter(modality_type='CR').count(),
                         studies.filter(modality_type='RF').count(),
-                        studies.filter(modality_type__exact='dual').count(),
+                        studies.filter(modality_type__exact='OT').count(),
     )
     return " ".join([message_start, message_finish])
 
@@ -2217,9 +2258,12 @@ def reprocess_dual(request, pk=None):
                         study.save()
                         continue
                 except ObjectDoesNotExist:
-                    logger.debug("Unable to reprocess study - no device type or accumulated data to go on.")
+                    study.modality_type = 'OT'
+                    logger.debug(
+                        "Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
             except ObjectDoesNotExist:
-                pass
+                study.modality_type = 'OT'
+                logger.debug("Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
         logger.debug(
             "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
             "{3} are CR, {4} are RF and {5} are 'dual'.".format(

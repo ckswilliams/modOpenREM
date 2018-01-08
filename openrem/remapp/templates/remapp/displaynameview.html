@@ -245,6 +245,7 @@
     <th>Serial no.</th>
     <th>Software version</th>
     <th>Gantry ID</th>
+    <th>Review studies</th>
   </tr>
   {% for eachrow in ot_names %}
     <tr class="clickable-row" row_name="{{ eachrow.id }}">
@@ -261,6 +262,7 @@
       <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
+      <td><a href="/admin/ot/{{ eachrow.pk }}/">Review</a> </td>
     </tr>
   {% endfor %}
 </table>
