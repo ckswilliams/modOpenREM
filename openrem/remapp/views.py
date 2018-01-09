@@ -1499,12 +1499,12 @@ def ot_summary_list_filter(request, equip_name_pk=None):
         studies = GeneralStudyModuleAttr.objects.filter(
             generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk)
         messages.info(request, "studies.count is {0} after equip_name_pk filter".format(studies.count()))
-        studies = studies.exclude(
-            modality_type__exact='CT').exclude(
-            modality_type__exact='RF').exclude(
-            modality_type__exact='MG').exclude(
-            modality_type__exact='DX').exclude(
-            modality_type__exact='CR')
+        # studies = studies.exclude(
+        #     modality_type__exact='CT').exclude(
+        #     modality_type__exact='RF').exclude(
+        #     modality_type__exact='MG').exclude(
+        #     modality_type__exact='DX').exclude(
+        #     modality_type__exact='CR')
 
         template = 'remapp/ot_equipment_summary.html'
         return render(request, template, {'equipment': equipment, 'studies': studies})
@@ -2161,13 +2161,23 @@ def display_name_count(request):
     :param request: Request object containing modality and equipment table ID
     :return: HTML table data element
     """
+    from django.db.models import Q
 
     if request.is_ajax():
         data = request.POST
         modality = data.get('modality')
         equip_name_pk = data.get('equip_name_pk')
         latest = None
-        if modality != 'OT':
+        if modality == 'DX':
+            studies = GeneralStudyModuleAttr.objects.filter(
+                generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
+                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="DX") |
+                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="CR")
+            )
+            count = studies.count()
+            if count:
+                latest = studies.latest('study_date').study_date
+        elif modality != 'OT':
             studies = GeneralStudyModuleAttr.objects.filter(
                 generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
                 modality_type__exact=modality)
