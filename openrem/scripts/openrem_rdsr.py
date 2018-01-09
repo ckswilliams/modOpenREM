@@ -14,7 +14,7 @@
 
 import sys
 from glob import glob
-from openrem.remapp.extractors import rdsr
+from openrem.remapp.extractors.rdsr import rdsr
 
 if len(sys.argv) < 2:
     sys.exit(u'Error: Supply at least one argument - the radiation dose structured report')

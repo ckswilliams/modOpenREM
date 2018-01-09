@@ -14,7 +14,7 @@
 
 import sys
 from glob import glob
-from openrem.remapp.extractors import mam
+from openrem.remapp.extractors.mam import mam
 
 if len(sys.argv) < 2:
     sys.exit(u'Error: Supply at least one argument - the DICOM mammography image file')

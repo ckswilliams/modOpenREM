@@ -16,7 +16,7 @@
 
 import sys
 from glob import glob
-from openrem.remapp.extractors import rdsr_toshiba_ct_from_dose_images
+from openrem.remapp.extractors.rdsr_toshiba_ct_from_dose_images import rdsr_toshiba_ct_from_dose_images
 
 if len(sys.argv) < 2:
     sys.exit('Error: supply at least one argument - the folder containing the DICOM objects')

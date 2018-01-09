@@ -14,7 +14,7 @@
 
 import sys
 from glob import glob
-from openrem.remapp.extractors import dx
+from openrem.remapp.extractors.dx import dx
 
 if len(sys.argv) < 2:
     sys.exit(u'Error: Supply at least one argument - the DICOM radiography image file')

@@ -14,7 +14,7 @@
 
 import sys
 from glob import glob
-from openrem.remapp.extractors import ct_philips
+from openrem.remapp.extractors.ct_philips import ct_philips
 
 if len(sys.argv) < 2:
     sys.exit(u'Error: Supply at least one argument - the Philips dose report image')
