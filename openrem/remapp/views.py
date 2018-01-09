@@ -2005,7 +2005,7 @@ def display_names_view(request):
 
     return_structure = {'name_list': f, 'admin': admin,
                         'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'rf_names': rf_names,
-                        'ot_names': ot_names}
+                        'ot_names': ot_names, 'modalities': ['CT', 'MG', 'DX', 'RF', 'OT']}
 
     return render_to_response(
         'remapp/displaynameview.html',
@@ -2105,7 +2105,57 @@ def display_name_update(request):
                               context_instance=RequestContext(request))
 
 
-def display_names_count(request):
+def display_name_populate(request):
+    """AJAX view to populate the modality tables for the display names view
+
+    :param request: Request object containing modality
+    :return: HTML table
+    """
+    from django.db.models import Q
+    from remapp.models import UniqueEquipmentNames
+
+    if request.is_ajax():
+        data = request.POST
+        modality = data.get('modality')
+        f = UniqueEquipmentNames.objects.order_by('display_name')
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in request.user.groups.all():
+            admin[group.name] = True
+        if modality in ['MG', 'CT']:
+            name_set = f.filter(
+                generalequipmentmoduleattr__general_study_module_attributes__modality_type=modality).distinct()
+            dual = False
+        elif modality == 'DX':
+            name_set = f.filter(Q(user_defined_modality="DX") | Q(user_defined_modality="dual") | (
+                Q(user_defined_modality__isnull=True) & (
+                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
+                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
+            dual = True
+        elif modality == 'RF':
+            name_set = f.filter(Q(user_defined_modality="RF") | Q(user_defined_modality="dual") | (
+                Q(user_defined_modality__isnull=True) &
+                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
+            dual = True
+        elif modality == 'OT':
+            name_set = f.filter(~Q(user_defined_modality__isnull=True) | (
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR"))).distinct()
+            dual = False
+        else:
+            name_set = None
+            dual = False
+        template = 'remapp/displayname-modality.html'
+        return render(request, template, {
+            'name_set': name_set,
+            'admin': admin,
+            'modality': modality,
+            'dual': dual,
+        })
+
+def display_name_count(request):
     """AJAX view to return the number of studies associated with an entry in the equipment database
 
     :param request: Request object containing modality and equipment table ID
@@ -2113,16 +2163,17 @@ def display_names_count(request):
     """
 
     if request.is_ajax():
-        logger.debug("Request is AJAX")
         data = request.POST
         modality = data.get('modality')
         equip_name_pk = data.get('equip_name_pk')
+        latest = None
         if modality != 'OT':
             studies = GeneralStudyModuleAttr.objects.filter(
                 generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
                 modality_type__exact=modality)
             count = studies.count()
-            latest = studies.latest('study_date').study_date
+            if count:
+                latest = studies.latest('study_date').study_date
         else:
             studies = GeneralStudyModuleAttr.objects.filter(
                 generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).exclude(
@@ -2139,8 +2190,6 @@ def display_names_count(request):
             count = studies.count()
             if count:
                 latest = studies.latest('study_date').study_date
-            else:
-                latest = None
         template = 'remapp/displayname-count.html'
         return render(request, template, {
             'count': count,
