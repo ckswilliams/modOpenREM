@@ -1,4 +1,3 @@
-
 <p>There are {{ name_set.count }} entries in this table. Back to the <a href="#top">top</a>.</p>
 <table class="table table-bordered table-hover row-clickable sortable">
   <tr>
@@ -6,9 +5,9 @@
       <th>Update?</th>
     {% endif %}
     <th>Display name</th>
-  {% if dual %}
-  <th>Userr defined modality</th>
-  {% endif %}
+    {% if dual %}
+      <th>User defined modality</th>
+    {% endif %}
     <th>Institution</th>
     <th>Department</th>
     <th>Manufacturer</th>
@@ -26,15 +25,15 @@
                                                                        value="{{ eachrow.id }}"/></td>
       {% endif %}
       <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
-    {% if dual %}
-            <td>
-        {% if admin.admingroup and eachrow.user_defined_modality == 'dual' %}
-          <a href="/admin/reprocessdual/{{ eachrow.pk }}/">Dual: reprocess</a>
-        {% else %}
-          <a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a>
-        {% endif %}
-      </td>
-    {% endif %}
+      {% if dual %}
+        <td>
+          {% if admin.admingroup and eachrow.user_defined_modality == 'dual' %}
+            <a href="/admin/reprocessdual/{{ eachrow.pk }}/">Dual: reprocess</a>
+          {% else %}
+            <a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a>
+          {% endif %}
+        </td>
+      {% endif %}
       <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>

@@ -49,26 +49,26 @@
     </script>
   {% endif %}
 
-  {% for modality in modalities %}
+{% for modality in modalities %}
   <script>
-            $(document).ready(
-                function get_display_name_list(json) {
-                    $.ajax(
-                        {
-                            url: "/populatedisplaynames",
-                            data: {
-                                modality: '{{ modality }}',
-                                csrfmiddlewaretoken: '{{ csrf_token }}'
-                            },
-                            type: "POST",
-                            success: function (data) {
-                                $('#{{ modality }}-names').html(data);
-                            }
-                        }
-                    )
-                }
-            )
-        </script>
+      $(document).ready(
+          function get_display_name_list(json) {
+              $.ajax(
+                  {
+                      url: "/populatedisplaynames",
+                      data: {
+                          modality: '{{ modality }}',
+                          csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                      type: "POST",
+                      success: function (data) {
+                          $('#{{ modality }}-names').html(data);
+                      }
+                  }
+              )
+          }
+      )
+  </script>
 {% endfor %}
 
 <a name="ct" class="vert-offset">
@@ -103,7 +103,7 @@
   <input class="btn btn-default" type="submit" value="Update">
 {% endif %}
 
-  <a name="others" class="vert-offset">
+<a name="others" class="vert-offset">
   <h3>Others</h3>
 </a>
 <span id="OT-names"></span>
