@@ -17,6 +17,7 @@
     <th>Software version</th>
     <th>Gantry ID</th>
     <th>How many studies</th>
+    <th>Review</th>
   </tr>
   {% for eachrow in name_set %}
     <tr class="clickable-row" row_name="{{ eachrow.id }}">
@@ -64,6 +65,7 @@
             )
         </script>
       </td>
+      <td><a href="/admin/ot/{{ eachrow.pk }}/">Review</a></td>
     </tr>
   {% endfor %}
 </table>

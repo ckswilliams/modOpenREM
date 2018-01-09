@@ -2137,12 +2137,12 @@ def display_name_populate(request):
                 Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
             dual = True
         elif modality == 'OT':
-            name_set = f.filter(~Q(user_defined_modality__isnull=True) | (
-                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
-                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
-                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
-                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
-                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR"))).distinct()
+            name_set = f.filter(  # ~Q(user_defined_modality__isnull=True) | (
+                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
+                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
+                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
+                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
+                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
             dual = False
         else:
             name_set = None
@@ -2168,6 +2168,7 @@ def display_name_count(request):
         modality = data.get('modality')
         equip_name_pk = data.get('equip_name_pk')
         latest = None
+        count_all = None
         if modality == 'DX':
             studies = GeneralStudyModuleAttr.objects.filter(
                 generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
@@ -2185,8 +2186,9 @@ def display_name_count(request):
             if count:
                 latest = studies.latest('study_date').study_date
         else:
-            studies = GeneralStudyModuleAttr.objects.filter(
-                generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).exclude(
+            studies_all = GeneralStudyModuleAttr.objects.filter(
+                generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk)
+            studies = studies_all.exclude(
                 modality_type__exact='CT'
             ).exclude(
                 modality_type__exact='MG'
@@ -2198,12 +2200,14 @@ def display_name_count(request):
                 modality_type__exact='RF'
             )
             count = studies.count()
+            count_all = studies_all.count()
             if count:
                 latest = studies.latest('study_date').study_date
         template = 'remapp/displayname-count.html'
         return render(request, template, {
             'count': count,
-            'latest': latest
+            'latest': latest,
+            'count_all': count_all,
         })
 
 
@@ -2362,11 +2366,13 @@ def reprocess_dual(request, pk=None):
                         continue
                 except ObjectDoesNotExist:
                     study.modality_type = 'OT'
+                    study.save()
                     logger.debug(
                         "Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
             except ObjectDoesNotExist:
                 study.modality_type = 'OT'
-                logger.debug("Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
+                study.save()
+                logger.debug("Unable to reprocess study - no projection xray table. Modality set to OT.")
         logger.debug(
             "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
             "{3} are CR, {4} are RF and {5} are 'dual'.".format(

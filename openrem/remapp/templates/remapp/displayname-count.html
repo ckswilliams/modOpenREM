@@ -1,5 +1,8 @@
 <td>
   {{ count }},
+  {% if count_all %}
+   (of {{ count_all }}),
+{% endif %}
   {% if latest %}
     latest {{ latest }}
   {% endif %}
