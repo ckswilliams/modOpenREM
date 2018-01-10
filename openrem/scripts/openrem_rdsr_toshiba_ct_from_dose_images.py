@@ -1,4 +1,5 @@
 #!/usr/local/bin/python
+# This Python file uses the following encoding: utf-8
 # scripts/openrem_rdsr_toshiba_ct_from_dose_images
 
 """Script to launch the rdsr_toshiba_ct_from_dose_images module to import information from

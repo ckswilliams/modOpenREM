@@ -1,5 +1,5 @@
-# This Python file uses the following encoding: utf-8
 #!/usr/local/bin/python
+# This Python file uses the following encoding: utf-8
 # scripts/openrem_dx
 
 """Script to launch the mam module to import information from radiographic images

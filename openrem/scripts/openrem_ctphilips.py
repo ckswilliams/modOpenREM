@@ -1,5 +1,5 @@
-# This Python file uses the following encoding: utf-8
 #!/usr/local/bin/python
+# This Python file uses the following encoding: utf-8
 # scripts/openrem_ctphilips
 
 """Script to launch the ct_philips module to import information from Philips CT 
