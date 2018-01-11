@@ -20,17 +20,7 @@
 
   {% load pagination_tags %}
 
-  <p>
-    These are the studies that are <em>not assigned</em> with a modality type of
-  <ul>
-    <li>CT</li>
-    <li>RF</li>
-    <li>MG</li>
-    <li>DX</li>
-    <li>CR</li>
-  </ul>
-  </p>
-  <p>The entry in the unique equipment names table for these studies looks like this
+  <p>The entry in the unique equipment names table for these {{ modality }} studies looks like this
   </p>
 
   <table class="table table-bordered">
@@ -62,6 +52,11 @@
 
   <p>
     There are {{ studies.count }} studies in this list.
+    {% if modality == "OT" %}
+      This list is of studies that are not identified as being CT, fluoroscopy, mammography or radiography (DX and CR).
+      The total number of studies associated with this equipment (before filtering out the modalities) is
+      {{ count_all }}.
+    {% endif %}
   </p>
 
 {% endblock %}
@@ -69,9 +64,9 @@
 
 {% block mainblock %}
 
-{% for study in studies %}
+  {% for study in studies %}
 
-  {{  study }}
+    {{ study }}
 
   {% endfor %}
 

@@ -1474,11 +1474,12 @@ def mg_detail_view(request, pk=None):
 
 
 @login_required
-def ot_summary_list_filter(request, equip_name_pk=None):
+def ot_summary_list_filter(request, equip_name_pk=None, modality=None):
     """View to list partial and broken studies
 
     :param request:
     :param equip_name_pk: UniqueEquipmentNames primary key
+    :param modality: modality to filter by
     :return:
     """
     from remapp.models import UniqueEquipmentNames
@@ -1496,18 +1497,11 @@ def ot_summary_list_filter(request, equip_name_pk=None):
 
     if request.method == 'GET':
         equipment = UniqueEquipmentNames.objects.get(pk=equip_name_pk)
-        studies = GeneralStudyModuleAttr.objects.filter(
-            generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk)
-        messages.info(request, "studies.count is {0} after equip_name_pk filter".format(studies.count()))
-        # studies = studies.exclude(
-        #     modality_type__exact='CT').exclude(
-        #     modality_type__exact='RF').exclude(
-        #     modality_type__exact='MG').exclude(
-        #     modality_type__exact='DX').exclude(
-        #     modality_type__exact='CR')
+        studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
 
         template = 'remapp/ot_equipment_summary.html'
-        return render(request, template, {'equipment': equipment, 'studies': studies})
+        return render(request, template, {
+            'modality': modality, 'equipment': equipment, 'studies': studies, 'count_all': count_all})
 
     # messages.error("Something went wrong in rendering OT review page :-(")
     # render
@@ -2067,11 +2061,11 @@ def display_name_update(request):
                 elif not modality:
                     error_message = error_message + 'Can\'t determine modality type for' \
                                                     ' ' + display_name_data.display_name + ', ' \
-                                                    'user defined modality type not set.\n'
+                                                                                           'user defined modality type not set.\n'
                 else:
                     error_message = error_message + 'Modality type change is not allowed for' \
                                                     ' ' + display_name_data.display_name + ' (only changing from DX ' \
-                                                    'to RF and vice versa is allowed).\n'
+                                                                                           'to RF and vice versa is allowed).\n'
             display_name_data.save()
 
         if error_message:
@@ -2127,22 +2121,22 @@ def display_name_populate(request):
             dual = False
         elif modality == 'DX':
             name_set = f.filter(Q(user_defined_modality="DX") | Q(user_defined_modality="dual") | (
-                Q(user_defined_modality__isnull=True) & (
-                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
-                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
+                    Q(user_defined_modality__isnull=True) & (
+                    Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
+                    Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
             dual = True
         elif modality == 'RF':
             name_set = f.filter(Q(user_defined_modality="RF") | Q(user_defined_modality="dual") | (
-                Q(user_defined_modality__isnull=True) &
-                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
+                    Q(user_defined_modality__isnull=True) &
+                    Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
             dual = True
         elif modality == 'OT':
             name_set = f.filter(  # ~Q(user_defined_modality__isnull=True) | (
-                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
-                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
-                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
-                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
-                    ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
             dual = False
         else:
             name_set = None
@@ -2155,61 +2149,74 @@ def display_name_populate(request):
             'dual': dual,
         })
 
+
+def display_name_modality_filter(equip_name_pk=None, modality=None):
+    """Function to filter the studies to a particular unique_name entry and particular modality.
+
+    :param equip_name_pk: Primary key of entry in unique names table
+    :param modality: Modality to filter on
+    :return: Reduced queryset of studies, plus count of pre-modality filtered studies for modality OT
+    """
+    from django.db.models import Q
+
+    if not equip_name_pk:
+        logger.error("Display name modality filter function called without a primary key ID for the unique names table")
+        return
+    if not modality or modality not in ['CT', 'RF', 'MG', 'DX', 'OT']:
+        logger.error("Display name modality filter function called without an appropriate modality specified")
+        return
+
+    count_all = None
+    if modality in ['CT', 'MG', 'RF']:
+        studies = GeneralStudyModuleAttr.objects.filter(
+            generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
+            modality_type__exact=modality)
+    elif modality == 'DX':
+        studies = GeneralStudyModuleAttr.objects.filter(
+            generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="DX") |
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="CR")
+        )
+    else:  # modality == 'OT'
+        studies_all = GeneralStudyModuleAttr.objects.filter(
+            generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk)
+        count_all = studies_all.count()
+        studies = studies_all.exclude(
+            modality_type__exact='CT'
+        ).exclude(
+            modality_type__exact='MG'
+        ).exclude(
+            modality_type__exact='DX'
+        ).exclude(
+            modality_type__exact='CR'
+        ).exclude(
+            modality_type__exact='RF'
+        )
+    return studies, count_all
+
+
 def display_name_count(request):
     """AJAX view to return the number of studies associated with an entry in the equipment database
 
     :param request: Request object containing modality and equipment table ID
     :return: HTML table data element
     """
-    from django.db.models import Q
 
     if request.is_ajax():
         data = request.POST
         modality = data.get('modality')
         equip_name_pk = data.get('equip_name_pk')
         latest = None
-        count_all = None
-        if modality == 'DX':
-            studies = GeneralStudyModuleAttr.objects.filter(
-                generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
-                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="DX") |
-                Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="CR")
-            )
-            count = studies.count()
-            if count:
-                latest = studies.latest('study_date').study_date
-        elif modality != 'OT':
-            studies = GeneralStudyModuleAttr.objects.filter(
-                generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
-                modality_type__exact=modality)
-            count = studies.count()
-            if count:
-                latest = studies.latest('study_date').study_date
-        else:
-            studies_all = GeneralStudyModuleAttr.objects.filter(
-                generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk)
-            studies = studies_all.exclude(
-                modality_type__exact='CT'
-            ).exclude(
-                modality_type__exact='MG'
-            ).exclude(
-                modality_type__exact='DX'
-            ).exclude(
-                modality_type__exact='CR'
-            ).exclude(
-                modality_type__exact='RF'
-            )
-            count = studies.count()
-            count_all = studies_all.count()
-            if count:
-                latest = studies.latest('study_date').study_date
+        studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+        count = studies.count()
+        if count:
+            latest = studies.latest('study_date').study_date
         template = 'remapp/displayname-count.html'
         return render(request, template, {
             'count': count,
             'latest': latest,
             'count_all': count_all,
         })
-
 
 
 def reset_dual(pk=None):
@@ -2226,13 +2233,13 @@ def reset_dual(pk=None):
     studies = GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)
     message_start = "Reprocessing dual for {0}. Number of studies is {1}, of which {2} are " \
                     "DX, {3} are CR, {4} are RF and {5} are OT before processing,".format(
-                        studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-                        studies.count(),
-                        studies.filter(modality_type__exact='DX').count(),
-                        studies.filter(modality_type__exact='CR').count(),
-                        studies.filter(modality_type__exact='RF').count(),
-                        studies.filter(modality_type__exact='OT').count()
-                        )
+        studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+        studies.count(),
+        studies.filter(modality_type__exact='DX').count(),
+        studies.filter(modality_type__exact='CR').count(),
+        studies.filter(modality_type__exact='RF').count(),
+        studies.filter(modality_type__exact='OT').count()
+    )
     not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
         modality_type__exact='RF').exclude(modality_type__exact='CR').exclude(modality_type__exact='OT')
 
@@ -2272,7 +2279,8 @@ def reset_dual(pk=None):
                     continue
             except ObjectDoesNotExist:
                 study.modality_type = 'OT'
-                logger.debug("Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
+                logger.debug(
+                    "Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
         except ObjectDoesNotExist:
             study.modality_type = 'OT'
             logger.debug("Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
@@ -2284,15 +2292,14 @@ def reset_dual(pk=None):
             studies.filter(modality_type='RF').count(), studies.filter(modality_type__exact='OT').count())
     )
     message_finish = "and after processing  {2} are DX, {3} are CR, {4} are RF and {5} are OT because they are incomplete.".format(
-                        studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-                        studies.count(),
-                        studies.filter(modality_type='DX').count(),
-                        studies.filter(modality_type='CR').count(),
-                        studies.filter(modality_type='RF').count(),
-                        studies.filter(modality_type__exact='OT').count(),
+        studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+        studies.count(),
+        studies.filter(modality_type='DX').count(),
+        studies.filter(modality_type='CR').count(),
+        studies.filter(modality_type='RF').count(),
+        studies.filter(modality_type__exact='OT').count(),
     )
     return " ".join([message_start, message_finish])
-
 
 
 @login_required
@@ -2316,13 +2323,13 @@ def reprocess_dual(request, pk=None):
             generalequipmentmoduleattr__unique_equipment_name__display_name=display_name)
         message_start = "Reprocessing dual for {0}. Number of studies is {1}, of which {2} are " \
                         "DX, {3} are CR, {4} are RF and {5} are 'dual' before processing,".format(
-                            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-                            studies.count(),
-                            studies.filter(modality_type__exact='DX').count(),
-                            studies.filter(modality_type__exact='CR').count(),
-                            studies.filter(modality_type__exact='RF').count(),
-                            studies.filter(modality_type__exact='dual').count()
-                            )
+            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+            studies.count(),
+            studies.filter(modality_type__exact='DX').count(),
+            studies.filter(modality_type__exact='CR').count(),
+            studies.filter(modality_type__exact='RF').count(),
+            studies.filter(modality_type__exact='dual').count()
+        )
         not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
             modality_type__exact='RF').exclude(modality_type__exact='CR').exclude(modality_type__exact='dual')
         not_dx_rf_cr_list = []
@@ -2381,12 +2388,12 @@ def reprocess_dual(request, pk=None):
                 studies.filter(modality_type='RF').count(), studies.filter(modality_type__exact='dual').count())
         )
         message_finish = "and after processing  {2} are DX, {3} are CR, {4} are RF and {5} are 'dual'.".format(
-                            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-                            studies.count(),
-                            studies.filter(modality_type='DX').count(),
-                            studies.filter(modality_type='CR').count(),
-                            studies.filter(modality_type='RF').count(),
-                            studies.filter(modality_type__exact='dual').count(),
+            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+            studies.count(),
+            studies.filter(modality_type='DX').count(),
+            studies.filter(modality_type='CR').count(),
+            studies.filter(modality_type='RF').count(),
+            studies.filter(modality_type__exact='dual').count(),
         )
         messages.info(request, " ".join([message_start, message_finish]))
 
