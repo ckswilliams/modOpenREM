@@ -2,7 +2,7 @@
 # This Python file uses the following encoding: utf-8
 # scripts/openrem_mg
 
-"""Script to launch the mam module to import information from mammography images 
+"""Script to launch the mam module to import information from mammography images
 
     :param filename: relative or absolute path to mammography DICOM image file.
     :type filename: str.
@@ -22,5 +22,5 @@ if len(sys.argv) < 2:
 for arg in sys.argv[1:]:
     for filename in glob(arg):
         mam(filename)
-    
+
 sys.exit()
