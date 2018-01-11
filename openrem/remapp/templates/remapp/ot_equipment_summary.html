@@ -64,10 +64,76 @@
 
 {% block mainblock %}
 
-  {% for study in studies %}
+  <table class="table table-bordered">
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Patient module?</th>
+      <th>Patient study module?</th>
+      <th>CT template</th>
+      <th>CT accumulated data</th>
+      <th>CT event data</th>
+      <th>X-ray Template</th>
+      <th>X-ray Accumulated data</th>
+      <th>Accum. fluoro and projection</th>
+      <th>Accum. mammography</th>
+      <th>Accum. cassette based projection</th>
+      <th>Accum. projection</th>
+      <th>Irradiation event data</th>
+      <th>Irradiation detector data</th>
+      <th>Irradiation source data</th>
+      <th>Irradiation mechanical data</th>
+    </tr>
+    {% for study in studies %}
 
-    {{ study }}
+      <tr>
+        <td>{{ study.study_date }}</td>
+        <td>{{ study.study_time }}</td>
+        <td>
+          {% if study.patientmoduleattr_set.get %}
+            Present
+          {% else %}
+            Missing
+          {% endif %}
+        </td>
+        <td>
+          {% if study.patientstudymoduleattr_set %}
+            Present. Age {{ study.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}
+          {% else %}
+            Missing
+          {% endif %}
+        </td>
+        <td>
+          {% if study.ctradiationdose_set.get %}
+            Present
+          {% else %}
+            None
+          {% endif %}
+        </td>
+        <td>
+          {% if study.ctradiationdose_set.get.ctaccumulateddosedata_set %}
+            Yes, number of events:
+            {{ study.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}
+          {% else %}
+            None
+          {% endif %}
+        </td>
+        <td>
+          {% if study.ctradiationdose_set.get.ctirradiationeventdata_set.all.count %}
+            {{ study.ctradiationdose_set.get.ctirradiationeventdata_set.all.count }} event(s)
+          {% else %}
+            None
+          {% endif %}
+        </td>
+      <td>
+        {% if study.projectionxrayradiationdose_set.get %}
+        Present
+        {% else %}
+        None
+        {% endif %}
+      </td>
+      </tr>
 
-  {% endfor %}
-
+    {% endfor %}
+  </table>
 {% endblock %}
