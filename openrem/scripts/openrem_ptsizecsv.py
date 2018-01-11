@@ -1,8 +1,8 @@
-# This Python file uses the following encoding: utf-8
 #!/usr/local/bin/python
+# This Python file uses the following encoding: utf-8
 # scripts/openrem_ptsizecsv
 
-"""Script to launch the rdsr to import information from DICOM Radiation SR objects 
+"""Script to launch the rdsr to import information from DICOM Radiation SR objects
 
     :param filename: relative or absolute path to Radiation Dose Structured Report.
     :type filename: str.
