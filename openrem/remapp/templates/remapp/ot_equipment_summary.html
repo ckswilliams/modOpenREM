@@ -86,54 +86,26 @@
     </tr>
     {% for study in studies %}
 
-      <tr>
-        <td>{{ study.study_date }}</td>
-        <td>{{ study.study_time }}</td>
-        <td>
-          {% if study.patientmoduleattr_set.get %}
-            Present
-          {% else %}
-            Missing
-          {% endif %}
-        </td>
-        <td>
-          {% if study.patientstudymoduleattr_set %}
-            Present. Age {{ study.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}
-          {% else %}
-            Missing
-          {% endif %}
-        </td>
-        <td>
-          {% if study.ctradiationdose_set.get %}
-            Present
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if study.ctradiationdose_set.get.ctaccumulateddosedata_set %}
-            Yes, number of events:
-            {{ study.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if study.ctradiationdose_set.get.ctirradiationeventdata_set.all.count %}
-            {{ study.ctradiationdose_set.get.ctirradiationeventdata_set.all.count }} event(s)
-          {% else %}
-            None
-          {% endif %}
-        </td>
-      <td>
-        {% if study.projectionxrayradiationdose_set.get %}
-        Present
-        {% else %}
-        None
-        {% endif %}
-      </td>
-      </tr>
-
+      <script>
+          $(document).ready(
+              function get_review_data(json) {
+                  $.ajax(
+                      {
+                          url: "/admin/review/study",
+                          data: {
+                              study_pk: '{{ study.pk }}',
+                              csrfmiddlewaretoken: '{{ csrf_token }}'
+                          },
+                          type: "POST",
+                          success: function (data) {
+                              $('#row{{ study.pk }}').html(data);
+                          }
+                      }
+                  )
+              }
+          )
+      </script>
+      <tr id="row{{ study.pk }}"></tr>
     {% endfor %}
   </table>
 {% endblock %}

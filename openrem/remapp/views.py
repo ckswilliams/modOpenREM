@@ -2400,6 +2400,65 @@ def reprocess_dual(request, pk=None):
     return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
 
+def review_study_details(request):
+    """AJAX function to populate row in table with details of study for review
+
+    :param request: Request object containing study pk
+    :return: HTML row data
+    """
+
+    if request.is_ajax():
+        data = request.POST
+        study_pk = data.get('study_pk')
+        study = GeneralStudyModuleAttr.objects.get(pk__exact=study_pk)
+        study_data = {
+            'study_date': study.study_date,
+            'study_time': study.study_time
+        }
+        try:
+            study.patientmoduleattr_set.get()
+            study_data['patientmoduleattr'] = u"Present"
+        except ObjectDoesNotExist:
+            study_data['patientmoduleattr'] = u"Missing"
+        try:
+            patientstudymoduleattr = study.patientstudymoduleattr_set.get()
+            age = patientstudymoduleattr.patient_age_decimal
+            if age:
+                study_data['patientstudymoduleattr'] = u"Present. Age {0:.1f}".format(
+                    patientstudymoduleattr.patient_age_decimal)
+            else:
+                study_data['patientstudymoduleattr'] = u"Present."
+        except ObjectDoesNotExist:
+            study_data['patientstudymoduleattr'] = u"Missing"
+        try:
+            ctradiationdose = study.ctradiationdose_set.get()
+            study_data['ctradiationdose'] = u"Present"
+            try:
+                ctaccumulateddosedata = ctradiationdose.ctaccumulateddosedata_set.get()
+                num_events = ctaccumulateddosedata.total_number_of_irradiation_events
+                study_data['ctaccumulateddosedata'] = "Yes, {0} events".format(num_events)
+            except ObjectDoesNotExist:
+                study_data['ctaccumulateddosedata'] = u"None"
+            try:
+                study_data['cteventdata'] = u"{0} event records".format(
+                    ctradiationdose.ctirradiationeventdata_set.order_by('pk').count()
+                )
+            except ObjectDoesNotExist:
+                study_data['cteventdata'] = u"None"
+        except ObjectDoesNotExist:
+            study_data['ctradiationdose'] = u"None"
+            study_data['ctaccumulateddosedata'] = u"None"
+            study_data['cteventdata'] = u"None"
+        try:
+            projectionxraydata = study.projectionxrayradiationdose_set.get()
+            study_data['projectionxraydata'] = u"Present"
+        except ObjectDoesNotExist:
+            study_data['projectionxraydata'] = u"None"
+
+        template = 'remapp/review_study.html'
+        return render(request, template, study_data)
+
+
 @login_required
 def chart_options_view(request):
     from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm,\
