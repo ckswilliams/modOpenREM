@@ -2498,18 +2498,72 @@ def review_study_details(request):
                     study_data['accumproj'] = u""
                     for index, accumxraydose in enumerate(accumxraydose_set):
                         accumproj[index] = accumxraydose.accumintegratedprojradiogdose_set.get()
-                        study_data['accumproj'] = u"DAP total {0:.2f} cGy.cm<sup>2</sup> ".format(
+                        study_data['accumproj'] += u"DAP total {0:.2f} cGy.cm<sup>2</sup> ".format(
                             accumproj[index].convert_gym2_to_cgycm2())
                 except ObjectDoesNotExist:
                     study_data['accumproj'] = u""
-
             except ObjectDoesNotExist:
                 study_data['accumxraydose'] = u""
                 study_data['accumfluoroproj'] = u""
                 study_data['accummammo'] = u""
                 study_data['accumcassproj'] = u""
                 study_data['accumproj'] = u""
-
+            try:
+                study_data['eventdetector'] = u""
+                study_data['eventsource'] = u""
+                study_data['eventmech'] = u""
+                irradevent_set = projectionxraydata.irradeventxraydata_set.order_by('pk')
+                irradevent_set_count = irradevent_set.count()
+                if irradevent_set_count == 1:
+                    study_data['irradevent'] = u"{0} event. ".format(irradevent_set_count)
+                else:
+                    study_data['irradevent'] = u"{0} events. ".format(irradevent_set_count)
+                for index, irradevent in enumerate(irradevent_set):
+                    if index == 4:
+                        study_data['irradevent'] += u"...etc"
+                        study_data['eventdetector'] += u"...etc"
+                        study_data['eventsource'] += u"...etc"
+                        study_data['eventmech'] += u"...etc"
+                        break
+                    if irradevent.dose_area_product:
+                        study_data['irradevent'] += u"DAP {0}: {1:.2f} cGy.cm<sup>2</sup> ".format(
+                            index+1, irradevent.convert_gym2_to_cgycm2())
+                    elif irradevent.entrance_exposure_at_rp:
+                        study_data['irradevent'] += u"RP dose {0}: {1:.2f} mGy ".format(
+                            index+1, irradevent.entrance_exposure_at_rp)
+                    try:
+                        eventdetector = irradevent.irradeventxraydetectordata_set.get()
+                        if eventdetector.exposure_index:
+                            study_data['eventdetector'] += "e{0}: EI {1:.1f}, ".format(
+                                index+1, eventdetector.exposure_index)
+                        else:
+                            study_data['eventdetector'] += "e{0} present, ".format(index+1)
+                    except ObjectDoesNotExist:
+                        study_data['eventdetector'] += u""
+                    try:
+                        eventsource = irradevent.irradeventxraysourcedata_set.get()
+                        if eventsource.dose_rp:
+                            study_data['eventsource'] += u"e{0} RP Dose {1:.3f} mGy, ".format(
+                                index+1, eventsource.convert_gy_to_mgy())
+                        elif eventsource.average_glandular_dose:
+                            study_data['eventsource'] += u"e{0} AGD {1:.2f} mGy, ".format(
+                                index + 1, eventsource.average_glandular_dose)
+                        else:
+                            study_data['eventsource'] += u"e{0} present, ".format(index+1)
+                    except ObjectDoesNotExist:
+                        study_data['eventsource'] += u""
+                    try:
+                        eventmech = irradevent.irradeventxraymechanicaldata_set.get()
+                        if eventmech.positioner_primary_angle:
+                            study_data['eventmech'] += u"e{0} {1:.1f}&deg;".format(
+                                index+1, eventmech.positioner_primary_angle)
+                        else:
+                            study_data['eventmech'] += u"e{0} present, ".format(
+                                index+1, eventmech.positioner_primary_angle)
+                    except ObjectDoesNotExist:
+                        study_data['eventmech'] = u""
+            except ObjectDoesNotExist:
+                study_data['irradevent'] = u""
         except ObjectDoesNotExist:
             study_data['projectionxraydata'] = u""
             study_data['accumxraydose'] = u""
@@ -2517,6 +2571,13 @@ def review_study_details(request):
             study_data['accummammo'] = u""
             study_data['accumcassproj'] = u""
             study_data['accumproj'] = u""
+            study_data['irradevent'] = u""
+            study_data['eventdetector'] = u""
+            study_data['eventdetector'] = u""
+            study_data['eventsource'] = u""
+            study_data['eventmech'] = u""
+            study_data['eventmech'] =u""
+
 
         template = 'remapp/review_study.html'
         return render(request, template, study_data)
