@@ -2438,17 +2438,17 @@ def review_study_details(request):
                 num_events = ctaccumulateddosedata.total_number_of_irradiation_events
                 study_data['ctaccumulateddosedata'] = "Yes, {0} events".format(num_events)
             except ObjectDoesNotExist:
-                study_data['ctaccumulateddosedata'] = u"None"
+                study_data['ctaccumulateddosedata'] = u""
             try:
                 study_data['cteventdata'] = u"{0} event records".format(
                     ctradiationdose.ctirradiationeventdata_set.order_by('pk').count()
                 )
             except ObjectDoesNotExist:
-                study_data['cteventdata'] = u"None"
+                study_data['cteventdata'] = u""
         except ObjectDoesNotExist:
-            study_data['ctradiationdose'] = u"None"
-            study_data['ctaccumulateddosedata'] = u"None"
-            study_data['cteventdata'] = u"None"
+            study_data['ctradiationdose'] = u""
+            study_data['ctaccumulateddosedata'] = u""
+            study_data['cteventdata'] = u""
         try:
             projectionxraydata = study.projectionxrayradiationdose_set.get()
             study_data['projectionxraydata'] = u"Present"
@@ -2460,7 +2460,7 @@ def review_study_details(request):
                 elif accumxraydose_set_count:
                     study_data['accumxraydose'] = u"{0} present".format(accumxraydose_set_count)
                 else:
-                    study_data['accumxraydose'] = u"None"
+                    study_data['accumxraydose'] = u""
                 try:
                     accumfluoroproj = {}
                     study_data['accumfluoroproj'] = u""
@@ -2472,29 +2472,51 @@ def review_study_details(request):
                             accumfluoroproj[index].fluoro_gym2_to_cgycm2(),
                             accumfluoroproj[index].acq_gym2_to_cgycm2())
                 except ObjectDoesNotExist:
-                    study_data['accumfluoroproj'] = u"None"
+                    study_data['accumfluoroproj'] = u""
                 try:
                     accummammo_set = accumxraydose_set[0].accummammographyxraydose_set.order_by('pk')
                     if accummammo_set.count() == 0:
-                        study_data['accummammo'] = u"None"
+                        study_data['accummammo'] = u""
                     else:
                         study_data['accummammo'] = u""
                         for accummammo in accummammo_set:
                             study_data['accummammo'] += u"{0}: {1:.3f} mGy".format(
                                 accummammo.laterality, accummammo.accumulated_average_glandular_dose)
                 except ObjectDoesNotExist:
-                    study_data['accummammo'] = u"None"
+                    study_data['accummammo'] = u""
+                try:
+                    accumcassproj = {}
+                    study_data['accumcassproj'] = u""
+                    for index, accumxraydose in enumerate(accumxraydose_set):
+                        accumcassproj[index] = accumxraydose.accumcassettebsdprojradiogdose_set.get()
+                        study_data['accumcassproj'] += u"Number of frames {0}".format(
+                            accumcassproj[index].total_number_of_radiographic_frames)
+                except ObjectDoesNotExist:
+                    study_data['accumcassproj'] = u""
+                try:
+                    accumproj = {}
+                    study_data['accumproj'] = u""
+                    for index, accumxraydose in enumerate(accumxraydose_set):
+                        accumproj[index] = accumxraydose.accumintegratedprojradiogdose_set.get()
+                        study_data['accumproj'] = u"DAP total {0:.2f} cGy.cm<sup>2</sup> ".format(
+                            accumproj[index].convert_gym2_to_cgycm2())
+                except ObjectDoesNotExist:
+                    study_data['accumproj'] = u""
 
             except ObjectDoesNotExist:
-                study_data['accumxraydose'] = u"None"
-                study_data['accumfluoroproj'] = u"None"
-                study_data['accummammo'] = u"None"
+                study_data['accumxraydose'] = u""
+                study_data['accumfluoroproj'] = u""
+                study_data['accummammo'] = u""
+                study_data['accumcassproj'] = u""
+                study_data['accumproj'] = u""
 
         except ObjectDoesNotExist:
-            study_data['projectionxraydata'] = u"None"
-            study_data['accumxraydose'] = u"None"
-            study_data['accumfluoroproj'] = u"None"
-            study_data['accummammo'] = u"None"
+            study_data['projectionxraydata'] = u""
+            study_data['accumxraydose'] = u""
+            study_data['accumfluoroproj'] = u""
+            study_data['accummammo'] = u""
+            study_data['accumcassproj'] = u""
+            study_data['accumproj'] = u""
 
         template = 'remapp/review_study.html'
         return render(request, template, study_data)
