@@ -2216,7 +2216,7 @@ def review_summary_list(request, equip_name_pk=None, modality=None):
         for group in request.user.groups.all():
             admin[group.name] = True
 
-        template = 'remapp/ot_equipment_summary.html'
+        template = 'remapp/review_summary_list.html'
         return render(request, template, {
             'modality': modality, 'equipment': equipment, 'studies': studies, 'count_all': count_all, 'admin': admin})
 
