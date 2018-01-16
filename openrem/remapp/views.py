@@ -2416,8 +2416,10 @@ def review_study_details(request):
             'study_time': study.study_time
         }
         try:
-            study.patientmoduleattr_set.get()
+            patient = study.patientmoduleattr_set.get()
             study_data['patientmoduleattr'] = u"Present"
+            if patient.not_patient_indicator:
+                study_data['patientmoduleattr'] += u"<br>?not patient"
         except ObjectDoesNotExist:
             study_data['patientmoduleattr'] = u"Missing"
         try:
@@ -2440,9 +2442,20 @@ def review_study_details(request):
             except ObjectDoesNotExist:
                 study_data['ctaccumulateddosedata'] = u""
             try:
-                study_data['cteventdata'] = u"{0} event records".format(
-                    ctradiationdose.ctirradiationeventdata_set.order_by('pk').count()
-                )
+                ctirradiationeventdata_set = ctradiationdose.ctirradiationeventdata_set.order_by('pk')
+
+                study_data['cteventdata'] = u"{0} events.<br>".format(
+                    ctirradiationeventdata_set.count())
+                for index, event in enumerate(ctirradiationeventdata_set):
+                    if event.acquisition_protocol:
+                        protocol = event.acquisition_protocol
+                    else:
+                        protocol = u""
+                    study_data['cteventdata'] += u"e{0}: {1} {2:.1f}&nbsp;mGycm<br>".format(
+                        index,
+                        protocol,
+                        event.dlp
+                    )
             except ObjectDoesNotExist:
                 study_data['cteventdata'] = u""
         except ObjectDoesNotExist:
@@ -2517,7 +2530,7 @@ def review_study_details(request):
                 if irradevent_set_count == 1:
                     study_data['irradevent'] = u"{0} event. ".format(irradevent_set_count)
                 else:
-                    study_data['irradevent'] = u"{0} events. ".format(irradevent_set_count)
+                    study_data['irradevent'] = u"{0} events. <br>".format(irradevent_set_count)
                 for index, irradevent in enumerate(irradevent_set):
                     if index == 4:
                         study_data['irradevent'] += u"...etc"
@@ -2526,39 +2539,41 @@ def review_study_details(request):
                         study_data['eventmech'] += u"...etc"
                         break
                     if irradevent.dose_area_product:
-                        study_data['irradevent'] += u"DAP {0}: {1:.2f} cGy.cm<sup>2</sup> ".format(
-                            index+1, irradevent.convert_gym2_to_cgycm2())
+                        study_data['irradevent'] += u"e{0}: {1} {2:.2f} cGy.cm<sup>2</sup> <br>".format(
+                            index+1,
+                            irradevent.acquisition_protocol,
+                            irradevent.convert_gym2_to_cgycm2())
                     elif irradevent.entrance_exposure_at_rp:
-                        study_data['irradevent'] += u"RP dose {0}: {1:.2f} mGy ".format(
+                        study_data['irradevent'] += u"RP dose {0}: {1:.2f} mGy  <br>".format(
                             index+1, irradevent.entrance_exposure_at_rp)
                     try:
                         eventdetector = irradevent.irradeventxraydetectordata_set.get()
                         if eventdetector.exposure_index:
-                            study_data['eventdetector'] += "e{0}: EI {1:.1f}, ".format(
+                            study_data['eventdetector'] += u"e{0}: EI {1:.1f},  <br>".format(
                                 index+1, eventdetector.exposure_index)
                         else:
-                            study_data['eventdetector'] += "e{0} present, ".format(index+1)
+                            study_data['eventdetector'] += u"e{0} present,  <br>".format(index+1)
                     except ObjectDoesNotExist:
                         study_data['eventdetector'] += u""
                     try:
                         eventsource = irradevent.irradeventxraysourcedata_set.get()
                         if eventsource.dose_rp:
-                            study_data['eventsource'] += u"e{0} RP Dose {1:.3f} mGy, ".format(
+                            study_data['eventsource'] += u"e{0} RP Dose {1:.3f} mGy,  <br>".format(
                                 index+1, eventsource.convert_gy_to_mgy())
                         elif eventsource.average_glandular_dose:
-                            study_data['eventsource'] += u"e{0} AGD {1:.2f} mGy, ".format(
+                            study_data['eventsource'] += u"e{0} AGD {1:.2f} mGy,  <br>".format(
                                 index + 1, eventsource.average_glandular_dose)
                         else:
-                            study_data['eventsource'] += u"e{0} present, ".format(index+1)
+                            study_data['eventsource'] += u"e{0} present,  <br>".format(index+1)
                     except ObjectDoesNotExist:
                         study_data['eventsource'] += u""
                     try:
                         eventmech = irradevent.irradeventxraymechanicaldata_set.get()
                         if eventmech.positioner_primary_angle:
-                            study_data['eventmech'] += u"e{0} {1:.1f}&deg;".format(
+                            study_data['eventmech'] += u"e{0} {1:.1f}&deg;  <br>".format(
                                 index+1, eventmech.positioner_primary_angle)
                         else:
-                            study_data['eventmech'] += u"e{0} present, ".format(
+                            study_data['eventmech'] += u"e{0} present,  <br>".format(
                                 index+1, eventmech.positioner_primary_angle)
                     except ObjectDoesNotExist:
                         study_data['eventmech'] = u""

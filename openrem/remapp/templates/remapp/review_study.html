@@ -1,10 +1,10 @@
 <td>{{ study_date }}</td>
 <td>{{ study_time }}</td>
-<td>{{ patientmoduleattr }}</td>
+<td>{{ patientmoduleattr |safe }}</td>
 <td>{{ patientstudymoduleattr }}</td>
 <td>{{ ctradiationdose }}</td>
 <td>{{ ctaccumulateddosedata }}</td>
-<td>{{ cteventdata }}</td>
+<td>{{ cteventdata |safe }}</td>
 <td>{{ projectionxraydata }}</td>
 <td>{{ accumxraydose }}</td>
 <td>{{ accumfluoroproj |safe }}</td>
@@ -12,6 +12,6 @@
 <td>{{ accumcassproj }}</td>
 <td>{{ accumproj |safe }}</td>
 <td>{{ irradevent |safe }}</td>
-<td>{{ eventdetector }}</td>
-<td>{{ eventsource }}</td>
+<td>{{ eventdetector |safe }}</td>
+<td>{{ eventsource |safe }}</td>
 <td>{{ eventmech |safe }}</td>
