@@ -1473,40 +1473,6 @@ def mg_detail_view(request, pk=None):
     )
 
 
-@login_required
-def review_summary_list(request, equip_name_pk=None, modality=None):
-    """View to list partial and broken studies
-
-    :param request:
-    :param equip_name_pk: UniqueEquipmentNames primary key
-    :param modality: modality to filter by
-    :return:
-    """
-    from remapp.models import UniqueEquipmentNames
-
-    if not equip_name_pk:
-        logger.error("Attempt to load review_summary_list without equip_name_pk")
-        messages.error(request,
-                       "Partial and broken imports can only be reviewed with the correct "
-                       "link from the display name page")
-        return HttpResponseRedirect('/openrem/viewdisplaynames/')
-
-    if not request.user.groups.filter(name="admingroup"):
-        messages.error(request, "You are not in the administrator group - please contact your administrator")
-        return redirect('/openrem/viewdisplaynames/')
-
-    if request.method == 'GET':
-        equipment = UniqueEquipmentNames.objects.get(pk=equip_name_pk)
-        studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
-
-        template = 'remapp/ot_equipment_summary.html'
-        return render(request, template, {
-            'modality': modality, 'equipment': equipment, 'studies': studies, 'count_all': count_all})
-
-    # messages.error("Something went wrong in rendering OT review page :-(")
-    # render
-
-
 def openrem_home(request):
     from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
@@ -2219,6 +2185,42 @@ def display_name_count(request):
         })
 
 
+@login_required
+def review_summary_list(request, equip_name_pk=None, modality=None):
+    """View to list partial and broken studies
+
+    :param request:
+    :param equip_name_pk: UniqueEquipmentNames primary key
+    :param modality: modality to filter by
+    :return:
+    """
+    from remapp.models import UniqueEquipmentNames
+
+    if not equip_name_pk:
+        logger.error("Attempt to load review_summary_list without equip_name_pk")
+        messages.error(request,
+                       "Partial and broken imports can only be reviewed with the correct "
+                       "link from the display name page")
+        return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+    if not request.user.groups.filter(name="admingroup"):
+        messages.error(request, "You are not in the administrator group - please contact your administrator")
+        return redirect('/openrem/viewdisplaynames/')
+
+    if request.method == 'GET':
+        equipment = UniqueEquipmentNames.objects.get(pk=equip_name_pk)
+        studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+        for group in request.user.groups.all():
+            admin[group.name] = True
+
+        template = 'remapp/ot_equipment_summary.html'
+        return render(request, template, {
+            'modality': modality, 'equipment': equipment, 'studies': studies, 'count_all': count_all, 'admin': admin})
+
+
 def reset_dual(pk=None):
     """function to set modality to DX or RF depending on presence of fluoro information.
 
@@ -2310,92 +2312,14 @@ def reprocess_dual(request, pk=None):
     :param request: Request object
     :return: Redirect back to display names view
     """
-    from remapp.models import UniqueEquipmentNames
 
     if not request.user.groups.filter(name="admingroup"):
         messages.error(request, "You are not in the administrator group - please contact your administrator")
         return redirect('/openrem/viewdisplaynames/')
 
     if request.method == 'GET' and pk:
-        display_name = UniqueEquipmentNames.objects.get(pk=pk).display_name
-
-        studies = GeneralStudyModuleAttr.objects.filter(
-            generalequipmentmoduleattr__unique_equipment_name__display_name=display_name)
-        message_start = "Reprocessing dual for {0}. Number of studies is {1}, of which {2} are " \
-                        "DX, {3} are CR, {4} are RF and {5} are 'dual' before processing,".format(
-            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-            studies.count(),
-            studies.filter(modality_type__exact='DX').count(),
-            studies.filter(modality_type__exact='CR').count(),
-            studies.filter(modality_type__exact='RF').count(),
-            studies.filter(modality_type__exact='dual').count()
-        )
-        not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
-            modality_type__exact='RF').exclude(modality_type__exact='CR').exclude(modality_type__exact='dual')
-        not_dx_rf_cr_list = []
-        for study in not_dx_rf_cr:
-            not_dx_rf_cr_list += study.modality_type
-
-        logger.debug(
-            "Reprocessed dual for {0}. Number of studies is {1}, of which {2} are DX, {3} are "
-            "CR, {4} are RF and {5} are 'dual', leaving {6} that are not, such as {7}".format(
-                studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
-                studies.filter(modality_type__exact='DX').count(),
-                studies.filter(modality_type__exact='CR').count(),
-                studies.filter(modality_type__exact='RF').count(),
-                studies.filter(modality_type__exact='dual').count(),
-                not_dx_rf_cr.count(),
-                not_dx_rf_cr_list
-            )
-        )
-        for study in studies:
-            try:
-                projection_xray_dose = study.projectionxrayradiationdose_set.get()
-                if projection_xray_dose.acquisition_device_type_cid:
-                    device_type = projection_xray_dose.acquisition_device_type_cid.code_meaning
-                    if 'Fluoroscopy-Guided' in device_type:
-                        study.modality_type = 'RF'
-                        study.save()
-                        continue
-                    elif any(x in device_type for x in ['Integrated', 'Cassette-based']):
-                        study.modality_type = 'DX'
-                        study.save()
-                        continue
-                try:
-                    accum_projection = projection_xray_dose.accumxraydose_set.get().accumprojxraydose_set.get()
-                    if accum_projection.fluoro_dose_area_product_total or accum_projection.total_fluoro_time:
-                        study.modality_type = 'RF'
-                        study.save()
-                        continue
-                    else:
-                        study.modality_type = 'DX'
-                        study.save()
-                        continue
-                except ObjectDoesNotExist:
-                    study.modality_type = 'OT'
-                    study.save()
-                    logger.debug(
-                        "Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
-            except ObjectDoesNotExist:
-                study.modality_type = 'OT'
-                study.save()
-                logger.debug("Unable to reprocess study - no projection xray table. Modality set to OT.")
-        logger.debug(
-            "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
-            "{3} are CR, {4} are RF and {5} are 'dual'.".format(
-                studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
-                studies.filter(modality_type='DX').count(), studies.filter(modality_type='CR').count(),
-                studies.filter(modality_type='RF').count(), studies.filter(modality_type__exact='dual').count())
-        )
-        message_finish = "and after processing  {2} are DX, {3} are CR, {4} are RF and {5} are 'dual'.".format(
-            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-            studies.count(),
-            studies.filter(modality_type='DX').count(),
-            studies.filter(modality_type='CR').count(),
-            studies.filter(modality_type='RF').count(),
-            studies.filter(modality_type__exact='dual').count(),
-        )
-        messages.info(request, " ".join([message_start, message_finish]))
+        status_message = reset_dual(pk=pk)
+        messages.info(request, status_message)
 
     return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
@@ -2593,8 +2517,7 @@ def review_study_details(request):
             study_data['eventdetector'] = u""
             study_data['eventsource'] = u""
             study_data['eventmech'] = u""
-            study_data['eventmech'] =u""
-
+            study_data['eventmech'] = u""
 
         template = 'remapp/review_study.html'
         return render(request, template, study_data)
