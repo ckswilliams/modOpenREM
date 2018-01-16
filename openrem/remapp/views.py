@@ -2270,21 +2270,41 @@ def reset_dual(pk=None):
                     study.save()
                     continue
             try:
-                accum_projection = projection_xray_dose.accumxraydose_set.get().accumprojxraydose_set.get()
-                if accum_projection.fluoro_dose_area_product_total or accum_projection.total_fluoro_time:
-                    study.modality_type = 'RF'
-                    study.save()
-                    continue
-                else:
-                    study.modality_type = 'DX'
-                    study.save()
-                    continue
+                accum_xray_dose = projection_xray_dose.accumxraydose_set.order_by('pk')[0]  # consider just first plane
+                try:
+                    accum_fluoro_proj = accum_xray_dose.accumprojxraydose_set.get()
+                    if accum_fluoro_proj.fluoro_dose_area_product_total or accum_fluoro_proj.total_fluoro_time:
+                        study.modality_type = 'RF'
+                        study.save()
+                        continue
+                    else:
+                        study.modality_type = 'DX'
+                        study.save()
+                        continue
+                except ObjectDoesNotExist:
+                    try:
+                        if accum_xray_dose.accumintegratedprojradiogdose_set.get():
+                            study.modality_type = 'DX'
+                            study.save()
+                            continue
+                    except ObjectDoesNotExist:
+                        study.modality_type = 'OT'
+                        study.save()
+                        logger.debug(
+                            "Unable to reprocess study - no device type or accumulated data to go on. "
+                            "Modality set to OT.")
+                study.modality_type = 'OT'
+                study.save()
+                logger.debug(
+                    "Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
             except ObjectDoesNotExist:
                 study.modality_type = 'OT'
+                study.save()
                 logger.debug(
                     "Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
         except ObjectDoesNotExist:
             study.modality_type = 'OT'
+            study.save()
             logger.debug("Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
     logger.debug(
         "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
