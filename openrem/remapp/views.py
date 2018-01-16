@@ -1474,7 +1474,7 @@ def mg_detail_view(request, pk=None):
 
 
 @login_required
-def ot_summary_list_filter(request, equip_name_pk=None, modality=None):
+def review_summary_list(request, equip_name_pk=None, modality=None):
     """View to list partial and broken studies
 
     :param request:
@@ -1485,7 +1485,7 @@ def ot_summary_list_filter(request, equip_name_pk=None, modality=None):
     from remapp.models import UniqueEquipmentNames
 
     if not equip_name_pk:
-        logger.error("Attempt to load ot_summary_list_filter without equip_name_pk")
+        logger.error("Attempt to load review_summary_list without equip_name_pk")
         messages.error(request,
                        "Partial and broken imports can only be reviewed with the correct "
                        "link from the display name page")
@@ -2479,10 +2479,12 @@ def review_study_details(request):
                     study_data['accumfluoroproj'] = u""
                     for index, accumxraydose in enumerate(accumxraydose_set):
                         accumfluoroproj[index] = accumxraydose.accumprojxraydose_set.get()
-                        study_data['accumfluoroproj'] += u"Total fluoro DAP {0}: {1:.2f}&nbsp;cGy.cm<sup>2</sup>; " \
-                                                         u"Acq: {2:.2f}&nbsp;cGy.cm<sup>2</sup>. ".format(
-                            index+1,
-                            accumfluoroproj[index].fluoro_gym2_to_cgycm2(),
+                        study_data['accumfluoroproj'] += u"P{0} ".format(index+1)
+                        if accumfluoroproj[index].fluoro_dose_area_product_total:
+                            study_data['accumfluoroproj'] += u"Total fluoro DA: {0:.2f}&nbsp;cGy.cm<sup>2</sup>" \
+                                                             u"; ".format(accumfluoroproj[index].fluoro_gym2_to_cgycm2())
+                        if accumfluoroproj[index].acquisition_dose_area_product_total:
+                            study_data['accumfluoroproj'] += u"Acq: {0:.2f}&nbsp;cGy.cm<sup>2</sup>. ".format(
                             accumfluoroproj[index].acq_gym2_to_cgycm2())
                 except ObjectDoesNotExist:
                     study_data['accumfluoroproj'] = u""
