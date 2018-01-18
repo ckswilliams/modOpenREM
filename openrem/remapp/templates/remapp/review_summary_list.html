@@ -62,8 +62,7 @@
 
 
   <script>
-      function getthisworkingfunction() {
-          console.log("button gethisworking pressed")
+      function studiesDeleteButton() {
           $.ajax(
               {
                   url: "/admin/review/studiesdelete",
@@ -81,7 +80,7 @@
 
   <ul>
     <li id="deleteStudiesLi">
-      <button id="getthisworking" class="btn btn-warning" onclick="getthisworkingfunction()">Delete all these studies
+      <button id="getthisworking" class="btn btn-warning" onclick="studiesDeleteButton()">Delete all these studies
       </button>
 
       Why do this? If you have assigned a custom Display Name to this equipment (e.g. 'imported'), new studies coming in
