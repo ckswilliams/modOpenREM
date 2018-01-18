@@ -59,8 +59,30 @@
     {% endif %}
   </p>
 
+
+
+  <script>
+      function getthisworkingfunction() {
+          console.log("button gethisworking pressed")
+          $.ajax(
+              {
+                  url: "/admin/review/studiesdelete",
+                  data: {
+                      csrfmiddlewaretoken: '{{ csrf_token }}'
+                  },
+                  type: "POST",
+                  success: function (data) {
+                      $('#deleteStudiesLi').html(data);
+                  }
+              }
+          )
+      }
+  </script>
+
   <ul>
-    <li><a class="btn btn-danger" href="#" role="button">Delete all these studies</a>
+    <li id="deleteStudiesLi">
+      <button id="getthisworking" class="btn btn-warning" onclick="getthisworkingfunction()">Delete all these studies
+      </button>
 
       Why do this? If you have assigned a custom Display Name to this equipment (e.g. 'imported'), new studies coming in
       will fall into that display name...

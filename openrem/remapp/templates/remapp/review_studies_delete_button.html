@@ -1,0 +1,13 @@
+<form method="post">{% csrf_token %}
+  Are you sure you want to delete all these studies?
+  <input type="submit" value="Delete" class="btn btn-danger"/>
+  <button id="backButton" class="btn btn-default">Cancel</button>
+
+  <script>
+      $("#backButton").click(function (e) {
+          e = e || window.event; // support  for IE8 and lower
+          e.preventDefault(); // stop browser from doing native logic
+          window.history.back();
+      });
+  </script>
+</form>

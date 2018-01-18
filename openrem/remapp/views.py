@@ -2220,6 +2220,21 @@ def review_summary_list(request, equip_name_pk=None, modality=None):
         return render(request, template, {
             'modality': modality, 'equipment': equipment, 'studies': studies, 'count_all': count_all, 'admin': admin})
 
+    if request.method == 'POST':
+        return redirect('/openrem/dx/')
+
+
+@login_required
+def review_studies_delete(request):
+    """AJAX function to replace Delete button with Are you sure button
+
+    :param request:
+    :return:
+    """
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
+        template = 'remapp/review_studies_delete_button.html'
+        return render(request, template, {'delete_equip': False})
+
 
 def reset_dual(pk=None):
     """function to set modality to DX or RF depending on presence of fluoro information.
