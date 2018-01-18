@@ -67,7 +67,9 @@
               {
                   url: "/admin/review/studiesdelete",
                   data: {
-                      csrfmiddlewaretoken: '{{ csrf_token }}'
+                      csrfmiddlewaretoken: '{{ csrf_token }}',
+                      equip_name_pk: '{{ equip_name_pk }}',
+                      modality: '{{ modality }}'
                   },
                   type: "POST",
                   success: function (data) {

@@ -2218,10 +2218,17 @@ def review_summary_list(request, equip_name_pk=None, modality=None):
 
         template = 'remapp/review_summary_list.html'
         return render(request, template, {
-            'modality': modality, 'equipment': equipment, 'studies': studies, 'count_all': count_all, 'admin': admin})
+            'modality': modality, 'equipment': equipment, 'equip_name_pk': equip_name_pk, 'studies': studies,
+            'count_all': count_all, 'admin': admin})
 
-    if request.method == 'POST':
-        return redirect('/openrem/dx/')
+    if request.method == 'POST' and request.user.groups.filter(name="admingroup") and equip_name_pk and modality:
+        studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+        studies.delete()
+        messages.info(request, "Studies deleted")
+        return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+    else:
+        messages.error(request, "Incorrect attempt to delete studies.")
+        return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
 
 
 @login_required
@@ -2232,8 +2239,10 @@ def review_studies_delete(request):
     :return:
     """
     if request.is_ajax() and request.user.groups.filter(name="admingroup"):
+        data = request.POST
         template = 'remapp/review_studies_delete_button.html'
-        return render(request, template, {'delete_equip': False})
+        return render(request, template, {'delete_equip': False, 'modality': data['modality'],
+                                          'equip_name_pk': data['equip_name_pk']})
 
 
 def reset_dual(pk=None):

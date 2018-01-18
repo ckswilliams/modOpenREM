@@ -1,5 +1,7 @@
 <form method="post">{% csrf_token %}
   Are you sure you want to delete all these studies?
+  <input type="hidden" name="equip_name_pk" value="{{ equip_name_pk }}">
+  <input type="hidden" name="modality" value="{{ modality }}">
   <input type="submit" value="Delete" class="btn btn-danger"/>
   <button id="backButton" class="btn btn-default">Cancel</button>
 
