@@ -2132,21 +2132,17 @@ def display_name_modality_filter(equip_name_pk=None, modality=None):
         logger.error("Display name modality filter function called without an appropriate modality specified")
         return
 
-    count_all = None
+    studies_all = GeneralStudyModuleAttr.objects.filter(
+        generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk)
+    count_all = studies_all.count()
     if modality in ['CT', 'MG', 'RF']:
-        studies = GeneralStudyModuleAttr.objects.filter(
-            generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
-            modality_type__exact=modality)
+        studies = studies_all.filter(modality_type__exact=modality)
     elif modality == 'DX':
-        studies = GeneralStudyModuleAttr.objects.filter(
-            generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk).filter(
+        studies = studies_all.filter(
             Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="DX") |
             Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="CR")
         )
     else:  # modality == 'OT'
-        studies_all = GeneralStudyModuleAttr.objects.filter(
-            generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk)
-        count_all = studies_all.count()
         studies = studies_all.exclude(
             modality_type__exact='CT'
         ).exclude(
@@ -2186,7 +2182,7 @@ def display_name_count(request):
 
 
 @login_required
-def review_summary_list(request, equip_name_pk=None, modality=None):
+def review_summary_list(request, equip_name_pk=None, modality=None, delete_equip=None):
     """View to list partial and broken studies
 
     :param request:
@@ -2222,10 +2218,24 @@ def review_summary_list(request, equip_name_pk=None, modality=None):
             'count_all': count_all, 'admin': admin})
 
     if request.method == 'POST' and request.user.groups.filter(name="admingroup") and equip_name_pk and modality:
-        studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
-        studies.delete()
-        messages.info(request, "Studies deleted")
-        return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+        delete_equip = request.POST['delete_equip']
+        if not delete_equip:
+            studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+            studies.delete()
+            messages.info(request, "Studies deleted")
+            return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+        else:
+            studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+            if count_all > studies.count():
+                messages.warning(request,
+                                 "Can't delete table entry - non-{0} studies are associated with it".format(modality))
+                logger.warning("Can't delete table entry - non-{0} studies are associated with it".format(modality))
+                return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+            else:
+                studies.delete()
+                UniqueEquipmentNames.objects.get(pk=equip_name_pk).delete()
+                messages.info(request, "Studies and equipment name table entry deleted")
+                return redirect('/openrem/viewdisplaynames/'.format(equip_name_pk, modality))
     else:
         messages.error(request, "Incorrect attempt to delete studies.")
         return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
@@ -2233,7 +2243,7 @@ def review_summary_list(request, equip_name_pk=None, modality=None):
 
 @login_required
 def review_studies_delete(request):
-    """AJAX function to replace Delete button with Are you sure button
+    """AJAX function to replace Delete button with delete form for associated studies
 
     :param request:
     :return:
@@ -2242,6 +2252,20 @@ def review_studies_delete(request):
         data = request.POST
         template = 'remapp/review_studies_delete_button.html'
         return render(request, template, {'delete_equip': False, 'modality': data['modality'],
+                                          'equip_name_pk': data['equip_name_pk']})
+
+
+@login_required
+def review_studies_equip_delete(request):
+    """AJAX function to replace Delete button with delete form for euipment table entry and studies
+
+    :param request:
+    :return:
+    """
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
+        data = request.POST
+        template = 'remapp/review_studies_delete_button.html'
+        return render(request, template, {'delete_equip': True, 'modality': data['modality'],
                                           'equip_name_pk': data['equip_name_pk']})
 
 
