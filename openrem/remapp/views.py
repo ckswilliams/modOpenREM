@@ -2190,6 +2190,7 @@ def review_summary_list(request, equip_name_pk=None, modality=None, delete_equip
     :param modality: modality to filter by
     :return:
     """
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
     from remapp.models import UniqueEquipmentNames
 
     if not equip_name_pk:
@@ -2205,7 +2206,15 @@ def review_summary_list(request, equip_name_pk=None, modality=None, delete_equip
 
     if request.method == 'GET':
         equipment = UniqueEquipmentNames.objects.get(pk=equip_name_pk)
-        studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+        studies_list, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+        paginator = Paginator(studies_list, 25)
+        page = request.GET.get('page')
+        try:
+            studies = paginator.page(page)
+        except PageNotAnInteger:
+            studies = paginator.page(1)
+        except EmptyPage:
+            studies = paginator.page(paginator.num_pages)
 
         admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -2215,10 +2224,10 @@ def review_summary_list(request, equip_name_pk=None, modality=None, delete_equip
         template = 'remapp/review_summary_list.html'
         return render(request, template, {
             'modality': modality, 'equipment': equipment, 'equip_name_pk': equip_name_pk, 'studies': studies,
-            'count_all': count_all, 'admin': admin})
+            'studies_count': studies_list.count(), 'count_all': count_all, 'admin': admin})
 
     if request.method == 'POST' and request.user.groups.filter(name="admingroup") and equip_name_pk and modality:
-        delete_equip = request.POST['delete_equip']
+        delete_equip = bool(request.POST['delete_equip'] == u"True")
         if not delete_equip:
             studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
             studies.delete()
@@ -2443,11 +2452,17 @@ def review_study_details(request):
                         protocol = event.acquisition_protocol
                     else:
                         protocol = u""
-                    study_data['cteventdata'] += u"e{0}: {1} {2:.1f}&nbsp;mGycm<br>".format(
-                        index,
-                        protocol,
-                        event.dlp
-                    )
+                    if event.dlp:
+                        study_data['cteventdata'] += u"e{0}: {1} {2:.2f}&nbsp;mGycm<br>".format(
+                            index,
+                            protocol,
+                            event.dlp
+                        )
+                    else:
+                        study_data['cteventdata'] += u"e{0}: {1}<br>".format(
+                            index,
+                            protocol
+                        )
             except ObjectDoesNotExist:
                 study_data['cteventdata'] = u""
         except ObjectDoesNotExist:

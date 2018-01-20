@@ -18,7 +18,7 @@
 
 {% block toprow %}
 
-  {% load pagination_tags %}
+
 
   <p>The entry in the unique equipment names table for these {{ modality }} studies looks like this
   </p>
@@ -54,9 +54,9 @@
     {% if modality == "OT" %}
       This list is of studies that are not identified as being CT, fluoroscopy, mammography or radiography (DX and CR).
       The total number of studies associated with this equipment (before filtering out the modalities) is
-      {{ count_all }}, and {{ studies.count }} after doing the exclusions.
+      {{ count_all }}, and {{ studies_count }} after doing the exclusions.
     {% else %}
-    There are {{ count_all }} studies associated with this equipment, and {{ studies.count }} studies in this list which
+    There are {{ count_all }} studies associated with this equipment, and {{ studies_count }} studies in this list which
   has been filtered by the modality {{ modality }} {% if modality == "DX" %}(including CR){% endif %}
   {% endif %}
   </p>
@@ -102,7 +102,7 @@
   <div class="col-md-offset-6">
   <span class="pull-right">
   <span id="deleteStudiesSpan">
-      {% if studies.count %}
+      {% if studies_count %}
       <button class="btn btn-warning pull-right" onclick="studiesDeleteButton()">Delete studies</button>
       {% else %}
       <button class="btn btn-default pull-right" disabled="disabled">Delete studies</button>
@@ -123,6 +123,22 @@
 
 
 {% block mainblock %}
+
+  <div class="pagination">
+    <span class="step-links">
+        {% if studies.has_previous %}
+            <a href="?page={{ studies.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ studies.number }} of {{ studies.paginator.num_pages }}.
+        </span>
+
+        {% if studies.has_next %}
+            <a href="?page={{ studies.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
 
   <table class="table table-bordered table-striped">
     <tr>
@@ -176,4 +192,20 @@
       <tr id="row{{ study.pk }}"></tr>
     {% endfor %}
   </table>
+    <div class="pagination">
+    <span class="step-links">
+        {% if studies.has_previous %}
+            <a href="?page={{ studies.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ studies.number }} of {{ studies.paginator.num_pages }}.
+        </span>
+
+        {% if studies.has_next %}
+            <a href="?page={{ studies.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+
 {% endblock %}
