@@ -17,7 +17,9 @@
     <th>Software version</th>
     <th>Gantry ID</th>
     <th>How many studies</th>
+    {% if admin.admingroup %}
     <th>Review</th>
+    {% endif %}
   </tr>
   {% for eachrow in name_set %}
     <tr class="clickable-row" row_name="{{ eachrow.id }}">
@@ -65,7 +67,9 @@
             )
         </script>
       </td>
+    {% if admin.admingroup %}
       <td><a href="/admin/review/{{ eachrow.pk }}/{{ modality }}/">Review</a></td>
+    {% endif %}
     </tr>
   {% endfor %}
 </table>
