@@ -102,11 +102,7 @@ def dx_summary_list_filter(request):
     from remapp.forms import DXChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
+    pid = bool(request.user.groups.filter(name='pidgroup'))
     f = dx_acq_filter(request.GET, pid=pid)
 
     try:
@@ -693,11 +689,8 @@ def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_p
 def rf_detail_view(request, pk=None):
     """Detail view for an RF study
     """
-    from django.contrib import messages
-    from remapp.models import GeneralStudyModuleAttr
     from django.db.models import Sum
     import numpy as np
-    from django.core.exceptions import ObjectDoesNotExist
     import operator
 
     try:
@@ -1823,7 +1816,6 @@ def size_delete(request):
     """
     from django.core.urlresolvers import reverse
     from django.contrib import messages
-    from remapp.models import SizeUpload
 
     for task in request.POST:
         uploads = SizeUpload.objects.filter(task_id__exact=request.POST[task])
@@ -1851,7 +1843,6 @@ def size_abort(request, pk):
     :type request: POST
     """
     from celery.task.control import revoke
-    from django.http import HttpResponseRedirect
     from remapp.models import SizeUpload
 
     size_import = get_object_or_404(SizeUpload, pk=pk)
@@ -1880,12 +1871,8 @@ def size_download(request, task_id):
 
     """
     import mimetypes
-    import os
     from django.core.servers.basehttp import FileWrapper
     from django.utils.encoding import smart_str
-    from django.contrib import messages
-    from openremproject.settings import MEDIA_ROOT
-    from remapp.models import SizeUpload
 
     importperm = False
     if request.user.groups.filter(name="importsizegroup"):
@@ -2862,7 +2849,7 @@ def dicom_summary(request):
     )
 
 
-class DicomStoreCreate(CreateView):
+class DicomStoreCreate(CreateView):  # pylint: disable=unused-variable
     from remapp.forms import DicomStoreForm
     from remapp.models import DicomStoreSCP
 
@@ -2878,7 +2865,7 @@ class DicomStoreCreate(CreateView):
         return context
 
 
-class DicomStoreUpdate(UpdateView):
+class DicomStoreUpdate(UpdateView):  # pylint: disable=unused-variable
     from remapp.forms import DicomStoreForm
     from remapp.models import DicomStoreSCP
 
@@ -2894,7 +2881,7 @@ class DicomStoreUpdate(UpdateView):
         return context
 
 
-class DicomStoreDelete(DeleteView):
+class DicomStoreDelete(DeleteView):  # pylint: disable=unused-variable
     from remapp.models import DicomStoreSCP
 
     model = DicomStoreSCP
@@ -2925,7 +2912,7 @@ class DicomQRCreate(CreateView):
         return context
 
 
-class DicomQRUpdate(UpdateView):
+class DicomQRUpdate(UpdateView):  # pylint: disable=unused-variable
     from remapp.forms import DicomQRForm
     from remapp.models import DicomRemoteQR
 
@@ -2941,7 +2928,7 @@ class DicomQRUpdate(UpdateView):
         return context
 
 
-class DicomQRDelete(DeleteView):
+class DicomQRDelete(DeleteView):  # pylint: disable=unused-variable
     from remapp.models import DicomRemoteQR
 
     model = DicomRemoteQR
@@ -2956,7 +2943,7 @@ class DicomQRDelete(DeleteView):
         return context
 
 
-class PatientIDSettingsUpdate(UpdateView):
+class PatientIDSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
     from remapp.models import PatientIDSettings
 
     model = PatientIDSettings
@@ -2972,7 +2959,7 @@ class PatientIDSettingsUpdate(UpdateView):
         return context
 
 
-class DicomDeleteSettingsUpdate(UpdateView):
+class DicomDeleteSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
     from remapp.models import DicomDeleteSettings
     from remapp.forms import DicomDeleteSettingsForm
 
@@ -2988,7 +2975,7 @@ class DicomDeleteSettingsUpdate(UpdateView):
         return context
 
 
-class SkinDoseMapCalcSettingsUpdate(UpdateView):
+class SkinDoseMapCalcSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
     from remapp.models import SkinDoseMapCalcSettings
     from remapp.forms import SkinDoseMapCalcSettingsForm
     from django.core.exceptions import ObjectDoesNotExist
@@ -3017,7 +3004,7 @@ class SkinDoseMapCalcSettingsUpdate(UpdateView):
         return super(SkinDoseMapCalcSettingsUpdate, self).form_valid(form)
 
 
-class NotPatientNameCreate(CreateView):
+class NotPatientNameCreate(CreateView):  # pylint: disable=unused-variable
     from remapp.forms import NotPatientNameForm
     from remapp.models import NotPatientIndicatorsName
 
@@ -3033,7 +3020,7 @@ class NotPatientNameCreate(CreateView):
         return context
 
 
-class NotPatientNameUpdate(UpdateView):
+class NotPatientNameUpdate(UpdateView):  # pylint: disable=unused-variable
     from remapp.forms import NotPatientNameForm
     from remapp.models import NotPatientIndicatorsName
 
@@ -3049,7 +3036,7 @@ class NotPatientNameUpdate(UpdateView):
         return context
 
 
-class NotPatientNameDelete(DeleteView):
+class NotPatientNameDelete(DeleteView):  # pylint: disable=unused-variable
     from remapp.models import NotPatientIndicatorsName
 
     model = NotPatientIndicatorsName
@@ -3063,7 +3050,7 @@ class NotPatientNameDelete(DeleteView):
         context['admin'] = admin
         return context
 
-class NotPatientIDCreate(CreateView):
+class NotPatientIDCreate(CreateView):  # pylint: disable=unused-variable
     from remapp.forms import NotPatientIDForm
     from remapp.models import NotPatientIndicatorsID
 
@@ -3079,7 +3066,7 @@ class NotPatientIDCreate(CreateView):
         return context
 
 
-class NotPatientIDUpdate(UpdateView):
+class NotPatientIDUpdate(UpdateView):  # pylint: disable=unused-variable
     from remapp.forms import NotPatientIDForm
     from remapp.models import NotPatientIndicatorsID
 
@@ -3095,7 +3082,7 @@ class NotPatientIDUpdate(UpdateView):
         return context
 
 
-class NotPatientIDDelete(DeleteView):
+class NotPatientIDDelete(DeleteView):  # pylint: disable=unused-variable
     from remapp.models import NotPatientIndicatorsID
 
     model = NotPatientIndicatorsID
