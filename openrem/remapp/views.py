@@ -2980,7 +2980,10 @@ class PatientIDSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
         return context
 
 
-class DicomDeleteSettingsUpdate(UpdateView):
+class DicomDeleteSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView tp update the settings relating to deleting DICOM after import
+
+    """
     from remapp.models import DicomDeleteSettings
     from remapp.forms import DicomDeleteSettingsForm
 
@@ -2996,7 +2999,10 @@ class DicomDeleteSettingsUpdate(UpdateView):
         return context
 
 
-class SkinDoseMapCalcSettingsUpdate(UpdateView):
+class SkinDoseMapCalcSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView for configuring the skin dose map calculation choices
+
+    """
     from remapp.models import SkinDoseMapCalcSettings
     from remapp.forms import SkinDoseMapCalcSettingsForm
     from django.core.exceptions import ObjectDoesNotExist
@@ -3025,7 +3031,10 @@ class SkinDoseMapCalcSettingsUpdate(UpdateView):
         return super(SkinDoseMapCalcSettingsUpdate, self).form_valid(form)
 
 
-class NotPatientNameCreate(CreateView):
+class NotPatientNameCreate(CreateView):  # pylint: disable=unused-variable
+    """CreateView for configuration of indicators a study might not be a patient study
+
+    """
     from remapp.forms import NotPatientNameForm
     from remapp.models import NotPatientIndicatorsName
 
@@ -3041,7 +3050,10 @@ class NotPatientNameCreate(CreateView):
         return context
 
 
-class NotPatientNameUpdate(UpdateView):
+class NotPatientNameUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView to update choices regarding not-patient indicators
+
+    """
     from remapp.forms import NotPatientNameForm
     from remapp.models import NotPatientIndicatorsName
 
@@ -3057,7 +3069,10 @@ class NotPatientNameUpdate(UpdateView):
         return context
 
 
-class NotPatientNameDelete(DeleteView):
+class NotPatientNameDelete(DeleteView):  # pylint: disable=unused-variable
+    """DeleteView for the not-patient name indicator table
+
+    """
     from remapp.models import NotPatientIndicatorsName
 
     model = NotPatientIndicatorsName
@@ -3072,7 +3087,10 @@ class NotPatientNameDelete(DeleteView):
         return context
 
 
-class NotPatientIDCreate(CreateView):
+class NotPatientIDCreate(CreateView):  # pylint: disable=unused-variable
+    """CreateView for not-patient ID indicators
+
+    """
     from remapp.forms import NotPatientIDForm
     from remapp.models import NotPatientIndicatorsID
 
@@ -3089,6 +3107,9 @@ class NotPatientIDCreate(CreateView):
 
 
 class NotPatientIDUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView for non-patient ID indicators
+
+    """
     from remapp.forms import NotPatientIDForm
     from remapp.models import NotPatientIndicatorsID
 
@@ -3105,6 +3126,9 @@ class NotPatientIDUpdate(UpdateView):  # pylint: disable=unused-variable
 
 
 class NotPatientIDDelete(DeleteView):  # pylint: disable=unused-variable
+    """DeleteView for non-patient ID indicators
+
+    """
     from remapp.models import NotPatientIndicatorsID
 
     model = NotPatientIndicatorsID
