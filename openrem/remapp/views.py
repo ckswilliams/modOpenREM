@@ -2850,6 +2850,9 @@ def dicom_summary(request):
 
 
 class DicomStoreCreate(CreateView):  # pylint: disable=unused-variable
+    """CreateView to add details of a DICOM Store to the database
+
+    """
     from remapp.forms import DicomStoreForm
     from remapp.models import DicomStoreSCP
 
@@ -2866,6 +2869,9 @@ class DicomStoreCreate(CreateView):  # pylint: disable=unused-variable
 
 
 class DicomStoreUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView to update details of a DICOM store in the database
+
+    """
     from remapp.forms import DicomStoreForm
     from remapp.models import DicomStoreSCP
 
@@ -2882,6 +2888,9 @@ class DicomStoreUpdate(UpdateView):  # pylint: disable=unused-variable
 
 
 class DicomStoreDelete(DeleteView):  # pylint: disable=unused-variable
+    """DeleteView to delete DICOM store information from the database
+
+    """
     from remapp.models import DicomStoreSCP
 
     model = DicomStoreSCP
@@ -2897,6 +2906,9 @@ class DicomStoreDelete(DeleteView):  # pylint: disable=unused-variable
 
 
 class DicomQRCreate(CreateView):
+    """CreateView to add details of a DICOM query-retrieve node
+
+    """
     from remapp.forms import DicomQRForm
     from remapp.models import DicomRemoteQR
 
@@ -2913,6 +2925,9 @@ class DicomQRCreate(CreateView):
 
 
 class DicomQRUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView to update details of a DICOM query-retrieve node
+
+    """
     from remapp.forms import DicomQRForm
     from remapp.models import DicomRemoteQR
 
@@ -2929,6 +2944,9 @@ class DicomQRUpdate(UpdateView):  # pylint: disable=unused-variable
 
 
 class DicomQRDelete(DeleteView):  # pylint: disable=unused-variable
+    """DeleteView to delete details of a DICOM query-retrieve node
+
+    """
     from remapp.models import DicomRemoteQR
 
     model = DicomRemoteQR
@@ -2944,6 +2962,9 @@ class DicomQRDelete(DeleteView):  # pylint: disable=unused-variable
 
 
 class PatientIDSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView to update the patient ID settings
+
+    """
     from remapp.models import PatientIDSettings
 
     model = PatientIDSettings
@@ -2959,7 +2980,7 @@ class PatientIDSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
         return context
 
 
-class DicomDeleteSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+class DicomDeleteSettingsUpdate(UpdateView):
     from remapp.models import DicomDeleteSettings
     from remapp.forms import DicomDeleteSettingsForm
 
@@ -2975,7 +2996,7 @@ class DicomDeleteSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
         return context
 
 
-class SkinDoseMapCalcSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+class SkinDoseMapCalcSettingsUpdate(UpdateView):
     from remapp.models import SkinDoseMapCalcSettings
     from remapp.forms import SkinDoseMapCalcSettingsForm
     from django.core.exceptions import ObjectDoesNotExist
@@ -3004,7 +3025,7 @@ class SkinDoseMapCalcSettingsUpdate(UpdateView):  # pylint: disable=unused-varia
         return super(SkinDoseMapCalcSettingsUpdate, self).form_valid(form)
 
 
-class NotPatientNameCreate(CreateView):  # pylint: disable=unused-variable
+class NotPatientNameCreate(CreateView):
     from remapp.forms import NotPatientNameForm
     from remapp.models import NotPatientIndicatorsName
 
@@ -3020,7 +3041,7 @@ class NotPatientNameCreate(CreateView):  # pylint: disable=unused-variable
         return context
 
 
-class NotPatientNameUpdate(UpdateView):  # pylint: disable=unused-variable
+class NotPatientNameUpdate(UpdateView):
     from remapp.forms import NotPatientNameForm
     from remapp.models import NotPatientIndicatorsName
 
@@ -3036,7 +3057,7 @@ class NotPatientNameUpdate(UpdateView):  # pylint: disable=unused-variable
         return context
 
 
-class NotPatientNameDelete(DeleteView):  # pylint: disable=unused-variable
+class NotPatientNameDelete(DeleteView):
     from remapp.models import NotPatientIndicatorsName
 
     model = NotPatientIndicatorsName
@@ -3050,7 +3071,8 @@ class NotPatientNameDelete(DeleteView):  # pylint: disable=unused-variable
         context['admin'] = admin
         return context
 
-class NotPatientIDCreate(CreateView):  # pylint: disable=unused-variable
+
+class NotPatientIDCreate(CreateView):
     from remapp.forms import NotPatientIDForm
     from remapp.models import NotPatientIndicatorsID
 
