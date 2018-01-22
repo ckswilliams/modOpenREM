@@ -868,11 +868,7 @@ def ct_summary_list_filter(request):
     from remapp.forms import CTChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
+    pid = bool(request.user.groups.filter(name='pidgroup'))
     f = ct_acq_filter(request.GET, pid=pid)
 
     try:
@@ -977,10 +973,7 @@ def ct_summary_chart_data(request):
     from openremproject import settings
     from django.http import JsonResponse
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
+    pid = bool(request.user.groups.filter(name='pidgroup'))
     f = ct_acq_filter(request.GET, pid=pid)
 
     try:
@@ -2905,7 +2898,7 @@ class DicomStoreDelete(DeleteView):  # pylint: disable=unused-variable
         return context
 
 
-class DicomQRCreate(CreateView):
+class DicomQRCreate(CreateView):  # pylint: disable=unused-variable
     """CreateView to add details of a DICOM query-retrieve node
 
     """
