@@ -36,6 +36,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
+# pylint: disable=unused-variable
 
 class AdminTaskQuestions(SingletonModel):
     """

@@ -2244,7 +2244,7 @@ def review_summary_list(request, equip_name_pk=None, modality=None, delete_equip
                 studies.delete()
                 UniqueEquipmentNames.objects.get(pk=equip_name_pk).delete()
                 messages.info(request, "Studies and equipment name table entry deleted")
-                return redirect('/openrem/viewdisplaynames/'.format(equip_name_pk, modality))
+                return redirect('/openrem/viewdisplaynames/')
     else:
         messages.error(request, "Incorrect attempt to delete studies.")
         return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
@@ -2366,18 +2366,20 @@ def reset_dual(pk=None):
     logger.debug(
         "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
         "{3} are CR, {4} are RF and {5} are 'OT'.".format(
-            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
-            studies.filter(modality_type='DX').count(), studies.filter(modality_type='CR').count(),
-            studies.filter(modality_type='RF').count(), studies.filter(modality_type__exact='OT').count())
+            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+            studies.count(),
+            studies.filter(modality_type='DX').count(),
+            studies.filter(modality_type='CR').count(),
+            studies.filter(modality_type='RF').count(),
+            studies.filter(modality_type__exact='OT').count())
     )
-    message_finish = "and after processing  {2} are DX, {3} are CR, {4} are RF and {5} are OT because they are incomplete.".format(
-        studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-        studies.count(),
-        studies.filter(modality_type='DX').count(),
-        studies.filter(modality_type='CR').count(),
-        studies.filter(modality_type='RF').count(),
-        studies.filter(modality_type__exact='OT').count(),
-    )
+    message_finish = "and after processing  {0} are DX, {1} are CR, {2} are RF and {3} are OT because" \
+                     " they are incomplete.".format(
+                                                        studies.filter(modality_type='DX').count(),
+                                                        studies.filter(modality_type='CR').count(),
+                                                        studies.filter(modality_type='RF').count(),
+                                                        studies.filter(modality_type__exact='OT').count(),
+                                                    )
     return " ".join([message_start, message_finish])
 
 
@@ -2583,7 +2585,7 @@ def review_study_details(request):
                                 index+1, eventmech.positioner_primary_angle)
                         else:
                             study_data['eventmech'] += u"e{0} present,<br>".format(
-                                index+1, eventmech.positioner_primary_angle)
+                                index+1)
                     except ObjectDoesNotExist:
                         study_data['eventmech'] = u""
             except ObjectDoesNotExist:
