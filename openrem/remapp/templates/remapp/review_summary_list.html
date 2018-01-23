@@ -109,14 +109,18 @@
     </div>
     <div class="row">
         <div class="col-lg-7">
-            {% if studies_count %}
-                <button class="btn btn-warning" onclick="studiesDeleteButton()">Delete studies</button>
-            {% else %}
-                <button class="btn btn-default" disabled="disabled">Delete studies</button>
-            {% endif %}
-            <button class="btn btn-warning" onclick="studiesEquipDeleteButton()">
+            <span id="deleteStudiesSpan">
+                {% if studies_count %}
+                    <button class="btn btn-warning" onclick="studiesDeleteButton()">Delete studies</button>
+                {% else %}
+                    <button class="btn btn-default" disabled="disabled">Delete studies</button>
+                {% endif %}
+            </span>
+            <span id="deleteStudiesEquipSpan">
+                <button class="btn btn-warning" onclick="studiesEquipDeleteButton()">
                 Delete studies and table entry
-            </button>
+                </button>
+            </span>
         </div>
     </div>
 
