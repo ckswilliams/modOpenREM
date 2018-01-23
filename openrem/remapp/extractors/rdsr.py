@@ -1076,6 +1076,22 @@ def _generalstudymoduleattributes(dataset, g, ch):
             g.save()
 
 
+def _get_event_uids(dataset):
+    """Function to extract the event UIDs when a study instance UID is already in the database
+
+    :param dataset: DICOM dataset being imported
+    :return: list of UIDs
+    """
+    event_uids = []
+    for item in dataset.ContentSequence:
+        if item.ValueType == 'CONTAINER' and item.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
+            event_dataset = item
+            for event_item in event_dataset.ContentSequence:
+                if event_item.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
+                    event_uids += [event_item.UID, ]
+    return event_uids
+
+
 def _rsdr2db(dataset):
     import os
     import openrem_settings
@@ -1088,9 +1104,10 @@ def _rsdr2db(dataset):
 
     if 'StudyInstanceUID' in dataset:
         uid = dataset.StudyInstanceUID
-        existing = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=uid)
-        if existing:
-            return
+        existing_study_inst_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=uid)
+        if existing_study_inst_uid:
+            dataset_event_uids = _get_event_uids(dataset)
+
 
     g = GeneralStudyModuleAttr.objects.create()
     if not g:  # Allows import to be aborted if no template found
