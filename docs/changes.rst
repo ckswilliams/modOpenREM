@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 * `#581`_  Import scripts: Interpreter line now always first, functions imported specifically
+* `#580`_  Imports and Interface: one modality creating both DX and RF can now be handled appropriately
 * `#578`_  Exports: Fixed NHSBSP export that was excluding RDSR imported Hologic studies
 * `#575`_  Exports: export page now updates using AJAX and has a select all button
 * `#573`_  Exports: corrected and clarified exposure time and duration units, added number of pulses
@@ -97,6 +98,7 @@ OpenREM version history
 * `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
 * `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
+* `#318`_  Database management: Display names view can be used to review and delete all studies from one source
 
 0.7.4 (2016-10-17)
 ------------------

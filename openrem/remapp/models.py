@@ -36,6 +36,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
+# pylint: disable=unused-variable
 
 class AdminTaskQuestions(SingletonModel):
     """
@@ -812,6 +813,18 @@ class AccumProjXRayDose(models.Model):  # TID 10004
     total_number_of_radiographic_frames  = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(ContextID, blank=True, null=True)
+
+    def fluoro_gym2_to_cgycm2(self):
+        """Converts fluoroscopy DAP total from Gy.m2 to cGy.cm2 for display in web interface
+        """
+        if self.fluoro_dose_area_product_total:
+            return 1000000*self.fluoro_dose_area_product_total
+
+    def acq_gym2_to_cgycm2(self):
+        """Converts acquisition DAP total from Gy.m2 to cGy.cm2 for display in web interface
+        """
+        if self.acquisition_dose_area_product_total:
+            return 1000000*self.acquisition_dose_area_product_total
 
 
 class AccumMammographyXRayDose(models.Model):  # TID 10005

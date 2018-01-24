@@ -526,8 +526,7 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
             pass
     if accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type == \
             'RF,DX':
-        if (accumproj.fluoro_dose_area_product_total != "" and accumproj.fluoro_dose_area_product_total is not None) \
-                or (accumproj.total_fluoro_time != "" and accumproj.total_fluoro_time is not None):
+        if accumproj.fluoro_dose_area_product_total or accumproj.total_fluoro_time:
             accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
                 modality_type = 'RF'
         else:
@@ -838,7 +837,8 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
                                                             cont2.ConceptCodeSequence[0].CodeMeaning)
             if 'Mammography' in proj.procedure_reported.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'MG'
-            elif (not proj.general_study_module_attributes.modality_type) and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
+            elif (not proj.general_study_module_attributes.modality_type) and (
+                    'Projection X-Ray' in proj.procedure_reported.code_meaning):
                 proj.general_study_module_attributes.modality_type = 'RF,DX'
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'acquisition device type':
             proj.acquisition_device_type_cid = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
@@ -864,20 +864,20 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Source of Dose Information':
             proj.source_of_dose_information = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                                 cont.ConceptCodeSequence[0].CodeMeaning)
-        if (not equip.unique_equipment_name.user_defined_modality) and (reporttype == 'projection') and (proj.acquisition_device_type_cid):
+        if (not equip.unique_equipment_name.user_defined_modality) and (
+                reporttype == 'projection') and proj.acquisition_device_type_cid:
             if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'RF'
-            elif 'Integrated' in proj.acquisition_device_type_cid.code_meaning:
-                proj.general_study_module_attributes.modality_type = 'DX'
-            elif 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
+            elif any(x in proj.acquisition_device_type_cid.code_meaning for x in ['Integrated', 'Cassette-based']):
                 proj.general_study_module_attributes.modality_type = 'DX'
             else:
                 logging.error(u"Acquisition device type code exists, but the value wasn't matched. Study UID: {0}, "
-                              u"Station name: {1}, Study date, time: {2}, {3} ".format(
+                              u"Station name: {1}, Study date, time: {2}, {3}, device type: {4} ".format(
                     proj.general_study_module_attributes.study_instance_uid,
                     proj.general_study_module_attributes.generalequipmentmoduleattr_set.get().station_name,
                     proj.general_study_module_attributes.study_date,
-                    proj.general_study_module_attributes.study_time
+                    proj.general_study_module_attributes.study_time,
+                    proj.acquisition_device_type_cid.code_meaning
                 ))
 
         proj.save()
@@ -885,7 +885,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Observer Type':
             if reporttype == 'projection':
                 obs = ObserverContext.objects.create(projection_xray_radiation_dose=proj)
-            elif reporttype == 'ct':
+            else:
                 obs = ObserverContext.objects.create(ct_radiation_dose=proj)
             _observercontext(dataset, obs, ch)
 

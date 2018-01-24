@@ -102,11 +102,7 @@ def dx_summary_list_filter(request):
     from remapp.forms import DXChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
+    pid = bool(request.user.groups.filter(name='pidgroup'))
     f = dx_acq_filter(request.GET, pid=pid)
 
     try:
@@ -693,11 +689,8 @@ def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_p
 def rf_detail_view(request, pk=None):
     """Detail view for an RF study
     """
-    from django.contrib import messages
-    from remapp.models import GeneralStudyModuleAttr
     from django.db.models import Sum
     import numpy as np
-    from django.core.exceptions import ObjectDoesNotExist
     import operator
 
     try:
@@ -875,11 +868,7 @@ def ct_summary_list_filter(request):
     from remapp.forms import CTChartOptionsForm, itemsPerPageForm
     from openremproject import settings
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
+    pid = bool(request.user.groups.filter(name='pidgroup'))
     f = ct_acq_filter(request.GET, pid=pid)
 
     try:
@@ -984,10 +973,7 @@ def ct_summary_chart_data(request):
     from openremproject import settings
     from django.http import JsonResponse
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
+    pid = bool(request.user.groups.filter(name='pidgroup'))
     f = ct_acq_filter(request.GET, pid=pid)
 
     try:
@@ -1473,7 +1459,6 @@ def mg_detail_view(request, pk=None):
     )
 
 
-
 def openrem_home(request):
     from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
@@ -1824,7 +1809,6 @@ def size_delete(request):
     """
     from django.core.urlresolvers import reverse
     from django.contrib import messages
-    from remapp.models import SizeUpload
 
     for task in request.POST:
         uploads = SizeUpload.objects.filter(task_id__exact=request.POST[task])
@@ -1852,7 +1836,6 @@ def size_abort(request, pk):
     :type request: POST
     """
     from celery.task.control import revoke
-    from django.http import HttpResponseRedirect
     from remapp.models import SizeUpload
 
     size_import = get_object_or_404(SizeUpload, pk=pk)
@@ -1881,12 +1864,8 @@ def size_download(request, task_id):
 
     """
     import mimetypes
-    import os
     from django.core.servers.basehttp import FileWrapper
     from django.utils.encoding import smart_str
-    from django.contrib import messages
-    from openremproject.settings import MEDIA_ROOT
-    from remapp.models import SizeUpload
 
     importperm = False
     if request.user.groups.filter(name="importsizegroup"):
@@ -1931,7 +1910,7 @@ def charts_off(request):
     messages.success(request, "Chart plotting has been turned off for {0}".format(name))
 
     # Redirect to the calling page, removing '&plotCharts=on' from the url
-    return redirect((request.META['HTTP_REFERER']).replace('&plotCharts=on',''))
+    return redirect((request.META['HTTP_REFERER']).replace('&plotCharts=on', ''))
 
 
 @login_required
@@ -1941,23 +1920,23 @@ def display_names_view(request):
 
     f = UniqueEquipmentNames.objects.order_by('display_name')
 
-    #if user_defined_modality is filled, we should use this value, otherwise the value of modality type in the general_study module
-    #so we look if the concatenation of the user_defined_modality (empty if not used) and modality_type starts with a specific modality type
-    ct_names = f.filter(Q(user_defined_modality="CT") | (
-                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT"))).distinct()
-    mg_names = f.filter(Q(user_defined_modality="MG") | (
-                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG"))).distinct()
-    dx_names = f.filter(Q(user_defined_modality="DX") | (
-                        Q(user_defined_modality__isnull=True) & (Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
-                                                                 Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
-    rf_names = f.filter(Q(user_defined_modality="RF") | (
-                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
+    # if user_defined_modality is filled, we should use this value, otherwise the value of modality type in the general_study module
+    # so we look if the concatenation of the user_defined_modality (empty if not used) and modality_type starts with a specific modality type
+    ct_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT").distinct()
+    mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
+    dx_names = f.filter(Q(user_defined_modality="DX") | Q(user_defined_modality="dual") | (
+            Q(user_defined_modality__isnull=True) & (
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
+    rf_names = f.filter(Q(user_defined_modality="RF") | Q(user_defined_modality="dual") | (
+            Q(user_defined_modality__isnull=True) &
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
     ot_names = f.filter(~Q(user_defined_modality__isnull=True) | (
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
-                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR"))).distinct()
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
+            ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR"))).distinct()
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1966,7 +1945,7 @@ def display_names_view(request):
 
     return_structure = {'name_list': f, 'admin': admin,
                         'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'rf_names': rf_names,
-                        'ot_names': ot_names}
+                        'ot_names': ot_names, 'modalities': ['CT', 'MG', 'DX', 'RF', 'OT']}
 
     return render_to_response(
         'remapp/displaynameview.html',
@@ -2006,20 +1985,33 @@ def display_name_update(request):
             if new_display_name:
                 display_name_data.display_name = new_display_name
             if new_user_defined_modality and (not display_name_data.user_defined_modality == new_user_defined_modality):
-                #See if change is valid otherwise return validation error
-                #Assuming modality is always the same, so we take the first
+                # See if change is valid otherwise return validation error
+                # Assuming modality is always the same, so we take the first
                 try:
-                    modality = GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)[0].modality_type
+                    modality = \
+                        GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)[
+                            0].modality_type
                 except:
                     modality = ''
-                if (modality == 'DX') or (modality == 'CR') or (modality == 'RF'):
+                if modality in {'DX', 'CR', 'RF', 'dual', 'OT'}:
                     display_name_data.user_defined_modality = new_user_defined_modality
                     # We can't reimport as new modality type, instead we just change the modality type value
-                    GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk).update(modality_type=new_user_defined_modality)
+                    if new_user_defined_modality == 'dual':
+                        status_message = reset_dual(pk=pk)
+                        messages.info(request, status_message)
+                        display_name_data.save()
+                        continue
+                    GeneralStudyModuleAttr.objects.filter(
+                        generalequipmentmoduleattr__unique_equipment_name__pk=pk).update(
+                        modality_type=new_user_defined_modality)
                 elif not modality:
-                    error_message = error_message + 'Can\'t determine modality type for ' + display_name_data.display_name + ', user defined modality type not set.\n'
+                    error_message = error_message + 'Can\'t determine modality type for' \
+                                                    ' ' + display_name_data.display_name + ', ' \
+                                                                                           'user defined modality type not set.\n'
                 else:
-                    error_message = error_message + 'Modality type change is not allowed for ' + display_name_data.display_name + ' (only changing from DX to RF and vice versa is allowed).\n'
+                    error_message = error_message + 'Modality type change is not allowed for' \
+                                                    ' ' + display_name_data.display_name + ' (only changing from DX ' \
+                                                                                           'to RF and vice versa is allowed).\n'
             display_name_data.save()
 
         if error_message:
@@ -2037,7 +2029,9 @@ def display_name_update(request):
 
         f = UniqueEquipmentNames.objects.filter(pk__in=map(int, request.GET.values()))
 
-        form = UpdateDisplayNamesForm(initial={'display_names': [x.encode('utf-8') for x in f.values_list('display_name', flat=True)]}, auto_id=False)
+        form = UpdateDisplayNamesForm(
+            initial={'display_names': [x.encode('utf-8') for x in f.values_list('display_name', flat=True)]},
+            auto_id=False)
 
         admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -2049,6 +2043,549 @@ def display_name_update(request):
     return render_to_response('remapp/displaynameupdate.html',
                               return_structure,
                               context_instance=RequestContext(request))
+
+
+def display_name_populate(request):
+    """AJAX view to populate the modality tables for the display names view
+
+    :param request: Request object containing modality
+    :return: HTML table
+    """
+    from django.db.models import Q
+    from remapp.models import UniqueEquipmentNames
+
+    if request.is_ajax():
+        data = request.POST
+        modality = data.get('modality')
+        f = UniqueEquipmentNames.objects.order_by('display_name')
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in request.user.groups.all():
+            admin[group.name] = True
+        if modality in ['MG', 'CT']:
+            name_set = f.filter(
+                generalequipmentmoduleattr__general_study_module_attributes__modality_type=modality).distinct()
+            dual = False
+        elif modality == 'DX':
+            name_set = f.filter(Q(user_defined_modality="DX") | Q(user_defined_modality="dual") | (
+                    Q(user_defined_modality__isnull=True) & (
+                    Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
+                    Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
+            dual = True
+        elif modality == 'RF':
+            name_set = f.filter(Q(user_defined_modality="RF") | Q(user_defined_modality="dual") | (
+                    Q(user_defined_modality__isnull=True) &
+                    Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
+            dual = True
+        elif modality == 'OT':
+            name_set = f.filter(  # ~Q(user_defined_modality__isnull=True) | (
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
+                ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
+            dual = False
+        else:
+            name_set = None
+            dual = False
+        template = 'remapp/displayname-modality.html'
+        return render(request, template, {
+            'name_set': name_set,
+            'admin': admin,
+            'modality': modality,
+            'dual': dual,
+        })
+
+
+def display_name_modality_filter(equip_name_pk=None, modality=None):
+    """Function to filter the studies to a particular unique_name entry and particular modality.
+
+    :param equip_name_pk: Primary key of entry in unique names table
+    :param modality: Modality to filter on
+    :return: Reduced queryset of studies, plus count of pre-modality filtered studies for modality OT
+    """
+    from django.db.models import Q
+
+    if not equip_name_pk:
+        logger.error("Display name modality filter function called without a primary key ID for the unique names table")
+        return
+    if not modality or modality not in ['CT', 'RF', 'MG', 'DX', 'OT']:
+        logger.error("Display name modality filter function called without an appropriate modality specified")
+        return
+
+    studies_all = GeneralStudyModuleAttr.objects.filter(
+        generalequipmentmoduleattr__unique_equipment_name__pk=equip_name_pk)
+    count_all = studies_all.count()
+    if modality in ['CT', 'MG', 'RF']:
+        studies = studies_all.filter(modality_type__exact=modality)
+    elif modality == 'DX':
+        studies = studies_all.filter(
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="DX") |
+            Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type__exact="CR")
+        )
+    else:  # modality == 'OT'
+        studies = studies_all.exclude(
+            modality_type__exact='CT'
+        ).exclude(
+            modality_type__exact='MG'
+        ).exclude(
+            modality_type__exact='DX'
+        ).exclude(
+            modality_type__exact='CR'
+        ).exclude(
+            modality_type__exact='RF'
+        )
+    return studies, count_all
+
+
+def display_name_count(request):
+    """AJAX view to return the number of studies associated with an entry in the equipment database
+
+    :param request: Request object containing modality and equipment table ID
+    :return: HTML table data element
+    """
+
+    if request.is_ajax():
+        data = request.POST
+        modality = data.get('modality')
+        equip_name_pk = data.get('equip_name_pk')
+        latest = None
+        studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+        count = studies.count()
+        if count:
+            latest = studies.latest('study_date').study_date
+        template = 'remapp/displayname-count.html'
+        return render(request, template, {
+            'count': count,
+            'latest': latest,
+            'count_all': count_all,
+        })
+
+
+@login_required
+def review_summary_list(request, equip_name_pk=None, modality=None, delete_equip=None):
+    """View to list partial and broken studies
+
+    :param request:
+    :param equip_name_pk: UniqueEquipmentNames primary key
+    :param modality: modality to filter by
+    :return:
+    """
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    from remapp.models import UniqueEquipmentNames
+
+    if not equip_name_pk:
+        logger.error("Attempt to load review_summary_list without equip_name_pk")
+        messages.error(request,
+                       "Partial and broken imports can only be reviewed with the correct "
+                       "link from the display name page")
+        return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+    if not request.user.groups.filter(name="admingroup"):
+        messages.error(request, "You are not in the administrator group - please contact your administrator")
+        return redirect('/openrem/viewdisplaynames/')
+
+    if request.method == 'GET':
+        equipment = UniqueEquipmentNames.objects.get(pk=equip_name_pk)
+        studies_list, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+        paginator = Paginator(studies_list, 25)
+        page = request.GET.get('page')
+        try:
+            studies = paginator.page(page)
+        except PageNotAnInteger:
+            studies = paginator.page(1)
+        except EmptyPage:
+            studies = paginator.page(paginator.num_pages)
+
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+        for group in request.user.groups.all():
+            admin[group.name] = True
+
+        template = 'remapp/review_summary_list.html'
+        return render(request, template, {
+            'modality': modality, 'equipment': equipment, 'equip_name_pk': equip_name_pk, 'studies': studies,
+            'studies_count': studies_list.count(), 'count_all': count_all, 'admin': admin})
+
+    if request.method == 'POST' and request.user.groups.filter(name="admingroup") and equip_name_pk and modality:
+        delete_equip = bool(request.POST['delete_equip'] == u"True")
+        if not delete_equip:
+            studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+            studies.delete()
+            messages.info(request, "Studies deleted")
+            return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+        else:
+            studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+            if count_all > studies.count():
+                messages.warning(request,
+                                 "Can't delete table entry - non-{0} studies are associated with it".format(modality))
+                logger.warning("Can't delete table entry - non-{0} studies are associated with it".format(modality))
+                return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+            else:
+                studies.delete()
+                UniqueEquipmentNames.objects.get(pk=equip_name_pk).delete()
+                messages.info(request, "Studies and equipment name table entry deleted")
+                return redirect('/openrem/viewdisplaynames/')
+    else:
+        messages.error(request, "Incorrect attempt to delete studies.")
+        return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+
+
+@login_required
+def review_studies_delete(request):
+    """AJAX function to replace Delete button with delete form for associated studies
+
+    :param request:
+    :return:
+    """
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
+        data = request.POST
+        template = 'remapp/review_studies_delete_button.html'
+        return render(request, template, {'delete_equip': False, 'modality': data['modality'],
+                                          'equip_name_pk': data['equip_name_pk']})
+
+
+@login_required
+def review_studies_equip_delete(request):
+    """AJAX function to replace Delete button with delete form for euipment table entry and studies
+
+    :param request:
+    :return:
+    """
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
+        data = request.POST
+        template = 'remapp/review_studies_delete_button.html'
+        return render(request, template, {'delete_equip': True, 'modality': data['modality'],
+                                          'equip_name_pk': data['equip_name_pk']})
+
+
+def reset_dual(pk=None):
+    """function to set modality to DX or RF depending on presence of fluoro information.
+
+    :param pk: Unique equipment names table prmary key
+    :return: status message
+    """
+
+    if not pk:
+        logger.error("Reset dual called with no primary key")
+        return
+
+    studies = GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)
+    message_start = "Reprocessing dual for {0}. Number of studies is {1}, of which {2} are " \
+                    "DX, {3} are CR, {4} are RF and {5} are OT before processing,".format(
+        studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+        studies.count(),
+        studies.filter(modality_type__exact='DX').count(),
+        studies.filter(modality_type__exact='CR').count(),
+        studies.filter(modality_type__exact='RF').count(),
+        studies.filter(modality_type__exact='OT').count()
+    )
+    not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
+        modality_type__exact='RF').exclude(modality_type__exact='CR').exclude(modality_type__exact='OT')
+
+    logger.debug(
+        "Reprocessed dual for {0}. Number of studies is {1}, of which {2} are DX, {3} are "
+        "CR, {4} are RF and {5} are OT, leaving {6} that are not.".format(
+            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
+            studies.filter(modality_type__exact='DX').count(),
+            studies.filter(modality_type__exact='CR').count(),
+            studies.filter(modality_type__exact='RF').count(),
+            studies.filter(modality_type__exact='OT').count(),
+            not_dx_rf_cr.count(),
+        )
+    )
+    for study in studies:
+        try:
+            projection_xray_dose = study.projectionxrayradiationdose_set.get()
+            if projection_xray_dose.acquisition_device_type_cid:
+                device_type = projection_xray_dose.acquisition_device_type_cid.code_meaning
+                if 'Fluoroscopy-Guided' in device_type:
+                    study.modality_type = 'RF'
+                    study.save()
+                    continue
+                elif any(x in device_type for x in ['Integrated', 'Cassette-based']):
+                    study.modality_type = 'DX'
+                    study.save()
+                    continue
+            try:
+                accum_xray_dose = projection_xray_dose.accumxraydose_set.order_by('pk')[0]  # consider just first plane
+                try:
+                    accum_fluoro_proj = accum_xray_dose.accumprojxraydose_set.get()
+                    if accum_fluoro_proj.fluoro_dose_area_product_total or accum_fluoro_proj.total_fluoro_time:
+                        study.modality_type = 'RF'
+                        study.save()
+                        continue
+                    else:
+                        study.modality_type = 'DX'
+                        study.save()
+                        continue
+                except ObjectDoesNotExist:
+                    try:
+                        if accum_xray_dose.accumintegratedprojradiogdose_set.get():
+                            study.modality_type = 'DX'
+                            study.save()
+                            continue
+                    except ObjectDoesNotExist:
+                        study.modality_type = 'OT'
+                        study.save()
+                        logger.debug(
+                            "Unable to reprocess study - no device type or accumulated data to go on. "
+                            "Modality set to OT.")
+                study.modality_type = 'OT'
+                study.save()
+                logger.debug(
+                    "Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
+            except ObjectDoesNotExist:
+                study.modality_type = 'OT'
+                study.save()
+                logger.debug(
+                    "Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
+        except ObjectDoesNotExist:
+            study.modality_type = 'OT'
+            study.save()
+            logger.debug("Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
+    logger.debug(
+        "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
+        "{3} are CR, {4} are RF and {5} are 'OT'.".format(
+            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+            studies.count(),
+            studies.filter(modality_type='DX').count(),
+            studies.filter(modality_type='CR').count(),
+            studies.filter(modality_type='RF').count(),
+            studies.filter(modality_type__exact='OT').count())
+    )
+    message_finish = "and after processing  {0} are DX, {1} are CR, {2} are RF and {3} are OT because" \
+                     " they are incomplete.".format(
+                                                        studies.filter(modality_type='DX').count(),
+                                                        studies.filter(modality_type='CR').count(),
+                                                        studies.filter(modality_type='RF').count(),
+                                                        studies.filter(modality_type__exact='OT').count(),
+                                                    )
+    return " ".join([message_start, message_finish])
+
+
+@login_required
+def reprocess_dual(request, pk=None):
+    """View to reprocess the studies from a modality that produces planar radiography and fluoroscopy to recategorise
+    them to DX or RF.
+
+    :param request: Request object
+    :return: Redirect back to display names view
+    """
+
+    if not request.user.groups.filter(name="admingroup"):
+        messages.error(request, "You are not in the administrator group - please contact your administrator")
+        return redirect('/openrem/viewdisplaynames/')
+
+    if request.method == 'GET' and pk:
+        status_message = reset_dual(pk=pk)
+        messages.info(request, status_message)
+
+    return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+
+def review_study_details(request):
+    """AJAX function to populate row in table with details of study for review
+
+    :param request: Request object containing study pk
+    :return: HTML row data
+    """
+
+    if request.is_ajax():
+        data = request.POST
+        study_pk = data.get('study_pk')
+        study = GeneralStudyModuleAttr.objects.get(pk__exact=study_pk)
+        study_data = {
+            'study_date': study.study_date,
+            'study_time': study.study_time
+        }
+        try:
+            patient = study.patientmoduleattr_set.get()
+            study_data['patientmoduleattr'] = u"Yes"
+            if patient.not_patient_indicator:
+                study_data['patientmoduleattr'] += u"<br>?not patient"
+        except ObjectDoesNotExist:
+            study_data['patientmoduleattr'] = u"Missing"
+        try:
+            patientstudymoduleattr = study.patientstudymoduleattr_set.get()
+            age = patientstudymoduleattr.patient_age_decimal
+            if age:
+                study_data['patientstudymoduleattr'] = u"Yes. Age {0:.1f}".format(
+                    patientstudymoduleattr.patient_age_decimal)
+            else:
+                study_data['patientstudymoduleattr'] = u"Yes."
+        except ObjectDoesNotExist:
+            study_data['patientstudymoduleattr'] = u"Missing"
+        try:
+            ctradiationdose = study.ctradiationdose_set.get()
+            study_data['ctradiationdose'] = u"Yes"
+            try:
+                ctaccumulateddosedata = ctradiationdose.ctaccumulateddosedata_set.get()
+                num_events = ctaccumulateddosedata.total_number_of_irradiation_events
+                study_data['ctaccumulateddosedata'] = "Yes, {0} events".format(num_events)
+            except ObjectDoesNotExist:
+                study_data['ctaccumulateddosedata'] = u""
+            try:
+                ctirradiationeventdata_set = ctradiationdose.ctirradiationeventdata_set.order_by('pk')
+
+                study_data['cteventdata'] = u"{0} events.<br>".format(
+                    ctirradiationeventdata_set.count())
+                for index, event in enumerate(ctirradiationeventdata_set):
+                    if event.acquisition_protocol:
+                        protocol = event.acquisition_protocol
+                    else:
+                        protocol = u""
+                    if event.dlp:
+                        study_data['cteventdata'] += u"e{0}: {1} {2:.2f}&nbsp;mGycm<br>".format(
+                            index,
+                            protocol,
+                            event.dlp
+                        )
+                    else:
+                        study_data['cteventdata'] += u"e{0}: {1}<br>".format(
+                            index,
+                            protocol
+                        )
+            except ObjectDoesNotExist:
+                study_data['cteventdata'] = u""
+        except ObjectDoesNotExist:
+            study_data['ctradiationdose'] = u""
+            study_data['ctaccumulateddosedata'] = u""
+            study_data['cteventdata'] = u""
+        try:
+            projectionxraydata = study.projectionxrayradiationdose_set.get()
+            study_data['projectionxraydata'] = u"Yes"
+            try:
+                accumxraydose_set = projectionxraydata.accumxraydose_set.order_by('pk')
+                accumxraydose_set_count = accumxraydose_set.count()
+                if accumxraydose_set_count == 1:
+                    study_data['accumxraydose'] = u"Yes"
+                elif accumxraydose_set_count:
+                    study_data['accumxraydose'] = u"{0} present".format(accumxraydose_set_count)
+                else:
+                    study_data['accumxraydose'] = u""
+                try:
+                    accumfluoroproj = {}
+                    study_data['accumfluoroproj'] = u""
+                    for index, accumxraydose in enumerate(accumxraydose_set):
+                        accumfluoroproj[index] = accumxraydose.accumprojxraydose_set.get()
+                        study_data['accumfluoroproj'] += u"P{0} ".format(index+1)
+                        if accumfluoroproj[index].fluoro_dose_area_product_total:
+                            study_data['accumfluoroproj'] += u"Total fluoro DA: {0:.2f}&nbsp;cGy.cm<sup>2</sup>" \
+                                                             u"; ".format(accumfluoroproj[index].fluoro_gym2_to_cgycm2())
+                        if accumfluoroproj[index].acquisition_dose_area_product_total:
+                            study_data['accumfluoroproj'] += u"Acq: {0:.2f}&nbsp;cGy.cm<sup>2</sup>. ".format(
+                            accumfluoroproj[index].acq_gym2_to_cgycm2())
+                except ObjectDoesNotExist:
+                    study_data['accumfluoroproj'] = u""
+                try:
+                    accummammo_set = accumxraydose_set[0].accummammographyxraydose_set.order_by('pk')
+                    if accummammo_set.count() == 0:
+                        study_data['accummammo'] = u""
+                    else:
+                        study_data['accummammo'] = u""
+                        for accummammo in accummammo_set:
+                            study_data['accummammo'] += u"{0}: {1:.3f}&nbsp;mGy".format(
+                                accummammo.laterality, accummammo.accumulated_average_glandular_dose)
+                except ObjectDoesNotExist:
+                    study_data['accummammo'] = u""
+                try:
+                    accumcassproj = {}
+                    study_data['accumcassproj'] = u""
+                    for index, accumxraydose in enumerate(accumxraydose_set):
+                        accumcassproj[index] = accumxraydose.accumcassettebsdprojradiogdose_set.get()
+                        study_data['accumcassproj'] += u"Number of frames {0}".format(
+                            accumcassproj[index].total_number_of_radiographic_frames)
+                except ObjectDoesNotExist:
+                    study_data['accumcassproj'] = u""
+                try:
+                    accumproj = {}
+                    study_data['accumproj'] = u""
+                    for index, accumxraydose in enumerate(accumxraydose_set):
+                        accumproj[index] = accumxraydose.accumintegratedprojradiogdose_set.get()
+                        study_data['accumproj'] += u"DAP total {0:.2f}&nbsp;cGy.cm<sup>2</sup> ".format(
+                            accumproj[index].convert_gym2_to_cgycm2())
+                except ObjectDoesNotExist:
+                    study_data['accumproj'] = u""
+            except ObjectDoesNotExist:
+                study_data['accumxraydose'] = u""
+                study_data['accumfluoroproj'] = u""
+                study_data['accummammo'] = u""
+                study_data['accumcassproj'] = u""
+                study_data['accumproj'] = u""
+            try:
+                study_data['eventdetector'] = u""
+                study_data['eventsource'] = u""
+                study_data['eventmech'] = u""
+                irradevent_set = projectionxraydata.irradeventxraydata_set.order_by('pk')
+                irradevent_set_count = irradevent_set.count()
+                if irradevent_set_count == 1:
+                    study_data['irradevent'] = u"{0} event. ".format(irradevent_set_count)
+                else:
+                    study_data['irradevent'] = u"{0} events. <br>".format(irradevent_set_count)
+                for index, irradevent in enumerate(irradevent_set):
+                    if index == 4:
+                        study_data['irradevent'] += u"...etc"
+                        study_data['eventdetector'] += u"...etc"
+                        study_data['eventsource'] += u"...etc"
+                        study_data['eventmech'] += u"...etc"
+                        break
+                    if irradevent.dose_area_product:
+                        study_data['irradevent'] += u"e{0}: {1} {2:.2f}&nbsp;cGy.cm<sup>2</sup> <br>".format(
+                            index+1,
+                            irradevent.acquisition_protocol,
+                            irradevent.convert_gym2_to_cgycm2())
+                    elif irradevent.entrance_exposure_at_rp:
+                        study_data['irradevent'] += u"RP dose {0}: {1:.2f} mGy  <br>".format(
+                            index+1, irradevent.entrance_exposure_at_rp)
+                    try:
+                        eventdetector = irradevent.irradeventxraydetectordata_set.get()
+                        if eventdetector.exposure_index:
+                            study_data['eventdetector'] += u"e{0}: EI&nbsp;{1:.1f},<br>".format(
+                                index+1, eventdetector.exposure_index)
+                        else:
+                            study_data['eventdetector'] += u"e{0} present,<br>".format(index+1)
+                    except ObjectDoesNotExist:
+                        study_data['eventdetector'] += u""
+                    try:
+                        eventsource = irradevent.irradeventxraysourcedata_set.get()
+                        if eventsource.dose_rp:
+                            study_data['eventsource'] += u"e{0} RP Dose {1:.3f}&nbsp;mGy,<br>".format(
+                                index+1, eventsource.convert_gy_to_mgy())
+                        elif eventsource.average_glandular_dose:
+                            study_data['eventsource'] += u"e{0} AGD {1:.2f}&nbsp;mGy,<br>".format(
+                                index + 1, eventsource.average_glandular_dose)
+                        else:
+                            study_data['eventsource'] += u"e{0} present,<br>".format(index+1)
+                    except ObjectDoesNotExist:
+                        study_data['eventsource'] += u""
+                    try:
+                        eventmech = irradevent.irradeventxraymechanicaldata_set.get()
+                        if eventmech.positioner_primary_angle:
+                            study_data['eventmech'] += u"e{0} {1:.1f}&deg;<br>".format(
+                                index+1, eventmech.positioner_primary_angle)
+                        else:
+                            study_data['eventmech'] += u"e{0} present,<br>".format(
+                                index+1)
+                    except ObjectDoesNotExist:
+                        study_data['eventmech'] = u""
+            except ObjectDoesNotExist:
+                study_data['irradevent'] = u""
+        except ObjectDoesNotExist:
+            study_data['projectionxraydata'] = u""
+            study_data['accumxraydose'] = u""
+            study_data['accumfluoroproj'] = u""
+            study_data['accummammo'] = u""
+            study_data['accumcassproj'] = u""
+            study_data['accumproj'] = u""
+            study_data['irradevent'] = u""
+            study_data['eventdetector'] = u""
+            study_data['eventdetector'] = u""
+            study_data['eventsource'] = u""
+            study_data['eventmech'] = u""
+            study_data['eventmech'] = u""
+
+        template = 'remapp/review_study.html'
+        return render(request, template, study_data)
 
 
 @login_required
@@ -2305,7 +2842,10 @@ def dicom_summary(request):
     )
 
 
-class DicomStoreCreate(CreateView):
+class DicomStoreCreate(CreateView):  # pylint: disable=unused-variable
+    """CreateView to add details of a DICOM Store to the database
+
+    """
     from remapp.forms import DicomStoreForm
     from remapp.models import DicomStoreSCP
 
@@ -2321,7 +2861,10 @@ class DicomStoreCreate(CreateView):
         return context
 
 
-class DicomStoreUpdate(UpdateView):
+class DicomStoreUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView to update details of a DICOM store in the database
+
+    """
     from remapp.forms import DicomStoreForm
     from remapp.models import DicomStoreSCP
 
@@ -2337,7 +2880,10 @@ class DicomStoreUpdate(UpdateView):
         return context
 
 
-class DicomStoreDelete(DeleteView):
+class DicomStoreDelete(DeleteView):  # pylint: disable=unused-variable
+    """DeleteView to delete DICOM store information from the database
+
+    """
     from remapp.models import DicomStoreSCP
 
     model = DicomStoreSCP
@@ -2352,7 +2898,10 @@ class DicomStoreDelete(DeleteView):
         return context
 
 
-class DicomQRCreate(CreateView):
+class DicomQRCreate(CreateView):  # pylint: disable=unused-variable
+    """CreateView to add details of a DICOM query-retrieve node
+
+    """
     from remapp.forms import DicomQRForm
     from remapp.models import DicomRemoteQR
 
@@ -2368,7 +2917,10 @@ class DicomQRCreate(CreateView):
         return context
 
 
-class DicomQRUpdate(UpdateView):
+class DicomQRUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView to update details of a DICOM query-retrieve node
+
+    """
     from remapp.forms import DicomQRForm
     from remapp.models import DicomRemoteQR
 
@@ -2384,7 +2936,10 @@ class DicomQRUpdate(UpdateView):
         return context
 
 
-class DicomQRDelete(DeleteView):
+class DicomQRDelete(DeleteView):  # pylint: disable=unused-variable
+    """DeleteView to delete details of a DICOM query-retrieve node
+
+    """
     from remapp.models import DicomRemoteQR
 
     model = DicomRemoteQR
@@ -2399,7 +2954,10 @@ class DicomQRDelete(DeleteView):
         return context
 
 
-class PatientIDSettingsUpdate(UpdateView):
+class PatientIDSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView to update the patient ID settings
+
+    """
     from remapp.models import PatientIDSettings
 
     model = PatientIDSettings
@@ -2415,7 +2973,10 @@ class PatientIDSettingsUpdate(UpdateView):
         return context
 
 
-class DicomDeleteSettingsUpdate(UpdateView):
+class DicomDeleteSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView tp update the settings relating to deleting DICOM after import
+
+    """
     from remapp.models import DicomDeleteSettings
     from remapp.forms import DicomDeleteSettingsForm
 
@@ -2431,7 +2992,10 @@ class DicomDeleteSettingsUpdate(UpdateView):
         return context
 
 
-class SkinDoseMapCalcSettingsUpdate(UpdateView):
+class SkinDoseMapCalcSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView for configuring the skin dose map calculation choices
+
+    """
     from remapp.models import SkinDoseMapCalcSettings
     from remapp.forms import SkinDoseMapCalcSettingsForm
     from django.core.exceptions import ObjectDoesNotExist
@@ -2460,7 +3024,10 @@ class SkinDoseMapCalcSettingsUpdate(UpdateView):
         return super(SkinDoseMapCalcSettingsUpdate, self).form_valid(form)
 
 
-class NotPatientNameCreate(CreateView):
+class NotPatientNameCreate(CreateView):  # pylint: disable=unused-variable
+    """CreateView for configuration of indicators a study might not be a patient study
+
+    """
     from remapp.forms import NotPatientNameForm
     from remapp.models import NotPatientIndicatorsName
 
@@ -2476,7 +3043,10 @@ class NotPatientNameCreate(CreateView):
         return context
 
 
-class NotPatientNameUpdate(UpdateView):
+class NotPatientNameUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView to update choices regarding not-patient indicators
+
+    """
     from remapp.forms import NotPatientNameForm
     from remapp.models import NotPatientIndicatorsName
 
@@ -2492,7 +3062,10 @@ class NotPatientNameUpdate(UpdateView):
         return context
 
 
-class NotPatientNameDelete(DeleteView):
+class NotPatientNameDelete(DeleteView):  # pylint: disable=unused-variable
+    """DeleteView for the not-patient name indicator table
+
+    """
     from remapp.models import NotPatientIndicatorsName
 
     model = NotPatientIndicatorsName
@@ -2506,7 +3079,11 @@ class NotPatientNameDelete(DeleteView):
         context['admin'] = admin
         return context
 
-class NotPatientIDCreate(CreateView):
+
+class NotPatientIDCreate(CreateView):  # pylint: disable=unused-variable
+    """CreateView for not-patient ID indicators
+
+    """
     from remapp.forms import NotPatientIDForm
     from remapp.models import NotPatientIndicatorsID
 
@@ -2522,7 +3099,10 @@ class NotPatientIDCreate(CreateView):
         return context
 
 
-class NotPatientIDUpdate(UpdateView):
+class NotPatientIDUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView for non-patient ID indicators
+
+    """
     from remapp.forms import NotPatientIDForm
     from remapp.models import NotPatientIndicatorsID
 
@@ -2538,7 +3118,10 @@ class NotPatientIDUpdate(UpdateView):
         return context
 
 
-class NotPatientIDDelete(DeleteView):
+class NotPatientIDDelete(DeleteView):  # pylint: disable=unused-variable
+    """DeleteView for non-patient ID indicators
+
+    """
     from remapp.models import NotPatientIndicatorsID
 
     model = NotPatientIndicatorsID
