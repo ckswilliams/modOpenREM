@@ -726,6 +726,7 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
                                                         cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
             event.irradiation_event_uid = cont.UID
+            event.save()
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
                 _scanninglength(cont, event)
@@ -1028,6 +1029,8 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
     g.study_date = get_date('StudyDate', dataset)
     g.study_time = get_time('StudyTime', dataset)
+    g.series_time = get_time('SeriesTime', dataset)
+    g.content_time = get_time('ContentTime', dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900, 1, 1)), datetime.time(g.study_time))
     g.referring_physician_name = list_to_string(get_value_kw('ReferringPhysicianName', dataset))
     g.referring_physician_identification = list_to_string(get_value_kw('ReferringPhysicianIdentification', dataset))
@@ -1076,22 +1079,6 @@ def _generalstudymoduleattributes(dataset, g, ch):
             g.save()
 
 
-def _get_event_uids(dataset):
-    """Function to extract the event UIDs when a study instance UID is already in the database
-
-    :param dataset: DICOM dataset being imported
-    :return: list of UIDs
-    """
-    event_uids = []
-    for item in dataset.ContentSequence:
-        if item.ValueType == 'CONTAINER' and item.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
-            event_dataset = item
-            for event_item in event_dataset.ContentSequence:
-                if event_item.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
-                    event_uids += [event_item.UID, ]
-    return event_uids
-
-
 def _rsdr2db(dataset):
     import os
     import openrem_settings
@@ -1099,15 +1086,40 @@ def _rsdr2db(dataset):
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
 
     openrem_settings.add_project_to_path()
+    from django.db.models import ObjectDoesNotExist
+    from time import sleep
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
+    from remapp.tools.dcmdatetime import get_time
 
     if 'StudyInstanceUID' in dataset:
         uid = dataset.StudyInstanceUID
         existing_study_inst_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=uid)
         if existing_study_inst_uid:
-            dataset_event_uids = _get_event_uids(dataset)
-
+            if existing_study_inst_uid.count() > 1:
+                logger.error("More than one study in database with study instance UID of {0}, attempting to import"
+                             "another! Comparison will be made with first instance, which will be replaced if new"
+                             "RDSR is newer.".format(uid))
+            new_series_time = get_time('SeriesTime', dataset)
+            new_content_time = get_time('ContentTime', dataset)
+            existing_series_time = existing_study_inst_uid[0].series_time
+            existing_content_time = existing_study_inst_uid[0].content_time
+            logger.debug("Importing duplicate RDSR, study UID {0}. Existing series time {1}, content time {2}"
+                         "new series time is {3}, content time is {4}".format(
+                                uid, existing_series_time, existing_content_time, new_series_time, new_content_time))
+            if (new_series_time > existing_series_time) or (
+                    new_series_time == existing_series_time and new_content_time > existing_content_time):
+                # delete existing and start again with new - after checking patient_module_attributes exists or wait
+                try:
+                    existing_study_inst_uid[0].patientmoduleattr_set.get()
+                    # previous one probably finished
+                    existing_study_inst_uid[0].delete()
+                    logger.debug("New RDSR will replace old one. Old one deleted, new one about to import")
+                except ObjectDoesNotExist:
+                    sleep(30.)  # give the previous one a little extra time to import
+                    existing_study_inst_uid[0].delete()
+                    logger.warning("New RDSR replacing old one, but old one didn't appear to be finished importing so"
+                                   "we waited an extra 30 seconds before deleting it and importing the new one.")
 
     g = GeneralStudyModuleAttr.objects.create()
     if not g:  # Allows import to be aborted if no template found
