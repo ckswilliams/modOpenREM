@@ -1120,6 +1120,9 @@ def _rsdr2db(dataset):
                     existing_study_inst_uid[0].delete()
                     logger.warning("New RDSR replacing old one, but old one didn't appear to be finished importing so"
                                    "we waited an extra 30 seconds before deleting it and importing the new one.")
+            else:
+                # New RDSR not newer than existing one, don't proceed
+                return
 
     g = GeneralStudyModuleAttr.objects.create()
     if not g:  # Allows import to be aborted if no template found
