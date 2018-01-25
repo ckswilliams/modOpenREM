@@ -1100,8 +1100,8 @@ def _rsdr2db(dataset):
                 logger.error("More than one study in database with study instance UID of {0}, attempting to import"
                              "another! Comparison will be made with first instance, which will be replaced if new"
                              "RDSR is newer.".format(uid))
-            new_series_time = get_time('SeriesTime', dataset)
-            new_content_time = get_time('ContentTime', dataset)
+            new_series_time = get_time('SeriesTime', dataset).time()
+            new_content_time = get_time('ContentTime', dataset).time()
             existing_series_time = existing_study_inst_uid[0].series_time
             existing_content_time = existing_study_inst_uid[0].content_time
             logger.debug("Importing duplicate RDSR, study UID {0}. Existing series time {1}, content time {2}"
