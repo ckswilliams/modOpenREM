@@ -53,4 +53,11 @@ class ImportMultipleRDSRs(TestCase):
         self.assertEqual(GeneralStudyModuleAttr.objects.count(), 1)
         self.assertEqual(num_events, 3)
 
+        rdsr(dicom_path_1)
+        study = GeneralStudyModuleAttr.objects.order_by('pk')[0]
+        num_events = study.ctradiationdose_set.get().ctirradiationeventdata_set.count()
+
+        # Test that there is one study, and it still has three events
+        self.assertEqual(GeneralStudyModuleAttr.objects.count(), 1)
+        self.assertEqual(num_events, 3)
 
