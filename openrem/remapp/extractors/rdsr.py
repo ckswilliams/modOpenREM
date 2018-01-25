@@ -573,7 +573,7 @@ def _accumulatedtotalprojectionradiographydose(dataset, accum):  # TID 10007
 
 
 def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
-    from remapp.models import AccumXRayDose, ContextID
+    from remapp.models import AccumXRayDose
     from remapp.tools.get_values import get_or_create_cid
     accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
@@ -597,7 +597,7 @@ def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
     elif proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
         _accumulatedtotalprojectionradiographydose(dataset, accum)
     if proj.acquisition_device_type_cid:
-       if 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
+        if 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
             _accumulatedcassettebasedprojectionradiographydose(dataset, accum)
     accum.save()
 
@@ -792,7 +792,7 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
 
 
 def _ctaccumulateddosedata(dataset, ct, ch):  # TID 10012
-    from remapp.models import CtAccumulatedDoseData, ContextID
+    from remapp.models import CtAccumulatedDoseData
     from remapp.tools.get_values import safe_strings
     ctacc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
@@ -1080,7 +1080,6 @@ def _generalstudymoduleattributes(dataset, g, ch):
 
 
 def _rsdr2db(dataset):
-    import os
     import openrem_settings
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
@@ -1088,7 +1087,7 @@ def _rsdr2db(dataset):
     openrem_settings.add_project_to_path()
     from django.db.models import ObjectDoesNotExist
     from time import sleep
-    from remapp.models import GeneralStudyModuleAttr
+    from remapp.models import GeneralStudyModuleAttr, SkinDoseMapCalcSettings
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_time
 
@@ -1133,8 +1132,6 @@ def _rsdr2db(dataset):
     _patientstudymoduleattributes(dataset, g)
     _patientmoduleattributes(dataset, g, ch)
 
-    from remapp.models import SkinDoseMapCalcSettings
-    from django.core.exceptions import ObjectDoesNotExist
     try:
         SkinDoseMapCalcSettings.objects.get()
     except ObjectDoesNotExist:
@@ -1182,7 +1179,6 @@ def rdsr(rdsr_file):
 
 
 if __name__ == "__main__":
-    import sys
 
     if len(sys.argv) != 2:
         sys.exit(u'Error: Supply exactly one argument - the DICOM RDSR file')
