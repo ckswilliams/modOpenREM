@@ -1106,7 +1106,12 @@ def _rsdr2db(dataset):
             logger.debug("Importing duplicate RDSR, study UID {0}. Existing series time {1}, content time {2}"
                          "new series time is {3}, content time is {4}".format(
                                 uid, existing_series_time, existing_content_time, new_series_time, new_content_time))
-            if (new_series_time > existing_series_time) or (
+            if not existing_series_time:
+                logger.warning("Importing an RDSR with duplicate study instance UID ({0}), but existing one was"
+                               " imported without recording series time so we can't tell which is newer. This RDSR is"
+                               " going to replace the existing one.".format(uid))
+                existing_study_inst_uid[0].delete()
+            elif (new_series_time > existing_series_time) or (
                     new_series_time == existing_series_time and new_content_time > existing_content_time):
                 # delete existing and start again with new - after checking patient_module_attributes exists or wait
                 try:
