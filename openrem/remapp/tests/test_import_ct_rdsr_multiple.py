@@ -1,15 +1,13 @@
 # This Python file uses the following encoding: utf-8
 # test_import_ct_rdsr_siemens.py
 
-import datetime
 import os
-from decimal import Decimal
 from django.test import TestCase
 from remapp.extractors import rdsr
-from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, NotPatientIndicatorsID, NotPatientIndicatorsName
+from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
 
 
-class ImportMultipleRDSRs(TestCase):
+class ImportMultipleRDSRs(TestCase):  # pylint: disable=unused-variable
     """Tests for multiple RDSR imports of the same study at different stages
 
     """
