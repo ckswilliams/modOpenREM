@@ -258,6 +258,16 @@ LOGGING = {
 ID_INDICATORS = [u'phy', u'test', u'qa']
 NAME_INDICATORS = [u'phys', u'test', u'qa']
 
+# Dummy locations of various tools for DICOM RDSR creation from CT images
+DCMTK_PATH = ''
+DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
+DCMMKDIR = os.path.join(DCMTK_PATH, 'dcmmkdir.exe')
+JAVA_EXE = ''
+JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
+PIXELMED_JAR = ''
+PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
+
+
 try:
     LOCAL_SETTINGS
 except NameError:
