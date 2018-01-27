@@ -1103,7 +1103,7 @@ def _rsdr2db(dataset):
             new_content_time = get_time('ContentTime', dataset).time()
             existing_series_time = existing_study_inst_uid[0].series_time
             existing_content_time = existing_study_inst_uid[0].content_time
-            logger.debug("Importing duplicate RDSR, study UID {0}. Existing series time {1}, content time {2}"
+            logger.debug("Importing duplicate RDSR, study UID {0}. Existing series time {1}, content time {2} "
                          "new series time is {3}, content time is {4}".format(
                                 uid, existing_series_time, existing_content_time, new_series_time, new_content_time))
             if not existing_series_time:
