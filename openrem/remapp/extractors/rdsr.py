@@ -137,9 +137,17 @@ def _deviceparticipant(dataset, eventdatatype, foreignkey, ch):
 
 def _pulsewidth(pulse_width_value, source):
     from remapp.models import PulseWidth
-    pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
-    pulse.pulse_width = pulse_width_value
-    pulse.save()
+    try:
+        pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
+        pulse.pulse_width = pulse_width_value
+        pulse.save()
+    except ValueError:
+        if not hasattr(pulse_width_value, "strip") and (
+                hasattr(pulse_width_value, "__getitem__") or hasattr(pulse_width_value, "__iter__")):
+            for per_pulse_pulse_width in pulse_width_value:
+                pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
+                pulse.pulse_width = per_pulse_pulse_width
+                pulse.save()
 
 
 def _kvptable(kvp_value, source):
