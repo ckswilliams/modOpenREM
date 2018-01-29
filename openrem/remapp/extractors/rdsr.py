@@ -152,24 +152,47 @@ def _pulsewidth(pulse_width_value, source):
 
 def _kvptable(kvp_value, source):
     from remapp.models import Kvp
-    kvpdata = Kvp.objects.create(irradiation_event_xray_source_data=source)
-    kvpdata.kvp = kvp_value
-    kvpdata.save()
+    try:
+        kvpdata = Kvp.objects.create(irradiation_event_xray_source_data=source)
+        kvpdata.kvp = kvp_value
+        kvpdata.save()
+    except ValueError:
+        if not hasattr(kvp_value, "strip") and (
+                hasattr(kvp_value, "__getitem__") or hasattr(kvp_value, "__iter__")):
+            for per_pulse_kvp in kvp_value:
+                kvp = Kvp.objects.create(irradiation_event_xray_source_data=source)
+                kvp.kvp = per_pulse_kvp
+                kvp.save()
 
 
 def _xraytubecurrent(current_value, source):
     from remapp.models import XrayTubeCurrent
-    tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
-    tubecurrent.xray_tube_current = current_value
-    tubecurrent.save()
+    try:
+        tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
+        tubecurrent.xray_tube_current = current_value
+        tubecurrent.save()
+    except ValueError:
+        if not hasattr(current_value, "strip") and (
+                hasattr(current_value, "__getitem__") or hasattr(current_value, "__iter__")):
+            for per_pulse_current in current_value:
+                tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
+                tubecurrent.xray_tube_current = per_pulse_current
+                tubecurrent.save()
 
 
 def _exposure(exposure_value, source):
     from remapp.models import Exposure
-    exposure = Exposure.objects.create(irradiation_event_xray_source_data=source)
-    exposure.exposure = exposure_value
-    exposure.save()
-
+    try:
+        exposure = Exposure.objects.create(irradiation_event_xray_source_data=source)
+        exposure.exposure = exposure_value
+        exposure.save()
+    except ValueError:
+        if not hasattr(exposure_value, "strip") and (
+                hasattr(exposure_value, "__getitem__") or hasattr(exposure_value, "__iter__")):
+            for per_pulse_exposure in exposure_value:
+                exposure = Exposure.objects.create(irradiation_event_xray_source_data=source)
+                exposure.exposure = per_pulse_exposure
+                exposure.save()
 
 def _xrayfilters(content_sequence, source):
     from remapp.models import XrayFilters
