@@ -77,6 +77,8 @@ def _dx_get_series_data(s):
     :param s: series
     :return: series data
     """
+    from django.core.exceptions import MultipleObjectsReturned
+    from django.db.models import Avg
     try:
         source_data = s.irradeventxraysourcedata_set.get()
         exposure_control_mode = source_data.exposure_control_mode
@@ -86,15 +88,22 @@ def _dx_get_series_data(s):
             kvp = source_data.kvp_set.get().kvp
         except ObjectDoesNotExist:
             kvp = None
+        except MultipleObjectsReturned:
+            kvp = source_data.kvp_set.all().aggregate(Avg('kvp'))['kvp__avg']
         try:
             exposure_set = source_data.exposure_set.get()
+            print(exposure_set)
             uas = exposure_set.exposure
             if uas:
                 mas = exposure_set.convert_uAs_to_mAs()
             else:
                 mas = None
         except ObjectDoesNotExist:
+            print("does not exist")
             mas = None
+        except MultipleObjectsReturned:
+            mas = source_data.exposure_set.all().aggregate(Avg('convert_uAs_to_mAs'))['vonvert_uAs_to_mAs']
+            print(mas)
         filters, filter_thicknesses = get_xray_filter_info(source_data)
     except ObjectDoesNotExist:
         exposure_control_mode = None
