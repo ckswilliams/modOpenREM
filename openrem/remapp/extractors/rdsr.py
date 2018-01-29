@@ -151,6 +151,12 @@ def _pulsewidth(pulse_width_value, source):
 
 
 def _kvptable(kvp_value, source):
+    """Takes kVp values and populates kvp table
+
+    :param kvp_value: Decimal or list of decimals
+    :param source: database object in IrradEventXRaySourceData table
+    :return: None
+    """
     from remapp.models import Kvp
     try:
         kvpdata = Kvp.objects.create(irradiation_event_xray_source_data=source)
@@ -166,6 +172,12 @@ def _kvptable(kvp_value, source):
 
 
 def _xraytubecurrent(current_value, source):
+    """Takes X-ray tube current values and populates XrayTubeCurrent table
+
+    :param current_value: Decimal or list of decimals
+    :param source: database object in IrradEventXRaySourceData table
+    :return: None
+    """
     from remapp.models import XrayTubeCurrent
     try:
         tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
@@ -181,6 +193,12 @@ def _xraytubecurrent(current_value, source):
 
 
 def _exposure(exposure_value, source):
+    """Takes exposure (mAs) values and populates Exposure table
+
+    :param exposure_value: Decimal or list of decimals
+    :param source: database object in IrradEventXRaySourceData table
+    :return: None
+    """
     from remapp.models import Exposure
     try:
         exposure = Exposure.objects.create(irradiation_event_xray_source_data=source)
