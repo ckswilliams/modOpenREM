@@ -99,6 +99,7 @@ OpenREM version history
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
 * `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
 * `#318`_  Database management: Display names view can be used to review and delete all studies from one source
+* `#114`_  Imports: Subsequent RDSRs of the same study will now replace existing study in database
 
 0.7.4 (2016-10-17)
 ------------------
