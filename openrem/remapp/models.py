@@ -475,6 +475,9 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     procedure_code_meaning = models.TextField(blank=True, null=True)
     requested_procedure_code_value = models.TextField(blank=True, null=True)
     requested_procedure_code_meaning = models.TextField(blank=True, null=True)
+    # Series and content to distinguish between multiple cumulative RDSRs
+    series_time = models.TimeField(blank=True, null=True)
+    content_time = models.TimeField(blank=True, null=True)
 
     def __unicode__(self):
         return self.study_instance_uid

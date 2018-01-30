@@ -629,7 +629,7 @@ def _accumulatedtotalprojectionradiographydose(dataset, accum):  # TID 10007
 
 
 def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
-    from remapp.models import AccumXRayDose, ContextID
+    from remapp.models import AccumXRayDose
     from remapp.tools.get_values import get_or_create_cid
     accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
@@ -653,7 +653,7 @@ def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
     elif proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
         _accumulatedtotalprojectionradiographydose(dataset, accum)
     if proj.acquisition_device_type_cid:
-       if 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
+        if 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
             _accumulatedcassettebasedprojectionradiographydose(dataset, accum)
     accum.save()
 
@@ -782,6 +782,7 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
                                                         cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
             event.irradiation_event_uid = cont.UID
+            event.save()
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
                 _scanninglength(cont, event)
@@ -847,7 +848,7 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
 
 
 def _ctaccumulateddosedata(dataset, ct, ch):  # TID 10012
-    from remapp.models import CtAccumulatedDoseData, ContextID
+    from remapp.models import CtAccumulatedDoseData
     from remapp.tools.get_values import safe_strings
     ctacc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
@@ -1084,6 +1085,8 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
     g.study_date = get_date('StudyDate', dataset)
     g.study_time = get_time('StudyTime', dataset)
+    g.series_time = get_time('SeriesTime', dataset)
+    g.content_time = get_time('ContentTime', dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900, 1, 1)), datetime.time(g.study_time))
     g.referring_physician_name = list_to_string(get_value_kw('ReferringPhysicianName', dataset))
     g.referring_physician_identification = list_to_string(get_value_kw('ReferringPhysicianIdentification', dataset))
@@ -1133,20 +1136,53 @@ def _generalstudymoduleattributes(dataset, g, ch):
 
 
 def _rsdr2db(dataset):
-    import os
     import openrem_settings
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
 
     openrem_settings.add_project_to_path()
-    from remapp.models import GeneralStudyModuleAttr
+    from django.db.models import ObjectDoesNotExist
+    from time import sleep
+    from remapp.models import GeneralStudyModuleAttr, SkinDoseMapCalcSettings
     from remapp.tools.get_values import get_value_kw
+    from remapp.tools.dcmdatetime import get_time
 
     if 'StudyInstanceUID' in dataset:
         uid = dataset.StudyInstanceUID
-        existing = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=uid)
-        if existing:
-            return
+        existing_study_inst_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=uid)
+        if existing_study_inst_uid:
+            if existing_study_inst_uid.count() > 1:
+                logger.error("More than one study in database with study instance UID of {0}, attempting to import"
+                             "another! Comparison will be made with first instance, which will be replaced if new"
+                             "RDSR is newer.".format(uid))
+            new_series_time = get_time('SeriesTime', dataset).time()
+            new_content_time = get_time('ContentTime', dataset).time()
+            existing_series_time = existing_study_inst_uid[0].series_time
+            existing_content_time = existing_study_inst_uid[0].content_time
+            logger.debug("Importing duplicate RDSR, study UID {0}. Existing series time {1}, content time {2} "
+                         "new series time is {3}, content time is {4}".format(
+                                uid, existing_series_time, existing_content_time, new_series_time, new_content_time))
+            if not existing_series_time:
+                logger.warning("Importing an RDSR with duplicate study instance UID ({0}), but existing one was"
+                               " imported without recording series time so we can't tell which is newer. This RDSR is"
+                               " going to replace the existing one.".format(uid))
+                existing_study_inst_uid[0].delete()
+            elif (new_series_time > existing_series_time) or (
+                    new_series_time == existing_series_time and new_content_time > existing_content_time):
+                # delete existing and start again with new - after checking patient_module_attributes exists or wait
+                try:
+                    existing_study_inst_uid[0].patientmoduleattr_set.get()
+                    # previous one probably finished
+                    existing_study_inst_uid[0].delete()
+                    logger.debug("New RDSR will replace old one. Old one deleted, new one about to import")
+                except ObjectDoesNotExist:
+                    sleep(30.)  # give the previous one a little extra time to import
+                    existing_study_inst_uid[0].delete()
+                    logger.warning("New RDSR replacing old one, but old one didn't appear to be finished importing so"
+                                   "we waited an extra 30 seconds before deleting it and importing the new one.")
+            else:
+                # New RDSR not newer than existing one, don't proceed
+                return
 
     g = GeneralStudyModuleAttr.objects.create()
     if not g:  # Allows import to be aborted if no template found
@@ -1157,8 +1193,6 @@ def _rsdr2db(dataset):
     _patientstudymoduleattributes(dataset, g)
     _patientmoduleattributes(dataset, g, ch)
 
-    from remapp.models import SkinDoseMapCalcSettings
-    from django.core.exceptions import ObjectDoesNotExist
     try:
         SkinDoseMapCalcSettings.objects.get()
     except ObjectDoesNotExist:
@@ -1206,7 +1240,6 @@ def rdsr(rdsr_file):
 
 
 if __name__ == "__main__":
-    import sys
 
     if len(sys.argv) != 2:
         sys.exit(u'Error: Supply exactly one argument - the DICOM RDSR file')
