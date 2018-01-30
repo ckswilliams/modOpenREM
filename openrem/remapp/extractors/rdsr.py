@@ -136,6 +136,12 @@ def _deviceparticipant(dataset, eventdatatype, foreignkey, ch):
 
 
 def _pulsewidth(pulse_width_value, source):
+    """Takes pulse width values and populates PulseWidth table
+
+    :param pulse_width_value: Decimal or list of decimals
+    :param source: database object in IrradEventXRaySourceData table
+    :return: None
+    """
     from remapp.models import PulseWidth
     try:
         pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
@@ -211,6 +217,7 @@ def _exposure(exposure_value, source):
                 exposure = Exposure.objects.create(irradiation_event_xray_source_data=source)
                 exposure.exposure = per_pulse_exposure
                 exposure.save()
+
 
 def _xrayfilters(content_sequence, source):
     from remapp.models import XrayFilters
