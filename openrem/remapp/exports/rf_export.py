@@ -32,7 +32,7 @@ import logging
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet
+    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet, get_pulse_data
 from remapp.tools.get_values import return_for_export
 
 logger = logging.getLogger(__name__)
@@ -127,18 +127,10 @@ def _get_series_data(event, filter_data):
         dose_rp = source_data.dose_rp
         number_of_pulses = source_data.number_of_pulses
         irradiation_duration = source_data.irradiation_duration
-        try:
-            kVp = source_data.kvp_set.get().kvp
-        except ObjectDoesNotExist:
-            kVp = None
-        try:
-            xray_tube_current = source_data.xraytubecurrent_set.get().xray_tube_current
-        except ObjectDoesNotExist:
-            xray_tube_current = None
-        try:
-            pulse_width = source_data.pulsewidth_set.get().pulse_width
-        except ObjectDoesNotExist:
-            pulse_width = None
+        pulse_data = get_pulse_data(source_data=source_data, modality="RF")
+        kVp = pulse_data['kvp']
+        xray_tube_current = pulse_data['xray_tube_current']
+        pulse_width = pulse_data['pulse_width']
     except ObjectDoesNotExist:
         pulse_rate = None
         ii_field_size = None
