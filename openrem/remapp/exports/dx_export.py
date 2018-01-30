@@ -102,7 +102,8 @@ def _dx_get_series_data(s):
             print("does not exist")
             mas = None
         except MultipleObjectsReturned:
-            mas = source_data.exposure_set.all().aggregate(Avg('convert_uAs_to_mAs'))['vonvert_uAs_to_mAs']
+            mas = source_data.exposure_set.all().aggregate(Avg('exposure'))['exposure__avg']
+            mas = mas/1000.
             print(mas)
         filters, filter_thicknesses = get_xray_filter_info(source_data)
     except ObjectDoesNotExist:

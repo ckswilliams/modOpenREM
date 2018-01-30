@@ -723,10 +723,12 @@ class Exposure(models.Model):  # EV 113736
     exposure = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
 
     def convert_uAs_to_mAs(self):
+        from decimal import Decimal
+        from numbers import Number
         """Converts uAs to mAs for display in web interface
         """
-        if self.exposure:
-            return self.exposure / 1000
+        if isinstance(self.exposure, Number):
+            return self.exposure / Decimal(1000.)
 
 
 class XrayFilters(models.Model):  # EV 113771

@@ -87,8 +87,13 @@
             {{ kvp_value.kvp|floatformat:0 }}
           {% endfor %}
         </td>
-        <td>{{ sourcedata.exposure_set.get.convert_uAs_to_mAs|floatformat:1 }}</td>
-        <td>{{ sourcedata.average_xray_tube_current|floatformat:0 }}</td>
+        <td>
+          {% for exposure_value in sourcedata.exposure_set.all %}
+           {{ exposure_value.convert_uAs_to_mAs|floatformat:1 }}
+{# .convert_uAs_to_mAs|floatformat:1#}
+          {% endfor %}
+        </td>
+        <td>{{ sourcedata.average_xray_tube_current|floatformat:1 }}</td>
         <td>{{ sourcedata.exposure_time|floatformat:0 }}</td>
         <td>
             {% for xrayfilt in sourcedata.xrayfilters_set.all %}
