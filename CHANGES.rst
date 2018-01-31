@@ -4,7 +4,7 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
-* `#446`_  Import: Extract some Philips private information for Allura Xper systems, create workaround for missing end angles for rotational acquisitions
+* `#446`_  Import: Extract additional Philips private information for Allura Xper systems, create workaround for missing end angles for rotational acquisitions
 * `#584`_  Import, Interface, Export: RDSR with pulse level data now function
 * `#581`_  Import scripts: Interpreter line now always first, functions imported specifically
 * `#580`_  Imports and Interface: one modality creating both DX and RF can now be handled appropriately

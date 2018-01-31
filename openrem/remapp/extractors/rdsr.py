@@ -377,7 +377,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                         if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Top Shutter':
                             top_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
                     # Get distance_source_to_detector (Sdd) in meters
-                    # Philips Allura XPer only notes distance_source_to_detector if it changed compared to last event
+                    # Philips Allura XPer only notes distance_source_to_detector if it changed
                     try:
                         Sdd = float(event.irradeventxraymechanicaldata_set.get().
                                     doserelateddistancemeasurements_set.get().distance_source_to_detector) / 1000
