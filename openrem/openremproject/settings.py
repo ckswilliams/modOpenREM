@@ -254,10 +254,6 @@ LOGGING = {
     }
 }
 
-# Not patient indicators: please override in local_settings.py
-ID_INDICATORS = [u'phy', u'test', u'qa']
-NAME_INDICATORS = [u'phys', u'test', u'qa']
-
 # Dummy locations of various tools for DICOM RDSR creation from CT images
 DCMTK_PATH = ''
 DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
