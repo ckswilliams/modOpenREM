@@ -7,6 +7,7 @@ OpenREM version history
 * `#584`_  Import, Interface, Export: RDSR with pulse level data now function
 * `#581`_  Import scripts: Interpreter line now always first, functions imported specifically
 * `#580`_  Imports and Interface: one modality creating both DX and RF can now be handled appropriately
+* `#579`_  Imports: Dummy values for Toshiba CT import function now in settings.py, log file config in docs
 * `#578`_  Exports: Fixed NHSBSP export that was excluding RDSR imported Hologic studies
 * `#575`_  Exports: export page now updates using AJAX and has a select all button
 * `#573`_  Exports: corrected and clarified exposure time and duration units, added number of pulses
