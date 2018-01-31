@@ -347,7 +347,7 @@ def _philips_ct2db(dataset):
     _patientmoduleattributes(dataset, g, ch)
 
 
-@shared_task
+@shared_task(name="remapp.extractors.ct_philips.ct_philips")
 def ct_philips(philips_file):
     """Extract radiation dose structured report related data from Philips CT dose report images
     

@@ -117,6 +117,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         u'S2 mA',
         u'S2 Exposure time/rotation',
         u'mA Modulation type',
+        u'Dose check details',
         u'Comments',
         ]
 
@@ -291,6 +292,7 @@ def _generate_all_data_headers_ct(max_events):
             u'E' + str(h+1) + u' S2 mA',
             u'E' + str(h+1) + u' S2 Exposure time/rotation',
             u'E' + str(h+1) + u' mA Modulation type',
+            u'E' + str(h+1) + u' Dose check details',
             u'E' + str(h+1) + u' Comments',
             ]
 
@@ -298,7 +300,7 @@ def _generate_all_data_headers_ct(max_events):
 
 
 def _ct_get_series_data(s):
-    from remapp.tools.get_values import return_for_export, string_to_float
+    from collections import OrderedDict
 
     try:
         if s.ctdiw_phantom_type.code_value == u'113691':
@@ -323,49 +325,90 @@ def _ct_get_series_data(s):
         phantom,
         s.dlp,
         ]
-    if s.number_of_xray_sources > 1:
-        for source in s.ctxraysourceparameters_set.all():
-            seriesdata += [
-                str(source.identification_of_the_xray_source),
-                source.kvp,
-                source.maximum_xray_tube_current,
-                source.xray_tube_current,
-                source.exposure_time_per_rotation,
-                ]
-    else:
-        try:
-            s.ctxraysourceparameters_set.get()
-        except ObjectDoesNotExist:
-            identification_of_the_xray_source = None
-            kvp = None
-            maximum_xray_tube_current = None
-            xray_tube_current = None
-            exposure_time_per_rotation = None
-        else:
-            identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                  'identification_of_the_xray_source')
-            kvp = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'kvp'))
-            maximum_xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                    'maximum_xray_tube_current'))
-            xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
-                                                            'xray_tube_current'))
-            exposure_time_per_rotation = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
-                                                                     'exposure_time_per_rotation'))
-
+    source_parameters = OrderedDict()
+    source_parameters[0] = {'id': None, 'kvp': None, 'max_current': None, 'current': None, 'time': None}
+    source_parameters[1] = {'id': None, 'kvp': None, 'max_current': None, 'current': None, 'time': None}
+    try:
+        for index, source in enumerate(s.ctxraysourceparameters_set.all()):
+            source_parameters[index]['id'] = source.identification_of_the_xray_source
+            source_parameters[index]['kvp'] = source.kvp
+            source_parameters[index]['max_current'] = source.maximum_xray_tube_current
+            source_parameters[index]['current'] = source.xray_tube_current
+            source_parameters[index]['time'] = source.exposure_time_per_rotation
+    except ObjectDoesNotExist:
+        logger.debug("Export: ctxraysourceparameters_set does not exist")
+    for source in source_parameters:
         seriesdata += [
-            identification_of_the_xray_source,
-            kvp,
-            maximum_xray_tube_current,
-            xray_tube_current,
-            exposure_time_per_rotation,
-            u'n/a',
-            u'n/a',
-            u'n/a',
-            u'n/a',
-            u'n/a',
-            ]
+            source_parameters[source]['id'],
+            source_parameters[source]['kvp'],
+            source_parameters[source]['max_current'],
+            source_parameters[source]['current'],
+            source_parameters[source]['time'],
+        ]
+    try:
+        dose_check = s.ctdosecheckdetails_set.get()
+        dose_check_string = []
+        if dose_check.dlp_alert_value_configured or dose_check.ctdivol_alert_value_configured:
+            dose_check_string += [u"Dose Check Alerts: "]
+            if dose_check.dlp_alert_value_configured:
+                dose_check_string += [
+                    u"DLP alert is configured at {0:.2f} mGy.cm with ".format(dose_check.dlp_alert_value)]
+                if dose_check.accumulated_dlp_forward_estimate:
+                    dose_check_string += [u"an accumulated forward estimate of {0:.2f} mGy.cm. ".format(
+                        dose_check.accumulated_dlp_forward_estimate)]
+                else:
+                    dose_check_string += [u"no accumulated forward estimate recorded. "]
+            if dose_check.ctdivol_alert_value_configured:
+                dose_check_string += [
+                    u"CTDIvol alert is configured at {0:.2f} mGy with ".format(dose_check.ctdivol_alert_value)]
+                if dose_check.accumulated_ctdivol_forward_estimate:
+                    dose_check_string += [u"an accumulated forward estimate of {0:.2f} mGy. ".format(
+                        dose_check.accumulated_ctdivol_forward_estimate)]
+                else:
+                    dose_check_string += [u"no accumulated forward estimate recorded. "]
+            if dose_check.alert_reason_for_proceeding:
+                dose_check_string += [u"Reason for proceeding: {0}. ".format(dose_check.alert_reason_for_proceeding)]
+            try:
+                dose_check_person_alert = dose_check.tid1020_alert.get()
+                if dose_check_person_alert.person_name:
+                    dose_check_string += [
+                        u"Person authorizing irradiation: {0}. ".format(dose_check_person_alert.person_name)]
+            except ObjectDoesNotExist:
+                pass
+        if dose_check.dlp_notification_value_configured or dose_check.ctdivol_notification_value_configured:
+            dose_check_string += [u"Dose Check Notifications: "]
+            if dose_check.dlp_notification_value_configured:
+                dose_check_string += [
+                    u"DLP notification is configured at {0:.2f} mGy.cm with ".format(dose_check.dlp_notification_value)]
+                if dose_check.dlp_forward_estimate:
+                    dose_check_string += [
+                        u"an accumulated forward estimate of {0:.2f} mGy.cm. ".format(dose_check.dlp_forward_estimate)]
+                else:
+                    dose_check_string += [u"no accumulated forward estimate recorded. "]
+            if dose_check.ctdivol_notification_value_configured:
+                dose_check_string += [u"CTDIvol notification is configured at {0:.2f} mGy with ".format(
+                    dose_check.ctdivol_notification_value)]
+                if dose_check.ctdivol_forward_estimate:
+                    dose_check_string += [
+                        u"a forward estimate of {0:.2f} mGy. ".format(dose_check.ctdivol_forward_estimate)]
+                else:
+                    dose_check_string += [u"no forward estimate recorded. "]
+            if dose_check.notification_reason_for_proceeding:
+                dose_check_string += [
+                    u"Reason for proceeding: {0}. ".format(dose_check.notification_reason_for_proceeding)]
+            try:
+                dose_check_person_notification = dose_check.tid1020_notification.get()
+                if dose_check_person_notification.person_name:
+                    dose_check_string += [
+                        u"Person authorizing irradiation: {0}. ".format(dose_check_person_notification.person_name)]
+            except ObjectDoesNotExist:
+                pass
+        dose_check_string = ''.join(dose_check_string)
+    except ObjectDoesNotExist:
+        dose_check_string = ""
     seriesdata += [
         s.xray_modulation_type,
+        dose_check_string,
         str(s.comment),
         ]
     return seriesdata

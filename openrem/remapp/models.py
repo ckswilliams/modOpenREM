@@ -36,6 +36,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
+# pylint: disable=unused-variable
 
 class AdminTaskQuestions(SingletonModel):
     """
@@ -474,6 +475,9 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     procedure_code_meaning = models.TextField(blank=True, null=True)
     requested_procedure_code_value = models.TextField(blank=True, null=True)
     requested_procedure_code_meaning = models.TextField(blank=True, null=True)
+    # Series and content to distinguish between multiple cumulative RDSRs
+    series_time = models.TimeField(blank=True, null=True)
+    content_time = models.TimeField(blank=True, null=True)
 
     def __unicode__(self):
         return self.study_instance_uid
@@ -724,8 +728,10 @@ class Exposure(models.Model):  # EV 113736
     def convert_uAs_to_mAs(self):
         """Converts uAs to mAs for display in web interface
         """
-        if self.exposure:
-            return self.exposure / 1000
+        from decimal import Decimal
+        from numbers import Number
+        if isinstance(self.exposure, Number):
+            return self.exposure / Decimal(1000.)
 
 
 class XrayFilters(models.Model):  # EV 113771
@@ -812,6 +818,18 @@ class AccumProjXRayDose(models.Model):  # TID 10004
     total_number_of_radiographic_frames  = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(ContextID, blank=True, null=True)
+
+    def fluoro_gym2_to_cgycm2(self):
+        """Converts fluoroscopy DAP total from Gy.m2 to cGy.cm2 for display in web interface
+        """
+        if self.fluoro_dose_area_product_total:
+            return 1000000*self.fluoro_dose_area_product_total
+
+    def acq_gym2_to_cgycm2(self):
+        """Converts acquisition DAP total from Gy.m2 to cGy.cm2 for display in web interface
+        """
+        if self.acquisition_dose_area_product_total:
+            return 1000000*self.acquisition_dose_area_product_total
 
 
 class AccumMammographyXRayDose(models.Model):  # TID 10005

@@ -1,25 +1,32 @@
 {% extends "remapp/base.html" %}
 
 {% block headextras %}
-    <script src="{{ STATIC_URL }}js/sorttable.js"></script>
+  <script src="{{ STATIC_URL }}js/sorttable.js"></script>
 {% endblock %}
 
-{% block confnav %}<li class="dropdown active">{% endblock %}
+{% block confnav %}
+  <li class="dropdown active">{% endblock %}
 
 {% block navhelp %}
-        <li>
-            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_displaynames.html" target="_blank" data-toggle="tooltip" title="Display name documentation - opens in a new tab">
-                Display name documentation
-            </a>
-        </li>
+  <li>
+    <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_displaynames.html" target="_blank"
+       data-toggle="tooltip" title="Display name documentation - opens in a new tab">
+      Display name documentation
+    </a>
+  </li>
 {% endblock %}
 
 {% block toprow %}
   {% load pagination_tags %}
+  <a name="#top"></a>
   <p>{% if admin.admingroup %}Check one or more boxes and click an Update button to be taken to a page where you can
-      update all of the selected systems to the same display name and / or set a user defined modality type.</p>
-      <p>The boxes can be checked or unchecked by clicking anywhere on the row. Tables can be sorted by clicking on
-  column headers.{% endif %}</p>
+    update all of the selected systems to the same display name and / or set a user defined modality type.</p>
+    <p>The boxes can be checked or unchecked by clicking anywhere on the row. Tables can be sorted by clicking on
+    column headers.{% endif %}</p>
+  <p>
+    Jump to <a href="#ct">CT</a> | <a href="#mammo">Mammography</a> | <a href="#dx">DX and CR</a> |
+    <a href="#fluoro">Fluoroscopy</a> | <a href="#others">Others</a>
+  </p>
 {% endblock %}
 
 
@@ -27,177 +34,88 @@
 
   {% paginate %}
 
+  {% if admin.admingroup %}
+    <form action="/openrem/updatedisplaynames/" method="get">
+    <script>
+        jQuery(document).ready(function ($) {
+            $(".clickable-row").click(function () {
+                var row_name = $(this).attr('row_name');
+                $('input[name=' + row_name + ']').prop("checked", !$('input[name=' + row_name + ']').prop("checked"));
+            });
+            $('input').click(function () {
+                $(this).prop("checked", !$(this).prop("checked"));
+            });
+        });
+    </script>
+  {% endif %}
+
+{% for modality in modalities %}
+  <script>
+      $(document).ready(
+          function get_display_name_list(json) {
+              $.ajax(
+                  {
+                      url: "/populatedisplaynames",
+                      data: {
+                          modality: '{{ modality }}',
+                          csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                      type: "POST",
+                      success: function (data) {
+                          $('#{{ modality }}-names').html(data);
+                      }
+                  }
+              )
+          }
+      )
+  </script>
+{% endfor %}
+
+<a name="ct" class="vert-offset">
+  <h3>CT</h3>
+</a>
+<span id="CT-names"></span>
 {% if admin.admingroup %}
-<form action="/openrem/updatedisplaynames/" method="get">
-<script>
-    jQuery(document).ready(function($) {
-        $(".clickable-row").click(function() {
-            var row_name = $(this).attr('row_name');
-            $('input[name='+row_name+']').prop("checked", !$('input[name='+row_name+']').prop("checked"));
-        });
-        $('input').click(function() {
-            $(this).prop("checked", !$(this).prop("checked"));
-        });
-    });
-</script>
+  <input class="btn btn-default" type="submit" value="Update">
 {% endif %}
 
-<h3>CT</h3>
-  <p>There are {{ ct_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable sortable">
-    <tr>
-      {% if admin.admingroup %}
-        <th>Update?</th>
-      {% endif %}
-      <th>Display name</th><th>User defined modality</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </tr>
-    {% for eachrow in ct_names %}
-      <tr class="clickable-row" row_name="{{ eachrow.id }}">
-        {% if admin.admingroup %}
-          <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
-        {% endif %}
-        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
-      </tr>
-    {% endfor %}
-  </table>
-  {% if admin.admingroup %}
+<a name="mammo" class="vert-offset">
+  <h3>Mammography</h3>
+</a>
+<span id="MG-names"></span>
+{% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
-  {% endif %}
+{% endif %}
 
-<h3>Mammography</h3>
-  <p>There are {{ mg_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable sortable">
-    <tr>
-      {% if admin.admingroup %}
-        <th>Update?</th>
-      {% endif %}
-      <th>Display name</th><th>User defined modality</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </tr>
-    {% for eachrow in mg_names %}
-      <tr class="clickable-row" row_name="{{ eachrow.id }}">
-        {% if admin.admingroup %}
-          <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
-        {% endif %}
-        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
-      </tr>
-    {% endfor %}
-  </table>
-  {% if admin.admingroup %}
+<a name="dx" class="vert-offset">
+  <h3>DX and CR</h3>
+</a>
+<span id="DX-names"></span>
+{% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
-  {% endif %}
+{% endif %}
 
-<h3>DX and CR</h3>
-  <p>There are {{ dx_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable sortable">
-    <tr>
-      {% if admin.admingroup %}
-        <th>Update?</th>
-      {% endif %}
-      <th>Display name</th><th>User defined modality</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </tr>
-    {% for eachrow in dx_names %}
-      <tr class="clickable-row" row_name="{{ eachrow.id }}">
-        {% if admin.admingroup %}
-          <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
-        {% endif %}
-        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
-      </tr>
-    {% endfor %}
-  </table>
-  {% if admin.admingroup %}
+<a name="fluoro" class="vert-offset">
+  <h3>Fluoroscopy</h3>
+</a>
+<span id="RF-names"></span>
+{% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
-  {% endif %}
+{% endif %}
 
-<h3>Fluoroscopy</h3>
-  <p>There are {{ rf_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable sortable">
-    <tr>
-      {% if admin.admingroup %}
-        <th>Update?</th>
-      {% endif %}
-      <th>Display name</th><th>User defined modality</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </tr>
-    {% for eachrow in rf_names %}
-      <tr class="clickable-row" row_name="{{ eachrow.id }}">
-        {% if admin.admingroup %}
-          <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
-        {% endif %}
-        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
-      </tr>
-    {% endfor %}
-  </table>
-  {% if admin.admingroup %}
+<a name="others" class="vert-offset">
+  <h3>Others</h3>
+</a>
+<span id="OT-names"></span>
+{% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
-  {% endif %}
+{% endif %}
 
-<h3>Other</h3>
-  <p>There are {{ ot_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable sortable">
-    <tr>
-      {% if admin.admingroup %}
-        <th>Update?</th>
-      {% endif %}
-      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </tr>
-    {% for eachrow in ot_names %}
-      <tr class="clickable-row" row_name="{{ eachrow.id }}">
-        {% if admin.admingroup %}
-          <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
-        {% endif %}
-        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
-        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
-      </tr>
-    {% endfor %}
-  </table>
-  {% if admin.admingroup %}
-  <input class="btn btn-default" type="submit" value="Update">
-  {% endif %}
+
+{#      <td><a href="/admin/ot/{{ eachrow.pk }}/">Review</a></td>#}
 
 {% if admin.admingroup %}
-</form>
+  </form>
 {% endif %}
 
 {% endblock %}

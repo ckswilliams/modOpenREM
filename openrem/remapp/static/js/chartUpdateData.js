@@ -73,7 +73,7 @@ function updateOverTimeChart(nameList, overTimeData, seriesColours, urlStart, ch
     var dateAxis, currentValue, tempDate, dateAfter, dateBefore, temp, i, j;
     var chart = $("#"+chartDiv).highcharts();
 
-    var index = nameList.indexOf(null);
+    var index = nameList.indexOf(null || "");
     if (index !== -1) {nameList[index] = "Blank";}
 
     dateAxis = [];
@@ -127,7 +127,7 @@ function updateFrequencyChart(nameList, systemList, summaryData, urlStart, chart
     var dataCounts = 0;
     var i, j;
 
-    var index = nameList.indexOf(null);
+    var index = nameList.indexOf(null || "");
     if (index !== -1) {nameList[index] = "Blank";}
 
     for (i = 0; i < nameList.length; i++) {
@@ -170,7 +170,7 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
     var calcHistograms = typeof histogramData !== "undefined";
     var i, j, k;
 
-    var index = nameList.indexOf(null);
+    var index = nameList.indexOf(null || "");
     if (index !== -1) {nameList[index] = "Blank";}
 
     // Calculate counts per name and average value per name. These are used to sort the chart series by.

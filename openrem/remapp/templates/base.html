@@ -51,16 +51,16 @@
           <ul class="nav navbar-nav">
             {% block navbar %}
                 {% if request.user.userprofile.displayCT %}
-                    {% block navct %}<li>{% endblock %}<a href="/openrem/ct">CT</a></li>
+                    {% block navct %}<li>{% endblock %}<a href="/openrem/ct/">CT</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayRF %}
-                    {% block navrf %}<li>{% endblock %}<a href="/openrem/rf">Fluoroscopy</a></li>
+                    {% block navrf %}<li>{% endblock %}<a href="/openrem/rf/">Fluoroscopy</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayMG %}
-                    {% block navmg %}<li>{% endblock %}<a href="/openrem/mg">Mammography</a></li>
+                    {% block navmg %}<li>{% endblock %}<a href="/openrem/mg/">Mammography</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayDX %}
-                    {% block navdx %}<li>{% endblock %}<a href="/openrem/dx">Radiography</a></li>
+                    {% block navdx %}<li>{% endblock %}<a href="/openrem/dx/">Radiography</a></li>
                 {% endif %}
             {% endblock %}
           </ul>
@@ -91,7 +91,7 @@
                     {% block exportnav %}
                         <li>
                     {% endblock %}
-                        <a href="/openrem/export">Exports</a></li>
+                        <a href="/openrem/export/">Exports</a></li>
                 {% endif %}
 
                 {% block confnav %}
@@ -102,21 +102,21 @@
                     </a>
                     <ul class="dropdown-menu">
                       <li class="dropdown-header">User level config</li>
-                      <li><a href="/openrem/chartoptions">Chart options</a></li>
-                      <li><a href="/openrem/charts_off">Switch charts off</a></li>
+                      <li><a href="/openrem/chartoptions/">Chart options</a></li>
+                      <li><a href="/openrem/charts_off/">Switch charts off</a></li>
                       {% if not admin.admingroup %}
-                        <li><a href="/openrem/viewdisplaynames">View display names & modality</a></li>
-                        <li><a href="/admin/notpatientindicators">View not-patient indicators</a> </li>
+                        <li><a href="/openrem/viewdisplaynames/">View display names & modality</a></li>
+                        <li><a href="/admin/notpatientindicators/">View not-patient indicators</a> </li>
                       {% endif %}
                       {% if admin.admingroup %}
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">System level settings</li>
                         <li><a href="/admin/auth/user/">Users</a></li>
-                        <li><a href="/openrem/viewdisplaynames">Display names & modality</a></li>
+                        <li><a href="/openrem/viewdisplaynames/">Display names & modality</a></li>
                         <li><a href="/openrem/admin/dicomdelsettings/1/">DICOM object deletion</a> </li>
                         <li><a href="/openrem/admin/dicomsummary">DICOM networking</a></li>
                         <li><a href="/admin/patientidsettings/1/">Patient ID</a> </li>
-                        <li><a href="/admin/notpatientindicators">Not-patient indicators</a> </li>
+                        <li><a href="/admin/notpatientindicators/">Not-patient indicators</a> </li>
                         <li><a href="/admin/skindosemapsettings/1/">Skin dose map</a> </li>
                       {% endif %}
                     </ul>

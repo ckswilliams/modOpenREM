@@ -14,8 +14,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -29,7 +29,8 @@
 
 """
 
-def get_date(tag,dataset):
+
+def get_date(tag, dataset):
     """Get DICOM date string and return Python date.
 
     :param tag:         DICOM keyword, no spaces or plural as per dictionary.
@@ -38,15 +39,12 @@ def get_date(tag,dataset):
     :type dataset:      dataset
     :returns:           Python date value
     """
-    import datetime
-    if (tag in dataset):
-        dicomdate = getattr(dataset,tag)
-        try:
-            return datetime.datetime.strptime(dicomdate, "%Y%m%d")
-        except ValueError:
-            return None
+    if tag in dataset:
+        dicomdate = getattr(dataset, tag)
+        return make_date(dicomdate)
 
-def get_time(tag,dataset):
+
+def get_time(tag, dataset):
     """Get DICOM time string and return Python time.
 
     :param tag:         DICOM keyword, no spaces or plural as per dictionary.
@@ -55,20 +53,12 @@ def get_time(tag,dataset):
     :type dataset:      dataset
     :returns:           python time value
     """
-    import datetime
     if tag in dataset:
-        dicomtime = getattr(dataset,tag)
-        if '+' in dicomtime or '-' in dicomtime:
-            import re
-            dicomtime = re.split('\+|-',dicomtime)[0]
-        if '.' in dicomtime:
-            return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
-        try:
-            return datetime.datetime.strptime(dicomtime, "%H%M%S")
-        except ValueError:
-            return None
+        dicomtime = getattr(dataset, tag)
+        return make_time(dicomtime)
 
-def get_date_time(tag,dataset):
+
+def get_date_time(tag, dataset):
     """Get DICOM date time string and return Python date time.
 
     :param tag:         DICOM keyword, no spaces or plural as per dictionary.
@@ -77,18 +67,10 @@ def get_date_time(tag,dataset):
     :type dataset:      dataset
     :returns:           Python date time value
     """
-    import datetime
-    if (tag in dataset):
-        dicomdatetime = getattr(dataset,tag)
-        if '+' in dicomdatetime or '-' in dicomdatetime:
-            import re
-            dicomdatetime = re.split('\+|-',dicomdatetime)[0]
-        if '.' in dicomdatetime:
-            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
-        try:
-            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
-        except ValueError:
-            return None
+    if tag in dataset:
+        dicomdatetime = getattr(dataset, tag)
+        return make_date_time(dicomdatetime)
+
 
 def make_date(dicomdate):
     """Given a DICOM date, return a Python date.
@@ -103,6 +85,7 @@ def make_date(dicomdate):
     except ValueError:
         return None
 
+
 def make_time(dicomtime):
     """Given a DICOM time, return a Python time.
 
@@ -114,12 +97,13 @@ def make_time(dicomtime):
     if '+' in dicomtime or '-' in dicomtime:
         import re
         dicomtime = re.split('\+|-', dicomtime)[0]
-    if '.' in dicomtime:
-        return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
     try:
+        if '.' in dicomtime:
+            return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
         return datetime.datetime.strptime(dicomtime, "%H%M%S")
     except ValueError:
         return None
+
 
 def make_date_time(dicomdatetime):
     """Given a DICOM date time, return a Python date time.
@@ -129,19 +113,20 @@ def make_date_time(dicomdatetime):
     :returns:           Python date time value
     """
     import datetime
-    if dicomdatetime == '':
+    if not dicomdatetime:
         return None
     if '+' in dicomdatetime or '-' in dicomdatetime:
         import re
         dicomdatetime = re.split('\+|-', dicomdatetime)[0]
-    if '.' in dicomdatetime:
-        return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
-    elif len(dicomdatetime) <= 8:
-        return datetime.datetime.strptime(dicomdatetime, "%Y%m%d")
     try:
+        if '.' in dicomdatetime:
+            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
+        elif len(dicomdatetime) <= 8:
+            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d")
         return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
     except ValueError:
         return None
+
 
 def make_dcm_date(pythondate):
     """Given a Python date, return a DICOM date
@@ -150,13 +135,14 @@ def make_dcm_date(pythondate):
     :returns:           DICOM date as string
     """
     import datetime
-    if type(pythondate) is not datetime.date:
+    if not isinstance(pythondate, datetime.date):
         return None
 
     try:
         return pythondate.strftime("%Y%m%d")
     except ValueError:
         return None
+
 
 def make_dcm_date_range(date1=None, date2=None):
     """Given one or two dates of the form yyyy-mm-dd, return a DICOM date range
@@ -166,36 +152,41 @@ def make_dcm_date_range(date1=None, date2=None):
     """
     import datetime
 
-    date_single= None
+    date_single = bool(date2 is None)
+    date1_python = None
+    date2_python = None
 
-    try:
-        date1 = datetime.datetime.strptime(date1,"%Y-%m-%d").date()
-    except:
-        date1 = None
-    try:
-        date2 = datetime.datetime.strptime(date2,"%Y-%m-%d").date()
-    except:
-        date2 = None
+    if date1:
+        try:
+            date1_python = datetime.datetime.strptime(date1, "%Y-%m-%d").date()
+        except ValueError:
+            date1_python = None
+    if date2:
+        try:
+            date2_python = datetime.datetime.strptime(date2, "%Y-%m-%d").date()
+        except ValueError:
+            date2_python = None
 
-    if date1 and date2:
-        if date1 < date2:
-            date_from= make_dcm_date(date1)
-            date_until = make_dcm_date(date2)
-        elif date1 == date2:
-            date_single = make_dcm_date(date1)
-        elif date1 > date2:
-            date_until = make_dcm_date(date1)
-            date_from= make_dcm_date(date2)
-    elif date1:
-        date_from = make_dcm_date(date1)
+    if date1_python == date2_python:
+        date_single = True
+
+    if date_single and date1_python:
+        return make_dcm_date(date1_python)
+
+    if date1_python and date2_python:
+        if date1_python < date2_python:
+            date_from = make_dcm_date(date1_python)
+            date_until = make_dcm_date(date2_python)
+        elif date1_python > date2_python:
+            date_until = make_dcm_date(date1_python)
+            date_from = make_dcm_date(date2_python)
+    elif date1_python and not date_single:
+        date_from = make_dcm_date(date1_python)
         date_until = make_dcm_date(datetime.date.today())
-    elif date2:
+    elif date2_python:
         date_from = '19000101'
-        date_until = make_dcm_date(date2)
+        date_until = make_dcm_date(date2_python)
     else:
         return None
 
-    if date_single:
-        return date_single
-    else:
-        return '{0}-{1}'.format(date_from, date_until)
+    return '{0}-{1}'.format(date_from, date_until)
