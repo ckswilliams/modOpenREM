@@ -3,7 +3,8 @@
 
 
 {% block mainblock %}
-
+{% with patientstudy=generalstudymoduleattr.patientstudymoduleattr_set.get %}
+{% with equipment=generalstudymoduleattr.generalequipmentmoduleattr_set.get %}
 <h1>Detail list of events</h1>
 
 <ul>
@@ -20,16 +21,16 @@
     <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
     <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
     <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
-    <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }} years</li>
-    <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:2 }} m, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
-    <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
+    <li>Patient age: {{ patientstudy.patient_age_decimal|floatformat:1 }} years</li>
+    <li>Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m, {{ patientstudy.patient_weight|floatformat:1 }} kg</li>
+    <li>Hospital: {{ equipment.institution_name }}</li>
     <li>
         X-ray system:
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
+        {{ equipment.manufacturer }} |
+        {{ equipment.manufacturer_model_name }} |
+        {{ equipment.station_name }}
     </li>
-    <li>Display name: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</li>
+    <li>Display name: {{ equipment.unique_equipment_name.display_name }}</li>
     <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
     <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
     <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
@@ -39,11 +40,11 @@
     <table class="table table-condensed table-bordered small">
       <tr>
         <th>Total number of events</th>
-        <td>{{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.total_number_of_radiographic_frames }}</td>
+        <td>{{ accum_integrated.total_number_of_radiographic_frames }}</td>
       </tr>
       <tr>
         <th>Total DAP </th>
-        <td>{{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy&middot;cm<sup>2</sup></td>
+        <td>{{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }} cGy&middot;cm<sup>2</sup></td>
       </tr>
     </table>
   </div>
@@ -69,8 +70,10 @@
     <th>DAP<br>(cGy.cm<sup>2</sup>)</th>
     <th>Control mode</th>
     <th>Comment</th>
-    {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
-    <tr>
+    {% for event in events_all %}
+      {% with sourcedata=event.irradeventxraysourcedata_set.get %}
+      {% with detector_data=event.irradeventxraydetectordata_set.get %}
+      <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
         <td>
@@ -79,12 +82,12 @@
           {% if event.target_region %}{{ event.target_region }} {% endif %}<br>
           {% if event.image_view %}{{ event.image_view }} {% endif %}
         </td>
-        <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.exposure_set.get.convert_uAs_to_mAs|floatformat:1 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.average_xray_tube_current|floatformat:0 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:0 }}</td>
+        <td>{{ sourcedata.kvp_set.get.kvp|floatformat:0 }}</td>
+        <td>{{ sourcedata.exposure_set.get.convert_uAs_to_mAs|floatformat:1 }}</td>
+        <td>{{ sourcedata.average_xray_tube_current|floatformat:0 }}</td>
+        <td>{{ sourcedata.exposure_time|floatformat:0 }}</td>
         <td>
-            {% for xrayfilt in event.irradeventxraysourcedata_set.get.xrayfilters_set.all %}
+            {% for xrayfilt in sourcedata.xrayfilters_set.all %}
                 {% if xrayfilt.xray_filter_material.code_value == 'C-120F9' %}
                     Al: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
                 {% elif xrayfilt.xray_filter_material.code_value == 'C-127F9' %}
@@ -96,24 +99,25 @@
         </td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
         <td>
-            {{ event.irradeventxraysourcedata_set.get.grid_focal_distance|floatformat:0 }}
+            {{ sourcedata.grid_focal_distance|floatformat:0 }}
         </td>
         <td>
-            EI: {{ event.irradeventxraydetectordata_set.get.exposure_index|floatformat:1 }} <br>
-            EI<sub>T</sub>: {{ event.irradeventxraydetectordata_set.get.target_exposure_index|floatformat:1 }} <br>
-            DI: {{ event.irradeventxraydetectordata_set.get.deviation_index|floatformat:1 }}
+            EI: {{ detector_data.exposure_index|floatformat:1 }} <br>
+            EI<sub>T</sub>: {{ detector_data.target_exposure_index|floatformat:1 }} <br>
+            DI: {{ detector_data.deviation_index|floatformat:1 }}
         </td>
         <td>
-            {{ event.irradeventxraydetectordata_set.get.relative_xray_exposure|floatformat:0 }}
-            {{ event.irradeventxraydetectordata_set.get.relative_exposure_unit }}
+            {{ detector_data.relative_xray_exposure|floatformat:0 }}
+            {{ detector_data.relative_exposure_unit }}
         </td>
         <td>{{ event.convert_gym2_to_cgycm2|floatformat:1 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.exposure_control_mode }}</td>
+        <td>{{ sourcedata.exposure_control_mode }}</td>
         <td>{{ event.comment }}</td>
     </tr>
+    {% endwith %}{% endwith %}
     {% endfor %}
 </table>
 
 
-
+{% endwith %}{% endwith %}
 {% endblock %}

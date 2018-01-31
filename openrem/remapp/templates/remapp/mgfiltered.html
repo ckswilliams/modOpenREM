@@ -3,9 +3,9 @@
 {% block navmg%}<li class="active">{% endblock %}
 
 {% block toprow %}
-      {% load pagination_tags %}    
+      {% load pagination_tags %}
       <p>
-        There are {{ filter.count }} studies in this list.
+        There are {{ filter|length }} studies in this list.
       </p>
 {% endblock %}
 
@@ -92,6 +92,15 @@
                 </table>
                 <input class="btn btn-default" name="submit" type="submit" />
             </div>
+            <div class="panel-heading">
+                <h3 class="panel-title">Table options</h3>
+            </div>
+            <div class="panel-body">
+                <table>
+                    {{ itemsPerPageForm }}
+                </table>
+                <input class="btn btn-default" name="submit" type="submit" />
+            </div>
           </div>
     </form>
 
@@ -102,7 +111,7 @@
 
 {% block col1 %}
 
-    {% autopaginate filter.qs 50 as filter_list %}
+    {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
     {% paginate %}
 
     <table class="table table-bordered table-hover row-clickable small">
@@ -131,18 +140,21 @@
             {% endif %}
         </tr>
         {% for exam in filter_list %}
+          {% with equipment=exam.generalequipmentmoduleattr_set.get %}
+          {% with projection_set=exam.projectionxrayradiationdose_set.get %}
+          {% with accum_mammo_set=projection_set.accumxraydose_set.get.accummammographyxraydose_set.all %}
         <tr>
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">
-                    {{ exam.generalequipmentmoduleattr_set.get.institution_name }}
+                    {{ equipment.institution_name }}
                 </a>
             </td>
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">
                     <table onclick="window.location='/openrem/mg/{{ exam.id }}/';">
-                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
-                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
-                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
+                        <tr><td class="nowrap">{{ equipment.manufacturer }}</td></tr>
+                        <tr><td class="nowrap">{{ equipment.manufacturer_model_name }}</td></tr>
+                        <tr><td class="nowrap">{{ equipment.unique_equipment_name.display_name }}</td></tr>
                     </table>
                 </a>
             </td>
@@ -165,12 +177,12 @@
             </td>
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">
-                    {{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}
+                    {{ projection_set.irradeventxraydata_set.count }}
                 </a>
             </td>
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">
-                {% for breast in exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all %}
+                {% for breast in accum_mammo_set %}
                     {% if breast.laterality.code_meaning == "Left breast" %}
                         Left:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}<br>
                     {% elif breast.laterality.code_meaning == "Right breast" %}
@@ -187,12 +199,13 @@
             </td>
             {% endif %}
         </tr>
+          {% endwith %}{% endwith %}{% endwith %}
         {% endfor %}
     </table>
 
     {% paginate %}
 
- 
+
 {% endblock %}
 
 {% block plotdata %}

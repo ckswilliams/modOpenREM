@@ -5,50 +5,53 @@
 {% block mainblock %}
     <div class="row">
         <div class="col-md-5">
+        {% with study=generalstudymoduleattr %}
+          {% with patientstudy=study.patientstudymoduleattr_set.get %}
+            {% with equipment=study.generalequipmentmoduleattr_set.get %}
             <h1>Detail list of events</h1>
 
             <ul>
                 <li>
                     Accession number:
-                    {% if not generalstudymoduleattr.accession_hashed %}
-                        {{ generalstudymoduleattr.accession_number }}
+                    {% if not study.accession_hashed %}
+                        {{ study.accession_number }}
                     {% else %}
                         <i>hidden</i>
                     {% endif %}
                 </li>
-                <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
-                <li>Study time: {{ generalstudymoduleattr.study_time|date:"H:i" }}</li>
-                <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
-                <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
-                <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
-                <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }} years</li>
-                <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:2 }} m, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
-                <li>
-                    {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                <li>Study date: {{ study.study_date }}</li>
+                <li>Study time: {{ study.study_time|date:"H:i" }}</li>
+                <li>Study description: {{ study.study_description }}</li>
+                <li>Procedure: {{ study.procedure_code_meaning }}</li>
+                <li>Requested procedure: {{ study.requested_procedure_code_meaning }}</li>
+                <li>Patient age: {{ patientstudy.patient_age_decimal|floatformat:1 }} years</li>
+                <li>Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m, {{ patientstudy.patient_weight|floatformat:1 }} kg</li>
+                {% for record in accumxraydose_set_all_planes %}
+                  {% with accumprojection=record.accumintegratedprojradiogdose_set.get %}
+                  <li>
                         Total DAP, {{ record.acquisition_plane }}:
-                        {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
+                        {{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
                         <br>
-                    {% endfor %}
-                </li>
-                <li>
-                    {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                  </li>
+                  <li>
                         Total dose at RP, {{ record.acquisition_plane }}:
-                        <script>document.write({{ record.accumintegratedprojradiogdose_set.get.dose_rp_total }}.toPrecision(3));</script> Gy
+                        <script>document.write({{ accumprojection.dose_rp_total }}.toPrecision(3));</script> Gy
                         <br>
-                    {% endfor %}
-                </li>
-                <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
+                   </li>
+                  {% endwith %}
+                {% endfor %}
+                <li>Hospital: {{ equipment.institution_name }}</li>
                 <li>
                     Equipment:
-                    {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
-                    {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                    {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
+                    {{ equipment.manufacturer }} |
+                    {{ equipment.manufacturer_model_name }} |
+                    {{ equipment.station_name }}
                 </li>
-                <li>Display name: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</li>
-                <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
-                <li>Performing physician(s): {{ generalstudymoduleattr.performing_physician_name }}</li>
-                <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
-                <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
+                <li>Display name: {{ equipment.unique_equipment_name.display_name }}</li>
+                <li>Study UID: {{ study.study_instance_uid }}</li>
+                <li>Performing physician(s): {{ study.performing_physician_name }}</li>
+                <li>Operator(s): {{ study.operator_name }}</li>
+                <li>Test patient indicators? {{ study.patientmoduleattr_set.get.not_patient_indicator }}</li>
             <br>
             <table class="table table-condensed table-bordered small">
                 <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th><th>Total duration (s)</th>
@@ -75,6 +78,7 @@
             </table>
             </ul>
         </div>
+    {% endwith %}{% endwith %}{% endwith %}
 
         {% if admin.enable_skin_dose_maps %}
         <div class="col-md-7" id="skinDoseMapContainer">
@@ -332,32 +336,34 @@
   <th>Detector size (mm)</th>
   <th>SDD (mm)</th>
   <th>Orientation</th>
-    {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
+    {% for event in events_all %}
+      {% with sourcedata=event.irradeventxraysourcedata_set.get %}
+        {% with mechanicaldata=event.irradeventxraymechanicaldata_set.get %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
         <td>{{ event.irradiation_event_type }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.pulse_rate|floatformat:2 }}</td>
+        <td>{{ sourcedata.pulse_rate|floatformat:2 }}</td>
         <td>{{ event.acquisition_plane }}</td>
         <td><script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script></td>
-        <td><script>document.write({{ event.irradeventxraysourcedata_set.get.convert_gy_to_mgy }}.toPrecision(3));</script></td>
+        <td><script>document.write({{ sourcedata.convert_gy_to_mgy }}.toPrecision(3));</script></td>
         <td>
-        {% if event.irradeventxraysourcedata_set.get.irradiation_duration %}
-            {{ event.irradeventxraysourcedata_set.get.irradiation_duration|multiply:1000|floatformat:1 }}
+        {% if sourcedata.irradiation_duration %}
+            {{ sourcedata.irradiation_duration|multiply:1000|floatformat:1 }}
         {% else %}
             <i>n/a</i>
         {% endif %}
         <br>
-        {% if event.irradeventxraysourcedata_set.get.exposure_time %}
-            {{ event.irradeventxraysourcedata_set.get.exposure_time }}
+        {% if sourcedata.exposure_time %}
+            {{ sourcedata.exposure_time }}
         {% else %}
             <i>n/a</i>
         {% endif %}
         </td>
-        <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
+        <td>{{ sourcedata.kvp_set.get.kvp|floatformat:0 }}</td>
+        <td>{{ sourcedata.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
         <td>
-            {% for xrayfilt in event.irradeventxraysourcedata_set.get.xrayfilters_set.all %}
+            {% for xrayfilt in sourcedata.xrayfilters_set.select_related.all %}
                 {% if xrayfilt.xray_filter_material.code_value == 'C-120F9' %}
                     Al: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
                 {% elif xrayfilt.xray_filter_material.code_value == 'C-127F9' %}
@@ -367,12 +373,13 @@
                 {% endif %}
             {% endfor %}
         </td>
-        <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_primary_angle|floatformat:1 }}</td>
-        <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_secondary_angle|floatformat:1 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.ii_field_size }}</td>
-        <td>{{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
+        <td>{{ mechanicaldata.positioner_primary_angle|floatformat:1 }}</td>
+        <td>{{ mechanicaldata.positioner_secondary_angle|floatformat:1 }}</td>
+        <td>{{ sourcedata.ii_field_size }}</td>
+        <td>{{ mechanicaldata.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
 		    <td>{{ event.patient_table_relationship_cid|title }}, {{ event.patient_orientation_cid|title }}, {{ event.patient_orientation_modifier_cid|title }}
     </tr>
+      {% endwith %}{% endwith %}
     {% endfor %}
 </table>
 

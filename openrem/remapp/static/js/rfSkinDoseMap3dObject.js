@@ -1,5 +1,6 @@
 /*global chroma, THREE, animate, render*/
 /*eslint no-undef: "error"*/
+/*eslint security/detect-object-injection: "off" */
 
 /**
  * Function to create a 3d skin dose map object

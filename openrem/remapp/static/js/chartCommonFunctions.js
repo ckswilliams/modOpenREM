@@ -1,3 +1,5 @@
+/*eslint security/detect-object-injection: "off" */
+
 function hideOrShowAllSeries(nameOfDIV, hideOrShow, buttonIDStub) {
     if (hideOrShow === "hide") {
         $($("#" + nameOfDIV).highcharts().series).each(function () {

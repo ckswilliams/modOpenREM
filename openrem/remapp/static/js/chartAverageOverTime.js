@@ -1,11 +1,14 @@
-function chartAverageOverTime(render_div, value_label, value_units, avg_label) {
+/*global Highcharts*/
+/*eslint no-undef: "error"*/
+
+function chartAverageOverTime(renderDiv, valueLabel, valueUnits, avgLabel) {
     var chart = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
         chart: {
-            renderTo: render_div,
-            zoomType: 'x'
+            renderTo: renderDiv,
+            zoomType: "x"
         },
         plotOptions: {
             line: {
@@ -13,10 +16,10 @@ function chartAverageOverTime(render_div, value_label, value_units, avg_label) {
             }
         },
         title: {
-            text: ''
+            text: ""
         },
         tooltip: {
-            pointFormat: '{series.name}<br/>{point.y:.1f} ' + value_units
+            pointFormat: "{series.name}<br/>{point.y:.1f} " + valueUnits
         },
         xAxis: {
             categories: [1,2,3,4,5],
@@ -27,19 +30,19 @@ function chartAverageOverTime(render_div, value_label, value_units, avg_label) {
         },
         yAxis: {
             title: {
-                text: avg_label + ' ' + value_label + (value_units != '' ? ' ('+ value_units +')' : ''),
+                text: avgLabel + " " + valueLabel + (valueUnits !== "" ? " ("+ valueUnits +")" : ""),
                 useHTML: true
             },
             floor: 0,
             plotLines: [{
                 value: 0,
                 width: 1,
-                color: '#808080'
+                color: "#808080"
             }]        },
         legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
+            layout: "vertical",
+            align: "right",
+            verticalAlign: "middle",
             borderWidth: 0,
             useHTML: true
         },

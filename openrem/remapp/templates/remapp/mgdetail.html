@@ -10,6 +10,7 @@
 
 {% block mainblock %}
 <h1>Detail list of events</h1>
+        {% with equipment=generalstudymoduleattr.generalequipmentmoduleattr_set.get %}
 
 <ul>
     <li>
@@ -26,14 +27,14 @@
     <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
     <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
     <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }} years</li>
-    <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
+    <li>Hospital: {{ equipment.institution_name }}</li>
     <li>
         Scanner:
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
+        {{ equipment.manufacturer }} |
+        {{ equipment.manufacturer_model_name }} |
+        {{ equipment.station_name }}
     </li>
-    <li>Display name: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</li>
+    <li>Display name: {{ equipment.unique_equipment_name.display_name }}</li>
     <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
     <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
     <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
@@ -43,9 +44,9 @@
     <table class="table table-condensed table-bordered small">
       <tr>
         <th>Total number of events</th>
-        <td>{{ generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
+        <td>{{ events_all|length }}</td>
       </tr>
-      {% for breast in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all %}
+      {% for breast in accum_mammo_set %}
         {% if breast.laterality.code_meaning == "Left breast" %}
           <tr>
             <th>Accumulated AGD: Left</th>
@@ -80,26 +81,28 @@
     <th>Exposure time (ms)</th>
     <th>ESD (mGy)</th>
     <th>AGD (mGy)</th>
-    {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
+    {% for event in events_all %}
+      {% with source_data=event.irradeventxraysourcedata_set.select_related.get %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
         <td>{{ event.laterality.code_meaning }} breast, {{ event.image_view }}</td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.compression_thickness|floatformat:0  }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.anode_target_material }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.xrayfilters_set.get.xray_filter_material }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.average_xray_tube_current|floatformat:1 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:0 }}</td>
+        <td>{{ source_data.anode_target_material }}</td>
+        <td>{{ source_data.xrayfilters_set.get.xray_filter_material }}</td>
+        <td>{{ source_data.kvp_set.get.kvp|floatformat:0 }}</td>
+        <td>{{ source_data.average_xray_tube_current|floatformat:1 }}</td>
+        <td>{{ source_data.exposure_time|floatformat:0 }}</td>
         <td>{{ event.entrance_exposure_at_rp|floatformat:3 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.average_glandular_dose|floatformat:3 }}</td>
+        <td>{{ source_data.average_glandular_dose|floatformat:3 }}</td>
     </tr>
     <tr>
         <td colspan = "11"><small> <strong>Exposure Control Mode Description:</strong>{{ event.comment }} </small></td>
     </tr>
+      {%  endwith %}
     {% endfor %}
 </table>
 
-
+{% endwith %}
 
 {% endblock %}

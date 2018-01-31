@@ -32,9 +32,9 @@ boxes on the right hand side to show just the studies where the modality
 model name includes the term 'soma':
 
 .. image:: img/CTFilter.png
-    :width: 730px
+    :width: 1440px
     :align: center
-    :height: 499px
+    :height: 1508px
     :alt: Filtering CT studies
 
 The search fields can all be used on their own or together, and they are
@@ -45,6 +45,19 @@ available, but it does exist as `issue 17 <https://bitbucket.org/openrem/openrem
 for a future release.
 
 The last box below the filtering search boxes is the ordering preference.
+
+Setting the number of studies displayed per page
+================================================
+
+The number of studies displayed per page can be controlled by changing the
+value selected in the ``Items per page`` drop down box, located beneath the
+chart options:
+
+.. image:: img/CTStudiesPerPage.png
+    :width: 1438px
+    :align: center
+    :height: 997px
+    :alt: Filtering CT studies
 
 Viewing study details
 =====================
