@@ -134,7 +134,7 @@ def rotational(xRay, startAngle, endAngle, frames, phantom, area, refAK, kV, fil
         elif (endAngle is None) and (startAngle > -45.5) and (startAngle < -44.5):
             endAngle = 135
         else:
-            raise(e)
+            raise e
         rotationAngle = (endAngle - startAngle) / frames
         pass
 

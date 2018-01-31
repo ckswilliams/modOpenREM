@@ -312,13 +312,13 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
             'SRData')
     except:
         pass
-    source.save()
     if (not source.collimated_field_height) and private_collimated_field_height:
         source.collimated_field_height = private_collimated_field_height
     if (not source.collimated_field_width) and private_collimated_field_width:
         source.collimated_field_width = private_collimated_field_width
     if (not source.collimated_field_area) and private_collimated_field_area:
         source.collimated_field_area = private_collimated_field_area
+    source.save()
     if not source.exposure_time and source.number_of_pulses:
         try:
             avg_pulse_width = source.pulsewidth_set.all().aggregate(Avg('pulse_width'))['pulse_width__avg']
