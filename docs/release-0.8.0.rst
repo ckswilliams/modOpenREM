@@ -39,7 +39,7 @@ Upgrading from version 0.7.4
 
 * Consider setting the timezone and language in ``local_settings.py``. See ``local_settings.py.example``.
 * Add the new extractor log file configuration to the ``local_settings.py`` - you can copy the 'Logging
-configuration' section from  ``local_settings.py.example`` if you haven't made many changes.
+  configuration' section from  ``local_settings.py.example`` if you haven't made many changes.
 
 **************************************
 Adding legacy Toshiba CT functionality
