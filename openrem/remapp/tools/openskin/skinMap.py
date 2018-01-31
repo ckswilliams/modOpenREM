@@ -136,7 +136,6 @@ def rotational(xRay, startAngle, endAngle, frames, phantom, area, refAK, kV, fil
         else:
             raise e
         rotationAngle = (endAngle - startAngle) / frames
-        pass
 
     myDose = skinMap(xRay, phantom, area, refAK / frames, kV, filterCu, Dref, tableLength, tableWidth, transmission,
                      tableMattressThickness)
