@@ -158,9 +158,9 @@ def _doserelateddistancemeasurements(dataset, mech):  # CID 10008
              'Table Lateral Position': 'table_lateral_position',
              'Table Height Position': 'table_height_position',
              'Distance Source to Table Plane': 'distance_source_to_table_plane'}
-    # For Philips XPer systems you get the privately defined 'Table Height Position' with CodingSchemeDesignator
+    # For Philips Allura XPer systems you get the privately defined 'Table Height Position' with CodingSchemeDesignator
     # '99PHI-IXR-XPER' instead of the DICOM defined 'Table Height Position'.
-    # So far I don't know if they are defined differently
+    # It seems they are defined the same
     for cont in dataset.ContentSequence:
         try:
             setattr(distance, codes[cont.ConceptNameCodeSequence[0].CodeMeaning],
@@ -288,7 +288,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                         if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Top Shutter':
                             top_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
                     # Get distance_source_to_detector (Sdd) in meters
-                    # Philips Allura only notes distance_source_to_detector if it changed compared to last event
+                    # Philips Allura XPer only notes distance_source_to_detector if it changed compared to last event
                     try:
                         Sdd = float(event.irradeventxraymechanicaldata_set.get().
                                     doserelateddistancemeasurements_set.get().distance_source_to_detector) / 1000
