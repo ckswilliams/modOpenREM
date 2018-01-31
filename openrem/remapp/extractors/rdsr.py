@@ -136,31 +136,87 @@ def _deviceparticipant(dataset, eventdatatype, foreignkey, ch):
 
 
 def _pulsewidth(pulse_width_value, source):
+    """Takes pulse width values and populates PulseWidth table
+
+    :param pulse_width_value: Decimal or list of decimals
+    :param source: database object in IrradEventXRaySourceData table
+    :return: None
+    """
     from remapp.models import PulseWidth
-    pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
-    pulse.pulse_width = pulse_width_value
-    pulse.save()
+    try:
+        pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
+        pulse.pulse_width = pulse_width_value
+        pulse.save()
+    except ValueError:
+        if not hasattr(pulse_width_value, "strip") and (
+                hasattr(pulse_width_value, "__getitem__") or hasattr(pulse_width_value, "__iter__")):
+            for per_pulse_pulse_width in pulse_width_value:
+                pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
+                pulse.pulse_width = per_pulse_pulse_width
+                pulse.save()
 
 
 def _kvptable(kvp_value, source):
+    """Takes kVp values and populates kvp table
+
+    :param kvp_value: Decimal or list of decimals
+    :param source: database object in IrradEventXRaySourceData table
+    :return: None
+    """
     from remapp.models import Kvp
-    kvpdata = Kvp.objects.create(irradiation_event_xray_source_data=source)
-    kvpdata.kvp = kvp_value
-    kvpdata.save()
+    try:
+        kvpdata = Kvp.objects.create(irradiation_event_xray_source_data=source)
+        kvpdata.kvp = kvp_value
+        kvpdata.save()
+    except ValueError:
+        if not hasattr(kvp_value, "strip") and (
+                hasattr(kvp_value, "__getitem__") or hasattr(kvp_value, "__iter__")):
+            for per_pulse_kvp in kvp_value:
+                kvp = Kvp.objects.create(irradiation_event_xray_source_data=source)
+                kvp.kvp = per_pulse_kvp
+                kvp.save()
 
 
 def _xraytubecurrent(current_value, source):
+    """Takes X-ray tube current values and populates XrayTubeCurrent table
+
+    :param current_value: Decimal or list of decimals
+    :param source: database object in IrradEventXRaySourceData table
+    :return: None
+    """
     from remapp.models import XrayTubeCurrent
-    tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
-    tubecurrent.xray_tube_current = current_value
-    tubecurrent.save()
+    try:
+        tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
+        tubecurrent.xray_tube_current = current_value
+        tubecurrent.save()
+    except ValueError:
+        if not hasattr(current_value, "strip") and (
+                hasattr(current_value, "__getitem__") or hasattr(current_value, "__iter__")):
+            for per_pulse_current in current_value:
+                tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
+                tubecurrent.xray_tube_current = per_pulse_current
+                tubecurrent.save()
 
 
 def _exposure(exposure_value, source):
+    """Takes exposure (mAs) values and populates Exposure table
+
+    :param exposure_value: Decimal or list of decimals
+    :param source: database object in IrradEventXRaySourceData table
+    :return: None
+    """
     from remapp.models import Exposure
-    exposure = Exposure.objects.create(irradiation_event_xray_source_data=source)
-    exposure.exposure = exposure_value
-    exposure.save()
+    try:
+        exposure = Exposure.objects.create(irradiation_event_xray_source_data=source)
+        exposure.exposure = exposure_value
+        exposure.save()
+    except ValueError:
+        if not hasattr(exposure_value, "strip") and (
+                hasattr(exposure_value, "__getitem__") or hasattr(exposure_value, "__iter__")):
+            for per_pulse_exposure in exposure_value:
+                exposure = Exposure.objects.create(irradiation_event_xray_source_data=source)
+                exposure.exposure = per_pulse_exposure
+                exposure.save()
 
 
 def _xrayfilters(content_sequence, source):

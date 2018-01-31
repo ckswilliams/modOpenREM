@@ -34,7 +34,7 @@ import logging
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet
+    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet, get_pulse_data
 
 logger = logging.getLogger(__name__)
 
@@ -82,19 +82,9 @@ def _dx_get_series_data(s):
         exposure_control_mode = source_data.exposure_control_mode
         average_xray_tube_current = source_data.average_xray_tube_current
         exposure_time = source_data.exposure_time
-        try:
-            kvp = source_data.kvp_set.get().kvp
-        except ObjectDoesNotExist:
-            kvp = None
-        try:
-            exposure_set = source_data.exposure_set.get()
-            uas = exposure_set.exposure
-            if uas:
-                mas = exposure_set.convert_uAs_to_mAs()
-            else:
-                mas = None
-        except ObjectDoesNotExist:
-            mas = None
+        pulse_data = get_pulse_data(source_data=source_data, modality="DX")
+        kvp = pulse_data['kvp']
+        mas = pulse_data['mas']
         filters, filter_thicknesses = get_xray_filter_info(source_data)
     except ObjectDoesNotExist:
         exposure_control_mode = None
