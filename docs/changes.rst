@@ -74,6 +74,7 @@ OpenREM version history
 * `#472`_  Query Retrieve: Overhauled the query retrieve routines
 * `#470`_  Query Retrieve: Optimised CT filtering
 * `#468`_  Query Retrieve: Station names can now be used for filtering if returned
+* `#467`_  Testing: Added tests for mammography RDSR imports
 * `#466`_  Query Retrieve: RDSR now retrieved in preference to images for MG and DX/CR
 * `#465`_  Added newer SSDE and water equivalent diameter fields to database
 * `#464`_  Imports: DX RDSR now imported properly
