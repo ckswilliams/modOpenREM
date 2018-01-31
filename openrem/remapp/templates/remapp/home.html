@@ -2,16 +2,18 @@
 
 
 {% block navhelp %}
-        <li>
-            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_navigate.html" target="_blank" data-toggle="tooltip" title="Web interface documentation - opens in a new tab">
-                Web interface documentation
-            </a>
-        </li>
+  <li>
+    <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_navigate.html" target="_blank" data-toggle="tooltip"
+       title="Web interface documentation - opens in a new tab">
+      Web interface documentation
+    </a>
+  </li>
 {% endblock %}
 
 
 {% block toprow %}
-  <h1><img src="{{ STATIC_URL }}img/openrem0055.png" height="55" width="55" class="openrem-logo">OpenREM database browser and export</h1>
+  <h1><img src="{{ STATIC_URL }}img/openrem0055.png" height="55" width="55" class="openrem-logo">OpenREM database
+    browser and export</h1>
 
   {% if not users_in_groups.any %}
     <div class="panel panel-danger">
@@ -86,133 +88,80 @@
 {% endblock %}
 
 
-      {% block mainblock %}
-{% load humanize %}
+{% block mainblock %}
 
-<table class="table table-bordered">
+  <script>
+      $(document).ready(
+          function get_modality_numbers(json) {
+              $.ajax(
+                  {
+                      url: "/openrem/hometotals/",
+                      type: "POST",
+                      dataType: "json",
+                      success: function (json) {
+                          $('#total-ct').html(json.total_ct);
+                          $('#total-rf').html(json.total_rf);
+                          $('#total-mg').html(json.total_mg);
+                          $('#total-dx').html(json.total_dx);
+                      }
+                  }
+              )
+          }
+      )
+  </script>
+  <table class="table table-bordered">
     <tr>
-        {% if homedata.CT %}<th><a href="/openrem/ct/">CT</a></th>{% endif %}{% if homedata.RF %}<th><a href="/openrem/rf/">Fluoroscopy</a></th>{% endif %}{% if homedata.MG %}<th><a href="/openrem/mg/">Mammography</a></th>{% endif %}{% if homedata.DX %}<th><a href="/openrem/dx/">Radiography</a></th>{% endif %}
+      {% for modality, details in modalities.items %}
+        <th style="width:25%"><a href="/openrem/{{ modality|lower }}/">{{ details.name }}</a></th>
+      {% endfor %}
     </tr>
     <tr>
-        {% if homedata.CT %}<td style="width:25%">{{ homedata.ct }}</td>{% endif %}{% if homedata.RF %}<td style="width:25%">{{ homedata.rf }}</td>{% endif %}{% if homedata.MG %}<td style="width:25%">{{ homedata.mg }}</td>{% endif %}{% if homedata.DX %}<td style="width:25%">{{ homedata.dx }}</td>{% endif %}
+      {% for modality, details in modalities.items %}
+        <td>
+          <div id="total-{{ modality|lower }}">{{ details.count }}</div>
+        </td>
+      {% endfor %}
     </tr>
-</table>
+  </table>
 
-{% if homedata.CT %}
-<h4>CT summary table</h4>
-<table class="table table-bordered table-hover row-clickable">
-    <tr>
-        <th>Scanner</th><th>Number of studies</th><th>Latest study</th>
-    </tr>
-    {% for key,value in homedata.CT.items %}
+  {% for modality, details in modalities.items %}
+    <script>
+        $(document).ready(
+            function get_latest_studies(json) {
+                $.ajax(
+                    {
+                        url: "/openrem/homestudies/",
+                        data: {modality: '{{ modality }}'},
+                        type: "POST",
+                        success: function (data) {
+                            $('#{{ modality }}-table').html(data);
+                        }
+                    }
+                )
+            }
+        )
+    </script>
+
+
+    <h4>{{ details.name }} summary table</h4>
+    <div id="{{ modality }}-table">
+      <table class="table table-bordered table-hover row-clickable">
         <tr>
-            <td style="width:33%">
-                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
-                    {{ value.displayname }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
-                {{ value.total }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
-                {{ value.latest|naturaltime }}
-                </a>
-            </td>
+          <th style="width:33%">Scanner</th>
+          <th style="width:33%">Number of studies</th>
+          <th style="width:33%">Latest study</th>
         </tr>
-    {% endfor %}
-</table>
-{% endif %}
-
-{% if homedata.RF %}
-<h4>Fluoroscopy summary table</h4>
-<table class="table table-bordered table-hover row-clickable">
-    <tr>
-        <th>Room</th><th>Number of studies</th><th>Latest study</th>
-    </tr>
-    {% for key,value in homedata.RF.items %}
         <tr>
-            <td style="width:33%">
-                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
-                    {{ value.displayname }}
-                </a>
-            </td style="width:33%">
-            <td>
-                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
-                    {{ value.total }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
-                    {{ value.latest|naturaltime }}
-                </a>
-            </td>
+          <td colspan="3">Please wait - querying the database</td>
         </tr>
-    {% endfor %}
-</table>
-{% endif %}
+      </table>
+    </div>
+  {% endfor %}
 
-{% if homedata.MG %}
-<h4>Mammography summary table</h4>
-<table class="table table-bordered table-hover row-clickable">
-    <tr>
-        <th>Room</th><th>Number of studies</th><th>Latest study</th>
-    </tr>
-    {% for key,value in homedata.MG.items %}
-        <tr>
-            <td style="width:33%">
-                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
-                    {{ value.displayname }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
-                    {{ value.total }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
-                    {{ value.latest|naturaltime }}
-                </a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-{% endif %}
-
-{% if homedata.DX %}
-<h4>Radiography summary table</h4>
-<table class="table table-bordered table-hover row-clickable">
-    <tr>
-        <th>Room</th><th>Number of studies</th><th>Latest study</th>
-    </tr>
-    {% for key,value in homedata.DX.items %}
-        <tr>
-            <td style="width:33%">
-                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
-                    {{ value.displayname }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
-                    {{ value.total }}
-                </a>
-            </td>
-            <td style="width:33%">
-                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
-                    {{ value.latest|naturaltime }}
-                </a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-{% endif %}
-
-{% if not homedata.CT and not homedata.RF and not homedata.MG and not homedata.DX %}
-<h4>No data to display in the system</h4>
-<p>There are currently no studies from any modality stored in the database. Add some to see a summary of each on this page.</p>
-{% endif %}
+  {% if not modalities %}
+    <h4>No data to display in the system</h4>
+    <p>There are currently no studies from any modality stored in the database. Add some to see a summary of each on
+      this page.</p>
+  {% endif %}
 
 {% endblock %}	

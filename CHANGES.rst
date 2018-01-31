@@ -5,6 +5,16 @@ OpenREM version history
 0.8.0 (?)
 ---------
 * `#446`_  Import: Extract some Philips private information for Allura Xper systems, create workaround for missing end angles for rotational acquisitions
+* `#584`_  Import, Interface, Export: RDSR with pulse level data now function
+* `#581`_  Import scripts: Interpreter line now always first, functions imported specifically
+* `#580`_  Imports and Interface: one modality creating both DX and RF can now be handled appropriately
+* `#579`_  Imports: Dummy values for Toshiba CT import function now in settings.py, log file config in docs
+* `#578`_  Exports: Fixed NHSBSP export that was excluding RDSR imported Hologic studies
+* `#575`_  Exports: export page now updates using AJAX and has a select all button
+* `#573`_  Exports: corrected and clarified exposure time and duration units, added number of pulses
+* `#572`_  Interface: Homepage now populates as AJAX to increase responsiveness
+* `#568`_  Imports: Missing DICOM date-time no longer causes an error
+* `#567`_  Celery: Fixed dual-namespace imports of tasks
 * `#566`_  Interface: Correctly show "assumed patient mass" in case of set value of zero
 * `#565`_  Interface: Correctly handle dose area product with zero value
 * `#564`_  Skin dose maps: Text information on skin dose maps now embedded when saving the 2d or 3d map as a graphic
@@ -49,12 +59,14 @@ OpenREM version history
 * `#494`_  Charts: Charts now ignore blank and zero-value data when calculating mean, median and number of events
 * `#493`_  Charts: Added user option to made chart categories all lower case
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
+* `#491`_  Imports, Interface and Exports: CT Dose Check alerts and notifications are now extracted, displayed and exported
+* `#490`_  Exports: Response object included for messages - removed as now asynchronous
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
 * `#488`_  Exports: All exports now include study time
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
 * `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
 * `#485`_  Imports: CT RDSR now imports 'target region' correctly
-* `#484`_  Exports: Most exports now more efficient use of queries and are therefore faster. More to do!
+* `#484`_  Exports and Interface: Exports and interface page views are now more efficient and (much) faster
 * `#482`_  Imports: DX extractor now extracts acquisition protocol, requested procedure name and study name for Fuji Go mobile; extracts acquisition protocol for Toshiba Radrex equipment; extracts requested procedure name from Carestream DRX-Revolution mobiles
 * `#476`_  Imports: Mixed latin-1 and UTF8 characters now imported, but need to be handled better if possible
 * `#475`_  Query Retrieve: Made -sr a stand-alone option - it has a very niche use-case!
@@ -63,6 +75,7 @@ OpenREM version history
 * `#472`_  Query Retrieve: Overhauled the query retrieve routines
 * `#470`_  Query Retrieve: Optimised CT filtering
 * `#468`_  Query Retrieve: Station names can now be used for filtering if returned
+* `#467`_  Testing: Added tests for mammography RDSR imports
 * `#466`_  Query Retrieve: RDSR now retrieved in preference to images for MG and DX/CR
 * `#465`_  Added newer SSDE and water equivalent diameter fields to database
 * `#464`_  Imports: DX RDSR now imported properly
@@ -89,6 +102,8 @@ OpenREM version history
 * `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
 * `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
+* `#318`_  Database management: Display names view can be used to review and delete all studies from one source
+* `#114`_  Imports: Subsequent RDSRs of the same study will now replace existing study in database
 
 0.7.4 (2016-10-17)
 ------------------

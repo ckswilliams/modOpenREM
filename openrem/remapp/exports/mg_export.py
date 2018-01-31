@@ -80,9 +80,10 @@ def _mg_get_series_data(event):
     :return: series data as list of strings
     """
     try:
-        compression_thickness = event.irradeventxraymechanicaldata_set.get().compression_thickness
-        compression_force = event.irradeventxraymechanicaldata_set.get().compression_force
-        magnification_factor = event.irradeventxraymechanicaldata_set.get().magnification_factor
+        mechanical_data = event.irradeventxraymechanicaldata_set.get()
+        compression_thickness = mechanical_data.compression_thickness
+        compression_force = mechanical_data.compression_force
+        magnification_factor = mechanical_data.magnification_factor
     except ObjectDoesNotExist:
         compression_thickness = None
         compression_force = None
@@ -95,13 +96,26 @@ def _mg_get_series_data(event):
         radiological_thickness = None
 
     try:
-        collimated_field_area = event.irradeventxraysourcedata_set.get().collimated_field_area
-        exposure_control_mode = event.irradeventxraysourcedata_set.get().exposure_control_mode
-        anode_target_material = get_anode_target_material(event.irradeventxraysourcedata_set.get())
-        focal_spot_size = event.irradeventxraysourcedata_set.get().focal_spot_size
-        average_xray_tube_current = event.irradeventxraysourcedata_set.get().average_xray_tube_current
-        exposure_time = event.irradeventxraysourcedata_set.get().exposure_time
-        average_glandular_dose = event.irradeventxraysourcedata_set.get().average_glandular_dose
+        source_data = event.irradeventxraysourcedata_set.get()
+        collimated_field_area = source_data.collimated_field_area
+        exposure_control_mode = source_data.exposure_control_mode
+        anode_target_material = get_anode_target_material(source_data)
+        focal_spot_size = source_data.focal_spot_size
+        average_xray_tube_current = source_data.average_xray_tube_current
+        exposure_time = source_data.exposure_time
+        average_glandular_dose = source_data.average_glandular_dose
+        try:
+            filters, filter_thicknesses = get_xray_filter_info(source_data)
+        except ObjectDoesNotExist:
+            filters = None
+        try:
+            kvp = source_data.kvp_set.get().kvp
+        except ObjectDoesNotExist:
+            kvp = None
+        try:
+            exposure = source_data.exposure_set.get().exposure
+        except ObjectDoesNotExist:
+            exposure = None
     except ObjectDoesNotExist:
         collimated_field_area = None
         exposure_control_mode = None
@@ -110,20 +124,8 @@ def _mg_get_series_data(event):
         average_xray_tube_current = None
         exposure_time = None
         average_glandular_dose = None
-
-    try:
-        filters, filter_thicknesses = get_xray_filter_info(event.irradeventxraysourcedata_set.get())
-    except ObjectDoesNotExist:
         filters = None
-
-    try:
-        kvp = event.irradeventxraysourcedata_set.get().kvp_set.get().kvp
-    except ObjectDoesNotExist:
         kvp = None
-
-    try:
-        exposure = event.irradeventxraysourcedata_set.get().exposure_set.get().exposure
-    except ObjectDoesNotExist:
         exposure = None
 
     if event.image_view:

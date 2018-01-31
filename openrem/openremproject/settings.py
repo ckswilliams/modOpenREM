@@ -1,6 +1,7 @@
 # Django settings for OpenREM project.
 
 from __future__ import absolute_import
+
 # ^^^ The above is required if you want to import from the celery
 # library.  If you don't have this then `from celery.schedules import`
 # becomes `proj.celery.schedules` in Python 2.x since it allows
@@ -26,18 +27,19 @@ CELERY_DEFAULT_QUEUE = 'default'
 CELERY_ACKS_LATE = True
 CELERYD_PREFETCH_MULTIPLIER = 1
 
-
 from celery.schedules import crontab
+
 CELERYBEAT_SCHEDULE = {
     'trigger-dicom-keep-alive': {
         'task': 'remapp.netdicom.keepalive.keep_alive',
         'schedule': crontab(minute='*/1'),
-        'options': {'expires': 10},   # expire if not run ten seconds after being scheduled
+        'options': {'expires': 10},  # expire if not run ten seconds after being scheduled
     },
 }
 
 import os
-ROOT_PROJECT = os.path.join(os.path.split(__file__)[0],"..")
+
+ROOT_PROJECT = os.path.join(os.path.split(__file__)[0], "..")
 
 # **********************************************************************
 #
@@ -143,7 +145,6 @@ ROOT_URLCONF = 'openremproject.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'openremproject.wsgi.application'
 
-
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -176,8 +177,8 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt' : "%d/%b/%Y %H:%M:%S"
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
@@ -197,7 +198,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-			'maxBytes': 10*1024*1024,
+            'maxBytes': 10 * 1024 * 1024,
             'backupCount': 5,
             'filename': 'openrem.log',
             'formatter': 'verbose'
@@ -205,7 +206,7 @@ LOGGING = {
         'qr_file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-			'maxBytes': 10*1024*1024,
+            'maxBytes': 10 * 1024 * 1024,
             'backupCount': 5,
             'filename': 'openrem_qrscu.log',
             'formatter': 'verbose'
@@ -213,7 +214,7 @@ LOGGING = {
         'store_file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-			'maxBytes': 10*1024*1024,
+            'maxBytes': 10 * 1024 * 1024,
             'backupCount': 5,
             'filename': 'openrem_storescp.log',
             'formatter': 'verbose'
@@ -256,6 +257,16 @@ LOGGING = {
 # Not patient indicators: please override in local_settings.py
 ID_INDICATORS = [u'phy', u'test', u'qa']
 NAME_INDICATORS = [u'phys', u'test', u'qa']
+
+# Dummy locations of various tools for DICOM RDSR creation from CT images
+DCMTK_PATH = ''
+DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
+DCMMKDIR = os.path.join(DCMTK_PATH, 'dcmmkdir.exe')
+JAVA_EXE = ''
+JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
+PIXELMED_JAR = ''
+PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
+
 
 try:
     LOCAL_SETTINGS

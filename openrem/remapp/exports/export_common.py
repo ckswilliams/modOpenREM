@@ -198,14 +198,15 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     patient_sex = None
     not_patient_indicator = None
     try:
-        patient_sex = exams.patientmoduleattr_set.get().patient_sex
-        not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+        patient_module = exams.patientmoduleattr_set.get()
+        patient_sex = patient_module.patient_sex
+        not_patient_indicator = patient_module.not_patient_indicator
         if pid and (name or patid):
-            patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
+            patient_birth_date = patient_module.patient_birth_date
             if name:
-                patient_name = exams.patientmoduleattr_set.get().patient_name
+                patient_name = patient_module.patient_name
             if patid:
-                patient_id = exams.patientmoduleattr_set.get().patient_id
+                patient_id = patient_module.patient_id
     except ObjectDoesNotExist:
         logger.debug("Export {0}; patientmoduleattr_set object does not exist".format(modality))
 
@@ -215,11 +216,12 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     station_name = None
     display_name = None
     try:
-        institution_name = exams.generalequipmentmoduleattr_set.get().institution_name
-        manufacturer = exams.generalequipmentmoduleattr_set.get().manufacturer
-        manufacturer_model_name = exams.generalequipmentmoduleattr_set.get().manufacturer_model_name
-        station_name = exams.generalequipmentmoduleattr_set.get().station_name
-        display_name = exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
+        equipment_module = exams.generalequipmentmoduleattr_set.get()
+        institution_name = equipment_module.institution_name
+        manufacturer = equipment_module.manufacturer
+        manufacturer_model_name = equipment_module.manufacturer_model_name
+        station_name = equipment_module.station_name
+        display_name = equipment_module.unique_equipment_name.display_name
     except ObjectDoesNotExist:
         logger.debug("Export {0}; generalequipmentmoduleattr_set object does not exist".format(modality))
 
@@ -227,9 +229,10 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     patient_size = None
     patient_weight = None
     try:
-        patient_age_decimal = exams.patientstudymoduleattr_set.get().patient_age_decimal
-        patient_size = exams.patientstudymoduleattr_set.get().patient_size
-        patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
+        patient_study_module = exams.patientstudymoduleattr_set.get()
+        patient_age_decimal = patient_study_module.patient_age_decimal
+        patient_size = patient_study_module.patient_size
+        patient_weight = patient_study_module.patient_weight
     except ObjectDoesNotExist:
         logger.debug("Export {0}; patientstudymoduleattr_set object does not exist".format(modality))
 
@@ -240,11 +243,10 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
     if modality in u"CT":
         try:
             comment = exams.ctradiationdose_set.get().comment
-            ct_dose_length_product_total = exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(
-                ).ct_dose_length_product_total
+            ct_accumulated = exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
+            ct_dose_length_product_total = ct_accumulated.ct_dose_length_product_total
             try:
-                event_count = int(
-                    exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events)
+                event_count = int(ct_accumulated.total_number_of_irradiation_events)
             except TypeError:
                 logger.debug("Export CT; couldn't get number of irradiation events")
         except ObjectDoesNotExist:
@@ -252,16 +254,15 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
 
     elif modality in u"DX":
         try:
-            event_count = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                ).accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames
-            dap_total = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                ).accumintegratedprojradiogdose_set.get().dose_area_product_total
+            comment = exams.projectionxrayradiationdose_set.get().comment
+            dx_accumulated = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                            ).accumintegratedprojradiogdose_set.get()
+            event_count = dx_accumulated.total_number_of_radiographic_frames
+            dap_total = dx_accumulated.dose_area_product_total
             if dap_total:
-                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
-                    ).accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+                cgycm2 = dx_accumulated.convert_gym2_to_cgycm2()
             else:
                 cgycm2 = None
-            comment = exams.projectionxrayradiationdose_set.get().comment
         except ObjectDoesNotExist:
             logger.debug("Export DX; projectionxrayradiationdose_set object does not exist")
     elif modality in [u"RF", u"MG"]:
@@ -322,6 +323,64 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         ]
 
     return examdata
+
+
+def get_pulse_data(source_data, modality=None):
+    """Get the pulse level data, which could be a single value or average, or could be per pulse data. Return average.
+
+    :param source_data: IrradEventXRaySourceData table
+    :param modality: RF or DX to limit what we look for
+    :return: dict of values
+    """
+    from django.core.exceptions import MultipleObjectsReturned
+    from django.db.models import Avg
+    from numbers import Number
+
+    try:
+        kvp = source_data.kvp_set.get().kvp
+    except MultipleObjectsReturned:
+        kvp = source_data.kvp_set.all().aggregate(Avg('kvp'))['kvp__avg']
+    except ObjectDoesNotExist:
+        kvp = None
+
+    if modality == "DX":
+        try:
+            exposure_set = source_data.exposure_set.get()
+            uas = exposure_set.exposure
+            if isinstance(uas, Number):
+                mas = exposure_set.convert_uAs_to_mAs()
+            else:
+                mas = None
+        except MultipleObjectsReturned:
+            mas = source_data.exposure_set.all().aggregate(Avg('exposure'))['exposure__avg']
+            mas = mas / 1000.
+        except ObjectDoesNotExist:
+            mas = None
+    else:
+        mas = None
+
+    if modality == "RF":
+        try:
+            xray_tube_current = source_data.xraytubecurrent_set.get().xray_tube_current
+        except MultipleObjectsReturned:
+            xray_tube_current = source_data.xraytubecurrent_set.all().aggregate(
+                Avg('xray_tube_current'))['xray_tube_current__avg']
+        except ObjectDoesNotExist:
+            xray_tube_current = None
+    else:
+        xray_tube_current = None
+
+    if modality == "RF":
+        try:
+            pulse_width = source_data.pulsewidth_set.get().pulse_width
+        except MultipleObjectsReturned:
+            pulse_width = source_data.pulsewidth_set.all().aggregate(Avg('pulse_width'))['pulse_width__avg']
+        except ObjectDoesNotExist:
+            pulse_width = None
+    else:
+        pulse_width = None
+
+    return {'kvp': kvp, 'mas': mas, 'xray_tube_current': xray_tube_current, 'pulse_width': pulse_width}
 
 
 def get_xray_filter_info(source):

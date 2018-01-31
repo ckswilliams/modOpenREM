@@ -31,11 +31,13 @@ class ExportCTxlsx(TestCase):
         ct_ge_ct660 = os.path.join("test_files", "CT-ESR-GE_Optima.dcm")
         ct_ge_vct = os.path.join("test_files", "CT-ESR-GE_VCT.dcm")
         ct_siemens_flash_ss = os.path.join("test_files", "CT-RDSR-Siemens_Flash-TAP-SS.dcm")
+        ct_toshiba_dosecheck = os.path.join("test_files", "CT-RDSR-Toshiba_DoseCheck.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
         rdsr(os.path.join(root_tests, ct_ge_ct660))
         rdsr(os.path.join(root_tests, ct_ge_vct))
         rdsr(os.path.join(root_tests, ct_siemens_flash_ss))
+        rdsr(os.path.join(root_tests, ct_toshiba_dosecheck))
 
     def test_id_as_text(self):  # See https://bitbucket.org/openrem/openrem/issues/443
         filter_set = ""
@@ -55,18 +57,29 @@ class ExportCTxlsx(TestCase):
         patient_id_col = [i for i, x in enumerate(headers) if x.value == 'Patient ID'][0]
         accession_number_col = [i for i, x in enumerate(headers) if x.value == 'Accession number'][0]
         dlp_total_col = [i for i, x in enumerate(headers) if x.value == 'DLP total (mGy.cm)'][0]
+        e1_dose_check_col = [i for i, x in enumerate(headers) if x.value == 'E1 Dose check details'][0]
+        e2_dose_check_col = [i for i, x in enumerate(headers) if x.value == 'E2 Dose check details'][0]
 
-        self.assertEqual(all_data_sheet.cell_type(1, patient_id_col), xlrd.XL_CELL_TEXT)
         self.assertEqual(all_data_sheet.cell_type(2, patient_id_col), xlrd.XL_CELL_TEXT)
-        self.assertEqual(all_data_sheet.cell_type(1, accession_number_col), xlrd.XL_CELL_TEXT)
+        self.assertEqual(all_data_sheet.cell_type(3, patient_id_col), xlrd.XL_CELL_TEXT)
         self.assertEqual(all_data_sheet.cell_type(2, accession_number_col), xlrd.XL_CELL_TEXT)
-        self.assertEqual(all_data_sheet.cell_type(1, dlp_total_col), xlrd.XL_CELL_NUMBER)
+        self.assertEqual(all_data_sheet.cell_type(3, accession_number_col), xlrd.XL_CELL_TEXT)
+        self.assertEqual(all_data_sheet.cell_type(2, dlp_total_col), xlrd.XL_CELL_NUMBER)
 
-        self.assertEqual(all_data_sheet.cell_value(1, patient_id_col), '008F/g234')
-        self.assertEqual(all_data_sheet.cell_value(2, patient_id_col), '00001234')
-        self.assertEqual(all_data_sheet.cell_value(1, accession_number_col), '001234512345678')
-        self.assertEqual(all_data_sheet.cell_value(2, accession_number_col), '0012345.12345678')
-        self.assertEqual(all_data_sheet.cell_value(1, dlp_total_col), 2002.39)
+        self.assertEqual(all_data_sheet.cell_value(2, patient_id_col), '008F/g234')
+        self.assertEqual(all_data_sheet.cell_value(3, patient_id_col), '00001234')
+        self.assertEqual(all_data_sheet.cell_value(2, accession_number_col), '001234512345678')
+        self.assertEqual(all_data_sheet.cell_value(3, accession_number_col), '0012345.12345678')
+        self.assertEqual(all_data_sheet.cell_value(2, dlp_total_col), 2002.39)
+
+        e1_dose_check_string = u"Dose Check Alerts: DLP alert is configured at 100.00 mGy.cm with an accumulated " \
+                               u"forward estimate of 251.20 mGy.cm. CTDIvol alert is configured at 10.00 mGy with no " \
+                               u"accumulated forward estimate recorded. Person authorizing irradiation: Luuk. "
+        e2_dose_check_string = u"Dose Check Alerts: DLP alert is configured at 100.00 mGy.cm with an accumulated " \
+                               u"forward estimate of 502.40 mGy.cm. CTDIvol alert is configured at 10.00 mGy with an " \
+                               u"accumulated forward estimate of 10.60 mGy. Person authorizing irradiation: Luuk. "
+        self.assertEqual(all_data_sheet.cell_value(1, e1_dose_check_col), e1_dose_check_string)
+        self.assertEqual(all_data_sheet.cell_value(1, e2_dose_check_col), e2_dose_check_string)
 
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!

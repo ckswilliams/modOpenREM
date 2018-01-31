@@ -34,7 +34,7 @@ import logging
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet
+    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet, get_pulse_data
 
 logger = logging.getLogger(__name__)
 
@@ -78,22 +78,14 @@ def _dx_get_series_data(s):
     :return: series data
     """
     try:
-        exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
-        average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
-        exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
-        try:
-            kvp = s.irradeventxraysourcedata_set.get().kvp_set.get().kvp
-        except ObjectDoesNotExist:
-            kvp = None
-        try:
-            uas = s.irradeventxraysourcedata_set.get().exposure_set.get().exposure
-            if uas:
-                mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
-            else:
-                mas = None
-        except ObjectDoesNotExist:
-            mas = None
-        filters, filter_thicknesses = get_xray_filter_info(s.irradeventxraysourcedata_set.get())
+        source_data = s.irradeventxraysourcedata_set.get()
+        exposure_control_mode = source_data.exposure_control_mode
+        average_xray_tube_current = source_data.average_xray_tube_current
+        exposure_time = source_data.exposure_time
+        pulse_data = get_pulse_data(source_data=source_data, modality="DX")
+        kvp = pulse_data['kvp']
+        mas = pulse_data['mas']
+        filters, filter_thicknesses = get_xray_filter_info(source_data)
     except ObjectDoesNotExist:
         exposure_control_mode = None
         average_xray_tube_current = None
@@ -104,8 +96,9 @@ def _dx_get_series_data(s):
         filter_thicknesses = None
 
     try:
-        exposure_index = s.irradeventxraydetectordata_set.get().exposure_index
-        relative_xray_exposure = s.irradeventxraydetectordata_set.get().relative_xray_exposure
+        detector_data = s.irradeventxraydetectordata_set.get()
+        exposure_index = detector_data.exposure_index
+        relative_xray_exposure = detector_data.relative_xray_exposure
     except ObjectDoesNotExist:
         exposure_index = None
         relative_xray_exposure = None
@@ -114,14 +107,11 @@ def _dx_get_series_data(s):
     entrance_exposure_at_rp = s.entrance_exposure_at_rp
 
     try:
-        distance_source_to_detector = s.irradeventxraymechanicaldata_set.get(
-            ).doserelateddistancemeasurements_set.get().distance_source_to_detector
-        distance_source_to_entrance_surface = s.irradeventxraymechanicaldata_set.get(
-            ).doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface
-        distance_source_to_isocenter = s.irradeventxraymechanicaldata_set.get(
-            ).doserelateddistancemeasurements_set.get().distance_source_to_isocenter
-        table_height_position = s.irradeventxraymechanicaldata_set.get(
-            ).doserelateddistancemeasurements_set.get().table_height_position
+        distances = s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
+        distance_source_to_detector = distances.distance_source_to_detector
+        distance_source_to_entrance_surface = distances.distance_source_to_entrance_surface
+        distance_source_to_isocenter = distances.distance_source_to_isocenter
+        table_height_position = distances.table_height_position
     except ObjectDoesNotExist:
         distance_source_to_detector = None
         distance_source_to_entrance_surface = None
@@ -133,7 +123,7 @@ def _dx_get_series_data(s):
         str(s.anatomical_structure),
     ]
     try:
-        series_data += [s.image_view.code_meaning,]
+        series_data += [s.image_view.code_meaning, ]
     except AttributeError:
         series_data += [None, ]
     series_data += [

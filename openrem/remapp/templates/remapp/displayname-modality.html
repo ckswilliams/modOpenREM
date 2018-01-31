@@ -1,0 +1,75 @@
+<p>There are {{ name_set.count }} entries in this table. Back to the <a href="#top">top</a>.</p>
+<table class="table table-bordered table-hover row-clickable sortable">
+  <tr>
+    {% if admin.admingroup %}
+      <th>Update?</th>
+    {% endif %}
+    <th>Display name</th>
+    {% if dual %}
+      <th>User defined modality</th>
+    {% endif %}
+    <th>Institution</th>
+    <th>Department</th>
+    <th>Manufacturer</th>
+    <th>Model</th>
+    <th>Station name</th>
+    <th>Serial no.</th>
+    <th>Software version</th>
+    <th>Gantry ID</th>
+    <th>How many studies</th>
+    {% if admin.admingroup %}
+    <th>Review</th>
+    {% endif %}
+  </tr>
+  {% for eachrow in name_set %}
+    <tr class="clickable-row" row_name="{{ eachrow.id }}">
+      {% if admin.admingroup %}
+        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}"
+                                                                       value="{{ eachrow.id }}"/></td>
+      {% endif %}
+      <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
+      {% if dual %}
+        <td>
+          {% if admin.admingroup and eachrow.user_defined_modality == 'dual' %}
+            <a href="/admin/reprocessdual/{{ eachrow.pk }}/">Dual: reprocess</a>
+          {% else %}
+            <a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a>
+          {% endif %}
+        </td>
+      {% endif %}
+      <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
+      <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
+      <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
+      <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
+      <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
+      <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
+      <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
+      <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
+      <td id="{{ modality }}-count-{{ eachrow.pk }}">
+        <script>
+            $(document).ready(
+                function get_latest_studies(json) {
+                    $.ajax(
+                        {
+                            url: "/admin/equipmentcount",
+                            data: {
+                                modality: '{{ modality }}',
+                                equip_name_pk: '{{ eachrow.pk }}',
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            type: "POST",
+                            success: function (data) {
+                                $('#{{ modality }}-count-{{ eachrow.pk }}').html(data);
+                            }
+                        }
+                    )
+                }
+            )
+        </script>
+      </td>
+    {% if admin.admingroup %}
+      <td><a href="/admin/review/{{ eachrow.pk }}/{{ modality }}/">Review</a></td>
+    {% endif %}
+    </tr>
+  {% endfor %}
+</table>

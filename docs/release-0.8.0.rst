@@ -11,8 +11,10 @@ Headline changes
 * Imports: Hologic DBT proprietary projection images now have laterality and accumulated AGD extracted correctly
 * Imports: Format of comment field constructed when importing from Philips Dose Info series no longer uses XML styling
 * Charts: Added mammography scatter plot, thanks to `@rijkhorst`_
+* Exports: Now much faster
 * Exports: DX and RF exports work with multiple filters, and will be displayed to max 4 sf
 * Interface/Imports: Now possible to define a modality as DX or fluoro when RDSR is ambiguous
+* Interface: Detail and filter views now faster, AJAX introduced to home page and exports
 * Interface: Operator's name is now displayed in the details page for each modality, along with the performing
   physician's name for CT and fluoro
 
@@ -36,7 +38,8 @@ Upgrading from version 0.7.4
     # XLSX_DATE = 'mm/dd/yyyy'
 
 * Consider setting the timezone and language in ``local_settings.py``. See ``local_settings.py.example``.
-
+* Add the new extractor log file configuration to the ``local_settings.py`` - you can copy the 'Logging
+  configuration' section from  ``local_settings.py.example`` if you haven't made many changes.
 
 **************************************
 Adding legacy Toshiba CT functionality
