@@ -17,12 +17,15 @@ this isn't possible, so we've added instructions for an offline installation too
 
     install-offline
 
-Upgrade an existing installation
+Upgrading an existing installation
+==================================
 
 ..  toctree::
     :maxdepth: 2
 
     release-0.8.0
+
+.. _databaselinks:
 
 Databases
 =========
