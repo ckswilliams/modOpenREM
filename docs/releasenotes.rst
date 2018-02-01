@@ -24,6 +24,9 @@ Version specific information
     ..  toctree::
         :maxdepth: 1
 
+        release-0.7.4
+        release-0.7.3
+        release-0.7.0
         release-0.6.0
         release-0.5.1
         release-0.5.0
