@@ -41,9 +41,8 @@ Upgrading from version 0.7.4
 * Add the new extractor log file configuration to the ``local_settings.py`` - you can copy the 'Logging
   configuration' section from  ``local_settings.py.example`` if you haven't made many changes.
 
-**************************************
 Adding legacy Toshiba CT functionality
-**************************************
+======================================
 
 If you need to import data from older Toshiba CT scanners into OpenREM then the following tools need to be available
 on the same server as OpenREM:
@@ -72,7 +71,44 @@ configuration above using the command ``which dcmconv``. This will be something 
 for ``DCMMKDIR`` and ``JAVA_EXE``, which might be ``/usr/bin/java``. The pixelmed.jar file should be downloaded from
 the link above, and you will need to provide the path to where you have saved it.
 
+Upgrade
+=======
 
+* Back up your database
+
+    * For PostgreSQL you can refer to :ref:`backup-psql-db`
+    * For a non-production SQLite3 database, simply make a copy of the database file
+
+* Stop any Celery workers
+
+* If you are using a virtualenv, activate it
+
+* Install the new version of OpenREM:
+
+.. sourcecode:: bash
+
+    pip install openrem==0.8.0b1
+
+Migrate the database
+====================
+
+In a shell/command window, move into the openrem folder:
+
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
+
+.. sourcecode:: bash
+
+    python manage.py makemigrations remapp
+    python manage.py migrate remapp
+
+Restart all the services
+========================
+
+Follow the guide at :doc:`startservices`.
 
 ..  _@rijkhorst: https://bitbucket.org/rijkhorst/
 .. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
