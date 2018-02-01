@@ -22,6 +22,7 @@ Contents:
 ..  toctree::
     :maxdepth: 2
 
+    installation
     install-firsttime
     release-0.8.0
     startservices
