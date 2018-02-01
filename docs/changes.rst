@@ -104,6 +104,7 @@ OpenREM version history
 * `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
 * `#318`_  Database management: Display names view can be used to review and delete all studies from one source
 * `#114`_  Imports: Subsequent RDSRs of the same study will now replace existing study in database
+* `#61`_  Skin dose maps: These have been re-enabled, and currently work for Siemens systems
 
 0.7.4 (2016-10-17)
 ------------------
