@@ -1,4 +1,4 @@
-""" 
+"""
     Copyright 2015 Jonathan Cole
 
     This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 """
 
 from geomfunc import *
@@ -124,7 +124,19 @@ def rotational(xRay, startAngle, endAngle, frames, phantom, area, refAK, kV, fil
         A skin dose map.
 
     """
-    rotationAngle = (endAngle - startAngle) / frames
+    try:
+        rotationAngle = (endAngle - startAngle) / frames
+    except TypeError as e:
+        # We assume that it is Philips Allura XPer FD10 or FD20 data if start angle = -120 (propeller mode) or
+        # -45 (roll mode) and endAngle is not available.
+        if (endAngle is None) and (startAngle > -120.5) and (startAngle < -119.5):
+            endAngle = 120
+        elif (endAngle is None) and (startAngle > -45.5) and (startAngle < -44.5):
+            endAngle = 135
+        else:
+            raise e
+        rotationAngle = (endAngle - startAngle) / frames
+
     myDose = skinMap(xRay, phantom, area, refAK / frames, kV, filterCu, Dref, tableLength, tableWidth, transmission,
                      tableMattressThickness)
     for i in range(1, frames - 1):
@@ -196,7 +208,7 @@ def skinMapToPng(colour, totalDose, filename, testPhantom, encode_16_bit_colour=
     else:
         # White at 10 Gy
         threshDose = Decimal(10)
-        totalDose = (totalDose * Decimal(65535)) / threshDose 
+        totalDose = (totalDose * Decimal(65535)) / threshDose
 
         f = open(filename, 'wb')
 
