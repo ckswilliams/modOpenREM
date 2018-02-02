@@ -183,11 +183,11 @@ is going wrong, but it is quite chatty for routine use!
     LOGGING['loggers']['remapp.extractors.rdsr_toshiba_ct_from_dose_images']['level'] = 'INFO'  # Toshiba RDSR creation extractor logs
 
 Finally, if you are using Linux you can set the system to start a new log file automatically when the current one
-gets to a certain size. The settings described below don't work with Windows - we'll to include Windows settings in the
-next release. See `issue 483`_ to find out the progress on this!
+gets to a certain size. The settings described below don't work with Windows - we'll try to include Windows settings in
+the next release. See `issue 483`_ to find out the progress on this!
 
-To activate the 'rotating' log function, uncomment the remaining lines by removing the '``# ``' from the beginning of
-the lines. For example:
+To activate the 'rotating' log function, uncomment the remaining lines by removing the ' ``# `` ' from the beginning of
+the lines. For example for the query retrieve logs:
 
 .. sourcecode:: python
 
