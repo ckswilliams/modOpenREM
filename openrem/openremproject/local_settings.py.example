@@ -78,6 +78,21 @@ LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'     # Query Retrie
 LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs
 LOGGING['loggers']['remapp.extractors.rdsr_toshiba_ct_from_dose_images']['level'] = 'INFO'  # Toshiba RDSR creation extractor logs
 
+# Linux only for now: configure 'rotating' logs so they don't get too big. Remove the '# ' to uncomment. 'LOGGING'
+# should be at the start of the line.
+# LOGGING['handlers']['file']['class'] = 'logging.handlers.RotatingFileHandler'
+# LOGGING['handlers']['file']['maxBytes'] = 10 * 1024 * 1024  # 10*1024*1024 = 10 MB
+# LOGGING['handlers']['file']['backupCount'] = 5  # number of log files to keep before deleting the oldest one
+# LOGGING['handlers']['qr_file']['class'] = 'logging.handlers.RotatingFileHandler'
+# LOGGING['handlers']['qr_file']['maxBytes'] = 10 * 1024 * 1024  # 10*1024*1024 = 10 MB
+# LOGGING['handlers']['qr_file']['backupCount'] = 5  # number of log files to keep before deleting the oldest one
+# LOGGING['handlers']['store_file']['class'] = 'logging.handlers.RotatingFileHandler'
+# LOGGING['handlers']['store_file']['maxBytes'] = 10 * 1024 * 1024  # 10*1024*1024 = 10 MB
+# LOGGING['handlers']['store_file']['backupCount'] = 5  # number of log files to keep before deleting the oldest one
+# LOGGING['handlers']['extractor_file']['class'] = 'logging.handlers.RotatingFileHandler'
+# LOGGING['handlers']['extractor_file']['maxBytes'] = 10 * 1024 * 1024  # 10*1024*1024 = 10 MB
+# LOGGING['handlers']['extractor_file']['backupCount'] = 5  # number of log files to keep before deleting the oldest one
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
