@@ -166,6 +166,7 @@ $(document).ready(function() {
                         "<p>Sorry, the skin dose map could not be calculated for this study. Possible reasons for this are shown below:</p>" +
                         "<ul>";
 
+                    errorMessage += "<li>The openSkin code currently only works for Siemens equipment.</li>";
                     if (skinDoseMapObj.maxDose === 0) {errorMessage += "<li>The maximum calculated dose was zero: it may be that every exposure has missed the phantom. This may be due to the way in which this x-ray system has defined the table and x-ray beam geometry.</li>";}
                     if (!isFinite(skinDoseMapObj.maxDose)) {errorMessage +=  "<li>There is no data in skin dose map: the x-ray source to isocentre distance or dose at reference point are not present.</li>";}
 
