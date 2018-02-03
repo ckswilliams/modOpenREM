@@ -186,7 +186,7 @@ Finally, if you are using Linux you can set the system to start a new log file a
 gets to a certain size. The settings described below don't work with Windows - we'll try to include Windows settings in
 the next release. See `issue 483`_ to find out the progress on this!
 
-To activate the 'rotating' log function, uncomment the remaining lines by removing the ``# `` from the beginning of
+To activate the 'rotating' log function, uncomment the remaining lines by removing the `` # `` from the beginning of
 the lines. For example for the query retrieve logs:
 
 .. sourcecode:: python
