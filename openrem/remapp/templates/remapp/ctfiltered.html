@@ -211,12 +211,12 @@
         <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
         <!-- Include JavaScript to enable highcharts plots -->
-        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
-        <script src="{{ STATIC_URL }}js/boost.js"></script>
-        <script src="{{ STATIC_URL }}js/exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
-        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/highcharts.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/boost.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/offline-exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/drilldown.js"></script>
         <script src="{{ STATIC_URL }}js/charts/chartSortingRoutines.js"></script>
         <script src="{{ STATIC_URL }}js/charts/chartHistogramNormalise.js"></script>
         <script src="{{ STATIC_URL }}js/charts/chartAverageAndHistogram.js"></script>
@@ -242,11 +242,11 @@
         <!-- End of JavaScript to enable bootstrap tooltips -->
 
         <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
-        <script src="{{ STATIC_URL }}js/sorting.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/sorting.js"></script>
         <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
 
         <!-- JavaScript chart AJAX code. -->
-        <script src="{{ STATIC_URL }}js/ctChartAjax.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/ctChartAjax.js"></script>
         <!-- End of JavaScript chart AJAX code. -->
 
         <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
