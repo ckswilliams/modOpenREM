@@ -26,10 +26,10 @@ need it.
 Create a user and database
 ==========================
 
-Open pgAdmin III
+Open pgAdmin
 
 + Click on servers to expand
-+ Double click on PostgreSQL 9.4
++ Double click on PostgreSQL 9.6 (or whichever version you have installed)
 + Enter your superuser password
 + Right click on "login roles" and choose "New login role"
 + Create the openremuser (or whatever you want your user to be called) and under definition add a password.
