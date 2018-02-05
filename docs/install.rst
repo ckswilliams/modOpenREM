@@ -2,12 +2,12 @@
 Installing OpenREM
 ******************
 
-Install OpenREM 0.7.4
-=====================
+Install OpenREM 0.8.0b1
+=======================
 
 .. sourcecode:: bash
 
-    pip install openrem
+    pip install openrem==0.8.0b1
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -157,6 +157,7 @@ Configure the filename to determine where the logs are written. In linux, you mi
     LOGGING['handlers']['file']['filename'] = logfilename          # General logs
     LOGGING['handlers']['qr_file']['filename'] = qrfilename        # Query Retrieve SCU logs
     LOGGING['handlers']['store_file']['filename'] = storefilename  # Store SCP logs
+    LOGGING['handlers']['extractor_file']['filename'] = extractorfilename  # Extractor logs
 
 If you want all the logs in one file, simply set them all to the same filename.
 
@@ -168,15 +169,31 @@ In the settings file, there are ``simple`` and ``verbose`` log message styles. W
     LOGGING['handlers']['file']['formatter'] = 'verbose'        # General logs
     LOGGING['handlers']['qr_file']['formatter'] = 'verbose'     # Query Retrieve SCU logs
     LOGGING['handlers']['store_file']['formatter'] = 'verbose'  # Store SCP logs
+    LOGGING['handlers']['extractor_file']['formatter'] = 'verbose'  # Extractor logs
 
-Finally you can set the logging level. Options are ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``, and ``CRITICAL``, with
-progressively less logging.
+Next, you can set the logging level. Options are ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``, and ``CRITICAL``, with
+progressively less logging. ``INFO`` is probably a good choice for most circumstances. ``DEBUG`` is useful if something
+is going wrong, but it is quite chatty for routine use!
 
 .. sourcecode:: python
 
     LOGGING['loggers']['remapp']['level'] = 'INFO'                    # General logs
     LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'     # Query Retrieve SCU logs
     LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs
+    LOGGING['loggers']['remapp.extractors.rdsr_toshiba_ct_from_dose_images']['level'] = 'INFO'  # Toshiba RDSR creation extractor logs
+
+Finally, if you are using Linux you can set the system to start a new log file automatically when the current one
+gets to a certain size. The settings described below don't work with Windows - we'll try to include Windows settings in
+the next release. See `issue 483`_ to find out the progress on this!
+
+To activate the 'rotating' log function, uncomment the remaining lines by removing the ``#`` from the beginning of
+the lines. For example for the query retrieve logs:
+
+.. sourcecode:: python
+
+    LOGGING['handlers']['qr_file']['class'] = 'logging.handlers.RotatingFileHandler'
+    LOGGING['handlers']['qr_file']['maxBytes'] = 10 * 1024 * 1024  # 10*1024*1024 = 10 MB
+    LOGGING['handlers']['qr_file']['backupCount'] = 5  # number of log files to keep before deleting the oldest one
 
 Time zone
 ^^^^^^^^^
@@ -342,3 +359,4 @@ To find out more about this, refer to the :doc:`netdicom` docs.
 .. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
 .. _`Java`: http://java.com/en/download/
 .. _`PixelMed Java DICOM Toolkit`: http://www.pixelmed.com/dicomtoolkit.html
+.. _`issue 483`: https://bitbucket.org/openrem/openrem/issues/483/add-automatic-zipping-of-log-files
