@@ -23,6 +23,7 @@ function skinDoseMap3dHUDObject() {
     this.hudCanvas = document.createElement("canvas");
     this.hudContext = this.hudCanvas.getContext("2d");
     this.hudTexture = new THREE.Texture(this.hudCanvas);
+    this.hudTexture.minFilter = THREE.LinearFilter;
 
     /**
      * Internal function to initialise the information display
