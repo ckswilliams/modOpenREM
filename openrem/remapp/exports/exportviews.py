@@ -303,8 +303,11 @@ def export(request):
     """
     from remapp.models import Exports
 
-    complete = Exports.objects.filter(status__contains=u'COMPLETE').order_by('-export_date')
-    latest_complete_pk = complete[0].pk
+    try:
+        complete = Exports.objects.filter(status__contains=u'COMPLETE').order_by('-export_date')
+        latest_complete_pk = complete[0].pk
+    except IndexError:
+        latest_complete_pk = 0
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
     for group in request.user.groups.all():
