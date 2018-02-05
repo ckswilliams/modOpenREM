@@ -314,11 +314,9 @@ and then run
 
 .. sourcecode:: console
 
-    python manage.py makemigrations --empty remapp
     python manage.py migrate
 
-The first command will create a skeleton ``0001_initial.py`` migration file. The
-second command runs the migration files, and will display the text
+This command runs the migration file, and will display the text
 ``Applying remapp.0002_0_7_fresh_install_add_median... OK``, indicating that the median function has been added.
 
 Start all the services!
