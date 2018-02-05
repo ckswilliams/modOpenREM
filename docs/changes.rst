@@ -29,6 +29,7 @@ OpenREM version history
 * `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
 * `#543`_  Interface: Added drop-down box to choose how many studies are displayed on filtered pages
 * `#542`_  Interface: Added display name to all detailed html pages
+* `#536`_  Code quality: reduced javascript duplication and collected file groups into subfolders
 * `#535`_  Interface: Fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
