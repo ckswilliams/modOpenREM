@@ -202,6 +202,8 @@ Configure the settings
     :align: center
     :alt: Link from Django user admin back to OpenREM
 
+* Follow the link to see more information about how you want OpenREM to identify non-patient exposures, such as QA.
+  See :doc:`i_not_patient_indicator`.
 * Go to ``Config -> DICOM object delete settings`` and configure appropriately (see :doc:`i_deletesettings`)
 * Go to ``Config -> Patient ID settings`` and configure appropriately (see :doc:`patientid`)
 * If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to
