@@ -22,7 +22,7 @@ Headline changes
 Upgrading an OpenREM server with no internet access
 ***************************************************
 
-Placeholder - will be populated for next beta
+Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
 ****************************
 Upgrading from version 0.7.4
@@ -45,6 +45,8 @@ Upgrade
 .. sourcecode:: bash
 
     pip install openrem==0.8.0b1
+
+..  _upgradefrom074:
 
 Migrate the database
 ====================

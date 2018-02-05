@@ -2,7 +2,7 @@
 Upgrade an offline OpenREM installation
 ***************************************
 
-Upgrading from OpenREM version 0.6 or later requires new Python packages to be available, as well as the latest
+Upgrading OpenREM requires new Python packages to be available as well as the latest
 version of OpenREM. These can be downloaded on any computer with Python 2.7 installed and an internet connection,
 though if you have trouble when installing the packages you might need to use a similar computer to the one you are
 installing on - same operating system and matching 32-bit or 64-bit.
@@ -16,7 +16,7 @@ download them all:
 .. sourcecode:: console
 
     mkdir openremfiles
-    pip install -d openremfiles openrem==0.7.1
+    pip install -d openremfiles openrem==0.8.0b1
 
 Copy everything to the OpenREM server
 -------------------------------------
@@ -36,7 +36,6 @@ On the OpenREM server without internet access
 
 .. sourcecode:: console
 
-    pip install --no-index --find-links=openremfiles openrem==0.7.1
+    pip install --no-index --find-links=openremfiles openrem==0.8.0b1
 
-Now continue with :ref:`upgradefrom060` or :ref:`upgradefrom070b` as appropriate, starting just after the ``pip
-install`` line.
+Now go back to :ref:`upgradefrom074` and update the configuration.
