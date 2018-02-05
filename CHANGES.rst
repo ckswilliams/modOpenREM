@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.8.0 (?)
----------
+0.8.0b1 (2018-02-05)
+--------------------
 * `#587`_  Documentation: Added instructions for Linux users to rotate logs
 * `#584`_  Import, Interface, Export: RDSR with pulse level data now function
 * `#581`_  Import scripts: Interpreter line now always first, functions imported specifically
