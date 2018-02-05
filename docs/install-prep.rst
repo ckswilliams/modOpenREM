@@ -88,7 +88,7 @@ For either install, just follow the defaults – no special configurations requi
 Install NumPy
 =============
 
-Numpy is required for charts. OpenREM will work without NumPy, but charts will not be displayed.
+Numpy is required for charts.
 
 For linux::
 
@@ -100,16 +100,16 @@ For Windows:
 
 Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
 
-* Find the right version - look for **numpy-x.xx.x+mkl-cp27-cp27m-win32.whl** for 32-bit Windows or
-* **numpy-x.xx.x+mkl-cp27-cp27m-win_amd64.whl** for 64-bit Windows.
-* At the time of writing, ``x.xx.x`` was ``1.11.0`` - choose the latest version
+* Find the right version - look for **numpy-X+mkl-cp27-cp27m-win32.whl** for 32-bit Windows or
+* **numpy-X+mkl-cp27-cp27m-win_amd64.whl** for 64-bit Windows.
+* At the time of writing, ``X`` was ``1.14.0`` - choose the latest version
 * Install using pip:
 
 .. sourcecode:: console
 
-    pip install numpy‑1.11.0+mkl‑cp27-cp27m‑win32.whl
+    pip install numpy‑1.14.0+mkl‑cp27-cp27m‑win32.whl  # update the version number
     # or
-    pip install numpy‑1.11.0+mkl‑cp27‑cp27m‑win_amd64.whl
+    pip install numpy‑1.14.0+mkl‑cp27‑cp27m‑win_amd64.whl  # update the version number
     # changing the filename appropriately
 
 Install pynetdicom (edited version)
