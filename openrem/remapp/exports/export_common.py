@@ -546,7 +546,7 @@ def create_summary_sheet(task, studies, book, summary_sheet, sheet_list):
     titleformat.set_font_color = '#FF0000'
     titleformat.set_bold()
     toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = u'OpenREM is copyright 2017 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
+    linetwostring = u'OpenREM is copyright 2018 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
                     u'See http://openrem.org'
     summary_sheet.write(0, 0, toplinestring, titleformat)
     summary_sheet.write(1, 0, linetwostring)
