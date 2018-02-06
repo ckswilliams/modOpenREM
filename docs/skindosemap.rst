@@ -2,14 +2,9 @@
 Calculation and display of skin dose maps
 #########################################
 
-* Skin dose maps have been withdrawn from OpenREM version 0.7.0 due to
-  incorrect orientation calculations that need to be fixed before openSkin
-  can be reimplemented into OpenREM. It is hoped that they will be included
-  in version 0.7.1.
+**Documentation needs to be updated for 0.8.0 release**
 
-* Users can continue to export OpenREM studies in a format that can be used
-  with a stand-alone version of openSkin.
-  
+
 ************************************
 Functionality that will be available
 ************************************
