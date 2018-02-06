@@ -6,17 +6,17 @@ Upgrade to OpenREM 0.8.0
 Headline changes
 ****************
 
-* Imports: Can now create RDSR for import from legacy Toshiba CT studies using Offis DCMTK and Pixelmed
-* Imports: No longer tries to import non-dose report Enhanced Structured Reports
-* Imports: Hologic DBT proprietary projection images now have laterality and accumulated AGD extracted correctly
-* Imports: Format of comment field constructed when importing from Philips Dose Info series no longer uses XML styling
-* Charts: Added mammography scatter plot, thanks to `@rijkhorst`_
-* Exports: Now much faster
-* Exports: DX and RF exports work with multiple filters, and will be displayed to max 4 sf
-* Interface/Imports: Now possible to define a modality as DX or fluoro when RDSR is ambiguous
-* Interface: Detail and filter views now faster, AJAX introduced to home page and exports
-* Interface: Operator's name is now displayed in the details page for each modality, along with the performing
-  physician's name for CT and fluoro
+* This release has extensive automated testing for large parts of the codebase (for the first time)
+* Code quality is much improved, reduced duplication, better documentation, many bugs fixed
+* Imports: RDSR from a wider range of systems now import properly
+* Imports: Better distinction and control over defining RDSR studies as RF or DX
+* Imports: Code and instructions to generate quality RDSR from older Toshiba CT scanners for import to OpenREM
+* Imports: DICOM Query-Retrieve functionality has been overhauled
+* Imports, display and export: Better handling of non-ASCII characters
+* Interface: More detailed, consistent and faster rendering of the data in the web interface
+* Interface: Calculation and display of fluoroscopy radiation exposure incident on a phantom (limited to Siemens RDSRs)
+* Interface: More and better charts, including scatter plots for mammography
+* Exports: Much faster, and more consistent
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
