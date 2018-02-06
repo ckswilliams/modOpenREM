@@ -10,11 +10,11 @@ Headline changes
 * Code quality is much improved, reduced duplication, better documentation, many bugs fixed
 * Imports: RDSR from a wider range of systems now import properly
 * Imports: Better distinction and control over defining RDSR studies as RF or DX
-* Imports: Code and instructions to generate quality RDSR from older Toshiba CT scanners for import to OpenREM
+* Imports: Code and instructions to generate and import RDSR from older Toshiba CT scanners
 * Imports: DICOM Query-Retrieve functionality has been overhauled
 * Imports, display and export: Better handling of non-ASCII characters
 * Interface: More detailed, consistent and faster rendering of the data in the web interface
-* Interface: Calculation and display of fluoroscopy radiation exposure incident on a phantom (limited to Siemens RDSRs)
+* Interface: Maps of fluoroscopy radiation exposure incident on a phantom (limited to Siemens RDSRs)
 * Interface: More and better charts, including scatter plots for mammography
 * Exports: Much faster, and more consistent
 
