@@ -14,7 +14,7 @@ Headline changes
 * Imports: DICOM Query-Retrieve functionality has been overhauled
 * Imports, display and export: Better handling of non-ASCII characters
 * Interface: More detailed, consistent and faster rendering of the data in the web interface
-* Interface: Maps of fluoroscopy radiation exposure incident on a phantom (limited to Siemens RDSRs)
+* Interface: Maps of fluoroscopy radiation exposure incident on a phantom (Siemens RDSRs only)
 * Interface: More and better charts, including scatter plots for mammography
 * Exports: Much faster, and more consistent
 
