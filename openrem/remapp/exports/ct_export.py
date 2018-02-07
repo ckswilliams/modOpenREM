@@ -148,23 +148,29 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             row + 1, numrows)
         tsk.save()
 
-        common_exam_data = get_common_data(u"CT", exams, pid, name, patid)
-        all_exam_data = list(common_exam_data)
+        try:
+            common_exam_data = get_common_data(u"CT", exams, pid, name, patid)
+            all_exam_data = list(common_exam_data)
 
-        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
-            # Get series data
-            series_data = _ct_get_series_data(s)
-            # Add series to all data
-            all_exam_data += series_data
-            # Add series data to series tab
-            protocol = s.acquisition_protocol
-            if not protocol:
-                protocol = u'Unknown'
-            tabtext = sheet_name(protocol)
-            sheet_list[tabtext]['count'] += 1
-            sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
+            for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
+                # Get series data
+                series_data = _ct_get_series_data(s)
+                # Add series to all data
+                all_exam_data += series_data
+                # Add series data to series tab
+                protocol = s.acquisition_protocol
+                if not protocol:
+                    protocol = u'Unknown'
+                tabtext = sheet_name(protocol)
+                sheet_list[tabtext]['count'] += 1
+                sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
 
-        wsalldata.write_row(row + 1, 0, all_exam_data)
+            wsalldata.write_row(row + 1, 0, all_exam_data)
+        except ObjectDoesNotExist:
+            logger.error(u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number {3}"
+                         u" - maybe database entry was deleted as part of importing later version of same"
+                         u" study?".format(row + 1, numrows, exams.study_instance_uid, exams.accession_number))
+            continue
 
     create_summary_sheet(tsk, e, book, summarysheet, sheet_list)
 
