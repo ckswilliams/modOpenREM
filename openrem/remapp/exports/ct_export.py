@@ -33,7 +33,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from celery import shared_task
 from remapp.exports.export_common import get_common_data, common_headers, create_xlsx, create_csv, write_export, \
-    create_summary_sheet
+    create_summary_sheet, abort_if_zero_studies
 
 logger = logging.getLogger(__name__)
 
@@ -79,9 +79,9 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Get the data!
     e = ct_acq_filter(filterdict, pid=pid).qs
 
-    tsk.progress = u'Required study filter complete.'
     tsk.num_records = e.count()
-    tsk.save()
+    if abort_if_zero_studies(tsk.num_records, tsk):
+        return
 
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet(u"Summary")
@@ -223,13 +223,11 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
     # Get the data!
     e = ct_acq_filter(filterdict, pid=pid).qs
 
-    tsk.progress = u'Required study filter complete.'
-    tsk.save()
+    tsk.num_records = e.count()
+    if abort_if_zero_studies(tsk.num_records, tsk):
+        return
 
-    numresults = e.count()
-
-    tsk.progress = u'{0} studies in query.'.format(numresults)
-    tsk.num_records = numresults
+    tsk.progress = u'{0} studies in query.'.format(tsk.num_records)
     tsk.save()
 
     headings = common_headers(pid=pid, name=name, patid=patid)
@@ -261,7 +259,7 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
             if isinstance(item, basestring) and u',' in item:
                 exam_data[index] = item.replace(u',', u';')
         writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
-        tsk.progress = u"{0} of {1}".format(i+1, numresults)
+        tsk.progress = u"{0} of {1}".format(i+1, tsk.num_records)
         tsk.save()
     tsk.progress = u'All study data written.'
     tsk.save()

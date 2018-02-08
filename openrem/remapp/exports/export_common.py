@@ -581,3 +581,21 @@ def create_summary_sheet(task, studies, book, summary_sheet, sheet_list):
         summary_sheet.write(row+6, 6, u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
         summary_sheet.write(row+6, 7, item[1]['count'])
     summary_sheet.set_column('G:G', 15)
+
+
+def abort_if_zero_studies(num_studies, tsk):
+    """Function to update progress and status if filter is empty
+
+    :param num_studies: study count in fiilter
+    :param tsk: export task
+    :return: bool - True if should abort
+    """
+    if not num_studies:
+        tsk.status = u"ERROR"
+        tsk.progress = u"Export aborted - zero studies in the filter!"
+        tsk.save()
+        return True
+    else:
+        tsk.progress = u'Required study filter complete.'
+        tsk.save()
+        return False
