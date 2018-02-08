@@ -135,6 +135,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
 
+    if not max_events:
+        max_events = 1
     alldataheaders += _generate_all_data_headers_ct(max_events)
 
     wsalldata.write_row('A1', alldataheaders)
@@ -167,10 +169,11 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
             wsalldata.write_row(row + 1, 0, all_exam_data)
         except ObjectDoesNotExist:
-            logger.error(u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number {3}"
-                         u" - maybe database entry was deleted as part of importing later version of same"
-                         u" study?".format(row + 1, numrows, exams.study_instance_uid, exams.accession_number))
-            continue
+            error_message = u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number" \
+                            u" {3} - maybe database entry was deleted as part of importing later version of same" \
+                            u" study?".format(row + 1, numrows, exams.study_instance_uid, exams.accession_number)
+            logger.error(error_message)
+            wsalldata.write(row + 1, 0, error_message)
 
     create_summary_sheet(tsk, e, book, summarysheet, sheet_list)
 
@@ -236,6 +239,8 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
 
     max_events_dict = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
     max_events = max_events_dict['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']
+    if not max_events:
+        max_events = 1
     headings += _generate_all_data_headers_ct(max_events)
     writer.writerow(headings)
 
