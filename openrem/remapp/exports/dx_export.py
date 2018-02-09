@@ -34,7 +34,8 @@ import logging
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet, get_pulse_data
+    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet, \
+    get_pulse_data, abort_if_zero_studies
 
 logger = logging.getLogger(__name__)
 
@@ -186,10 +187,12 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = u'Required study filter complete.'
     tsk.save()
         
-    numresults = e.count()
+    tsk.num_records = e.count()
+    if abort_if_zero_studies(tsk.num_records, tsk):
+        return
 
-    tsk.progress = u'{0} studies in query.'.format(numresults)
-    tsk.num_records = numresults
+    tsk.progress = u'{0} studies in query.'.format(tsk.num_records)
+    tsk.num_records = tsk.num_records
     tsk.save()
 
     headers = common_headers(pid=pid, name=name, patid=patid)
@@ -213,21 +216,30 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.save()
 
     for row, exams in enumerate(e):
-        exam_data = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
-        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
-            # Get series data
-            series_data = _dx_get_series_data(s)
-            # Add series to all data
-            exam_data += series_data
-        # Clear out any commas
-        for index, item in enumerate(exam_data):
-            if item is None:
-                exam_data[index] = ''
-            if isinstance(item, basestring) and u',' in item:
-                exam_data[index] = item.replace(u',', u';')
-        writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
-        tsk.progress = u"{0} of {1}".format(row + 1, numresults)
+        tsk.progress = u"Writing {0} of {1} to csv file".format(row + 1, tsk.num_records)
         tsk.save()
+        try:
+            exam_data = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
+            for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
+                # Get series data
+                series_data = _dx_get_series_data(s)
+                # Add series to all data
+                exam_data += series_data
+            # Clear out any commas
+            for index, item in enumerate(exam_data):
+                if item is None:
+                    exam_data[index] = ''
+                if isinstance(item, basestring) and u',' in item:
+                    exam_data[index] = item.replace(u',', u';')
+            writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
+        except ObjectDoesNotExist:
+            error_message = u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number" \
+                            u" {3} - maybe database entry was deleted as part of importing later version of same" \
+                            u" study?".format(
+                                row + 1, tsk.num_records, exams.study_instance_uid, exams.accession_number)
+            logger.error(error_message)
+            writer.writerow([error_message, ])
+
     tsk.progress = u'All study data written.'
     tsk.save()
 
@@ -274,9 +286,9 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     e = dx_acq_filter(filterdict, pid=pid).qs
 
-    tsk.progress = u'Required study filter complete.'
     tsk.num_records = e.count()
-    tsk.save()
+    if abort_if_zero_studies(tsk.num_records, tsk):
+        return
 
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
@@ -347,23 +359,30 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             row + 1, numrows)
         tsk.save()
 
-        common_exam_data = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
-        all_exam_data = list(common_exam_data)
+        try:
+            common_exam_data = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
+            all_exam_data = list(common_exam_data)
 
-        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
-            # Get series data
-            series_data = _dx_get_series_data(s)
-            # Add series to all data
-            all_exam_data += series_data
-            # Add series data to series tab
-            protocol = s.acquisition_protocol
-            if not protocol:
-                protocol = u'Unknown'
-            tabtext = sheet_name(protocol)
-            sheet_list[tabtext]['count'] += 1
-            sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
+            for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
+                # Get series data
+                series_data = _dx_get_series_data(s)
+                # Add series to all data
+                all_exam_data += series_data
+                # Add series data to series tab
+                protocol = s.acquisition_protocol
+                if not protocol:
+                    protocol = u'Unknown'
+                tabtext = sheet_name(protocol)
+                sheet_list[tabtext]['count'] += 1
+                sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
 
-        wsalldata.write_row(row + 1, 0, all_exam_data)
+            wsalldata.write_row(row + 1, 0, all_exam_data)
+        except ObjectDoesNotExist:
+            error_message = u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number" \
+                            u" {3} - maybe database entry was deleted as part of importing later version of same" \
+                            u" study?".format(row + 1, numrows, exams.study_instance_uid, exams.accession_number)
+            logger.error(error_message)
+            wsalldata.write(row + 1, 0, error_message)
 
     create_summary_sheet(tsk, e, book, summarysheet, sheet_list)
 
