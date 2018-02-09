@@ -34,7 +34,8 @@ import logging
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import common_headers,  text_and_date_formats, generate_sheets, create_summary_sheet,\
-    get_common_data, get_anode_target_material, get_xray_filter_info, create_csv, create_xlsx, write_export, sheet_name
+    get_common_data, get_anode_target_material, get_xray_filter_info, create_csv, create_xlsx, write_export, \
+    sheet_name, abort_if_zero_studies
 
 logger = logging.getLogger(__name__)
 
@@ -218,10 +219,9 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
     tsk.progress = u'Required study filter complete.'
     tsk.save()
 
-    numresults = studies.count()
-
-    tsk.num_records = numresults
-    tsk.save()
+    tsk.num_records = studies.count()
+    if abort_if_zero_studies(tsk.num_records, tsk):
+        return
 
     if xlsx:
         # Add summary sheet and all data sheet
@@ -269,40 +269,54 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
 
     max_events = 0
     for study_index, exam in enumerate(studies):
-        common_exam_data = get_common_data(u"MG", exam, pid=pid, name=name, patid=patid)
-        all_exam_data = list(common_exam_data)
-
-        this_study_max_events = 0
-        for series in exam.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
-            this_study_max_events += 1
-            if this_study_max_events > max_events:
-                max_events = this_study_max_events
-            series_data = _mg_get_series_data(series)
-            if not xlsx:
-                series_data = list(common_exam_data) + series_data
-                for index, item in enumerate(series_data):
-                    if item is None:
-                        series_data[index] = ''
-                    if isinstance(item, basestring) and u',' in item:
-                        series_data[index] = item.replace(u',', u';')
-                writer.writerow([unicode(data_string).encode("utf-8") for data_string in series_data])
-            else:
-                all_exam_data += series_data  # For all data
-                protocol = series.acquisition_protocol
-                if not protocol:
-                    protocol = u'Unknown'
-                tabtext = sheet_name(protocol)
-                sheet_list[tabtext]['count'] += 1
-                try:
-                    sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
-                except TypeError:
-                    logger.error("Common is |{0}| series is |{1}|".format(common_exam_data, series_data))
-                    exit()
-        if xlsx:
-            wsalldata.write_row(study_index + 1, 0, all_exam_data)
-
-        tsk.progress = u"{0} of {1}".format(study_index + 1, numresults)
+        tsk.progress = u"{0} of {1}".format(study_index + 1, tsk.num_records)
         tsk.save()
+
+        try:
+            common_exam_data = get_common_data(u"MG", exam, pid=pid, name=name, patid=patid)
+            all_exam_data = list(common_exam_data)
+
+            this_study_max_events = 0
+            for series in exam.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
+                this_study_max_events += 1
+                if this_study_max_events > max_events:
+                    max_events = this_study_max_events
+                series_data = _mg_get_series_data(series)
+                if not xlsx:
+                    series_data = list(common_exam_data) + series_data
+                    for index, item in enumerate(series_data):
+                        if item is None:
+                            series_data[index] = ''
+                        if isinstance(item, basestring) and u',' in item:
+                            series_data[index] = item.replace(u',', u';')
+                    writer.writerow([unicode(data_string).encode("utf-8") for data_string in series_data])
+                else:
+                    all_exam_data += series_data  # For all data
+                    protocol = series.acquisition_protocol
+                    if not protocol:
+                        protocol = u'Unknown'
+                    tabtext = sheet_name(protocol)
+                    sheet_list[tabtext]['count'] += 1
+                    try:
+                        sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
+                    except TypeError:
+                        logger.error("Common is |{0}| series is |{1}|".format(common_exam_data, series_data))
+                        exit()
+            if xlsx:
+                wsalldata.write_row(study_index + 1, 0, all_exam_data)
+        except ObjectDoesNotExist:
+            error_message = u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number" \
+                            u" {3} - maybe database entry was deleted as part of importing later version of same" \
+                            u" study?".format(
+                                study_index + 1, tsk.num_records, exam.study_instance_uid, exam.accession_number)
+            logger.error(error_message)
+            if xlsx:
+                wsalldata.write(study_index + 1, 0, error_message)
+            else:
+                writer.writerow([error_message, ])
+
+
+
 
     if xlsx:
         all_data_headings += _series_headers(max_events)
