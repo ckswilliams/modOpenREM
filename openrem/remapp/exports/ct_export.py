@@ -246,21 +246,27 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.save()
 
     for i, exams in enumerate(e):
-        exam_data = get_common_data(u"CT", exams, pid, name, patid)
-
-        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
-            # Get series data
-            exam_data += _ct_get_series_data(s)
-
-        # Clear out any commas
-        for index, item in enumerate(exam_data):
-            if item is None:
-                exam_data[index] = ''
-            if isinstance(item, basestring) and u',' in item:
-                exam_data[index] = item.replace(u',', u';')
-        writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
         tsk.progress = u"{0} of {1}".format(i+1, tsk.num_records)
         tsk.save()
+        try:
+            exam_data = get_common_data(u"CT", exams, pid, name, patid)
+            for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
+                # Get series data
+                exam_data += _ct_get_series_data(s)
+            # Clear out any commas
+            for index, item in enumerate(exam_data):
+                if item is None:
+                    exam_data[index] = ''
+                if isinstance(item, basestring) and u',' in item:
+                    exam_data[index] = item.replace(u',', u';')
+            writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
+        except ObjectDoesNotExist:
+            error_message = u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number" \
+                            u" {3} - maybe database entry was deleted as part of importing later version of same" \
+                            u" study?".format(i + 1, tsk.num_records, exams.study_instance_uid, exams.accession_number)
+            logger.error(error_message)
+            writer.writerow([error_message, ])
+
     tsk.progress = u'All study data written.'
     tsk.save()
 

@@ -222,9 +222,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             exam_data = get_common_data(u"DX", exams, pid=pid, name=name, patid=patid)
             for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
                 # Get series data
-                series_data = _dx_get_series_data(s)
-                # Add series to all data
-                exam_data += series_data
+                exam_data += _dx_get_series_data(s)
             # Clear out any commas
             for index, item in enumerate(exam_data):
                 if item is None:
