@@ -32,7 +32,8 @@ import logging
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.exports.export_common import text_and_date_formats, common_headers, generate_sheets, sheet_name, \
-    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet, get_pulse_data
+    get_common_data, get_xray_filter_info, create_xlsx, create_csv, write_export, create_summary_sheet, \
+    get_pulse_data, abort_if_zero_studies
 from remapp.tools.get_values import return_for_export
 
 logger = logging.getLogger(__name__)
@@ -250,9 +251,9 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         df_filtered_qs = RFSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
     e = df_filtered_qs.qs
 
-    tsk.progress = u'Required study filter complete.'
     tsk.num_records = e.count()
-    tsk.save()
+    if abort_if_zero_studies(tsk.num_records, tsk):
+        return
 
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet(u"Summary")
@@ -297,165 +298,173 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = u'Writing study {0} of {1}'.format(row + 1, e.count())
         tsk.save()
 
-        examdata = get_common_data(u"RF", exams, pid=pid, name=name, patid=patid)
-        examdata += _add_plane_summary_data(exams)
-        common_exam_data = list(examdata)
+        try:
+            examdata = get_common_data(u"RF", exams, pid=pid, name=name, patid=patid)
+            examdata += _add_plane_summary_data(exams)
+            common_exam_data = list(examdata)
 
-        angle_range = 5.0  # plus or minus range considered to be the same position
-        studyiuid = exams.study_instance_uid
-        # TODO: Check if generation of inst could be more efficient, ie start with exams?
-        inst = IrradEventXRayData.objects.filter(
-            projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__exact=studyiuid)
+            angle_range = 5.0  # plus or minus range considered to be the same position
+            studyiuid = exams.study_instance_uid
+            # TODO: Check if generation of inst could be more efficient, ie start with exams?
+            inst = IrradEventXRayData.objects.filter(
+                projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__exact=studyiuid)
 
-        num_groups_this_exam = 0
-        while inst:  # ie while there are events still left that haven't been matched into a group
-            tsk.progress = u'Writing study {0} of {1}; {2} events remaining.'.format(
-                row + 1, e.count(), inst.count())
-            tsk.save()
-            num_groups_this_exam += 1
-            plane = inst[0].acquisition_plane.code_meaning
-            try:
-                mechanical_data = inst[0].irradeventxraymechanicaldata_set.get()
-                anglei = mechanical_data.positioner_primary_angle
-                angleii = mechanical_data.positioner_secondary_angle
-            except ObjectDoesNotExist:
-                anglei = None
-                angleii = None
-            try:
-                source_data = inst[0].irradeventxraysourcedata_set.get()
-                pulse_rate = source_data.pulse_rate
-                fieldsize = source_data.ii_field_size
+            num_groups_this_exam = 0
+            while inst:  # ie while there are events still left that haven't been matched into a group
+                tsk.progress = u'Writing study {0} of {1}; {2} events remaining.'.format(
+                    row + 1, e.count(), inst.count())
+                tsk.save()
+                num_groups_this_exam += 1
+                plane = inst[0].acquisition_plane.code_meaning
                 try:
-                    filter_material, filter_thick = get_xray_filter_info(source_data)
+                    mechanical_data = inst[0].irradeventxraymechanicaldata_set.get()
+                    anglei = mechanical_data.positioner_primary_angle
+                    angleii = mechanical_data.positioner_secondary_angle
                 except ObjectDoesNotExist:
+                    anglei = None
+                    angleii = None
+                try:
+                    source_data = inst[0].irradeventxraysourcedata_set.get()
+                    pulse_rate = source_data.pulse_rate
+                    fieldsize = source_data.ii_field_size
+                    try:
+                        filter_material, filter_thick = get_xray_filter_info(source_data)
+                    except ObjectDoesNotExist:
+                        filter_material = None
+                        filter_thick = None
+                except ObjectDoesNotExist:
+                    pulse_rate = None
+                    fieldsize = None
                     filter_material = None
                     filter_thick = None
-            except ObjectDoesNotExist:
-                pulse_rate = None
-                fieldsize = None
-                filter_material = None
-                filter_thick = None
 
-            protocol = inst[0].acquisition_protocol
-            event_type = inst[0].irradiation_event_type.code_meaning
+                protocol = inst[0].acquisition_protocol
+                event_type = inst[0].irradiation_event_type.code_meaning
 
-            similarexposures = inst
-            if plane:
-                similarexposures = similarexposures.filter(
-                    acquisition_plane__code_meaning__exact = plane)
-            if protocol:
-                similarexposures = similarexposures.filter(
-                    acquisition_protocol__exact = protocol)
-            if fieldsize:
-                similarexposures = similarexposures.filter(
-                    irradeventxraysourcedata__ii_field_size__exact = fieldsize)
-            if pulse_rate:
-                similarexposures = similarexposures.filter(
-                    irradeventxraysourcedata__pulse_rate__exact = pulse_rate)
-            if filter_material:
-                for xray_filter in inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                similarexposures = inst
+                if plane:
                     similarexposures = similarexposures.filter(
-                        irradeventxraysourcedata__xrayfilters__xray_filter_material__code_meaning__exact = xray_filter.xray_filter_material)
+                        acquisition_plane__code_meaning__exact = plane)
+                if protocol:
                     similarexposures = similarexposures.filter(
-                        irradeventxraysourcedata__xrayfilters__xray_filter_thickness_maximum__exact = xray_filter.xray_filter_thickness_maximum)
-            if anglei:
-                similarexposures = similarexposures.filter(
-                    irradeventxraymechanicaldata__positioner_primary_angle__range=(float(anglei) - angle_range, float(anglei) + angle_range))
-            if angleii:
-                similarexposures = similarexposures.filter(
-                    irradeventxraymechanicaldata__positioner_secondary_angle__range=(float(angleii) - angle_range, float(angleii) + angle_range))
-            if event_type:
-                similarexposures = similarexposures.filter(
-                    irradiation_event_type__code_meaning__exact = event_type)
+                        acquisition_protocol__exact = protocol)
+                if fieldsize:
+                    similarexposures = similarexposures.filter(
+                        irradeventxraysourcedata__ii_field_size__exact = fieldsize)
+                if pulse_rate:
+                    similarexposures = similarexposures.filter(
+                        irradeventxraysourcedata__pulse_rate__exact = pulse_rate)
+                if filter_material:
+                    for xray_filter in inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                        similarexposures = similarexposures.filter(
+                            irradeventxraysourcedata__xrayfilters__xray_filter_material__code_meaning__exact = xray_filter.xray_filter_material)
+                        similarexposures = similarexposures.filter(
+                            irradeventxraysourcedata__xrayfilters__xray_filter_thickness_maximum__exact = xray_filter.xray_filter_thickness_maximum)
+                if anglei:
+                    similarexposures = similarexposures.filter(
+                        irradeventxraymechanicaldata__positioner_primary_angle__range=(float(anglei) - angle_range, float(anglei) + angle_range))
+                if angleii:
+                    similarexposures = similarexposures.filter(
+                        irradeventxraymechanicaldata__positioner_secondary_angle__range=(float(angleii) - angle_range, float(angleii) + angle_range))
+                if event_type:
+                    similarexposures = similarexposures.filter(
+                        irradiation_event_type__code_meaning__exact = event_type)
 
-            # Remove exposures included in this group from inst
-            exposures_to_exclude = [o.irradiation_event_uid for o in similarexposures]
-            inst = inst.exclude(irradiation_event_uid__in = exposures_to_exclude)
+                # Remove exposures included in this group from inst
+                exposures_to_exclude = [o.irradiation_event_uid for o in similarexposures]
+                inst = inst.exclude(irradiation_event_uid__in = exposures_to_exclude)
 
-            angle1 = similarexposures.all().aggregate(
-                Min('irradeventxraymechanicaldata__positioner_primary_angle'),
-                Max('irradeventxraymechanicaldata__positioner_primary_angle'),
-                Avg('irradeventxraymechanicaldata__positioner_primary_angle'))
-            angle2 = similarexposures.all().aggregate(
-                Min('irradeventxraymechanicaldata__positioner_secondary_angle'),
-                Max('irradeventxraymechanicaldata__positioner_secondary_angle'),
-                Avg('irradeventxraymechanicaldata__positioner_secondary_angle'))
-            dap = similarexposures.all().aggregate(
-                Min('dose_area_product'),
-                Max('dose_area_product'),
-                Avg('dose_area_product'))
-            dose_rp = similarexposures.all().aggregate(
-                Min('irradeventxraysourcedata__dose_rp'),
-                Max('irradeventxraysourcedata__dose_rp'),
-                Avg('irradeventxraysourcedata__dose_rp'))
-            kvp = similarexposures.all().aggregate(
-                Min('irradeventxraysourcedata__kvp__kvp'),
-                Max('irradeventxraysourcedata__kvp__kvp'),
-                Avg('irradeventxraysourcedata__kvp__kvp'))
-            tube_current = similarexposures.all().aggregate(
-                Min('irradeventxraysourcedata__xraytubecurrent__xray_tube_current'),
-                Max('irradeventxraysourcedata__xraytubecurrent__xray_tube_current'),
-                Avg('irradeventxraysourcedata__xraytubecurrent__xray_tube_current'))
-            exp_time = similarexposures.all().aggregate(
-                Min('irradeventxraysourcedata__exposure_time'),
-                Max('irradeventxraysourcedata__exposure_time'),
-                Avg('irradeventxraysourcedata__exposure_time'))
-            pulse_width = similarexposures.all().aggregate(
-                Min('irradeventxraysourcedata__pulsewidth__pulse_width'),
-                Max('irradeventxraysourcedata__pulsewidth__pulse_width'),
-                Avg('irradeventxraysourcedata__pulsewidth__pulse_width'))
+                angle1 = similarexposures.all().aggregate(
+                    Min('irradeventxraymechanicaldata__positioner_primary_angle'),
+                    Max('irradeventxraymechanicaldata__positioner_primary_angle'),
+                    Avg('irradeventxraymechanicaldata__positioner_primary_angle'))
+                angle2 = similarexposures.all().aggregate(
+                    Min('irradeventxraymechanicaldata__positioner_secondary_angle'),
+                    Max('irradeventxraymechanicaldata__positioner_secondary_angle'),
+                    Avg('irradeventxraymechanicaldata__positioner_secondary_angle'))
+                dap = similarexposures.all().aggregate(
+                    Min('dose_area_product'),
+                    Max('dose_area_product'),
+                    Avg('dose_area_product'))
+                dose_rp = similarexposures.all().aggregate(
+                    Min('irradeventxraysourcedata__dose_rp'),
+                    Max('irradeventxraysourcedata__dose_rp'),
+                    Avg('irradeventxraysourcedata__dose_rp'))
+                kvp = similarexposures.all().aggregate(
+                    Min('irradeventxraysourcedata__kvp__kvp'),
+                    Max('irradeventxraysourcedata__kvp__kvp'),
+                    Avg('irradeventxraysourcedata__kvp__kvp'))
+                tube_current = similarexposures.all().aggregate(
+                    Min('irradeventxraysourcedata__xraytubecurrent__xray_tube_current'),
+                    Max('irradeventxraysourcedata__xraytubecurrent__xray_tube_current'),
+                    Avg('irradeventxraysourcedata__xraytubecurrent__xray_tube_current'))
+                exp_time = similarexposures.all().aggregate(
+                    Min('irradeventxraysourcedata__exposure_time'),
+                    Max('irradeventxraysourcedata__exposure_time'),
+                    Avg('irradeventxraysourcedata__exposure_time'))
+                pulse_width = similarexposures.all().aggregate(
+                    Min('irradeventxraysourcedata__pulsewidth__pulse_width'),
+                    Max('irradeventxraysourcedata__pulsewidth__pulse_width'),
+                    Avg('irradeventxraysourcedata__pulsewidth__pulse_width'))
 
-            examdata += [
-                event_type,
-                protocol,
-                similarexposures.count(),
-                plane,
-                pulse_rate,
-                fieldsize,
-                filter_material,
-                filter_thick,
-                kvp['irradeventxraysourcedata__kvp__kvp__min'],
-                kvp['irradeventxraysourcedata__kvp__kvp__max'],
-                kvp['irradeventxraysourcedata__kvp__kvp__avg'],
-                tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__min'],
-                tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__max'],
-                tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__avg'],
-                pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__min'],
-                pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__max'],
-                pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__avg'],
-                exp_time['irradeventxraysourcedata__exposure_time__min'],
-                exp_time['irradeventxraysourcedata__exposure_time__max'],
-                exp_time['irradeventxraysourcedata__exposure_time__avg'],
-                dap['dose_area_product__min'],
-                dap['dose_area_product__max'],
-                dap['dose_area_product__avg'],
-                dose_rp['irradeventxraysourcedata__dose_rp__min'],
-                dose_rp['irradeventxraysourcedata__dose_rp__max'],
-                dose_rp['irradeventxraysourcedata__dose_rp__avg'],
-                angle1['irradeventxraymechanicaldata__positioner_primary_angle__min'],
-                angle1['irradeventxraymechanicaldata__positioner_primary_angle__max'],
-                angle1['irradeventxraymechanicaldata__positioner_primary_angle__avg'],
-                angle2['irradeventxraymechanicaldata__positioner_secondary_angle__min'],
-                angle2['irradeventxraymechanicaldata__positioner_secondary_angle__max'],
-                angle2['irradeventxraymechanicaldata__positioner_secondary_angle__avg'],
-            ]
+                examdata += [
+                    event_type,
+                    protocol,
+                    similarexposures.count(),
+                    plane,
+                    pulse_rate,
+                    fieldsize,
+                    filter_material,
+                    filter_thick,
+                    kvp['irradeventxraysourcedata__kvp__kvp__min'],
+                    kvp['irradeventxraysourcedata__kvp__kvp__max'],
+                    kvp['irradeventxraysourcedata__kvp__kvp__avg'],
+                    tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__min'],
+                    tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__max'],
+                    tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__avg'],
+                    pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__min'],
+                    pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__max'],
+                    pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__avg'],
+                    exp_time['irradeventxraysourcedata__exposure_time__min'],
+                    exp_time['irradeventxraysourcedata__exposure_time__max'],
+                    exp_time['irradeventxraysourcedata__exposure_time__avg'],
+                    dap['dose_area_product__min'],
+                    dap['dose_area_product__max'],
+                    dap['dose_area_product__avg'],
+                    dose_rp['irradeventxraysourcedata__dose_rp__min'],
+                    dose_rp['irradeventxraysourcedata__dose_rp__max'],
+                    dose_rp['irradeventxraysourcedata__dose_rp__avg'],
+                    angle1['irradeventxraymechanicaldata__positioner_primary_angle__min'],
+                    angle1['irradeventxraymechanicaldata__positioner_primary_angle__max'],
+                    angle1['irradeventxraymechanicaldata__positioner_primary_angle__avg'],
+                    angle2['irradeventxraymechanicaldata__positioner_secondary_angle__min'],
+                    angle2['irradeventxraymechanicaldata__positioner_secondary_angle__max'],
+                    angle2['irradeventxraymechanicaldata__positioner_secondary_angle__avg'],
+                ]
 
-            if not protocol:
-                protocol = u'Unknown'
-            tab_text = sheet_name(protocol)
-            filter_data = {
-                'filter_material': filter_material,
-                'filter_thick': filter_thick,
-            }
-            for exposure in similarexposures:
-                series_data = _get_series_data(exposure, filter_data)
-                sheetlist[tab_text]['count'] += 1
-                sheetlist[tab_text]['sheet'].write_row(sheetlist[tab_text]['count'], 0, common_exam_data + series_data)
+                if not protocol:
+                    protocol = u'Unknown'
+                tab_text = sheet_name(protocol)
+                filter_data = {
+                    'filter_material': filter_material,
+                    'filter_thick': filter_thick,
+                }
+                for exposure in similarexposures:
+                    series_data = _get_series_data(exposure, filter_data)
+                    sheetlist[tab_text]['count'] += 1
+                    sheetlist[tab_text]['sheet'].write_row(sheetlist[tab_text]['count'], 0, common_exam_data + series_data)
 
-        if num_groups_this_exam > num_groups_max:
-            num_groups_max = num_groups_this_exam
+            if num_groups_this_exam > num_groups_max:
+                num_groups_max = num_groups_this_exam
 
-        wsalldata.write_row(row + 1, 0, examdata)
+            wsalldata.write_row(row + 1, 0, examdata)
+        except ObjectDoesNotExist:
+            error_message = u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number" \
+                            u" {3} - maybe database entry was deleted as part of importing later version of same" \
+                            u" study?".format(
+                                row + 1, tsk.num_records, exams.study_instance_uid, exams.accession_number)
+            logger.error(error_message)
+            wsalldata.write(row + 1, 0, error_message)
 
     tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
@@ -553,42 +562,46 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             modality_type__exact='RF'))
     e = df_filtered_qs.qs
 
-    tsk.progress = u'Required study filter complete.'
-    tsk.save()
-
-    numresults = e.count()
-
-    tsk.num_records = numresults
-    tsk.save()
+    tsk.num_records = e.count()
+    if abort_if_zero_studies(tsk.num_records, tsk):
+        return
 
     headings = _all_data_headers(pid=pid, name=name, patid=patid)
     writer.writerow(headings)
     for i, exams in enumerate(e):
 
-        exam_data = get_common_data(u"RF", exams, pid=pid, name=name, patid=patid)
-
-        for plane in exams.projectionxrayradiationdose_set.get().accumxraydose_set.all():
-            accum = _get_accumulated_data(plane)
-            exam_data += [
-                accum['dose_area_product_total'],
-                accum['dose_rp_total'],
-                accum['fluoro_dose_area_product_total'],
-                accum['fluoro_dose_rp_total'],
-                accum['total_fluoro_time'],
-                accum['acquisition_dose_area_product_total'],
-                accum['acquisition_dose_rp_total'],
-                accum['total_acquisition_time'],
-                accum['eventcount'],
-            ]
-        # Clear out any commas
-        for index, item in enumerate(exam_data):
-            if item is None:
-                exam_data[index] = ''
-            if isinstance(item, basestring) and u',' in item:
-                exam_data[index] = item.replace(u',', u';')
-        writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
-        tsk.progress = u"{0} of {1}".format(i + 1, numresults)
+        tsk.progress = u"{0} of {1}".format(i + 1, tsk.num_records)
         tsk.save()
+
+        try:
+            exam_data = get_common_data(u"RF", exams, pid=pid, name=name, patid=patid)
+
+            for plane in exams.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+                accum = _get_accumulated_data(plane)
+                exam_data += [
+                    accum['dose_area_product_total'],
+                    accum['dose_rp_total'],
+                    accum['fluoro_dose_area_product_total'],
+                    accum['fluoro_dose_rp_total'],
+                    accum['total_fluoro_time'],
+                    accum['acquisition_dose_area_product_total'],
+                    accum['acquisition_dose_rp_total'],
+                    accum['total_acquisition_time'],
+                    accum['eventcount'],
+                ]
+            # Clear out any commas
+            for index, item in enumerate(exam_data):
+                if item is None:
+                    exam_data[index] = ''
+                if isinstance(item, basestring) and u',' in item:
+                    exam_data[index] = item.replace(u',', u';')
+            writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
+        except ObjectDoesNotExist:
+            error_message = u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number" \
+                            u" {3} - maybe database entry was deleted as part of importing later version of same" \
+                            u" study?".format(i + 1, tsk.num_records, exams.study_instance_uid, exams.accession_number)
+            logger.error(error_message)
+            writer.writerow([error_message, ])
 
     tsk.progress = u'All study data written.'
     tsk.save()
