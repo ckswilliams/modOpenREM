@@ -11,6 +11,9 @@ from remapp.models import PatientIDSettings, Exports
 
 
 class ExportCTxlsx(TestCase):
+    """Test class for CT exports to XLSX
+
+    """
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create_user(
@@ -84,3 +87,18 @@ class ExportCTxlsx(TestCase):
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
         task.delete()  # not necessary, by hey, why not?
+
+    def test_zero_filter(self):
+        """Test error handled correctly when empty filter.
+
+        """
+        filter_set = {"study_description": "asd"}
+        pid = True
+        name = False
+        patient_id = True
+
+        ctxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
+
+        task = Exports.objects.all()[0]
+        self.assertEqual(u"ERROR", task.status)
+
