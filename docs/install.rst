@@ -344,6 +344,7 @@ has instructions and links to get you set up with Apache.
 An advanced guide using Apache, including auto-restarting the server when the code changes, has been contributed
 here: :doc:`apache_on_windows`
 
+A guide for using IIS on windows can be found here: :doc:'iis_on_windows'
 
 DICOM Store and query-retrieve
 ------------------------------
