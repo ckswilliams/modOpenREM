@@ -18,7 +18,7 @@ Prerequisites
 =============
 
 + A working OpenREM installation, that serves web pages using the built-in web server.
-    You can test this using the instructions, see :doc:`startservices`
+    You can test this using the instructions in :doc:`startservices`
 
 Steps to perform
 ================
@@ -26,7 +26,7 @@ Steps to perform
 Install wfastcgy Python package
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    - Open a command prompt and go to the python\\script directory if that directory is not in your path
+    - Open a command prompt and navigate to the python\\script directory if that directory is not in your path
     - Type "pip install wfastcgi"
     - Close the command prompt by entering "exit"
 
