@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0b2 (2018-02-??)
 --------------------
+* `#594`_  Display: corrected display of dual-plane DAP and RP dose in RF filtered view
 * `#589`_  Exports: now handles zero studies and studies deleted during exports sensibly
 * `#587`_  Documentation: Added instructions for Linux users to rotate logs
 * `#584`_  Import, Interface, Export: RDSR with pulse level data now function
