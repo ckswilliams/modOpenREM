@@ -186,10 +186,14 @@
                         {% endif %}
                         {{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }}
                         <br>
+                      {% endwith %}
+                    {% endfor %}
                 </a>
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
+                    {% for record in accum_set %}
+                      {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
                         {% if accum_set.count > 1 %}
                             {{ record.acquisition_plane }}:
                         {% endif %}
