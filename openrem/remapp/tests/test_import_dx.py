@@ -6,9 +6,9 @@ import os, datetime
 from decimal import Decimal
 from django.contrib.auth.models import User, Group
 from django.test import TestCase
-from dicom.dataelem import RawDataElement
 from dicom.dataset import Dataset
-from dicom.tag import Tag
+from dicom.dataelem import DataElement
+from dicom.multival import MultiValue
 from remapp.extractors.dx import _xray_filters_prep
 from remapp.models import GeneralStudyModuleAttr, ProjectionXRayRadiationDose, IrradEventXRayData, \
     IrradEventXRaySourceData
@@ -20,7 +20,9 @@ class DXFilterTests(TestCase):
         Test the material extraction process when the materials are in a MultiValue format
         """
         ds = Dataset()
-        ds.FilterMaterial = "aluminum\\copper"
+        multi = MultiValue(str, ["ALUMINUM", "COPPER"])
+        data_el = DataElement(0x187050, "CS", multi, already_converted=True)
+        ds[0x187050] = data_el
         ds.FilterThicknessMinimum = "1.0\\0.1"
         ds.FilterThicknessMaximum = "1.0\\0.1"
 
