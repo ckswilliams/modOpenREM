@@ -46,10 +46,9 @@ are repeated here.
 Web servers
 ===========
 
-Unlike the database, the production webserver can be left till later and
-can be changed again at any time.
+Unlike the database, the production webserver can be left till later and can be changed again at any time. However,
+for performance it is recommended that a production webserver is used instead of the inbuilt 'runserver'.
 
-For performance it is recommended that a production webserver is used instead of the inbuilt 'runserver'.
 Popular choices would be either `Apache <http://httpd.apache.org>`_ or you can do as the cool kids
 do and use `Gunicorn with nginx <http://www.robgolding.com/blog/2011/11/12/django-in-production-part-1---the-stack/>`_.
 

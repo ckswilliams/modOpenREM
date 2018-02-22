@@ -27,28 +27,28 @@ Install wfastcgy Python package
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     - Open a command prompt and navigate to the python\\script directory if that directory is not in your path
-    - Type "pip install wfastcgi"
-    - Close the command prompt by entering "exit"
+    - Type ``pip install wfastcgi``
+    - Close the command prompt by entering ``exit``
 
 Install IIS
 ^^^^^^^^^^^
 
     - Open Control panel
-    - Take care the "view by" is on small or large icons
+    - Take care the ``view by`` is on small or large icons
     - Select Program and Features
     - Select Turn Windows features on or off
-    - Click "Next"
-    - Leave the "Role-based or feature-based installation" radio button selected and click "Next"
-    - Leave the current server highlighted and click "Next"
-    - Scroll to the bottom of the list and check "Web Server (IIS)"
+    - Click ``Next``
+    - Leave the "Role-based or feature-based installation" radio button selected and click ``Next``
+    - Leave the current server highlighted and click ``Next``
+    - Scroll to the bottom of the list and check ``Web Server (IIS)``
     - In the dialog that appears, leave the "Include management tools (if applicable)" checkbox checked and click
-      "Add Features"
-    - On the "Select server roles" step, now that "Web Server (IIS)" is checked, click "Next"
-    - Leave the defaults and click "Next"
-    - On the "Web Server Role (IIS)" step, click "Next"
-    - On the "Select role services" step, scroll down to "Application Development," expand that section, and check the
-      "CGI" box. click "Next."
-    - Click "Install" and after installation, click "Close"
+      ``Add Features``
+    - On the ``Select server roles`` step, now that ``Web Server (IIS)`` is checked, click ``Next``
+    - Leave the defaults and click ``Next``
+    - On the ``Web Server Role (IIS)`` step, click ``Next``
+    - On the ``Select role services`` step, scroll down to ``Application Development,`` expand that section, and check the
+      ``CGI`` box. click ``Next.``
+    - Click ``Install`` and after installation, click ``Close``
     - Close the Server Manager and the Control Panel
 
     To test the IIS installation browse to http://localhost. You should see the default IIS "Welcome" Page.
