@@ -39,7 +39,7 @@ import sys
 import django
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('remapp.extractors.dx')  # Explicitly named so that it is still handled when using __main__
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -68,13 +68,14 @@ def _xrayfilters(filttype, material, thickmax, thickmin, source):
                 filter_types[filttype]["code"], filter_types[filttype]["meaning"]
             )
     if material:
+        logger.debug("In _xrayfilters, attempting to match material {0}".format(material.strip().lower()))
         if material.strip().lower() == 'molybdenum':
             filters.xray_filter_material = get_or_create_cid('C-150F9', 'Molybdenum or Molybdenum compound')
         if material.strip().lower() == 'rhodium':
             filters.xray_filter_material = get_or_create_cid('C-167F9', 'Rhodium or Rhodium compound')
         if material.strip().lower() == 'silver':
             filters.xray_filter_material = get_or_create_cid('C-137F9', 'Silver or Silver compound')
-        if material.strip().lower() == 'aluminum':
+        if material.strip().lower() in ['aluminum', 'aluminium']:  # Illegal spelling of Aluminium found in Philips DiDi
             filters.xray_filter_material = get_or_create_cid('C-120F9', 'Aluminum or Aluminum compound')
         if material.strip().lower() == 'copper':
             filters.xray_filter_material = get_or_create_cid('C-127F9', 'Copper or Copper compound')
@@ -141,7 +142,7 @@ def _xray_filters_prep(dataset, source):
     xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
     xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
 
-    if type(xray_filter_material) is list:
+    if isinstance(xray_filter_material, list):
         _xray_filters_multiple(
             xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source)
     else:
@@ -653,7 +654,7 @@ def _create_event(dataset):
         return 0
     same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
     if same_study_uid.count() != 1:
-        print(u"Duplicate study UIDs in database! Could be a problem.")
+        logger.warning(u"Duplicate study UIDs in database! Could be a problem.")
         for dup in same_study_uid:
             if dup.modality_type:
                 same_study_uid = dup
@@ -708,6 +709,7 @@ def _dx2db(dataset):
         g = GeneralStudyModuleAttr.objects.create()
         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
         g.save()
+        logger.debug("Started importing DX with Study Instance UID of {0}".format(g.study_instance_uid))
         # check again
         study_in_db = check_uid.check_uid(study_uid)
         if study_in_db == 1:
