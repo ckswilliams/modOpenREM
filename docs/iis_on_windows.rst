@@ -1,8 +1,9 @@
-***********************************************
-Running OpenREM on Windows Server 2012 with IIS
-***********************************************
+***********************************
+Running OpenREM on Windows with IIS
+***********************************
 
-These instructions are for running OpenREM under IIS on Windows.
+These instructions are for running OpenREM under IIS on Windows Server 2012, but should work on Windows 7/8/10 and
+later versions of Windows Server with minimal modification.
 The instructions are based on http://blog.mattwoodward.com/2016/07/running-django-application-on-windows.html
 
 Why using IIS
