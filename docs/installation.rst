@@ -64,8 +64,8 @@ Our recommendations for Windows and Linux are:
     :maxdepth: 2
 
     iis_on_windows
+    nginx_on_linux
 
-(yet to write the nginx/gunicorn doc)
 
 
 **Below to be deleted**
