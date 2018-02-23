@@ -47,8 +47,8 @@ Install IIS
     - On the ``Select server roles`` step, now that ``Web Server (IIS)`` is checked, click ``Next``
     - Leave the defaults and click ``Next``
     - On the ``Web Server Role (IIS)`` step, click ``Next``
-    - On the ``Select role services`` step, scroll down to ``Application Development,`` expand that section, and check the
-      ``CGI`` box. click ``Next.``
+    - On the ``Select role services`` step, scroll down to ``Application Development``, expand that section, and check the
+      ``CGI`` box. click ``Next``.
     - Click ``Install`` and after installation, click ``Close``
     - Close the Server Manager and the Control Panel
 
@@ -77,7 +77,7 @@ Configure IIS
     - As ``Value`` enter ``openremproject.settings``
     - Click Add again and add a variable with name ``PYTHON_PATH`` and value the path to the openrem path,
       e.g. ``C:\Python27\Lib\site-packages\openrem``
-    - Click Add for the third time and a variable with name ``WSGI_HANDLER ``and value
+    - Click Add for the third time and a variable with name ``WSGI_HANDLER `` and value
       ``django.core.wsgi.get_wsgi_application()``
     - Click twice ``Ok`` to close the ``EnviromentVariables Collection Editor`` and the ``Add FastCGI Application dialog``
     - Start Windows Explorer and browse to the openrem directory, e.g. ``C:\Python27\Lib\site-packages\openrem``
