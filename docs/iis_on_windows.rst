@@ -27,7 +27,7 @@ Steps to perform
 Install wfastcgy Python package
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    - Open a command prompt and navigate to the python\\script directory if that directory is not in your path
+    - Open a command prompt and navigate to the python\script directory if that directory is not in your path
     - Type ``pip install wfastcgi``
     - Close the command prompt by entering ``exit``
 
@@ -62,8 +62,8 @@ Configure IIS
     - Click No if a pop-up about the Web Platform Components appears
     - Double-click on the ``FastCGI Settings`` icon
     - In the right pane under ``actions`` click ``Add Application...``
-    - In the ``Full Path`` box type the path to the Python executable, e.g.: ``c:\\python27\\python.exe``
-    - In the ``Arguments`` box type the path to wfastcgi.py file, e.g.: ``c:\\python27\\Lib\\site-packages\\wfastcgi.py``.
+    - In the ``Full Path`` box type the path to the Python executable, e.g.: ``c:\python27\python.exe``
+    - In the ``Arguments`` box type the path to wfastcgi.py file, e.g.: ``c:\python27\Lib\site-packages\wfastcgi.py``.
 
     ..  Note::
 
@@ -76,11 +76,11 @@ Configure IIS
       ``Name`` by ``DJANGO_SETTINGS_MODULE`` (caption is important)
     - As ``Value`` enter ``openremproject.settings``
     - Click Add again and add a variable with name ``PYTHON_PATH`` and value the path to the openrem path,
-      e.g. ``C:\\Python27\\Lib\\site-packages\\openrem``
+      e.g. ``C:\Python27\Lib\site-packages\openrem``
     - Click Add for the third time and a variable with name ``WSGI_HANDLER ``and value
       ``django.core.wsgi.get_wsgi_application()``
     - Click twice ``Ok`` to close the ``EnviromentVariables Collection Editor`` and the ``Add FastCGI Application dialog``
-    - Start Windows Explorer and browse to the openrem directory, e.g. ``C:\\Python27\\Lib\\site-packages\\openrem``
+    - Start Windows Explorer and browse to the openrem directory, e.g. ``C:\Python27\Lib\site-packages\openrem``
     - Right click on the folder and choose properties. In the security tab, make sure ``SYSTEM`` (local system) has
       ``Full control`` for this directory and the subdirectories.
     - The same applies for the MEDIA_ROOT (as configured in local_settings.py; default ``c:/Temp/OpenREM/media``)
@@ -93,7 +93,7 @@ Create a new website
     - Right-click on sites and click ``Add Website...``
     - Enter as sitename ``OpenREM``
     - As physical path enter the same path as the ``PYTHON_PATH`` in de FastCGI settings above,
-      e.g. ``C:\\Python27\\Lib\\site-packages\\openrem``
+      e.g. ``C:\Python27\Lib\site-packages\openrem``
     - Set the port to the port you desire. If you wish to use the default port 80, you need to stop and/or remove  the
       default website or change the port of the default website
 
@@ -105,8 +105,8 @@ Configure the new website
     - In the right pane, under ``Actions``, click ``Add Module Mappings``
     - In the ``Request Path`` box enter an asterix (``*``)
     - In the ``Module`` box select ``FastCgiModule`` (not the CgiModule)
-    - In the ``Executable`` box enter ``path\\to\\python-executable|path\\to\\wfastcgi.py``,
-      e.g.: ``c:\\python27\\python.exe|c:\\python27\\Lib\\site-packages\\wfastcgi.py``.
+    - In the ``Executable`` box enter ``path\to\python-executable|path\to\wfastcgi.py``,
+      e.g.: ``c:\python27\python.exe|c:\python27\Lib\site-packages\wfastcgi.py``.
 
     ..  Note::
 
@@ -127,19 +127,19 @@ Configure Django and IIS to serve static files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     - Create a directory called ``static`` in your openrem directory,
-      e.g. ``C:\\Python27\\Lib\\site-packages\\openrem\\static``
+      e.g. ``C:\Python27\Lib\site-packages\openrem\static``
     - In the Openrem local settingsfile, located in the openremproject directory
-      (e.g. ``C:\\Python27\\Lib\\site-packages\\openrem\\oprenremproject\\local_settings.py``) find the ``STATIC_ROOT`` variable
+      (e.g. ``C:\Python27\Lib\site-packages\openrem\oprenremproject\local_settings.py``) find the ``STATIC_ROOT`` variable
       and set the value to match the directory you just created. The backslashes should be replaced by forward slashed.
       e.g. ``STATIC_ROOT = 'C:/Python27/Lib/site-packages/openrem/static'``
-    - Open a command prompt and navigate to the openrem directory, e.g. ``C:\\Python27\\Lib\\site-packages\\openrem``
+    - Open a command prompt and navigate to the openrem directory, e.g. ``C:\Python27\Lib\site-packages\openrem``
     - Type ``python manage.py collectstatic``
     - Type ``Yes`` to confirm if the static root directory mentioned is correct
     - Close the command prompt by typing ``exit``
     - In IIS right-click on the OpenREM website (under Sites)
     - Click ``Add Virtual Directory``
     - Type ``static`` as alias and the path to the static directoy as ``Physical Path``,
-      e.g. ``C:\\Python27\\Lib\\site-packages\\openrem\\static``
+      e.g. ``C:\Python27\Lib\site-packages\openrem\static``
     - Click ``Ok`` to close the dialog box
     - Click on the ``static`` directory in IIS within the OpenREM site (unfold the OpenREM site)
     - Double click on the ``Handler Mappings`` icon in the middle pane
