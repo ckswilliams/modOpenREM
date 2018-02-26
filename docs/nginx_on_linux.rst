@@ -58,7 +58,7 @@ Now delete the default nginx configuration from ``sites-enabled`` and make a lin
     sudo ln -s /etc/nginx/sites-available/openrem-server /etc/nginx/sites-enabled/openrem-server
 
 Now we reload nginx and start our server as before to test this step. At this stage, nginx is simply passing requests to
-the default port (80) on to port 8000 to be dealt with (which is why we need to start the test server again.
+the default port (80) on to port 8000 to be dealt with (which is why we need to start the test server again).
 
 .. sourcecode:: bash
 
@@ -69,3 +69,85 @@ the default port (80) on to port 8000 to be dealt with (which is why we need to 
 
 Now use your web browser to look at your server again - the 'Welcome to nginx' page should be replaced by an ugly
 version of the OpenREM website - this is because the 'static' files are not yet being served - we'll fix this later.
+
+Replace runserver with Gunicorn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Activate your virtualenv if you are using one (add sudo if your aren't), and:
+
+.. sourcecode:: bash
+
+    pip install gunicorn
+
+Make sure you have stopped the test webserver (``Ctrl-c`` in the shell ``runserver`` is running in), then from the same
+openrem folder:
+
+.. sourcecode:: bash
+
+    gunicorn openremproject.wsgi:application
+
+The Gunicorn server should start, and you should be able to see the same broken version of the web interface again.
+
+Serve static files using nginx
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Create a folder called ``static`` somewhere that your webserver user will be able to get to - for example alongside the
+``media`` folder. For example, if you created your media folder in ``/var/openrem/media``. We will need to make user the
+permissions will be suitable. For example:
+
+.. sourcecode:: bash
+
+    sudo mkdir /var/openrem/static
+    sudo chown $USER:www-data /var/openrem/static
+    sudo chmod 755 /var/openrem/static
+
+Now edit your ``openrem/openremproject/local_settings.py`` config file to put the same path in the ``STATIC_ROOT``:
+
+.. sourcecode:: bash
+
+    nano local_settings.py
+
+    # Find the static files section
+    STATIC_ROOT = '/var/openrem/static'  # replacing path as appropriate
+
+Now use the Django ``manage.py`` application to pull all the static files into the new folder:
+
+.. sourcecode:: bash
+
+    python manage.py collectstatic
+
+Now we need to tell nginx to serve them:
+
+.. sourcecode:: bash
+
+    sudo nano /etc/nginx/sites-available/openrem-server
+
+And modify the file to add the ``static`` section - remember to put the path you have used instead of
+``/var/openrem/static``
+
+.. sourcecode:: nginx
+
+    server {
+        listen 80;
+        server_name openrem-server;
+
+        location /static {
+            alias /var/openrem/static;
+        }
+
+        location / {
+            proxy_pass http://localhost:8000;
+        }
+    }
+
+Now reload nginx and gunicorn to see if it is all working...
+
+.. sourcecode:: bash
+
+    sudo systemctl reload nginx
+    # activate your virtual environment if you are using one
+    # navigate to the openrem folder with manage.py in
+    gunicorn openremproject.wsgi:application
+
+Take another look, and it should all be looking nice now!
+
