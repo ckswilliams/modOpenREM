@@ -91,6 +91,8 @@ Configure IIS
       e.g. ``C:\Python27\Lib\site-packages\openrem``
     - Click Add for the third time and a variable with name ``WSGI_HANDLER`` and value
       ``django.core.wsgi.get_wsgi_application()``
+    - Under ``FastCGI properties`` find the ``Activity Timeout`` entry and increase the value to 300. This is to ensure
+      that the server allows enough time for skin dose map data to be calculated.
     - Click twice ``Ok`` to close the ``EnviromentVariables Collection Editor`` and the ``Add FastCGI Application dialog``
     - Start Windows Explorer and browse to the openrem directory, e.g. ``C:\Python27\Lib\site-packages\openrem``
     - Right click on the folder and choose properties. In the security tab, make sure ``SYSTEM`` (local system) has
