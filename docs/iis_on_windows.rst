@@ -101,14 +101,14 @@ Configure IIS
 Create a new website
 ^^^^^^^^^^^^^^^^^^^^
 
-    - In the IIS manager under connections expand the three under server name
+    - In the IIS manager under connections expand the tree under server name
     - Right-click on sites and click ``Add Website...``
     - Enter as sitename ``OpenREM``
     - As physical path enter the same path as the ``PYTHON_PATH`` in the ``FastCGI`` settings above,
       e.g. ``C:\Python27\Lib\site-packages\openrem``
     - Set the port to the port you desire. If you wish to use the default port 80, you need to stop and/or remove  the
       default website or change the port of the default website
-    - Click ``OK`` (Windows 10 only?)
+    - Click ``OK``
 
 Configure the new website
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -132,6 +132,17 @@ Configure the new website
     - Click ``Ok`` twice to close the Request Restrictions dialog and the Add Module Mapping dialog
     - When prompted ``Do you want to create a FastCGI application for this executable?`` click ``No``
 
+Modify the application pool identity setting
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    - In the IIS manager under connections expand the tree under server name
+    - Left-click on the ``Application Pools`` item. The middle window pane now displays a table called ``Application Pools``
+    - In the middle window pane right-hand click on the OpenREM table row and choose ``Advanced settings``
+    - Under the ``Process Model`` heading there is an ``Identity`` option which is set to ``ApplicationPoolIdentity`` by default
+    - Change the ``Identity`` setting from ``ApplicationPoolIdentity`` to ``LocalSystem`` by clicking on ``ApplicationPoolIdentity`` and then selecting the three dots to the right of the box
+    - Click ``OK`` to dismiss the ``Advanced Settings``
+    
+
     The website should work now: browse to http://localhost:port (port is the number you configured the website on.
     If the port is 80, you can omit the colon and port number).
 
@@ -143,7 +154,7 @@ Configure Django and IIS to serve static files
 
     - Create a directory called ``static`` in your openrem directory,
       e.g. ``C:\Python27\Lib\site-packages\openrem\static``
-    - In the Openrem local settingsfile, located in the openremproject directory
+    - In the Openrem ``local_settings.py`` file, located in the openremproject directory
       (e.g. ``C:\Python27\Lib\site-packages\openrem\oprenremproject\local_settings.py``) find the ``STATIC_ROOT`` variable
       and set the value to match the directory you just created. The backslashes should be replaced by forward slashed.
       e.g. ``STATIC_ROOT = 'C:/Python27/Lib/site-packages/openrem/static'``
