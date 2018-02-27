@@ -151,3 +151,38 @@ Now reload nginx and gunicorn to see if it is all working...
 
 Take another look, and it should all be looking nice now!
 
+Switch to using Unix Sockets
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This step is optional, but does allow you more flexibility if you need to do anything else on this server using port
+8000 as this installation of OpenREM will no longer be using that port. Instead we'll use 'sockets', which are like
+files on the disk. We put these in ``/tmp/``.
+
+Change the nginx configuration again (``sudo nano /etc/nginx/sites-available/openrem-server``):
+
+.. sourcecode:: nginx
+
+    server {
+        listen 80;
+        server_name openrem-server;
+
+        location /static {
+            alias /var/openrem/static;
+        }
+
+        location / {
+            proxy_pass http://unix:/tmp/openrem-server.socket;
+        }
+    }
+
+Now restart Gunicorn, this time telling it to use the socket, after reloading nginx:
+
+.. sourcecode:: bash
+
+    sudo systemctl reload nginx
+    gunicorn --bind unix:/tmp/openrem-server.socket \
+    openremproject.wsgi:application
+
+The ``\`` just allows the command to spread to two lines - feel free to put it all on one line.
+
+Check the web interface again, hopefully it should still be working!
