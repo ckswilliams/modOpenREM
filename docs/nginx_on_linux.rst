@@ -186,3 +186,149 @@ Now restart Gunicorn, this time telling it to use the socket, after reloading ng
 The ``\`` just allows the command to spread to two lines - feel free to put it all on one line.
 
 Check the web interface again, hopefully it should still be working!
+
+Start Gunicorn automatically
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We can use systemd on Ubuntu to ensure Gunicorn starts on boot and restarts if it crashes. As before, change each
+instance of ``openrem-server`` for the name of your server. You will need to change the ``WorkingDirectory`` to match
+the path to your openrem folder.
+
+For the gunicorn command, you will need to provide the full path to gunicorn, whether that is in
+``/usr/local/bin/gunicorn`` or the bin folder of your virtualenv.
+
+.. sourcecode:: bash
+
+    # Customise the name of the file as you please - it must end in .service
+     sudo nano /etc/systemd/system/gunicorn-openrem-server.service
+
+.. sourcecode:: systemd
+
+    [Unit]
+    Description=Gunicorn server for openrem-server
+
+    [Service]
+    Restart=on-failure
+    User=www-data
+    WorkingDirectory=/usr/local/lib/python2.7/dist-packages/openrem
+
+    ExecStart=/usr/local/bin/gunicorn \
+        --bind unix:/tmp/openrem-server.socket \
+    openremproject.wsgi:application
+
+    [Install]
+    WantedBy=multi-user.target
+
+Make sure you have customised the `WorkingDirectory` path, the path to gunicorn, and the name of the socket file.
+
+Now enable the new configuration:
+
+.. sourcecode:: bash
+
+    # Load to config
+    sudo systemctl daemon-reload
+    # Enable start on boot - change the name as per how you created it
+    sudo systemctl enable gunicorn-openrem-server.service
+    # Now start the service
+    sudo systemctl start gunicorn-openrem-server.service
+
+ You might like to see if it worked...
+
+.. sourcecode:: bash
+
+    sudo systemctl status gunicorn-openrem-server.service
+
+Look for Active: active (running)
+
+
+Making use of ALLOWED_HOSTS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The default setting of ``ALLOWED_HOSTS`` is ``*`` which isn't secure, but is convenient! We should really change this
+to match the hostname of the server.
+
+If your hostname is ``openrem-server``, and the fully qualified domain name is ``openrem-server.ad.hospital.org`` and
+IP address is ``10.212.18.209``, then you might configure ``ALLOWED_HOSTS`` to:
+
+.. sourcecode:: python
+
+    ALLOWED_HOSTS = [
+        'openrem-server',
+        'openrem-server.ad.hospital.org',
+        '10.212.18.209',
+    ]
+
+Next we need to edit the nginx configuration again to make sure Django can see the hostname by adding the
+``proxy_set_header`` configuration:
+
+.. sourcecode:: bash
+
+    sudo nano /etc/nginx/sites-available/openrem-server
+
+.. sourcecode:: nginx
+
+    server {
+        listen 80;
+        server_name openrem-server;
+
+        location /static {
+            alias /var/openrem/static;
+        }
+
+        location / {
+            proxy_pass http://unix:/tmp/openrem-server.socket;
+            proxy_set_header Host $host;
+        }
+    }
+
+Now reload the nginx configuration and reload Gunicorn:
+
+.. sourcecode:: bash
+
+    sudo systemctl reload nginx
+    sudo systemctl restart gunicorn-openrem-server.service
+
+And check the web interface again. If it doesn't work due to the ``ALLOWED_HOSTS`` setting, you will get a 'Bad request
+400' error.
+
+Troubleshooting and tips
+========================
+
+less
+^^^^
+Use ``less`` to review files without editing them
+
+* Navigate using arrow keys, page up and down,
+* ``Shift-G`` to go to the end
+* ``Shift-F`` to automatically update as new logs are added. ``Ctrl-C`` to stop.
+* ``/`` to search
+
+nano
+^^^^
+Use ``nano`` to edit the files.
+
+* ``Ctrl-o`` to save ('out')
+* ``Ctrl-x`` to exit
+
+Nginx
+^^^^^
+
+* Logs are located in ``/var/log/nginx/``
+* You need root privileges to view the files:
+
+    * To view latest error log: ``sudo less /var/log/nginx/error.log``
+
+* Reload: ``sudo systemctl reload nginx``
+* Check nginx config: ``sudo nginx -t``
+
+Systemd and Gunicorn
+^^^^^^^^^^^^^^^^^^^^
+
+* Review the logs with ``sudo journalctl -u gunicorn-openrem-server`` (change as appropriate for the the name you have
+  used)
+* Check the systemd configuration with ``systemd-analyze verify /etc/systemd/system/gunicorn-openrem-server.service`` -
+  again changing the name as appropriate.
+* If you make changes, you need to use ``sudo systemctl daemon-reload`` before the changes will take effect.
+* Restart: ``sudo systemctl restart gunicorn-openrem-server.service``
+
+
