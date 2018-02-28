@@ -4,7 +4,10 @@ Running OpenREM on Linux with Gunicorn and NGINX
 
 These instructions are for running OpenREM with Gunicorn and NGINX on Ubuntu Server, but should work on other Linux
 distributions with minimal modification.
-These instructions are based on https://www.obeythetestinggoat.com/book/chapter_making_deployment_production_ready.html
+These instructions are based on a guide at
+`obeythetestingoat.com <https://www.obeythetestinggoat.com/book/chapter_making_deployment_production_ready.html>`_
+
+
 
 Prerequisites
 =============
@@ -219,7 +222,7 @@ For the gunicorn command, you will need to provide the full path to gunicorn, wh
     [Install]
     WantedBy=multi-user.target
 
-Make sure you have customised the `WorkingDirectory` path, the path to gunicorn, and the name of the socket file.
+Make sure you have customised the ``WorkingDirectory`` path, the path to gunicorn, and the name of the socket file.
 
 Now enable the new configuration:
 
@@ -232,13 +235,13 @@ Now enable the new configuration:
     # Now start the service
     sudo systemctl start gunicorn-openrem-server.service
 
- You might like to see if it worked...
+You might like to see if it worked...
 
 .. sourcecode:: bash
 
     sudo systemctl status gunicorn-openrem-server.service
 
-Look for Active: active (running)
+Look for ``Active: active (running)``
 
 
 Making use of ALLOWED_HOSTS
