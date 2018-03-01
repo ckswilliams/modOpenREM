@@ -294,6 +294,94 @@ Now reload the nginx configuration and reload Gunicorn:
 And check the web interface again. If it doesn't work due to the ``ALLOWED_HOSTS`` setting, you will get a 'Bad request
 400' error.
 
+Increasing the timeout
+^^^^^^^^^^^^^^^^^^^^^^
+
+You may wish to do this to allow for :doc:`skindosemap` that can take more than 30 seconds for complex studies. Both
+Gunicorn and nginx configurations need to be modified:
+
+.. sourcecode:: bash
+
+     sudo nano /etc/systemd/system/gunicorn-openrem-server.service
+
+Add the ``--timeout`` setting to the end of the ``ExecStart`` command, time is in seconds (300s = 5 minutes,
+1200s = 20 minutes)
+
+.. sourcecode:: systemd
+
+    [Unit]
+    Description=Gunicorn server for openrem-server
+
+    [Service]
+    Restart=on-failure
+    User=www-data
+    WorkingDirectory=/usr/local/lib/python2.7/dist-packages/openrem
+
+    ExecStart=/usr/local/bin/gunicorn \
+        --bind unix:/tmp/openrem-server.socket \
+        openremproject.wsgi:application --timeout 300
+
+    [Install]
+    WantedBy=multi-user.target
+
+
+.. sourcecode:: bash
+
+    sudo nano /etc/nginx/sites-available/openrem-server
+
+Add the ``proxy_read_timeout`` setting in seconds
+
+.. sourcecode:: nginx
+
+    server {
+        listen 80;
+        server_name openrem-server;
+
+        location /static {
+            alias /var/openrem/static;
+        }
+
+        location / {
+            proxy_pass http://unix:/tmp/openrem-server.socket;
+            proxy_set_header Host $host;
+            proxy_read_timeout 1200s;
+        }
+    }
+
+Reload everything:
+
+.. sourcecode:: bash
+
+    sudo systemctl daemon-reload
+    sudo systemctl restart gunicorn-openrem-server.service
+    sudo systemctl reload nginx
+
+.. Note::
+
+    If you have jumped straight to here to get the final config, then make sure you substitute all the following values
+    to suit your install:
+
+    * ``gunicorn-openrem-server.service`` - name not important (except the ``.service``, but you need to use it in the
+      reload commands etc
+    * ``User=www-data`` as appropriate. This should either be your user or ``www-data``. You will need to ensure folder
+      permissions correspond
+    * ``WorkingDirectory`` needs to match the path to your ``openrem`` folder (the one with ``manage.py`` in)
+    * ``ExecStart=/usr/local/bin/gunicorn \`` needs to match the path to your ``gunicorn`` executable - either in your
+      virtualenv bin folder or system wide as per the example
+    * ``--bind unix:/tmp/openrem-server.socket \`` name in ``tmp`` doesn't matter, needs to match in gunicorn and nginx
+      configs
+    * ``/etc/nginx/sites-available/openrem-server`` ie name of config file in nginx, doesn't matter, usually matches
+      hostname
+    * ``server_name openrem-server`` - should match hostname
+    * ``/var/openrem/static`` folder must exist, with the right permissions. Location not important, must match setting
+      in ``local_settings``
+    * ``proxy_pass http://unix:/tmp/openrem-server.socket;`` must match setting in gunicorn config, prefixed with
+      ``http://``
+
+    You will also need to ``collectstatic``, symlink the nginx configuration into enabled, enabled the gunicorn systemd
+    config to start on reboot, and you should configure the ``ALLOWED_HOST`` setting. And you will need to have
+    installed nginx and gunicorn!
+
 Troubleshooting and tips
 ========================
 
