@@ -304,8 +304,8 @@ Gunicorn and nginx configurations need to be modified:
 
      sudo nano /etc/systemd/system/gunicorn-openrem-server.service
 
-Add the ``--timeout`` setting to the end of the ``ExecStart`` command, time is in seconds (300s = 5 minutes,
-1200s = 20 minutes)
+Add the ``--timeout`` setting to the end of the ``ExecStart`` command, time is in seconds (300 = 5 minutes,
+1200 = 20 minutes)
 
 .. sourcecode:: systemd
 
@@ -329,7 +329,7 @@ Add the ``--timeout`` setting to the end of the ``ExecStart`` command, time is i
 
     sudo nano /etc/nginx/sites-available/openrem-server
 
-Add the ``proxy_read_timeout`` setting in seconds
+Add the ``proxy_read_timeout`` setting in seconds (note the trailing ``s`` this time).
 
 .. sourcecode:: nginx
 
@@ -378,7 +378,7 @@ Reload everything:
     * ``proxy_pass http://unix:/tmp/openrem-server.socket;`` must match setting in gunicorn config, prefixed with
       ``http://``
 
-    You will also need to ``collectstatic``, symlink the nginx configuration into enabled, enabled the gunicorn systemd
+    You will also need to ``collectstatic``, symlink the nginx configuration into enabled, enable the gunicorn systemd
     config to start on reboot, and you should configure the ``ALLOWED_HOST`` setting. And you will need to have
     installed nginx and gunicorn!
 
