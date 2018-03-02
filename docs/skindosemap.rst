@@ -9,10 +9,10 @@ Functionality that is available
 * Skin dose map data is calculated to the surface of a simple geometric phantom
   using the in-built `openSkin`_ routines (3D phantom)
 * The calculated doses include kVp-dependent backscatter factors, and account
-  for any copper filters. Aluminium or other filters are not considered.
+  for any copper filters; aluminium or other filters are not considered
 * The phantom dimensions are calculated from the height and mass of the
-  patient. Defaults of 1.786 m and 73.2 kg are used when patient height and mass
-  are not available.
+  patient; defaults of 1.786 m and 73.2 kg are used when patient height and mass
+  are not available
 * Data can be calculated on import to OpenREM, or on demand when a study is
   viewed
 * Data is recalculated automatically if the patient height or mass stored in
@@ -37,18 +37,6 @@ The phantom consists of a cuboid with one semi-cylinder on each side (see
 2D visualisation of the 3D data
 ===============================
 
-This is a 2D view of the whole surface of the 3D phantom, as though the phantom
-surface has been peeled off and laid out flat. The 2D visualisation includes
-the following features:
-
-* The skin dose at the mouse pointer is shown as a tool-tip
-* Moving the mouse whilst holding down the left-hand mouse button changes the
-  window level and width of the displayed skin dose map
-* An overlay indicating the phantom regions and orientation can be toggled on
-  and off. This indicates the phantom anterior, left, posterior and right
-  sides, and also shows the superior and inferior ends
-* The current view can be saved as a png file
-
 .. figure:: img/skinDoseMap2D.png
    :figwidth: 50%
    :align: right
@@ -65,8 +53,28 @@ the following features:
 
    Figure 2: Phantom region overlay
 
+This is a 2D view of the whole surface of the 3D phantom, as though the phantom
+surface has been peeled off and laid out flat (figure 1). The 2D visualisation
+includes the following features:
+
+* The skin dose at the mouse pointer is shown as a tool-tip
+* Moving the mouse whilst holding down the left-hand mouse button changes the
+  window level and width of the displayed skin dose map
+* An overlay indicating the phantom regions and orientation can be toggled on
+  and off. This indicates the phantom anterior, left, posterior and right
+  sides, and also shows the superior and inferior ends (figure 2)
+* The current view can be saved as a png file
+
 3D visualisation
 ================
+
+.. figure:: img/skinDoseMap3D.png
+   :figwidth: 50%
+   :align: right
+   :alt: 3D visualisation of the skin dose map data
+   :target: _images/skinDoseMap3D.png
+
+   Figure 3: 3D visualisation of the data
 
 This is a 3D view of the phantom that was used for the calculations, with the
 skin dose map overlaid onto the surface. The 3D visualisation includes the
@@ -79,14 +87,6 @@ following features:
   to enable the viewer to orientate themselves when viewing the 3D skin dose
   map
 * The current view can be saved as a png file
-
-.. figure:: img/skinDoseMap3D.png
-   :figwidth: 50%
-   :align: right
-   :alt: 3D visualisation of the skin dose map data
-   :target: _images/skinDoseMap3D.png
-
-   Figure 3: 3D visualisation of the data
 
 .. figure:: img/skinDoseMapColourScales.png
    :figwidth: 30%
