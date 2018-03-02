@@ -49,14 +49,6 @@ This is a 2D view of the whole surface of the 3D phantom, as though the phantom
 surface has been peeled off and laid out flat (figure 1). The 2D visualisation
 includes the following features:
 
-.. figure:: img/skinDoseMap2DincOverlay.png
-   :figwidth: 30%
-   :align: right
-   :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
-   :target: _images/skinDoseMap2DincOverlay.png
-
-   Figure 2: Phantom region overlay
-
 * The skin dose at the mouse pointer is shown as a tool-tip
 * Moving the mouse whilst holding down the left-hand mouse button changes the
   window level and width of the displayed skin dose map
@@ -65,8 +57,20 @@ includes the following features:
   sides, and also shows the superior and inferior ends (figure 2)
 * The current view can be saved as a png file
 
+.. figure:: img/skinDoseMap2DincOverlay.png
+   :figwidth: 30%
+   :align: right
+   :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
+   :target: _images/skinDoseMap2DincOverlay.png
+
+   Figure 2: Phantom region overlay
+
 3D visualisation
 ================
+
+This is a 3D view of the phantom that was used for the calculations, with the
+skin dose map overlaid onto the surface. The 3D visualisation includes the
+following features:
 
 .. figure:: img/skinDoseMap3D.png
    :figwidth: 30%
@@ -75,10 +79,6 @@ includes the following features:
    :target: _images/skinDoseMap3D.png
 
    Figure 3: 3D visualisation of the data
-
-This is a 3D view of the phantom that was used for the calculations, with the
-skin dose map overlaid onto the surface. The 3D visualisation includes the
-following features:
 
 * Moving the mouse whilst holding down the left-hand mouse button rotates the
   3D model
