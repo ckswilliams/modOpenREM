@@ -55,7 +55,6 @@ includes the following features:
 * An overlay indicating the phantom regions and orientation can be toggled on
   and off. This indicates the phantom anterior, left, posterior and right
   sides, and also shows the superior and inferior ends (figure 2)
-* The current view can be saved as a png file
 
 .. figure:: img/skinDoseMap2DincOverlay.png
    :figwidth: 30%
@@ -65,12 +64,18 @@ includes the following features:
 
    Figure 2: Phantom region overlay
 
+* The current view can be saved as a png file
+
 3D visualisation
 ================
 
 This is a 3D view of the phantom that was used for the calculations, with the
 skin dose map overlaid onto the surface. The 3D visualisation includes the
 following features:
+
+* Moving the mouse whilst holding down the left-hand mouse button rotates the
+  3D model
+* Using the mouse wheel zooms in and out
 
 .. figure:: img/skinDoseMap3D.png
    :figwidth: 30%
@@ -80,9 +85,7 @@ following features:
 
    Figure 3: 3D visualisation of the data
 
-* Moving the mouse whilst holding down the left-hand mouse button rotates the
-  3D model
-* Using the mouse wheel zooms in and out
+
 * A simple 3D model of a person is displayed in the bottom left corner. This is
   to enable the viewer to orientate themselves when viewing the 3D skin dose
   map
