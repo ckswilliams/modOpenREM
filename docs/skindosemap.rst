@@ -8,8 +8,9 @@ Functionality that is available
 
 * Skin dose map data is calculated to the surface of a simple geometric phantom
   using the in-built `openSkin`_ routines (3D phantom)
-* The calculated doses include kVp-dependent backscatter factors, and account
-  for any copper filters; aluminium or other filters are not considered
+* The calculated doses include kVp-dependent backscatter factors and account
+  for any copper filters using data from `this paper`_; aluminium or other
+  filters are not considered
 * The phantom dimensions are calculated from the height and mass of the
   patient; defaults of 1.786 m and 73.2 kg are used when patient height and mass
   are not available
@@ -243,3 +244,4 @@ want to do, please do go ahead and feed back your findings to Jonathan Cole at
 .. _`GIMP`: http://www.gimp.org/
 .. _ImageJ: http://imagej.nih.gov/ij/download.html
 .. _`openSkin downloads`: http://bitbucket.org/openskin/openskin/downloads
+.. _`this paper`:  https://doi.org/10.1088/0031-9155/56/22/012
