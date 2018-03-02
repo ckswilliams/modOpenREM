@@ -45,6 +45,10 @@ The phantom consists of a cuboid with one semi-cylinder on each side (see
    
    Figure 1: 2D visualisation of the 3D data
 
+This is a 2D view of the whole surface of the 3D phantom, as though the phantom
+surface has been peeled off and laid out flat (figure 1). The 2D visualisation
+includes the following features:
+
 .. figure:: img/skinDoseMap2DincOverlay.png
    :figwidth: 30%
    :align: right
@@ -52,10 +56,6 @@ The phantom consists of a cuboid with one semi-cylinder on each side (see
    :target: _images/skinDoseMap2DincOverlay.png
 
    Figure 2: Phantom region overlay
-
-This is a 2D view of the whole surface of the 3D phantom, as though the phantom
-surface has been peeled off and laid out flat (figure 1). The 2D visualisation
-includes the following features:
 
 * The skin dose at the mouse pointer is shown as a tool-tip
 * Moving the mouse whilst holding down the left-hand mouse button changes the
