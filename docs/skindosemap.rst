@@ -88,14 +88,6 @@ following features:
   map
 * The current view can be saved as a png file
 
-.. figure:: img/skinDoseMapColourScales.png
-   :figwidth: 30%
-   :align: right
-   :alt: Colour scale choices
-   :target: _images/skinDoseMapColourScales.png
-
-   Figure 4: Colour scale choices
-
 **********************
 Skin dose map settings
 **********************
