@@ -38,7 +38,7 @@ The phantom consists of a cuboid with one semi-cylinder on each side (see
 ===============================
 
 .. figure:: img/skinDoseMap2D.png
-   :figwidth: 50%
+   :figwidth: 30%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map data
    :target: _images/skinDoseMap2D.png
@@ -46,7 +46,7 @@ The phantom consists of a cuboid with one semi-cylinder on each side (see
    Figure 1: 2D visualisation of the 3D data
 
 .. figure:: img/skinDoseMap2DincOverlay.png
-   :figwidth: 50%
+   :figwidth: 30%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
    :target: _images/skinDoseMap2DincOverlay.png
@@ -69,7 +69,7 @@ includes the following features:
 ================
 
 .. figure:: img/skinDoseMap3D.png
-   :figwidth: 50%
+   :figwidth: 30%
    :align: right
    :alt: 3D visualisation of the skin dose map data
    :target: _images/skinDoseMap3D.png
