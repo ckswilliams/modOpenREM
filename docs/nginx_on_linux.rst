@@ -344,7 +344,7 @@ Add the ``proxy_read_timeout`` setting in seconds (note the trailing ``s`` this 
         location / {
             proxy_pass http://unix:/tmp/openrem-server.socket;
             proxy_set_header Host $host;
-            proxy_read_timeout 1200s;
+            proxy_read_timeout 300s;
         }
     }
 
