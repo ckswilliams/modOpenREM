@@ -143,7 +143,7 @@ If skin dose maps are disabled, and the user has export rights, the user is
 presented with the option of exporting the study data as a csv file that is
 formatted for use with a stand-alone installation of openSkin. The user must
 be in the detail view of the study they wish to create the exposure incidence
-map for, and then click on the link to create the OpenSkin export (figure 5).
+map for, and then click on the link to create the OpenSkin export (figure 4).
 
 .. figure:: img/OpenSkinExport.png
    :figwidth: 50%
@@ -151,7 +151,7 @@ map for, and then click on the link to create the OpenSkin export (figure 5).
    :alt: Export from OpenREM to openSkin
    :target: _images/OpenSkinExport.png
 
-   Figure 5: Export from OpenREM to openSkin
+   Figure 4: Export from OpenREM to openSkin
 
 *************************
 Instructions for openSkin
