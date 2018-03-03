@@ -57,6 +57,7 @@ def make_skin_map(study_pk=None):
     import gzip
     from remapp.version import __skin_map_version__
     from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import Median
 
     if study_pk:
         study = GeneralStudyModuleAttr.objects.get(pk=study_pk)
@@ -168,7 +169,7 @@ def make_skin_map(study_pk=None):
             except (ObjectDoesNotExist, TypeError):
                 ref_ak = None
             try:
-                kvp = float(irrad.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
+                kvp = float(irrad.irradeventxraysourcedata_set.get().kvp_set.all().aggregate(Median('kvp')).values()[0])
             except (ObjectDoesNotExist, TypeError):
                 kvp = None
 
