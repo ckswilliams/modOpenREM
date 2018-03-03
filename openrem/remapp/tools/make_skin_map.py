@@ -57,7 +57,7 @@ def make_skin_map(study_pk=None):
     import gzip
     from remapp.version import __skin_map_version__
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.models import Median
+    import numpy as np
 
     if study_pk:
         study = GeneralStudyModuleAttr.objects.get(pk=study_pk)
@@ -169,7 +169,8 @@ def make_skin_map(study_pk=None):
             except (ObjectDoesNotExist, TypeError):
                 ref_ak = None
             try:
-                kvp = float(irrad.irradeventxraysourcedata_set.get().kvp_set.all().aggregate(Median('kvp')).values()[0])
+                kvp = float(np.median(irrad.irradeventxraysourcedata_set.get().kvp_set.all().values_list('kvp')))
+
             except (ObjectDoesNotExist, TypeError):
                 kvp = None
 
@@ -200,8 +201,6 @@ def make_skin_map(study_pk=None):
                                     d_ref=d_ref, dap=dap, ref_ak=ref_ak,
                                     kvp=kvp, filter_cu=filter_cu,
                                     run_type=run_type, frames=frames, end_angle=end_angle, patPos=patPos)
-
-        import numpy as np
 
         # Flip the skin dose map left-right so the view is from the front
         # my_exp_map.my_dose.fliplr()
