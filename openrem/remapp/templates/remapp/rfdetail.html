@@ -345,8 +345,8 @@
         <td>{{ event.irradiation_event_type }}</td>
         <td>{{ sourcedata.pulse_rate|floatformat:2 }}</td>
         <td>{{ event.acquisition_plane }}</td>
-        <td><script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script></td>
-        <td><script>document.write({{ sourcedata.convert_gy_to_mgy }}.toPrecision(3));</script></td>
+        <td>{% if event.convert_gym2_to_cgycm2 %}<script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script>{% endif %}</td>
+        <td>{% if sourcedata.convert_gy_to_mgy %}<script>document.write({{ sourcedata.convert_gy_to_mgy }}.toPrecision(3));</script>{% endif %}</td>
         <td>
         {% if sourcedata.irradiation_duration %}
             {{ sourcedata.irradiation_duration|multiply:1000|floatformat:1 }}
