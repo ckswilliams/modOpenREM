@@ -4,7 +4,7 @@ OpenREM version history
 
 0.8.0b2 (2018-02-??)
 --------------------
-* `#597`_  Skin dose maps: documented that if using IIS webserver the default Activity Timeout value must be increased
+* `#597`_  Skin dose maps: documented that using a production webserver the default timeout value must be increased
 * `#602`_  Skin dose maps: fixed error when there are multiple kVp values for a single irradiation event
 * `#594`_  Display: corrected display of dual-plane DAP and RP dose in RF filtered view
 * `#593`_  Imports: Properly handles MultiValue filter material tags and permits aluminium spelling
