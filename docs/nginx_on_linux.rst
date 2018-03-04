@@ -113,7 +113,7 @@ Now edit your ``openrem/openremproject/local_settings.py`` config file to put th
     nano local_settings.py
 
     # Find the static files section
-    STATIC_ROOT = '/var/openrem/static'  # replacing path as appropriate
+    STATIC_ROOT = '/var/openrem/static/'  # replacing path as appropriate
 
 Now use the Django ``manage.py`` application to pull all the static files into the new folder:
 
