@@ -2,68 +2,71 @@
 Calculation and display of skin dose maps
 #########################################
 
-**Documentation needs to be updated for 0.8.0 release**
-
-
 ************************************
-Functionality that will be available
+Functionality that is available
 ************************************
 
-* Skin dose map data calculated to the surface of a simple geometric phantom
+* Skin dose map data is calculated to the surface of a simple geometric phantom
   using the in-built `openSkin`_ routines (3D phantom)
-* Phantom dimensions calculated from the height and mass of the patient
+* The calculated doses include kVp-dependent backscatter factors and account
+  for any copper filters using data from `this paper`_ for each irradiation
+  event; aluminium or other filters are not considered. Where more than one kVp
+  is stored for an irradiation event the median kVp is used
+* The phantom dimensions are calculated from the height and mass of the
+  patient; defaults of 1.786 m and 73.2 kg are used when patient height and mass
+  are not available
 * Data can be calculated on import to OpenREM, or on demand when a study is
   viewed
 * Data is recalculated automatically if the patient height or mass stored in
   the database differs from the values stored in the skin dose map data file.
-  This is useful when patient size information has imported in to OpenREM after
-  the initial skin dose map data has been calculated
-* 3D skin dose map data shown graphically as a 2D image and a 3D model
+  This is useful when patient size information has been imported in to OpenREM
+  after the initial skin dose map data has been calculated
+* 3D skin dose map data is shown graphically as a 2D image and a 3D model
+* The 3D model can be manipulated using a touch screen 
 * The user can change the maximum and minimum displayed dose; alternatively,
   window level and width can be adjusted
 * A colour dose scale is shown with a selection of colour schemes
 * The skin dose map section can be displayed full-screen
-* The calculated peak skin dose, phantom dimensions and patient height and mass
-  used for the calculations are shown in the top left hand corner of the skin
-  dose map
+* The calculated peak skin dose, phantom dimensions, patient height, mass and
+  orientation used for the calculations are shown in the top left hand corner
+  of the skin dose map
 * If skin dose map display is disabled then fluoroscopy study data can be
   exported in a format suitable for the stand-alone openSkin routines
 
 The phantom consists of a cuboid with one semi-cylinder on each side (see
-3D phantom section of `phantom design`_ on the openSkin website for details). A
-default height of 1.786 m and mass of 73.2 kg are used if patient-specific data
-are unavailable.
+3D phantom section of `phantom design`_ on the openSkin website for details).
 
 2D visualisation of the 3D data
 ===============================
 
-This is a 2D view of the whole surface of the 3D phantom, as though the phantom
-surface has been peeled off and laid out flat. The 2D visualisation includes
-the following features:
-
-* The skin dose at the mouse pointer is shown as a tool-tip
-* Moving the mouse whilst holding down the left-hand mouse button changes the
-  window level and width of the displayed skin dose map
-* An overlay indicating the phantom regions and orientation can be toggled on
-  and off. This indicates the phantom anterior, left, posterior and right
-  sides, and also shows the superior and inferior ends
-* The current view can be saved as a png file
-
 .. figure:: img/skinDoseMap2D.png
-   :figwidth: 50%
+   :figwidth: 30%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map data
    :target: _images/skinDoseMap2D.png
    
    Figure 1: 2D visualisation of the 3D data
 
+This is a 2D view of the whole surface of the 3D phantom, as though the phantom
+surface has been peeled off and laid out flat (figure 1). The 2D visualisation
+includes the following features:
+
+* The skin dose at the mouse pointer is shown as a tool-tip
+* Moving the mouse whilst holding down the left-hand mouse button changes the
+  window level and width of the displayed skin dose map
+* An overlay indicating the phantom regions and orientation can be toggled on
+  and off. This indicates the phantom anterior, left, posterior and right
+  sides, and also shows the superior and inferior ends (figure 2)
+
 .. figure:: img/skinDoseMap2DincOverlay.png
-   :figwidth: 50%
+   :figwidth: 30%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
    :target: _images/skinDoseMap2DincOverlay.png
 
    Figure 2: Phantom region overlay
+
+* The current view can be saved as a png file
 
 3D visualisation
 ================
@@ -75,26 +78,20 @@ following features:
 * Moving the mouse whilst holding down the left-hand mouse button rotates the
   3D model
 * Using the mouse wheel zooms in and out
-* A simple 3D model of a person is displayed in the bottom left corner. This is
-  to enable the viewer to orientate themselves when viewing the 3D skin dose
-  map
-* The current view can be saved as a png file
 
 .. figure:: img/skinDoseMap3D.png
-   :figwidth: 50%
+   :figwidth: 30%
    :align: right
    :alt: 3D visualisation of the skin dose map data
    :target: _images/skinDoseMap3D.png
 
    Figure 3: 3D visualisation of the data
 
-.. figure:: img/skinDoseMapColourScales.png
-   :figwidth: 30%
-   :align: right
-   :alt: Colour scale choices
-   :target: _images/skinDoseMapColourScales.png
 
-   Figure 4: Colour scale choices
+* A simple 3D model of a person is displayed in the bottom left corner. This is
+  to enable the viewer to orientate themselves when viewing the 3D skin dose
+  map
+* The current view can be saved as a png file
 
 **********************
 Skin dose map settings
@@ -109,7 +106,8 @@ administrator via the ``Skin dose map settings`` option in the ``Config menu``:
 The first of these sets whether skin dose map data is calculated, and also
 switches the display of skin dose maps on or off. The second option controls
 whether the skin dose map data is calculated at the point when a new study is
-imported into OpenREM.
+imported into OpenREM, or calculated when a user first views the details of
+that particular study in the OpenREM interface.
 
 When skin dose maps are enabled:
 
@@ -143,11 +141,11 @@ When calculation on import is enabled:
 Exporting data to openSkin
 **************************
 
-If skin dose maps are disabled the user you are presented with the option of exporting
-the study data as a csv file for use with a stand-alone installation of
-openSkin. Select the fluoroscopy study you wish to create the exposure
-incidence map for and go to the detail view. Then click on the link to create
-the OpenSkin export (figure 5).
+If skin dose maps are disabled, and the user has export rights, the user is
+presented with the option of exporting the study data as a csv file that is
+formatted for use with a stand-alone installation of openSkin. The user must
+be in the detail view of the study they wish to create the exposure incidence
+map for, and then click on the link to create the OpenSkin export (figure 4).
 
 .. figure:: img/OpenSkinExport.png
    :figwidth: 50%
@@ -155,24 +153,22 @@ the OpenSkin export (figure 5).
    :alt: Export from OpenREM to openSkin
    :target: _images/OpenSkinExport.png
 
-   Figure 5: Export from OpenREM to openSkin
+   Figure 4: Export from OpenREM to openSkin
 
 *************************
 Instructions for openSkin
 *************************
 
-Download the latest version as a zip file from `openSkin downloads`_. At the
-time of release for OpenREM 0.7.0 the current openSkin beta was dated 14th
-September 2016. The application referred to here will only work on Windows.
+Download the openSkin repository as a zip file from `openSkin downloads`_. To
+use openSkin as a stand-alone application you need python 2.x and the pypng
+python library.
 
 * Extract the contents of the zip file into a folder on your computer and run
-  the openSkin.exe executable
-* Choose a phantom type: 3D or flat. See `phantom design`_ for details
-* Select the source csv file - this should be the one exported from OpenREM
-* Select the output folder - this should already exist as it can't be created
-  in the dialogue
-* Wait! Depending on the number of events in the export and the power of your
-  machine, this can take a few minutes
+  `python main.py` from a command line and answer each question.
+* See `phantom design`_ for details of the 2D and 3D phantoms.
+* When asked for the source csv file use the one exported from OpenREM
+* Depending on the number of events in the export and the power of your
+  computer the calculations can take a few minutes
 
 Two files will be produced - a textfile called ``skin_dose_results.txt`` and a
 small image called ``skin_dose_map.png``
@@ -249,3 +245,4 @@ want to do, please do go ahead and feed back your findings to Jonathan Cole at
 .. _`GIMP`: http://www.gimp.org/
 .. _ImageJ: http://imagej.nih.gov/ij/download.html
 .. _`openSkin downloads`: http://bitbucket.org/openskin/openskin/downloads
+.. _`this paper`:  https://doi.org/10.1088/0031-9155/56/22/012
