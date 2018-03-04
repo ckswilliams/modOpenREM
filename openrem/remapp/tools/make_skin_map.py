@@ -170,7 +170,8 @@ def make_skin_map(study_pk=None):
                 ref_ak = None
             try:
                 kvp = float(np.median(irrad.irradeventxraysourcedata_set.get().kvp_set.all().values_list('kvp')))
-
+                if np.isnan(kvp):
+                    kvp = None
             except (ObjectDoesNotExist, TypeError):
                 kvp = None
 
