@@ -29,6 +29,7 @@ OpenREM version history
 * `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector postition are missing
 * `#557`_  Skin dose maps: Improved construction of patient orientation code
 * `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
+* `#552`_  Documentation: documented extractor for older Toshiba CT scanners
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
 * `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
 * `#543`_  Interface: Added drop-down box to choose how many studies are displayed on filtered pages
