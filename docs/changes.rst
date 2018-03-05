@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0b2 (2018-02-??)
 --------------------
+* `#603`_  Interface: fixed JavaScript error if there are any None values in fluoro detail irradiation type table
 * `#602`_  Skin dose maps: fixed error when there are multiple kVp values for a single irradiation event
 * `#594`_  Display: corrected display of dual-plane DAP and RP dose in RF filtered view
 * `#593`_  Imports: Properly handles MultiValue filter material tags and permits aluminium spelling
@@ -29,6 +30,7 @@ OpenREM version history
 * `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector postition are missing
 * `#557`_  Skin dose maps: Improved construction of patient orientation code
 * `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
+* `#552`_  Documentation: documented extractor for older Toshiba CT scanners
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
 * `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
 * `#543`_  Interface: Added drop-down box to choose how many studies are displayed on filtered pages
