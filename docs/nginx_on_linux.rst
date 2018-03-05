@@ -20,6 +20,11 @@ Prerequisites
 Steps to perform
 ================
 
+.. note::
+
+    If you get stuck somewhere in these instructions, please check the :ref:`troubleshooting` section at the end of this
+    page.
+
 Install NGINX
 ^^^^^^^^^^^^^
 
@@ -224,7 +229,16 @@ For the gunicorn command, you will need to provide the full path to gunicorn, wh
     [Install]
     WantedBy=multi-user.target
 
-Make sure you have customised the ``WorkingDirectory`` path, the path to gunicorn, and the name of the socket file.
+Make sure you have customised the ``User``, the  ``WorkingDirectory`` path, the path to gunicorn, and the name of the
+socket file.
+
+.. warning::
+
+    If the user you have configured can't write to the ``STATIC_ROOT`` folder, the ``MEDIA_ROOT`` folder and
+    the location the logs are configured to be written (usually in ``MEDIA_ROOT``), the systemd gunicorn service is
+    likely to fail when started.
+
+    If you have installed everything in your user folder, you are likely to need to set ``User`` to your own username.
 
 Now enable the new configuration:
 
@@ -246,14 +260,14 @@ You might like to see if it worked...
 Look for ``Active: active (running)``
 
 
-Making use of ALLOWED_HOSTS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Making use of ALLOWED_HOSTS in local_settings.py
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The default setting of ``ALLOWED_HOSTS`` is ``*`` which isn't secure, but is convenient! We should really change this
 to match the hostname of the server.
 
 If your hostname is ``openrem-server``, and the fully qualified domain name is ``openrem-server.ad.hospital.org`` and
-IP address is ``10.212.18.209``, then you might configure ``ALLOWED_HOSTS`` to:
+IP address is ``10.212.18.209``, then you might configure ``ALLOWED_HOSTS`` in ``openremproject/local_settings.py`` to:
 
 .. sourcecode:: python
 
@@ -263,8 +277,15 @@ IP address is ``10.212.18.209``, then you might configure ``ALLOWED_HOSTS`` to:
         '10.212.18.209',
     ]
 
+.. note::
+
+    Which hostnames do I need to put in ``ALLOWED_HOSTS``? You need to put in any hostnames you want people to be able
+    to access your OpenREM web interface at. So if in your hospital you only type in the address bar the hostname
+    (``openrem-server`` in this example), then that is all you need to add. If you only use the IP address, then add
+    that. If you use any one of them, add them all :-)
+
 Next we need to edit the nginx configuration again to make sure Django can see the hostname by adding the
-``proxy_set_header`` configuration:
+``proxy_set_header`` configuration (else it gets lost before Django can check it):
 
 .. sourcecode:: bash
 
@@ -383,6 +404,9 @@ Reload everything:
     You will also need to ``collectstatic``, symlink the nginx configuration into enabled, enable the gunicorn systemd
     config to start on reboot, and you should configure the ``ALLOWED_HOST`` setting. And you will need to have
     installed nginx and gunicorn!
+
+
+..  _troubleshooting:
 
 Troubleshooting and tips
 ========================
