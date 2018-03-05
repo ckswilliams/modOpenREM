@@ -45,7 +45,7 @@ everything else is configured, you might need to revisit this file and see if th
 .. note::
 
     If you need to have different settings for different databases on your server, you can use the database name instead
-    of the first ``all``, and/or the the database user name instead of the second ``all`.
+    of the first ``all``, and/or the the database user name instead of the second ``all``.
 
 Restart PostgreSQL so the new settings take effect:
 
