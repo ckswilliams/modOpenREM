@@ -58,7 +58,7 @@ use ``openrem-server``
         }
     }
 
-Save (``Ctrl-o``) and exit (``Ctrl-x``).
+Save and exit (see :ref:`nano` below for tips).
 
 Now delete the default nginx configuration from ``sites-enabled`` and make a link to our new one:
 
@@ -419,6 +419,8 @@ Use ``less`` to review files without editing them
 * ``Shift-G`` to go to the end
 * ``Shift-F`` to automatically update as new logs are added. ``Ctrl-C`` to stop.
 * ``/`` to search
+
+.. _nano:
 
 nano
 ^^^^

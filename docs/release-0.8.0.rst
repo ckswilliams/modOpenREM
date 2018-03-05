@@ -87,7 +87,7 @@ Consider setting the timezone and language in ``local_settings.py``. See ``local
 Add additional log file configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-,, warning::
+.. warning::
 
     If the configuration is not added for the new ``openrem_extractor.log`` is not configured, you will find it being
     created whereever you start the webserver from, or starting the webserver may fail.
