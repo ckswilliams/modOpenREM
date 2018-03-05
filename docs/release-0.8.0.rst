@@ -90,7 +90,7 @@ Add additional log file configuration
 .. warning::
 
     If the configuration is not added for the new ``openrem_extractor.log`` is not configured, you will find it being
-    created whereever you start the webserver from, or starting the webserver may fail.
+    created whereever you start the webserver from, and starting the webserver may fail.
 
 Add the new extractor log file configuration to the ``local_settings.py`` - you can copy the 'Logging
 configuration' section from  ``local_settings.py.example`` if you haven't made many changes to this section. See the
