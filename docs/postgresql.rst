@@ -42,6 +42,8 @@ Don't worry about any lines that start with a ``#`` as they are ignored. If you 
 everything else is configured, you might need to revisit this file and see if there are other lines with a method of
 ``peer`` that need to be ``md5``
 
+..
+
 Restart PostgreSQL so the new settings take effect:
 
 .. sourcecode:: console

@@ -102,8 +102,8 @@ Serve static files using nginx
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Create a folder called ``static`` somewhere that your webserver user will be able to get to - for example alongside the
-``media`` folder. For example, if you created your media folder in ``/var/openrem/media``. We will need to make user the
-permissions will be suitable. For example:
+``media`` folder, and set the permissions. So if you created your media folder in ``/var/openrem/media``, you might
+do this:
 
 .. sourcecode:: bash
 
@@ -111,7 +111,7 @@ permissions will be suitable. For example:
     sudo chown $USER:www-data /var/openrem/static
     sudo chmod 755 /var/openrem/static
 
-Now edit your ``openrem/openremproject/local_settings.py`` config file to put the same path in the ``STATIC_ROOT``:
+Now edit your ``openremproject/local_settings.py`` config file to put the same path in the ``STATIC_ROOT``:
 
 .. sourcecode:: bash
 
@@ -224,7 +224,7 @@ For the gunicorn command, you will need to provide the full path to gunicorn, wh
 
     ExecStart=/usr/local/bin/gunicorn \
         --bind unix:/tmp/openrem-server.socket \
-    openremproject.wsgi:application
+        openremproject.wsgi:application
 
     [Install]
     WantedBy=multi-user.target
@@ -281,8 +281,8 @@ IP address is ``10.212.18.209``, then you might configure ``ALLOWED_HOSTS`` in `
 
     Which hostnames do I need to put in ``ALLOWED_HOSTS``? You need to put in any hostnames you want people to be able
     to access your OpenREM web interface at. So if in your hospital you only type in the address bar the hostname
-    (``openrem-server`` in this example), then that is all you need to add. If you only use the IP address, then add
-    that. If you use any one of them, add them all :-)
+    (``http://openrem-server`` in this example), then that is all you need to add. If you only use the IP address, then add
+    that. If you can use any of them, add them all :-)
 
 Next we need to edit the nginx configuration again to make sure Django can see the hostname by adding the
 ``proxy_set_header`` configuration (else it gets lost before Django can check it):
