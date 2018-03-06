@@ -8,6 +8,12 @@ a developers alternative to the built-in HTTP server. They have been written
 using Windows Server 2012, and feature automatic restarts of the Apache server
 when the code changes, much as the built-in server does.
 
+..  Note:: Be aware that using Apache on Windows in combination with Python 
+    it is neccessary that Apache, Python and mod_wsgi need to be compiled with 
+    the same Microsoft C/C++ compiler version,
+    see https://github.com/GrahamDumpleton/mod_wsgi/blob/develop/win32/README.rst.
+
+
 Get and Install Apache
 ======================
     

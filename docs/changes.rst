@@ -2,43 +2,44 @@
 OpenREM version history
 =======================
 
-0.8.0b2 (2018-02-??)
+0.8.0b2 (2018-03-??)
 --------------------
 * `#603`_  Interface: fixed JavaScript error if there are any None values in fluoro detail irradiation type table
 * `#602`_  Skin dose maps: fixed error when there are multiple kVp values for a single irradiation event
 * `#599`_  Installation: postgres instructions now include note about differing security choices
+* `#596`_  Documentation: added docs for using Gunicorn and NGINX on linux
 * `#594`_  Display: corrected display of dual-plane DAP and RP dose in RF filtered view
-* `#593`_  Imports: Properly handles MultiValue filter material tags and permits aluminium spelling
+* `#593`_  Imports: properly handles MultiValue filter material tags and permits aluminium spelling
 * `#589`_  Exports: now handles zero studies and studies deleted during exports sensibly
-* `#587`_  Documentation: Added instructions for Linux users to rotate logs
+* `#587`_  Documentation: added instructions for Linux users to rotate logs
 * `#584`_  Import, Interface, Export: RDSR with pulse level data now function
-* `#581`_  Import scripts: Interpreter line now always first, functions imported specifically
+* `#581`_  Import scripts: interpreter line now always first, functions imported specifically
 * `#580`_  Imports and Interface: one modality creating both DX and RF can now be handled appropriately
-* `#579`_  Imports: Dummy values for Toshiba CT import function now in settings.py, log file config in docs
-* `#578`_  Exports: Fixed NHSBSP export that was excluding RDSR imported Hologic studies
+* `#579`_  Imports: dummy values for Toshiba CT import function now in settings.py, log file config in docs
+* `#578`_  Exports: fixed NHSBSP export that was excluding RDSR imported Hologic studies
 * `#575`_  Exports: export page now updates using AJAX and has a select all button
 * `#573`_  Exports: corrected and clarified exposure time and duration units, added number of pulses
-* `#572`_  Interface: Homepage now populates as AJAX to increase responsiveness
-* `#568`_  Imports: Missing DICOM date-time no longer causes an error
-* `#567`_  Celery: Fixed dual-namespace imports of tasks
-* `#566`_  Interface: Correctly show "assumed patient mass" in case of set value of zero
-* `#565`_  Interface: Correctly handle dose area product with zero value
-* `#564`_  Skin dose maps: Text information on skin dose maps now embedded when saving the 2d or 3d map as a graphic
+* `#572`_  Interface: homepage now populates as AJAX to increase responsiveness
+* `#568`_  Imports: missing DICOM date-time no longer causes an error
+* `#567`_  Celery: fixed dual-namespace imports of tasks
+* `#566`_  Interface: correctly show "assumed patient mass" in case of set value of zero
+* `#565`_  Interface: correctly handle dose area product with zero value
+* `#564`_  Skin dose maps: text information on skin dose maps now embedded when saving the 2d or 3d map as a graphic
 * `#562`_  Skin dose maps: error message on calculation failure now more explicit
-* `#561`_  Imports: Patient orientation modifier now correctly extracted from RDSR
-* `#560`_  Exports: Added study level comments
-* `#559`_  Interface: Date pickers inconsistent start day fixed
+* `#561`_  Imports: patient orientation modifier now correctly extracted from RDSR
+* `#560`_  Exports: added study level comments
+* `#559`_  Interface: date pickers inconsistent start day fixed
 * `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector postition are missing
-* `#557`_  Skin dose maps: Improved construction of patient orientation code
+* `#557`_  Skin dose maps: improved construction of patient orientation code
 * `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
 * `#552`_  Documentation: documented extractor for older Toshiba CT scanners
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
-* `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
-* `#543`_  Interface: Added drop-down box to choose how many studies are displayed on filtered pages
-* `#542`_  Interface: Added display name to all detailed html pages
+* `#544`_  Interface: added procedure, requested procedure to summary listings and details and filtering
+* `#543`_  Interface: added drop-down box to choose how many studies are displayed on filtered pages
+* `#542`_  Interface: added display name to all detailed html pages
 * `#536`_  Code quality: reduced javascript duplication and collected file groups into subfolders
-* `#535`_  Interface: Fixed problem where category names that included a plus symbol caused filtering and chart issues
-* `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
+* `#535`_  Interface: fixed problem where category names that included a plus symbol caused filtering and chart issues
+* `#534`_  Interface: chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#529`_  Charts: Added CT charts of number of irradiation events per study description and requested procedure
 * `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
