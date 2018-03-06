@@ -339,7 +339,8 @@ def get_pulse_data(source_data, modality=None):
     try:
         kvp = source_data.kvp_set.get().kvp
     except MultipleObjectsReturned:
-        kvp = source_data.kvp_set.all().aggregate(Avg('kvp'))['kvp__avg']
+        kvp = source_data.kvp_set.all().exclude(kvp__isnull=True).exclude(kvp__exact=0).aggregate(
+            Avg('kvp'))['kvp__avg']
     except ObjectDoesNotExist:
         kvp = None
 
@@ -352,7 +353,8 @@ def get_pulse_data(source_data, modality=None):
             else:
                 mas = None
         except MultipleObjectsReturned:
-            mas = source_data.exposure_set.all().aggregate(Avg('exposure'))['exposure__avg']
+            mas = source_data.exposure_set.all().exclude(exposure__isnull=True).exclude(exposure__exact=0).aggregate(
+                Avg('exposure'))['exposure__avg']
             mas = mas / 1000.
         except ObjectDoesNotExist:
             mas = None
@@ -363,7 +365,9 @@ def get_pulse_data(source_data, modality=None):
         try:
             xray_tube_current = source_data.xraytubecurrent_set.get().xray_tube_current
         except MultipleObjectsReturned:
-            xray_tube_current = source_data.xraytubecurrent_set.all().aggregate(
+            xray_tube_current = source_data.xraytubecurrent_set.all().exclude(
+                xray_tube_current__isnull=True).exclude(
+                xray_tube_current__exact=0).aggregate(
                 Avg('xray_tube_current'))['xray_tube_current__avg']
         except ObjectDoesNotExist:
             xray_tube_current = None
@@ -374,7 +378,10 @@ def get_pulse_data(source_data, modality=None):
         try:
             pulse_width = source_data.pulsewidth_set.get().pulse_width
         except MultipleObjectsReturned:
-            pulse_width = source_data.pulsewidth_set.all().aggregate(Avg('pulse_width'))['pulse_width__avg']
+            pulse_width = source_data.pulsewidth_set.all().exclude(
+                pulse_width__isnull=True).exclude(
+                pulse_width__exact=0).aggregate(
+                Avg('pulse_width'))['pulse_width__avg']
         except ObjectDoesNotExist:
             pulse_width = None
     else:
