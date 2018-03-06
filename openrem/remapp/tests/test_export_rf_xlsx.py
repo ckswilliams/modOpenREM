@@ -129,9 +129,9 @@ class ExportRFxlsx(TransactionTestCase):  # Not TestCase as raises TransactionMa
         ma_col = [i for i, x in enumerate(eurocolumbus_headers) if x.value == u'mA'][0]
         pulse_width_col =[i for i, x in enumerate(eurocolumbus_headers) if x.value == u'Pulse width (ms)'][0]
 
-        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(1, kvp_col), 54.0909090909091)
-        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(1, ma_col), 47.7272727272727)
-        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(1, pulse_width_col), 7.63636363636364)
+        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(1, kvp_col), 56.6666666666667)
+        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(1, ma_col), 50.0)
+        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(1, pulse_width_col), 8.0)
 
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
