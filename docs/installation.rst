@@ -61,22 +61,7 @@ get you set up.
 Our recommendations for Windows and Linux are:
 
 ..  toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     iis_on_windows
-
-(yet to write the nginx/gunicorn doc)
-
-
-**Below to be deleted**
-
-Popular choices would be either `Apache <http://httpd.apache.org>`_ or you can do as the cool kids
-do and use `Gunicorn with nginx <http://www.robgolding.com/blog/2011/11/12/django-in-production-part-1---the-stack/>`_.
-
-The `django website <https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/modwsgi/>`_
-has instructions and links to get you set up with Apache.
-
-An advanced guide using Apache, including auto-restarting the server when the code changes, has been contributed
-here: :doc:`apache_on_windows`
-
-A guide for using IIS on windows can be found here: :doc:`iis_on_windows`
+    nginx_on_linux

@@ -11,7 +11,8 @@ Functionality that is available
 * The calculated doses include kVp-dependent backscatter factors and account
   for any copper filters using data from `this paper`_ for each irradiation
   event; aluminium or other filters are not considered. Where more than one kVp
-  is stored for an irradiation event the median kVp is used
+  is stored for an irradiation event the mean kVp is calculated, excluding any
+  zero values.
 * The phantom dimensions are calculated from the height and mass of the
   patient; defaults of 1.786 m and 73.2 kg are used when patient height and mass
   are not available

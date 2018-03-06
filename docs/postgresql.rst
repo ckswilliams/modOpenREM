@@ -24,13 +24,13 @@ If you are using a virtualenv, make sure you are in it and it is active (``sourc
 Change the security configuration
 =================================
 
-The default security settings are too restrictive to allow access to the database. Assumes version ``9.4``, change as
+The default security settings are too restrictive to allow access to the database. Assumes version ``9.5``, change as
 appropriate.
 
 
 .. sourcecode:: console
 
-    sudo nano /etc/postgresql/9.4/main/pg_hba.conf
+    sudo nano /etc/postgresql/9.5/main/pg_hba.conf
 
 Scroll down to the bottom of the file and edit the following line from ``peer`` to ``md5``:
 
@@ -41,6 +41,11 @@ Scroll down to the bottom of the file and edit the following line from ``peer`` 
 Don't worry about any lines that start with a ``#`` as they are ignored. If you can't access the database when
 everything else is configured, you might need to revisit this file and see if there are other lines with a method of
 ``peer`` that need to be ``md5``
+
+.. note::
+
+    If you need to have different settings for different databases on your server, you can use the database name instead
+    of the first ``all``, and/or the the database user name instead of the second ``all``.
 
 Restart PostgreSQL so the new settings take effect:
 
@@ -54,20 +59,20 @@ Optional: Specify the location for the database files
 You might like to do this if you want to put the database on an encrypted location instead of ``/var/lib/postgresql``.
 
 For this example, I'm going to assume all the OpenREM programs and data are in the folder ``/var/openrem/`` and
-PostgreSQL is at version ``9.4`` (change both as appropriate)
+PostgreSQL is at version ``9.5`` (change both as appropriate)
 
 .. sourcecode:: console
 
     sudo service postgresql stop
     mkdir /var/openrem/database
-    sudo cp -aRv /var/lib/postgresql/9.4/main /var/openrem/database/
-    sudo nano /etc/postgresql/9.4/main/postgresql.conf
+    sudo cp -aRv /var/lib/postgresql/9.5/main /var/openrem/database/
+    sudo nano /etc/postgresql/9.5/main/postgresql.conf
 
 Change the line
 
 .. sourcecode:: console
 
-    data_directory = '/var/lib/postgresql/9.4/main'
+    data_directory = '/var/lib/postgresql/9.5/main'
 
 to
 

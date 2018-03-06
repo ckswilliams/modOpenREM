@@ -59,19 +59,19 @@
                     <tr>
                     {% if '- ' in irr_type.0 %}
                         <td><i>{{ irr_type.0 }}</i></td>
-                        <td style="text-align:right"><i><script>document.write({{ irr_type.1 }}.toFixed(2));</script></i></td>
-                        <td style="text-align:right"><i><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></i></td>
-                        <td style="text-align:right"><i><script>document.write({{ irr_type.3 }}.toFixed(2));</script></i></td>
+                        <td style="text-align:right"><i>{% if irr_type.1 %}<script>document.write({{ irr_type.1 }}.toFixed(2));</script>{% endif %}</i></td>
+                        <td style="text-align:right"><i>{% if irr_type.2 %}<script>document.write({{ irr_type.2 }}.toPrecision(3));</script>{% endif %}</i></td>
+                        <td style="text-align:right"><i>{% if irr_type.3 %}<script>document.write({{ irr_type.3 }}.toFixed(2));</script>{% endif %}</i></td>
                     {% elif 'Total' in irr_type.0 %}
                         <td><strong>{{ irr_type.0 }}</strong></td>
-                        <td><strong><script>document.write({{ irr_type.1 }}.toFixed(2));</script></strong></td>
-                        <td><strong><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></strong></td>
-                        <td><strong><script>document.write({{ irr_type.3 }}.toFixed(2));</script></strong></td>
+                        <td><strong>{% if irr_type.1 %}<script>document.write({{ irr_type.1 }}.toFixed(2));</script>{% endif %}</strong></td>
+                        <td><strong>{% if irr_type.2 %}<script>document.write({{ irr_type.2 }}.toPrecision(3));</script>{% endif %}</strong></td>
+                        <td><strong>{% if irr_type.3 %}<script>document.write({{ irr_type.3 }}.toFixed(2));</script>{% endif %}</strong></td>
                     {% else %}
                         <td>{{ irr_type.0 }}</td>
-                        <td><script>document.write({{ irr_type.1 }}.toFixed(2));</script></td>
-                        <td><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></td>
-                        <td><script>document.write({{ irr_type.3 }}.toFixed(2));</script></td>
+                        <td>{% if irr_type.1 %}<script>document.write({{ irr_type.1 }}.toFixed(2));</script>{% endif %}</td>
+                        <td>{% if irr_type.2 %}<script>document.write({{ irr_type.2 }}.toPrecision(3));</script>{% endif %}</td>
+                        <td>{% if irr_type.3 %}<script>document.write({{ irr_type.3 }}.toFixed(2));</script>{% endif %}</td>
                     {% endif %}
                     </tr>
                 {% endfor %}
@@ -345,8 +345,8 @@
         <td>{{ event.irradiation_event_type }}</td>
         <td>{{ sourcedata.pulse_rate|floatformat:2 }}</td>
         <td>{{ event.acquisition_plane }}</td>
-        <td><script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script></td>
-        <td><script>document.write({{ sourcedata.convert_gy_to_mgy }}.toPrecision(3));</script></td>
+        <td>{% if event.convert_gym2_to_cgycm2 %}<script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script>{% endif %}</td>
+        <td>{% if sourcedata.convert_gy_to_mgy %}<script>document.write({{ sourcedata.convert_gy_to_mgy }}.toPrecision(3));</script>{% endif %}</td>
         <td>
         {% if sourcedata.irradiation_duration %}
             {{ sourcedata.irradiation_duration|multiply:1000|floatformat:1 }}
