@@ -8,14 +8,14 @@ If you are logged in as a user in the ``exportgroup`` or the ``admingroup``,
 the export links will be available near the top of the modality filter pages
 in the OpenREM interface.
 
-For each modality you can export to a single-sheet CSV file or a multi-sheet XLSX file. In addition, there is an export
+For each modality you can export to a single-sheet csv file or a multi-sheet xlsx file. In addition, there is an export
 tailored to the :ref:`NHSBSP_dose_audit` requirements.
 
 If you are logged in as a user in the ``pidgroup`` you will also have a choice of exporting with patient name and/or
 patient ID information included in the export (if any is recorded in the database). See :doc:`patientid` for more
 details.
 
-The XLSX export has multiple sheets. The first sheet contains a
+The xlsx export has multiple sheets. The first sheet contains a
 summary of all the study descriptions, requested procedures and series
 protocol names contained in the export:
 
@@ -66,6 +66,7 @@ Exposures are considered similar and put in the same group if they are, relative
 - of the same 'event type' (Fluoroscopy, Stationary Acquisition, Stepping Acquisition, Rotational Acquisition)
 
 The minimum, maximum and mean of all the remaining factors are presented for each group along with the common factors.
+Where a factor is not available in the source RDSR, that factor is not considered.
 
 The grouping process for the all data sheet takes a lot of time compared to the other exports. However, we hope that
 this is a useful way of comprehending the study. Other modalities have all the series for any one study detailed in full
