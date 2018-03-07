@@ -53,13 +53,12 @@ Install IIS
           ``CGI`` box. click ``Next``.
         - Click ``Install`` and after installation, click ``Close``
 
-    - **Windows 10**
+    - **Window 7 & Windows 10**
 
-        - ``Internet information services``
-        - Ticked (black square) ``Web Management Tools``, ``World Wide Web Services``
+        - Tick ``Internet information services`` to turn the default features on
         - In ``World Wide Web Services``, ``Application Development Features``, tick ``CGI``
-        - ``OK``
-        - ``Close``
+        - Click ``OK``
+        - Click ``Close`` (Windows 10 only, In Windows 7 the ``Windows Features`` window will close automatically)
 
     - Close the Server Manager and the Control Panel
 
@@ -70,6 +69,7 @@ Configure IIS
 
     - Open Administrative Tools and double-click the Internet Information Services (IIS) Manager link. You may need to
       right click and ``Run as Adminstrator``.
+      - For Windows 7 the ``Administrative Tools`` are not available by default, you can also type ``inetmgr`` in the ``search program and files`` text box.
     - Click on the name of the server within the IIS manager
     - Click No if a pop-up about the Web Platform Components appears
     - Double-click on the ``FastCGI Settings`` icon
@@ -91,12 +91,13 @@ Configure IIS
       e.g. ``C:\Python27\Lib\site-packages\openrem``
     - Click Add for the third time and a variable with name ``WSGI_HANDLER`` and value
       ``django.core.wsgi.get_wsgi_application()``
+    - Click ``Ok`` to close the ``EnviromentVariables Collection Editor``.
     - Under ``FastCGI properties`` find the ``Activity Timeout`` entry and increase the value to 300. This is to ensure
       that the server allows enough time for skin dose map data to be calculated.
-    - Click twice ``Ok`` to close the ``EnviromentVariables Collection Editor`` and the ``Add FastCGI Application dialog``
+    - Click ``Ok`` to close the ``Add FastCGI Application dialog``
     - Start Windows Explorer and browse to the openrem directory, e.g. ``C:\Python27\Lib\site-packages\openrem``
-    - Right click on the folder and choose properties. In the security tab, make sure ``SYSTEM`` (local system) has
-      ``Full control`` for this directory and the subdirectories.
+    - Right click on the folder and choose properties. In the security tab, make sure ``IIS_IUSRS`` has
+      ``Read``, ``Write``, ``Execute`` and ``Change`` permissions for this directory and the subdirectories.
     - The same applies for the ``MEDIA_ROOT`` (as configured in ``local_settings.py``; default ``c:/Temp/OpenREM/media``)
 
 
