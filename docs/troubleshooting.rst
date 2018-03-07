@@ -32,7 +32,7 @@ The ``openrem.log`` has general logging information, the other two are specific 
 query-retrieve functions if you are making use of them.
 
 You can increase the verbosity of the log files by changing the log 'level' to ``DEBUG``, or you can decrease the
-verbosity to ``WARNING``, 'ERROR', or 'CRITICAL'. The default is ``INFO``.
+verbosity to ``WARNING``, ``ERROR``, or ``CRITICAL``. The default is ``INFO``.
 
 Starting again!
 ===============
