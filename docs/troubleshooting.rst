@@ -8,6 +8,12 @@ Troubleshooting
     trouble500
     troubleencoding
 
+If you have a modality where every study has one event (usually CT), review
+
+.. toctree::
+    :maxdepth: 1
+
+    import_multirdsr
 
 Query-retrieve issues
 =====================
