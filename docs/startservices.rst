@@ -50,6 +50,8 @@ For full functionality start the `Celery task queue`_ before moving on to `Confi
     ``DEBUG`` mode is set to ``False``, which prevents the test web server
     serving those files. The ``--insecure`` option allows them to be served again.
 
+.. _celery-task-queue:
+
 Celery task queue
 =================
 
