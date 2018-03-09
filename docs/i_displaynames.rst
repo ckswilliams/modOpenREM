@@ -1,3 +1,6 @@
+Display names and user-defined modalities
+*****************************************
+
 Viewing and editing individual x-ray system display names and set user defined modality using the web interface
 ***************************************************************************************************************
 *New in 0.7.0*
