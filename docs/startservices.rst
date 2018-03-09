@@ -98,7 +98,7 @@ Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuatio
 
 .. sourcecode:: console
 
-    celery worker -n default -A openremproject -c 4 -Q default ^
+    celery worker -n default -P solo -Ofair -A openremproject -c 4 -Q default ^
     --pidfile=C:\path\to\media\celery\default.pid --logfile=C:\path\to\media\celery\default.log
 
 For production use, see `Daemonising Celery`_ below
