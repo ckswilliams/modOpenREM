@@ -11,6 +11,7 @@ OpenREM version history
 * `#596`_  Documentation: added docs for using Gunicorn and NGINX on linux
 * `#594`_  Display: corrected display of dual-plane DAP and RP dose in RF filtered view
 * `#593`_  Imports: properly handles MultiValue filter material tags and permits aluminium spelling
+* `#592`_  Documentation: added docs for using IIS on Windows
 * `#589`_  Exports: now handles zero studies and studies deleted during exports sensibly
 * `#587`_  Documentation: added instructions for Linux users to rotate logs
 * `#586`_  Documentation: updated exports and detailed how pulse level data is exported
