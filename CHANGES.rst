@@ -13,6 +13,7 @@ OpenREM version history
 * `#593`_  Imports: properly handles MultiValue filter material tags and permits aluminium spelling
 * `#589`_  Exports: now handles zero studies and studies deleted during exports sensibly
 * `#587`_  Documentation: added instructions for Linux users to rotate logs
+* `#586`_  Documentation: updated exports and detailed how pulse level data is exported
 * `#584`_  Import, Interface, Export: RDSR with pulse level data now function
 * `#581`_  Import scripts: interpreter line now always first, functions imported specifically
 * `#580`_  Imports and Interface: one modality creating both DX and RF can now be handled appropriately
@@ -42,6 +43,7 @@ OpenREM version history
 * `#535`_  Interface: fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
+* `#532`_  DICOM: documented how to work-around missing encoding charsets due to old pydicom
 * `#529`_  Charts: Added CT charts of number of irradiation events per study description and requested procedure
 * `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#526`_  Code quality: Addressed some of the code quality/style issues raised by `Codacy`_
