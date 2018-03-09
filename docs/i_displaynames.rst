@@ -126,3 +126,5 @@ in the 'User defined modality' cell:
     :align: center
     :alt: Reprocess Dual link
     :width: 500px
+
+    Re-sort studies into planar X-ray and fluoroscopy
