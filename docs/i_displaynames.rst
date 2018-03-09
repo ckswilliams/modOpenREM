@@ -54,7 +54,6 @@ Viewing x-ray system display names and user defined modality
    :align: right
    :alt: User options menu
    :width: 179px
-   :height: 173px
 
    The ``Config`` menu (user)
 
