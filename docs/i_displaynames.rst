@@ -110,13 +110,16 @@ If you update the user defined modality, the modality type for already imported
 studies will also be set to the user defined modality type. Only changes
 from modality DX (planar X-ray) to RF (fluoroscopy) and vice versa are possible.
 
+Dual modality systems
+---------------------
+
 Some systems are dual purpose in that they can be used in both standard planar x-ray mode and in fluoroscopy mode. For
 these systems you can configure them as 'Dual' and OpenREM will attempt to reprocess all the studies related to the rows
 you have selected and assign them to DX or RF. The studies will then be displayed in the right sections in the web
-interface and will export correctly. New RDSRs relating to that x-ray system will be assigned a modality in the same
+interface and will export correctly. New RDSRs relating to that X-ray system will be assigned a modality in the same
 way.
 
-If after an X-ray system has been set to Dual you wish to reprocess the studies again, you can use the 'Reprocess' link
+If after an X-ray system has been set to Dual you wish to reprocess the studies again, you can use the 'reprocess' link
 in the 'User defined modality' cell:
 
 ..  figure:: img/ReprocessModality.png

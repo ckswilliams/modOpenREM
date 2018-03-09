@@ -8,6 +8,7 @@ Troubleshooting
     trouble500
     troubleencoding
 
+If planar X-ray studies are appearing in fluoroscopy or vice-versa, review the :doc:`i_displaynames` docs.
 
 Query-retrieve issues
 =====================
