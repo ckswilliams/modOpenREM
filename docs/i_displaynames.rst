@@ -1,8 +1,6 @@
 Display names and user-defined modalities
 *****************************************
 
-Viewing and editing individual x-ray system display names and set user defined modality using the web interface
-***************************************************************************************************************
 *New in 0.7.0*
 
 *Functionality changed in 0.8.0*
@@ -71,7 +69,6 @@ fluoroscopy; and other.
    :align: center
    :alt: List of current display names
    :width: 1036px
-   :height: 962px
 
    Example list of display names
 
@@ -81,8 +78,7 @@ Changing x-ray system display names and user defined modality
 .. figure:: img/ConfigMenu.png
    :align: right
    :alt: Admin menu
-   :width: 235px
-   :height: 313px
+   :width: 179px
 
    The ``Config`` menu (admin)
 
@@ -103,8 +99,7 @@ edit these parameters. Click on the ``Update`` button to confirm your changes:
 .. figure:: img/UpdateDisplayName.png
    :align: center
    :alt: Update a display name
-   :width: 1080px
-   :height: 193px
+   :width: 1036px
 
    Example of the page for updating a display name and user defined modality
 
