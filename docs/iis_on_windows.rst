@@ -6,8 +6,8 @@ These instructions are for running OpenREM under IIS on Windows Server 2012, but
 later versions of Windows Server with minimal modification.
 The instructions are based on http://blog.mattwoodward.com/2016/07/running-django-application-on-windows.html
 
-Why using IIS
-=============
+Why use IIS?
+============
 The built-in Django webserver is not advised for production environments. There are a few alternatives for serving
 a Django application. Apache is probably the best known web server, but  has some requirements under Windows in
 combination with Python / Django that are hard to fulfill (see
@@ -135,16 +135,6 @@ Configure the new website
     - Click ``Ok`` twice to close the Request Restrictions dialog and the Add Module Mapping dialog
     - When prompted ``Do you want to create a FastCGI application for this executable?`` click ``No``
 
-Modify the application pool identity setting
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    - In the IIS manager under connections expand the tree under server name
-    - Left-click on the ``Application Pools`` item. The middle window pane now displays a table called ``Application Pools``
-    - In the middle window pane right-hand click on the OpenREM table row and choose ``Advanced settings``
-    - Under the ``Process Model`` heading there is an ``Identity`` option which is set to ``ApplicationPoolIdentity`` by default
-    - Change the ``Identity`` setting from ``ApplicationPoolIdentity`` to ``LocalSystem`` by clicking on ``ApplicationPoolIdentity`` and then selecting the three dots to the right of the box
-    - Click ``OK`` to dismiss the ``Advanced Settings``
-    
 
     The website should work now: browse to http://localhost:port (port is the number you configured the website on.
     If the port is 80, you can omit the colon and port number).
