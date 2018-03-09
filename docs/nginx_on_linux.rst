@@ -16,7 +16,6 @@ Prerequisites
       instructions in :doc:`startservices`
 
 .. contents::
-    :local:
 
 Steps to perform
 ================
