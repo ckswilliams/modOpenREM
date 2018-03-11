@@ -19,15 +19,10 @@ If planar X-ray studies are appearing in fluoroscopy or vice-versa, review
 
 * :doc:`i_displaynames`
 
-Query-retrieve issues
-=====================
+For DICOM networking:
 
-Refer to the :ref:`qrtroubleshooting` documentation
-
-OpenREM DICOM storage nodes
-===========================
-
-Refer to the :ref:`storetroubleshooting` documentation
+* :ref:`qrtroubleshooting` for query retrieve
+* :ref:`storetroubleshooting` for DICOM store
 
 Log files
 =========
