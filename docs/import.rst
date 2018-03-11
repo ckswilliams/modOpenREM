@@ -19,6 +19,11 @@ You can use wildcards to process a number of files at once, ie::
 
     openrem_rdsr.py *.dcm
 
+..  toctree::
+    :maxdepth: 1
+
+    import_multirdsr
+
 
 For mammography DICOM images
 ----------------------------

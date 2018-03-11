@@ -15,6 +15,7 @@ OpenREM version history
 * `#589`_  Exports: now handles zero studies and studies deleted during exports sensibly
 * `#587`_  Documentation: added instructions for Linux users to rotate logs
 * `#586`_  Documentation: updated exports and detailed how pulse level data is exported
+* `#585`_  Documentation: added information about multiple cumulative RDSRs
 * `#584`_  Import, Interface, Export: RDSR with pulse level data now function
 * `#581`_  Import scripts: interpreter line now always first, functions imported specifically
 * `#580`_  Imports and Interface: one modality creating both DX and RF can now be handled appropriately

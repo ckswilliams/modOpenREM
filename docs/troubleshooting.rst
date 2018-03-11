@@ -8,7 +8,16 @@ Troubleshooting
     trouble500
     troubleencoding
 
-If planar X-ray studies are appearing in fluoroscopy or vice-versa, review the :doc:`i_displaynames` docs.
+If you have a modality where every study has one event (usually CT), review
+
+.. toctree::
+    :maxdepth: 1
+
+    import_multirdsr
+
+If planar X-ray studies are appearing in fluoroscopy or vice-versa, review
+
+* :doc:`i_displaynames`
 
 Query-retrieve issues
 =====================
