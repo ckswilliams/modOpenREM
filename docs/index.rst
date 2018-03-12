@@ -27,12 +27,10 @@ Contents:
     configuration
     import
     netdicom
-    patientid
     i_navigate
     charts
     skindosemap
     i_exporting
-    i_administration
     troubleshooting
     code
     releasenotes
