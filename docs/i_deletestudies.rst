@@ -44,7 +44,14 @@ particular source, or you can use it to delete all the studies from one source i
    Source equipment review page with study delete options
 
 The details for that source are displayed, along with a table showing which sort of data is contained in each study.
-This works no-matter which modality the data comes from.
+Above the 'Study deletion options' panel the following two numbers are indicated:
+
+1. The number of studies associated with this equipment
+1. The number of studies associated with this equipment after being filtered by the indicated modality type
+
+If the second number is smaller than the first, this will indicate that some of the studies from the equipment have
+been labelled with a different modality type. There will therefore be an entry in one of the other tables on the
+equipment display name page.
 
 Delete studies and table entry
 ------------------------------
@@ -53,9 +60,14 @@ Use this button if you want to delete all the studies and remove the entry that 
 Names table. Otherwise, the entry would remain but with zero studies associated with it. The deletion takes a second
 confirmation step.
 
+If there are studies associated with this equipment that are listed with a modality type different to the one shown,
+those studies will not be deleted and the table entry will not be removed.
+
 Delete studies
 --------------
 
 If you have associated this table entry with a ``Display name`` and you want any future studies to fall under the same
 name, you can leave the entry in the Unique Equipment Names table. You might want to do this for example if you have
 a Display name of 'CR' or 'Imported'. Again, there is a confirmation step.
+
+Again, only the studies associated with this equipment that have the same modality type as shown will be deleted.
