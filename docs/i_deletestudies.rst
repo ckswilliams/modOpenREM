@@ -46,8 +46,8 @@ particular source, or you can use it to delete all the studies from one source i
 The details for that source are displayed, along with a table showing which sort of data is contained in each study.
 Above the 'Study deletion options' panel the following two numbers are indicated:
 
-1. The number of studies associated with this equipment
-1. The number of studies associated with this equipment after being filtered by the indicated modality type
+#. The number of studies associated with this equipment
+#. The number of studies associated with this equipment after being filtered by the indicated modality type
 
 If the second number is smaller than the first, this will indicate that some of the studies from the equipment have
 been labelled with a different modality type. There will therefore be an entry in one of the other tables on the
