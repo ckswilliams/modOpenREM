@@ -42,6 +42,7 @@ are repeated here.
     postgresql_windows
     backupMySQLWindows
 
+.. _webservers:
 
 Web servers
 ===========
