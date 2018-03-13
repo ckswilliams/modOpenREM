@@ -1,6 +1,6 @@
-#############
-Configuration
-#############
+###############################
+Configuration and adminstration
+###############################
 
 See also: ``local_settings.py`` :ref:`localsettingsconfig`
 
@@ -10,3 +10,6 @@ See also: ``local_settings.py`` :ref:`localsettingsconfig`
     i_deletesettings
     i_displaynames
     i_not_patient_indicator
+    patientid
+    i_deletestudies
+    i_patientsize

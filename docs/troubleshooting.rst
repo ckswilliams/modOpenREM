@@ -15,15 +15,14 @@ If you have a modality where every study has one event (usually CT), review
 
     import_multirdsr
 
-Query-retrieve issues
-=====================
+If planar X-ray studies are appearing in fluoroscopy or vice-versa, review
 
-Refer to the :ref:`qrtroubleshooting` documentation
+* :doc:`i_displaynames`
 
-OpenREM DICOM storage nodes
-===========================
+For DICOM networking:
 
-Refer to the :ref:`storetroubleshooting` documentation
+* :ref:`qrtroubleshooting` for query retrieve
+* :ref:`storetroubleshooting` for DICOM store
 
 Log files
 =========

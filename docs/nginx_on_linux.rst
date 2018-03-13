@@ -15,7 +15,7 @@ Prerequisites
     + A working OpenREM installation, that serves web pages using the built-in web server. You can test this using the
       instructions in :doc:`startservices`
 
-.. contents:: :local:
+.. contents::
 
 Steps to perform
 ================
