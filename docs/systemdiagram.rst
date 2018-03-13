@@ -83,7 +83,7 @@ Alternatives
 ------------
 
 1: Web servers
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 The recommended web server for Windows is Microsoft IIS - see :doc:`iis_on_windows` for details. This
 has replaced the recommendation to use :doc:`apache_on_windows` due to difficulties in obtaining the
 required binary files, as described in the :ref:`webservers` section of the installation document.
