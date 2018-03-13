@@ -30,13 +30,14 @@ combination of the following eight fields:
     * gantry id
 
 The default text for ``display name`` is set to a combination of
-``institution name`` and ``station name``.
+``institution name`` and ``station name``. The default display name text can be changed by a user in the ``admingroup``
+— see :ref:`changing_display_names`
 
 User defined modality field
 ===========================
 
 OpenREM determines the modality type of a system based on the information in
-the DICOM dose structured report . However sometimes this mechanism failes
+the DICOM radiation dose structured report. However sometimes this mechanism fails
 because vendors use templates meant for RF also for DX systems. Therefore it
 is possible from version 0.8.0 to set a modality type for each system manually.
 A manually set modality type overrides the automatically determined value.
@@ -68,6 +69,8 @@ fluoroscopy; and other.
    :width: 1036px
 
    Example list of display names
+
+.. _changing_display_names:
 
 Changing X-ray system display names and user defined modality
 =============================================================
@@ -119,8 +122,8 @@ you have selected and assign them to DX or RF. The studies will then be displaye
 interface and will export correctly. New RDSRs relating to that X-ray system will be assigned a modality in the same
 way.
 
-If after an X-ray system has been set to Dual you wish to reprocess the studies again, you can use the 'reprocess' link
-in the 'User defined modality' cell:
+After an X-ray system has been set to Dual you may wish to reprocess the studies to assign modality again. To do this
+you can use the 'reprocess' link in the 'User defined modality' cell:
 
 ..  figure:: img/ReprocessModality.png
     :align: center
