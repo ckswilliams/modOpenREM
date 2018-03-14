@@ -24,6 +24,8 @@ If Hologic mammo DBT studies derived from the projection images object have no a
 .. toctree::
     :maxdepth: 1
 
+    troubledbtlaterality
+
 For DICOM networking:
 
 * :ref:`qrtroubleshooting` for query retrieve
