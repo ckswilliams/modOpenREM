@@ -13,10 +13,20 @@ per breast.
 How to use the code
 ===================
 
+Create a new file in your Python OpenREM folder which we will add the code to. For example it could be called
+``fix_dbt_laterality.py``:
 
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/fix_dbt_laterality.py``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/fix_dbt_laterality.py``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/fix_dbt_laterality.py``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\fix_dbt_laterality.py``
+* Windows virtualenv: ``Lib\site-packages\openrem\fix_dbt_laterality.py``
 
-The code
-========
+Copy and paste the code from below. You will need to edit the ``DISPLAY_NAME`` tp match the Display name you have
+configured for the Hologic DBT system that needs to be modified.
+
+If you are working on Linux, you may like to look at the brief tips on using ``nano`` on the NGINX
+:ref:`troubleshooting` section.
 
 .. sourcecode:: python
 
@@ -39,7 +49,7 @@ The code
 
     # setup django/OpenREM
     basepath = os.path.dirname(__file__)
-    projectpath = os.path.abspath(os.path.join(basepath, "..", "openrem"))
+    projectpath = os.path.abspath(os.path.join(basepath, ))
     if projectpath not in sys.path:
         sys.path.insert(1, projectpath)
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'openremproject.settings')
@@ -48,7 +58,7 @@ The code
     from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_or_create_cid
 
-    DISPLAY_NAME = "The Royal Marsden This Station"
+    DISPLAY_NAME = "Display name of my Hologic"
 
 
     def _accumulatedxraydose(proj):
@@ -141,3 +151,32 @@ The code
     print(u"Post update, total events is {0}, of which {1} are Right, {2} are Left and {3} are null (remainder {4})".format(
         events.count(), events_r.count(), events_l.count(), events_n.count(),
         events.count() - events_r.count() - events_l.count() - events_n.count()))
+
+Run the fix
+===========
+
+In a shell/command window, activate your virtualenv if you are using one, and change directory to the openrem folder:
+
+* Ubuntu linux: ``cd /usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``cd /usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``cd lib/python2.7/site-packages/openrem/``
+* Windows: ``cd C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``cd Lib\site-packages\openrem\``
+
+Then:
+
+.. sourcecode:: bash
+
+    python fix_dbt_laterality.py
+
+This should generate the following response, with one message for each event that can't be assigned laterality due to
+the acquisition protocol name not starting with ``L`` or ``R``:
+
+.. sourcecode:: bash
+
+    Total events is 1, of which 0 are Right, 0 are Left and 1 are null (remainder 0)
+    Event acquisition protocol is Flat Field Tomo so we couldn't assign it left or right. Exam ID is 261384
+    Post update, total events is 1, of which 0 are Right, 0 are Left and 1 are null (remainder 0)
+
+The Exam ID referred to is the database ID, so if you look at a mammography exam in the web interface, you can change
+the Exam ID in the URL if you want to review that study.
