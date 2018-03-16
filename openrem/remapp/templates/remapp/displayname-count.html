@@ -1,4 +1,4 @@
-<td>
+<div style="display:none;">{{ latest|date:"Ymd" }}</div>
   {{ count }},
   {% if count_all %}
    (of {{ count_all }}),
@@ -6,4 +6,3 @@
   {% if latest %}
     latest {{ latest }}
   {% endif %}
-</td>
