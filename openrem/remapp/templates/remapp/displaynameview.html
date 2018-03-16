@@ -14,12 +14,6 @@
       Display name documentation
     </a>
   </li>
-  <li>
-    <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_deletestudies.html" target="_blank"
-       data-toggle="tooltip" title="Study deletion documentation - opens in a new tab">
-      Study deletion documentation
-    </a>
-  </li>
 {% endblock %}
 
 {% block toprow %}
@@ -69,6 +63,8 @@
                       type: "POST",
                       success: function (data) {
                           $('#{{ modality }}-names').html(data);
+                          var display_name_table_{{ modality }} = document.getElementById("display_name_table_{{ modality }}");
+                          sorttable.makeSortable(display_name_table_{{ modality }});
                       }
                   }
               )

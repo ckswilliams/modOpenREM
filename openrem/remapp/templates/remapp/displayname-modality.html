@@ -1,5 +1,5 @@
 <p>There are {{ name_set.count }} entries in this table. Back to the <a href="#top">top</a>.</p>
-<table class="table table-bordered table-hover row-clickable sortable">
+<table class="table table-bordered table-hover row-clickable sortable" id="display_name_table_{{ modality }}">
   <tr>
     {% if admin.admingroup %}
       <th>Update?</th>
