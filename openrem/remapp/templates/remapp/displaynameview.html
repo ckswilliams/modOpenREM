@@ -44,10 +44,6 @@
     <form action="/openrem/updatedisplaynames/" method="get">
     <script>
         jQuery(document).ready(function ($) {
-            $(".clickable-row").click(function () {
-                var row_name = $(this).attr('row_name');
-                $('input[name=' + row_name + ']').prop("checked", !$('input[name=' + row_name + ']').prop("checked"));
-            });
             $('input').click(function () {
                 $(this).prop("checked", !$(this).prop("checked"));
             });
@@ -69,6 +65,15 @@
                       type: "POST",
                       success: function (data) {
                           $('#{{ modality }}-names').html(data);
+                          var display_name_table_{{ modality }} = document.getElementById("display_name_table_{{ modality }}");
+                          sorttable.makeSortable(display_name_table_{{ modality }});
+
+                          {% if admin.admingroup %}
+                          $("#display_name_table_{{ modality }} .clickable-row").click(function () {
+                              var row_name = $(this).attr('row_name');
+                              $('input[name=' + row_name + ']').prop("checked", !$('input[name=' + row_name + ']').prop("checked"));
+                          });
+                          {% endif %}
                       }
                   }
               )

@@ -14,7 +14,7 @@
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
 #    Foundation trust in connection with this Program in any press or
-#    other public announcement without the prior written consent of 
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -89,6 +89,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/review/studiesdelete$', 'review_studies_delete', name='review_studies_delete'),
     url(r'^admin/review/studiesequipdelete$', 'review_studies_equip_delete', name='review_studies_equip_delete'),
     url(r'^admin/equipmentcount$', 'display_name_count', name='display_name_count'),
+    url(r'^admin/equipmentlastdate$', 'display_name_last_date', name='display_name_last_date'),
     url(r'^chartoptions/$', 'chart_options_view', name='chart_options_view'),
     url(r'^admin/dicomsummary', 'dicom_summary', name='dicom_summary'),
     url(r'^admin/dicomstore/add/$', DicomStoreCreate.as_view(), name='dicomstore_add'),

@@ -2148,16 +2148,34 @@ def display_name_count(request):
         data = request.POST
         modality = data.get('modality')
         equip_name_pk = data.get('equip_name_pk')
+        studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
+        count = studies.count()
+        template = 'remapp/displayname-count.html'
+        return render(request, template, {
+            'count': count,
+            'count_all': count_all,
+        })
+
+
+def display_name_last_date(request):
+    """AJAX view to return the most recent study date associated with an entry in the equipment database
+
+    :param request: Request object containing modality and equipment table ID
+    :return: HTML table data element
+    """
+
+    if request.is_ajax():
+        data = request.POST
+        modality = data.get('modality')
+        equip_name_pk = data.get('equip_name_pk')
         latest = None
         studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
         count = studies.count()
         if count:
             latest = studies.latest('study_date').study_date
-        template = 'remapp/displayname-count.html'
+        template = 'remapp/displayname-last-date.html'
         return render(request, template, {
-            'count': count,
             'latest': latest,
-            'count_all': count_all,
         })
 
 
