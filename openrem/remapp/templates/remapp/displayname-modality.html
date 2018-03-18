@@ -53,7 +53,7 @@
                 function get_latest_studies(json) {
                     $.ajax(
                         {
-                            url: "/admin/equipmentcount",
+                            url: "/admin/equipmentlastdateandcount",
                             data: {
                                 modality: '{{ modality }}',
                                 equip_name_pk: '{{ eachrow.pk }}',
@@ -61,21 +61,8 @@
                             },
                             type: "POST",
                             success: function (data) {
-                                $('#{{ modality }}-count-{{ eachrow.pk }}').html(data);
-                            }
-                        }
-                    );
-                    $.ajax(
-                        {
-                            url: "/admin/equipmentlastdate",
-                            data: {
-                                modality: '{{ modality }}',
-                                equip_name_pk: '{{ eachrow.pk }}',
-                                csrfmiddlewaretoken: '{{ csrf_token }}'
-                            },
-                            type: "POST",
-                            success: function (data) {
-                                $('#{{ modality }}-latest-{{ eachrow.pk }}').html(data);
+                                $('#{{ modality }}-count-{{ eachrow.pk }}').html(data.count_html);
+                                $('#{{ modality }}-latest-{{ eachrow.pk }}').html(data.latest_html);
                             }
                         }
                     )
