@@ -4,6 +4,8 @@ OpenREM version history
 
 0.8.0b2 (2018-03-??)
 --------------------
+* `#609`_  Interface: fixed the feature that toggles the selection when clicking anywhere on a display name table row
+* `#608`_  Interface: fixed the broken sorting of display name table
 * `#603`_  Interface: fixed JavaScript error if there are any None values in fluoro detail irradiation type table
 * `#602`_  Skin dose maps: fixed error when there are multiple kVp values for a single irradiation event
 * `#599`_  Installation: postgres instructions now include note about differing security choices
