@@ -49,16 +49,17 @@ OpenREM version history
 * `#534`_  Interface: chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#532`_  DICOM: documented how to work-around missing encoding charsets due to old pydicom
-* `#529`_  Charts: Added CT charts of number of irradiation events per study description and requested procedure
-* `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
-* `#526`_  Code quality: Addressed some of the code quality/style issues raised by `Codacy`_
-* `#525`_  Importing: Improved mammo import by checking compression force before converting to float
-* `#524`_  Importing: Improved mammo import by checking anode exists before converting to DICOM terms
-* `#523`_  Importing: Changed mammo import to use del_no_match instead of del_mg_im if not mammo
-* `#521`_  Testing: Added tests for dual source CT imports
-* `#520`_  Imports: Removed XML styling from Philips legacy CT comment creation
-* `#518`_  Importing: Fixed imports where CT Target Region isn't specified
-* `#517`_  Interface: Operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
+* `#529`_  Charts: added CT charts of number of irradiation events per study description and requested procedure
+* `#528`_  Query Retrieve: reduced number of simultaneous associations to one, reused for everything
+* `#526`_  Code quality: addressed some of the code quality/style issues raised by `Codacy`_
+* `#525`_  Importing: improved mammo import by checking compression force before converting to float
+* `#524`_  Importing: improved mammo import by checking anode exists before converting to DICOM terms
+* `#523`_  Importing: changed mammo import to use del_no_match instead of del_mg_im if not mammo
+* `#522`_  Documentation: made it clearer on offline-install docs that version numbers will change
+* `#521`_  Testing: added tests for dual source CT imports
+* `#520`_  Imports: removed XML styling from Philips legacy CT comment creation
+* `#518`_  Importing: fixed imports where CT Target Region isn't specified
+* `#517`_  Interface: operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
 * `#516`_  Imports: MultiValue person names are now stored as a decoded string, not a list
 * `#511`_  Testing: develop and other branches can now be deployed to dev.openrem.org and testing.openrem.org automatically
 * `#509`_  Skin dose maps: now recalculated on view if recorded height or weight has changed since last calculation
