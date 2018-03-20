@@ -8,6 +8,7 @@
 # See https://bitbucket.org/openrem/openrem/issues/411
 
 import os
+import sys
 import django
 import logging
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,13 +16,17 @@ from django.core.exceptions import ObjectDoesNotExist
 logger = logging.getLogger(__name__)
 
 # setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", "openrem"))
+if projectpath not in sys.path:
+    sys.path.insert(1, projectpath)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'openremproject.settings')
 django.setup()
 
 from remapp.models import IrradEventXRayData
 from remapp.tools.get_values import get_or_create_cid
 
-DISPLAY_NAME = "RMH Sutton RDAC 3"
+DISPLAY_NAME = "The Royal Marsden This Station"
 
 
 def _accumulatedxraydose(proj):

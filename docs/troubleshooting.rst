@@ -19,6 +19,13 @@ If planar X-ray studies are appearing in fluoroscopy or vice-versa, review
 
 * :doc:`i_displaynames`
 
+If Hologic mammo DBT studies derived from the projection images object have no accumulated AGD, review
+
+.. toctree::
+    :maxdepth: 1
+
+    troubledbtlaterality
+
 For DICOM networking:
 
 * :ref:`qrtroubleshooting` for query retrieve

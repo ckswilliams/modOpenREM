@@ -41,6 +41,7 @@ OpenREM version history
 * `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
 * `#552`_  Documentation: documented extractor for older Toshiba CT scanners
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
+* `#549`_  Documentation: added procedure for fixing laterality on Hologic studies, ref `#411`_
 * `#544`_  Interface: added procedure, requested procedure to summary listings and details and filtering
 * `#543`_  Interface: added drop-down box to choose how many studies are displayed on filtered pages
 * `#542`_  Interface: added display name to all detailed html pages
@@ -122,7 +123,7 @@ OpenREM version history
 * `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
 * `#414`_  Reduced use of JavaScript global variables and improved JavaScript objects
-* `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
+* `#411`_  Imports: fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
 * `#318`_  Database management: Display names view can be used to review and delete all studies from one source
 * `#114`_  Imports: Subsequent RDSRs of the same study will now replace existing study in database
 * `#61`_  Skin dose maps: These have been re-enabled, and currently work for Siemens systems
