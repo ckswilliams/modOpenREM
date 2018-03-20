@@ -260,7 +260,8 @@ class DicomQueryForm(forms.Form):
             attrs={"checked": ""}), required=False, help_text=("At least one modality must be ticked - if SR only is "
                                                               "ticked (Advanced) these modalities will be ignored"))
     inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=False,
-                                      help_text="Normally only useful if querying a store holding just DICOM Radiation Dose Structured Reports")
+                                      help_text="Only use with stores containing only RDSRs, "
+                                                "with no accompanying images")
     duplicates_field = forms.BooleanField(label='Ignore studies already in the database?', required=False, initial=True,
                                           help_text="Studies with the same study UID won't be imported, so there isn't any point getting them!")
     desc_exclude_field = forms.CharField(required=False,
@@ -306,9 +307,9 @@ class DicomQueryForm(forms.Form):
                 Accordion(
                     AccordionGroup(
                         'Advanced',
-                        'inc_sr_field',
                         'duplicates_field',
                         'get_toshiba_images_field',
+                        'inc_sr_field',
                         active=False
                     )
                 ),
