@@ -10,6 +10,14 @@ The code below allows the laterality to be derived automatically from the acquis
 name has ``R`` or ``L`` as the first letter. When this information is derived, the accumulated AGD is also calculated
 per breast.
 
+Back up your database
+=====================
+
+It is always best practice to backup your database before running code to edit your database:
+
+* For PostgreSQL you can refer to :ref:`backup-psql-db`
+* For a non-production SQLite3 database, simply make a copy of the database file
+
 How to use the code
 ===================
 
@@ -22,14 +30,14 @@ Create a new file in your Python OpenREM folder (the folder ``manage.py`` is in)
 * Windows: ``C:\Python27\Lib\site-packages\openrem\fix_dbt_laterality.py``
 * Windows virtualenv: ``Lib\site-packages\openrem\fix_dbt_laterality.py``
 
-Copy and paste into the new file the code from below. You will need to edit the ``DISPLAY_NAME`` to match the Display
+Copy and paste into the new file the code from below. You will need to edit the ``DISPLAY_NAME`` to match the display
 name you have configured for the Hologic DBT system that needs to be modified. If you are not sure what this is, go to
 the home page of your OpenREM installation and see how the Hologic unit is listed there. You will not be able to copy
 and paste from there as if you click on it it will load that page, and likewise on the summary list page. If you click
 through to the study detail page, you will find the display name listed in the details there. See the
 :doc:`i_displaynames` documentation for more information.
 
-If you are working on Linux, you may like to look at the brief tips on using ``nano`` on the NGINX
+If you are working on Linux, you may like to look at the brief tips on using ``nano`` on the Nginx
 :ref:`troubleshooting` section.
 
 .. sourcecode:: python
@@ -62,8 +70,10 @@ If you are working on Linux, you may like to look at the brief tips on using ``n
     from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_or_create_cid
 
+    # ******************************************************
+    # Update the DISPLAY_NAME
     DISPLAY_NAME = "Display name of my Hologic"
-
+    # ******************************************************
 
     def _accumulatedxraydose(proj):
         """
@@ -178,9 +188,25 @@ the acquisition protocol name not starting with ``L`` or ``R``:
 
 .. sourcecode:: bash
 
-    Total events is 1, of which 0 are Right, 0 are Left and 1 are null (remainder 0)
-    Event acquisition protocol is Flat Field Tomo so we couldn't assign it left or right. Exam ID is 261384
-    Post update, total events is 1, of which 0 are Right, 0 are Left and 1 are null (remainder 0)
+    Total events is 46410, of which 0 are Right, 0 are Left and 46410 are null (remainder 0)
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 184466
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 75963
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 75919
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 76004
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 83784
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 83784
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 84912
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 100765
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 110471
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 121500
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 121588
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 123462
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 137145
+    Event acquisition protocol is ACR Phantom Combo so we couldn't assign it left or right. Exam ID is 140563
+    Event acquisition protocol is Flat Field Tomo so we couldn't assign it left or right. Exam ID is 156826
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 165131
+    Event acquisition protocol is Flat Field Combo so we couldn't assign it left or right. Exam ID is 165486
+    Post update, total events is 46410, of which 23323 are Right, 23070 are Left and 17 are null (remainder 0)
 
 The Exam ID referred to is the database ID, so if you look at a mammography exam in the web interface, you can change
 the Exam ID in the URL if you want to review that study.
