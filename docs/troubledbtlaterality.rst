@@ -13,7 +13,7 @@ per breast.
 How to use the code
 ===================
 
-Create a new file in your Python OpenREM folder which we will add the code to. For example it could be called
+Create a new file in your Python OpenREM folder (the folder ``manage.py`` is in). For example it could be called
 ``fix_dbt_laterality.py``:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/fix_dbt_laterality.py``
@@ -22,8 +22,12 @@ Create a new file in your Python OpenREM folder which we will add the code to. F
 * Windows: ``C:\Python27\Lib\site-packages\openrem\fix_dbt_laterality.py``
 * Windows virtualenv: ``Lib\site-packages\openrem\fix_dbt_laterality.py``
 
-Copy and paste the code from below. You will need to edit the ``DISPLAY_NAME`` tp match the Display name you have
-configured for the Hologic DBT system that needs to be modified.
+Copy and paste into the new file the code from below. You will need to edit the ``DISPLAY_NAME`` to match the Display
+name you have configured for the Hologic DBT system that needs to be modified. If you are not sure what this is, go to
+the home page of your OpenREM installation and see how the Hologic unit is listed there. You will not be able to copy
+and paste from there as if you click on it it will load that page, and likewise on the summary list page. If you click
+through to the study detail page, you will find the display name listed in the details there. See the
+:doc:`i_displaynames` documentation for more information.
 
 If you are working on Linux, you may like to look at the brief tips on using ``nano`` on the NGINX
 :ref:`troubleshooting` section.
