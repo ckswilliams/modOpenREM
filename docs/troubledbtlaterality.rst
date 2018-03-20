@@ -210,3 +210,9 @@ the acquisition protocol name not starting with ``L`` or ``R``:
 
 The Exam ID referred to is the database ID, so if you look at a mammography exam in the web interface, you can change
 the Exam ID in the URL if you want to review that study.
+
+Multiple Hologic units
+======================
+
+If you have more than one unit that has studies that need fixing, simply change the ``DISPLAY_NAME`` and run the code
+again.
