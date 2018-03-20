@@ -920,7 +920,7 @@ def parse_args(argv):
     parser.add_argument('-toshiba', action="store_true",
                         help='Advanced: Attempt to retrieve CT dose summary objects and one image from each series')
     parser.add_argument('-sr', action="store_true",
-                        help='Advanced: Query for structured report only studies. Cannot be used with -ct, -mg, -fl, -dx')
+                        help='Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx')
     parser.add_argument('-dup', action="store_true",
                         help="Advanced: Retrieve duplicates (studies that are already in database)")
     args = parser.parse_args(argv)
