@@ -681,23 +681,6 @@ def qrscu(
                 study.delete()
         logger.debug(u"Finished removing studies that have anything other than SR in.")
 
-    # FIXME: why not perform at series level? Fixes the problem of additional series that might be missed, but
-    # would need to be  combined with changes to extractor scripts
-    if remove_duplicates:
-        logger.debug(u"About to remove any studies we already have in the database")
-        query.stage = u'Checking to see if any response studies are already in the OpenREM database'
-        try:
-            query.save()
-        except Exception as e:
-            logger.error(u"query.save in remove duplicates didn't work because of {0}".format(e))
-        logger.info(
-            u'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
-        for uid in study_rsp.values_list('study_instance_uid', flat=True):
-            if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
-                study_rsp.filter(study_instance_uid__exact=uid).delete()
-        study_rsp = query.dicomqrrspstudy_set.all()
-        logger.info(u'After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
-
     filter_logs = []
     if filters['study_desc_inc']:
         filter_logs += [u"study description includes {0}, ".format(u", ".join(filters['study_desc_inc']))]
@@ -752,6 +735,33 @@ def qrscu(
 
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info(u'Now have {0} studies'.format(study_rsp.count()))
+
+    if remove_duplicates:
+        logger.debug(u"About to remove any studies we already have in the database")
+        query.stage = u'Checking to see if any response studies are already in the OpenREM database'
+        try:
+            query.save()
+        except Exception as e:
+            logger.error(u"query.save in remove duplicates didn't work because of {0}".format(e))
+        logger.info(
+            u'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
+        for study in study_rsp:
+            existing_study = GeneralStudyModuleAttr.objects.filter(study_instance_uid=study.study_instance_uid)
+            if existing_study.exists():
+                existing_series_instance_uid = existing_study[0].series_instance_uid
+                existing_series_time = existing_study[0].series_time
+                for series_rsp in study.dicomqrrspseries_set.all():
+                    if series_rsp.modality == 'SR':
+                        if series_rsp.series_instance_uid == existing_series_instance_uid:
+                            series_rsp.delete()
+                        elif existing_series_time and (series_rsp.series_time < existing_series_time):
+                            series_rsp.delete()
+
+                            # TODO: Do the SOPInstanceUID check fro MG/DX. Adde SeriesTime to _query_series
+
+
+        study_rsp = query.dicomqrrspstudy_set.all()
+        logger.info(u'After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
 
     # done
     my_ae.Quit()
