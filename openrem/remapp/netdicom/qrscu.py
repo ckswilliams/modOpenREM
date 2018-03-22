@@ -339,6 +339,7 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False, msg_id=N
 
 
 def _query_series(assoc, d2, studyrsp, query_id):
+    from remapp.tools.dcmdatetime import get_time
     from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspSeries
     d2.QueryRetrieveLevel = "SERIES"
@@ -349,6 +350,7 @@ def _query_series(assoc, d2, studyrsp, query_id):
     d2.NumberOfSeriesRelatedInstances = ''
     d2.StationName = ''
     d2.SpecificCharacterSet = ''
+    d2.SeriesTime = ''
 
     logger.debug(u'Query_id {0}: In _query_series'.format(query_id))
     logger.debug(u'Query_id {0}: series query is {1}'.format(query_id, d2))
@@ -380,6 +382,7 @@ def _query_series(assoc, d2, studyrsp, query_id):
         if not seriesrsp.number_of_series_related_instances:
             seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
         seriesrsp.station_name = get_value_kw('StationName', series[1])
+        seriesrsp.series_time = get_time('SeriesTime', series[1])
         logger.debug(u"Series Response {0}: Modality {1}, StationName {2}, StudyUID {3}, Series No. {4}, "
                      u"Series description {5}".format(
                             seRspNo, seriesrsp.modality, seriesrsp.station_name, d2.StudyInstanceUID,
@@ -754,12 +757,19 @@ def qrscu(
                     if series_rsp.modality == 'SR':
                         if series_rsp.series_instance_uid == existing_series_instance_uid:
                             series_rsp.delete()
-                        elif existing_series_time and (series_rsp.series_time < existing_series_time):
+                        elif existing_series_time and series_rsp.series_time and (
+                                series_rsp.series_time < existing_series_time
+                        ):
                             series_rsp.delete()
-
-                            # TODO: Do the SOPInstanceUID check fro MG/DX. Adde SeriesTime to _query_series
-
-
+                    elif series_rsp.modality in ['MG', 'DX', 'CR']:
+                        _query_images(assoc, series_rsp, query_id)
+                        for image_rsp in series_rsp.dicomqrrspimage_set.all():
+                            if existing_study.filter(
+                                    projectionxrayradiationdose__irradeventxraydata__irradiation_event_uid=\
+                                    image_rsp.sop_instance_uid).exists():
+                                image_rsp.delete()
+                                series_rsp.image_level_move = True  # If we have deleted images we need to set this flag
+                                series_rsp.save()
         study_rsp = query.dicomqrrspstudy_set.all()
         logger.info(u'After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
 
