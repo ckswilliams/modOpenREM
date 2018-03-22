@@ -35,6 +35,50 @@ logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that 
 
 from remapp.netdicom.tools import _create_ae
 
+def _remove_duplicates(query, study_rsp, assoc, query_id):
+    """
+    Checks for objects in C-Find response already being in the OpenREM database to remove them from the C-Move request
+    :param query: Query object in database
+    :param study_rsp: study level C-Find response object in database
+    :param assoc: current DICOM Query object
+    :param query_id: current query ID for logging
+    :return: Study, series and image level responses deleted if not useful
+    """
+    from remapp.models import GeneralStudyModuleAttr
+
+    logger.debug(u"About to remove any studies we already have in the database")
+    query.stage = u'Checking to see if any response studies are already in the OpenREM database'
+    try:
+        query.save()
+    except Exception as e:
+        logger.error(u"query.save in remove duplicates didn't work because of {0}".format(e))
+    logger.info(
+        u'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
+    for study in study_rsp:
+        existing_study = GeneralStudyModuleAttr.objects.filter(study_instance_uid=study.study_instance_uid)
+        if existing_study.exists():
+            existing_series_instance_uid = existing_study[0].series_instance_uid
+            existing_series_time = existing_study[0].series_time
+            for series_rsp in study.dicomqrrspseries_set.all():
+                if series_rsp.modality == 'SR':
+                    if series_rsp.series_instance_uid == existing_series_instance_uid:
+                        series_rsp.delete()
+                    elif existing_series_time and series_rsp.series_time and (
+                            series_rsp.series_time < existing_series_time
+                    ):
+                        series_rsp.delete()
+                elif series_rsp.modality in ['MG', 'DX', 'CR']:
+                    _query_images(assoc, series_rsp, query_id)
+                    for image_rsp in series_rsp.dicomqrrspimage_set.all():
+                        if existing_study.filter(
+                                projectionxrayradiationdose__irradeventxraydata__irradiation_event_uid=
+                                image_rsp.sop_instance_uid).exists():
+                            image_rsp.delete()
+                            series_rsp.image_level_move = True  # If we have deleted images we need to set this flag
+                            series_rsp.save()
+    study_rsp = query.dicomqrrspstudy_set.all()
+    logger.info(u'After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
+
 
 def _filter(query, level, filter_name, filter_list, filter_type):
     """
@@ -559,7 +603,7 @@ def qrscu(
 
     from dicom.dataset import Dataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
-    from remapp.models import GeneralStudyModuleAttr, DicomQuery, DicomRemoteQR, DicomStoreSCP
+    from remapp.models import DicomQuery, DicomRemoteQR, DicomStoreSCP
     from remapp.tools.dcmdatetime import make_dcm_date_range
 
     debug_timer = datetime.now()
@@ -740,38 +784,7 @@ def qrscu(
     logger.info(u'Now have {0} studies'.format(study_rsp.count()))
 
     if remove_duplicates:
-        logger.debug(u"About to remove any studies we already have in the database")
-        query.stage = u'Checking to see if any response studies are already in the OpenREM database'
-        try:
-            query.save()
-        except Exception as e:
-            logger.error(u"query.save in remove duplicates didn't work because of {0}".format(e))
-        logger.info(
-            u'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
-        for study in study_rsp:
-            existing_study = GeneralStudyModuleAttr.objects.filter(study_instance_uid=study.study_instance_uid)
-            if existing_study.exists():
-                existing_series_instance_uid = existing_study[0].series_instance_uid
-                existing_series_time = existing_study[0].series_time
-                for series_rsp in study.dicomqrrspseries_set.all():
-                    if series_rsp.modality == 'SR':
-                        if series_rsp.series_instance_uid == existing_series_instance_uid:
-                            series_rsp.delete()
-                        elif existing_series_time and series_rsp.series_time and (
-                                series_rsp.series_time < existing_series_time
-                        ):
-                            series_rsp.delete()
-                    elif series_rsp.modality in ['MG', 'DX', 'CR']:
-                        _query_images(assoc, series_rsp, query_id)
-                        for image_rsp in series_rsp.dicomqrrspimage_set.all():
-                            if existing_study.filter(
-                                    projectionxrayradiationdose__irradeventxraydata__irradiation_event_uid=\
-                                    image_rsp.sop_instance_uid).exists():
-                                image_rsp.delete()
-                                series_rsp.image_level_move = True  # If we have deleted images we need to set this flag
-                                series_rsp.save()
-        study_rsp = query.dicomqrrspstudy_set.all()
-        logger.info(u'After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
+        _remove_duplicates(query, study_rsp, assoc, query_id)
 
     # done
     my_ae.Quit()
