@@ -22,7 +22,7 @@ import sys
 import uuid
 import collections
 
-
+logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
@@ -31,9 +31,9 @@ if projectpath not in sys.path:
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
-logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 
 from remapp.netdicom.tools import _create_ae
+
 
 def _remove_duplicates(query, study_rsp, assoc, query_id):
     """
