@@ -195,11 +195,12 @@ class DicomQRRspSeries(models.Model):
     query_id = models.CharField(max_length=64)
     series_instance_uid = models.TextField(blank=True, null=True)
     series_number = models.IntegerField(blank=True, null=True)
+    series_time = models.TimeField(blank=True, null=True)
     modality = models.CharField(max_length=16, blank=True, null=True)
     series_description = models.TextField(blank=True, null=True)
     number_of_series_related_instances = models.IntegerField(blank=True, null=True)
     station_name = models.CharField(max_length=16, blank=True, null=True)
-    sop_class_in_series = models.TextField(blank=True,null=True)
+    sop_class_in_series = models.TextField(blank=True, null=True)
     image_level_move = models.BooleanField(default=False)
 
 
@@ -476,6 +477,7 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     requested_procedure_code_value = models.TextField(blank=True, null=True)
     requested_procedure_code_meaning = models.TextField(blank=True, null=True)
     # Series and content to distinguish between multiple cumulative RDSRs
+    series_instance_uid = models.TextField(blank=True, null=True)
     series_time = models.TimeField(blank=True, null=True)
     content_time = models.TimeField(blank=True, null=True)
 
