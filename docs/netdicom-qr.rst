@@ -151,21 +151,21 @@ example PowerShell script is shown below:
     # Run the openrem_qr.py script with yesterday's date as the to and from date
     python D:\Server_Apps\python27\Scripts\openrem_qr.py 2 1 -ct -f $dateString -t $dateString
 
-The above PowerShell script could be run on a regular basis by adding a task to the Windows `Task Scheduler` that
-executes the `powershell` program with an argument of `-file C:\\path\\to\\script.ps1`.
+The above PowerShell script could be run on a regular basis by adding a task to the Windows ``Task Scheduler`` that
+executes the ``powershell`` program with an argument of ``-file C:\\path\\to\\script.ps1``.
 
 *********************
 Query filtering logic
 *********************
 
 #. First we query for each modality chosen in turn to get matching responses at study level.
-#. If the optional `ModalitiesInStudy` has been populated in the response, and if you have ticked
-   `Include SR only studies`, then any studies with anything other than just `SR` studies is removed from the response
+#. If the optional ``ModalitiesInStudy`` has been populated in the response, and if you have ticked
+   ``Include SR only studies``, then any studies with anything other than just `SR` studies is removed from the response
    list.
-#. If any study description or station name filters have been added, and if the `StudyDescription` and/or `StationName`
-   tags are returned by the remote server, the study response list is filtered accordingly.
+#. If any study description or station name filters have been added, and if the ``StudyDescription`` and/or
+  ``StationName`` tags are returned by the remote server, the study response list is filtered accordingly.
 #. For the remaining study level responses, each series is queried.
-#. If `ModalitiesInStudy` was not returned, it is now built from the series level responses.
+#. If ``ModalitiesInStudy`` was not returned, it is now built from the series level responses.
 #. If the remote server returned everything rather than just the modalities we asked for, the study level responses are
    now filtered accordingly.
 
