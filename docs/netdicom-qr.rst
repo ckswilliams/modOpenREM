@@ -47,16 +47,16 @@ Query-retrieve using the web interface
 Advanced query options
 ======================
 
-* **Ignore studies already in the database** *default ticked*: Normally
-The RDSR import routine checks for the existence of the
-  study UID in the database, and if it is found they it doesn't go any further. This might change in the future as there
-  are instances where two RDSRs might legitimately have the same study UID, but different event UIDs. For image based
-  imports, the individual events are checked, so if you think there is a reasonable chance that the database is missing
-  individual images from a study, then you might like to deselect this setting. If the same dates are selected multiple
-  times (to update during a day for example), activating this setting will result in the same exams all being
-  transferred each time.
+* **Attempt to get Toshiba dose images** *default not ticked*: If you have done the extra installation and configuration
+  required for creating RDSRs from older Toshiba scanners, then you can tick this box for `CT` searches to get the
+  images needed for this process. See the logic description below for details.
+* **Ignore studies already in the database** *default ticked*: By default OpenREM will attempt to avoid downloading any
+  DICOM objects (RDSRs or images) that have already been imported into the database. Untick this box to override that
+  behaviour and download all suitable objects. See the logic description below for details.
 * **Include SR only studies** *default not ticked*: If you have a DICOM store with only the radiation dose structured
-  reports (RDSR) in, or a mix of whole studies and RDSRs without the corresponding study, then tick this box.
+  reports (RDSR) in, or a mix of whole studies and RDSRs without the corresponding study, then tick this box. Any
+  studies with images and RDSRS will be ignored (they can be found without this option). If this box is ticked any
+  modality choices will be ignored.
 
 When you have finished the query parameters, click ``Submit``
 
