@@ -158,15 +158,15 @@ executes the `powershell` program with an argument of `-file C:\\path\\to\\scrip
 Query filtering logic
 *********************
 
-1. First we query for each modality chosen in turn to get matching responses at study level.
-1. If the optional `ModalitiesInStudy` has been populated in the response, and if you have ticked
+#. First we query for each modality chosen in turn to get matching responses at study level.
+#. If the optional `ModalitiesInStudy` has been populated in the response, and if you have ticked
    `Include SR only studies`, then any studies with anything other than just `SR` studies is removed from the response
    list.
-1. If any study description or station name filters have been added, and if the `StudyDescription` and/or `StationName`
+#. If any study description or station name filters have been added, and if the `StudyDescription` and/or `StationName`
    tags are returned by the remote server, the study response list is filtered accordingly.
-1. For the remaining study level responses, each series is queried.
-1. If `ModalitiesInStudy` was not returned, it is now built from the series level responses.
-1. If the remote server returned everything rather than just the modalities we asked for, the study level responses are
+#. For the remaining study level responses, each series is queried.
+#. If `ModalitiesInStudy` was not returned, it is now built from the series level responses.
+#. If the remote server returned everything rather than just the modalities we asked for, the study level responses are
    now filtered accordingly.
 
 
