@@ -26,6 +26,7 @@ Line 1 kills any celery.exe processes that are currently running. Line 2 deletes
 any process ID file that exists in the celery log file location. Lines 3 and 4
 navigate to the OpenREM drive and folder. Finally, line 5 runs celery.
 
+Figure 1 shsows the ``OpenREM - start celery`` task in the task list.
 
 .. figure:: img/010_taskOverview.png
    :figwidth: 100%
@@ -35,7 +36,11 @@ navigate to the OpenREM drive and folder. Finally, line 5 runs celery.
 
    Figure 1: An overview of Windows Task Scheduler
 
-   
+
+Figure 2 shows the general task settings. The task has been set to run using
+the Windows ``SYSTEM`` user, whether the user is logged in or not, and with
+the highest privileges.
+
 .. figure:: img/020_taskPropertiesGeneral.png
    :figwidth: 100%
    :align: center
@@ -44,7 +49,11 @@ navigate to the OpenREM drive and folder. Finally, line 5 runs celery.
 
    Figure 2: General properties
 
-   
+
+Figure 3 shows the times when the task will be triggered. In the example
+celery is started at system start up, and restarted multiple times each day
+to ensure that it is running before any PACS queries.
+
 .. figure:: img/030_taskPropertiesTriggers.png
    :figwidth: 100%
    :align: center
@@ -53,6 +62,9 @@ navigate to the OpenREM drive and folder. Finally, line 5 runs celery.
 
    Figure 3: Trigger properties
 
+
+Figure 4 shows the action that is taken when the task is run: it is set to run
+the batch file that is described at the top of this document.
 
 .. figure:: img/040_taskPropertiesActions.png
    :figwidth: 100%
@@ -71,6 +83,10 @@ navigate to the OpenREM drive and folder. Finally, line 5 runs celery.
 
    Figure 5: Condition properties
 
+
+Figure 6 shows the task settings. The task is set so that it can be run on
+demand if required. It is also set so that it is forced to stop when requested
+to do so.
 
 .. figure:: img/060_taskOverviewSettings.png
    :figwidth: 100%
