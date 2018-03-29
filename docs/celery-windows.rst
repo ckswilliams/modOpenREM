@@ -3,13 +3,14 @@ Daemonising Celery on Windows
 #############################
 
 To ensure that the Celery task queue is started at system start-up it is
-advisable to launch Celery using a batch file. Windows Task Scheduler can then
-be used to start Celery at system start-up.
+advisable to launch Celery using a batch file and configure Windows Task
+Scheduler to run this at system start-up.
 
 Celery will sometimes fall over during the execution of a long task. In this
 situation it will not restart on its own. Windows Task Scheduler can be used to
-restart Celery on a regular basis, or can be used to restart celery a few
-minutes before OpenREM is due to carry out a long task, such as making a PACS query. 
+restart Celery on a regular basis, and can also be used to restart celery a few
+minutes before Task Scheduler runs tasks to query PACS in order to import data
+into OpenREM.
 
 A suitable batch file may be similar to the code below:
 
@@ -23,10 +24,11 @@ A suitable batch file may be similar to the code below:
     celery worker -n default -P solo -Ofair -A openremproject -c 4 -Q default --pidfile=e:\media_root\celery\default.pid --logfile=e:\media_root\celery\default.log
 
 Line 1 kills any celery.exe processes that are currently running. Line 2 deletes
-any process ID file that exists in the celery log file location. Lines 3 and 4
-navigate to the OpenREM drive and folder. Finally, line 5 runs celery.
+any process ID file that exists in the celery log file location. Celery won't
+restart if this pid file exists. Lines 3 and 4 navigate to the OpenREM drive
+and folder. Finally, line 5 runs celery.
 
-Figure 1 shsows the ``OpenREM - start celery`` task in the task list.
+Figure 1 shows the ``OpenREM - start celery`` task in the task list.
 
 .. figure:: img/010_taskOverview.png
    :figwidth: 100%
@@ -88,10 +90,10 @@ Figure 6 shows the task settings. The task is set so that it can be run on
 demand if required. It is also set so that it is forced to stop when requested
 to do so.
 
-.. figure:: img/060_taskOverviewSettings.png
+.. figure:: img/060_taskPropertiesSettings.png
    :figwidth: 100%
    :align: center
    :alt: Task scheduler overview
-   :target: _images/060_taskOverviewSettings.png
+   :target: _images/060_taskPropertiesSettings.png
 
    Figure 6: Task settings
