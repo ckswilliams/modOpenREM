@@ -160,15 +160,29 @@ Query filtering logic
 
 #. First we query for each modality chosen in turn to get matching responses at study level.
 #. If the optional ``ModalitiesInStudy`` has been populated in the response, and if you have ticked
-   ``Include SR only studies``, then any studies with anything other than just `SR` studies is removed from the response
-   list.
+   ``Include SR only studies``, then any studies with anything other than just ``SR`` studies is removed from the
+   response list.
 #. If any study description or station name filters have been added, and if the ``StudyDescription`` and/or
-  ``StationName`` tags are returned by the remote server, the study response list is filtered accordingly.
+   ``StationName`` tags are returned by the remote server, the study response list is filtered accordingly.
 #. For the remaining study level responses, each series is queried.
 #. If ``ModalitiesInStudy`` was not returned, it is now built from the series level responses.
 #. If the remote server returned everything rather than just the modalities we asked for, the study level responses are
-   now filtered accordingly.
+   now filtered against the modalities selected.
+#. The responses are now processed at series level:
 
+   #. Another attempt is made to exclude or only-include if station name filters have been set
+   #. If mammography exams were requested, and a study has ``MG`` in:
+
+      * If one of the series is of type ``SR``, an image level query is done to see if it is an RDSR. If it is, all the
+        other series responses are deleted (i.e. when the move request/'retrieve' is sent only the RDSR is requested
+        not the images.
+      * Otherwise the ``SR`` series is deleted and all the image series are requested.
+
+   #. If planar radiographic exams were requested, and a study has ``DX`` or ``CR`` in:
+
+      * Any ``SR`` series are checked to see if they are RDSR. If they are, the other series level responses for that
+        study are deleted.
+      * Otherwise the ``SR`` series is deleted and all the image series are requested.
 
 .. _qrtroubleshooting:
 
