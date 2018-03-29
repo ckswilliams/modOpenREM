@@ -177,8 +177,7 @@ Series level query processing
 
 * Another attempt is made to exclude or only-include if station name filters have been set
 
-Mammography
------------
+**Mammography**
 
 If mammography exams were requested, and a study has ``MG`` in:
 
@@ -187,10 +186,9 @@ If mammography exams were requested, and a study has ``MG`` in:
   not the images.
 * Otherwise the ``SR`` series is deleted and all the image series are requested.
 
-Radiography
------------
+**Radiography**
 
-* If planar radiographic exams were requested, and a study has ``DX`` or ``CR`` in:
+If planar radiographic exams were requested, and a study has ``DX`` or ``CR`` in:
 
 * Any ``SR`` series are checked to see if they are RDSR. If they are, the other series level responses for that
   study are deleted.
