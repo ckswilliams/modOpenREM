@@ -170,15 +170,15 @@ Query filtering logic
    now filtered against the modalities selected.
 #. The responses are now processed at series level:
 
-   #. Another attempt is made to exclude or only-include if station name filters have been set
-   #. If mammography exams were requested, and a study has ``MG`` in:
+   a. Another attempt is made to exclude or only-include if station name filters have been set
+   b. If mammography exams were requested, and a study has ``MG`` in:
 
       * If one of the series is of type ``SR``, an image level query is done to see if it is an RDSR. If it is, all the
         other series responses are deleted (i.e. when the move request/'retrieve' is sent only the RDSR is requested
         not the images.
       * Otherwise the ``SR`` series is deleted and all the image series are requested.
 
-   #. If planar radiographic exams were requested, and a study has ``DX`` or ``CR`` in:
+   c. If planar radiographic exams were requested, and a study has ``DX`` or ``CR`` in:
 
       * Any ``SR`` series are checked to see if they are RDSR. If they are, the other series level responses for that
         study are deleted.
