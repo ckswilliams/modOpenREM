@@ -177,22 +177,25 @@ Series level query processing
 
 * Another attempt is made to exclude or only-include if station name filters have been set
 
-**Mammography**
-
-If mammography exams were requested, and a study has ``MG`` in:
+If **mammography** exams were requested, and a study has ``MG`` in:
 
 * If one of the series is of type ``SR``, an image level query is done to see if it is an RDSR. If it is, all the
   other series responses are deleted (i.e. when the move request/'retrieve' is sent only the RDSR is requested
   not the images.
 * Otherwise the ``SR`` series is deleted and all the image series are requested.
 
-**Radiography**
+If **planar radiographic** exams were requested, and a study has ``DX`` or ``CR`` in:
 
-If planar radiographic exams were requested, and a study has ``DX`` or ``CR`` in:
-
-* Any ``SR`` series are checked to see if they are RDSR. If they are, the other series level responses for that
-  study are deleted.
+* Any ``SR`` series are checked at 'image' level to see if they are RDSRs. If they are, the other series level responses
+  for that study are deleted.
 * Otherwise the ``SR`` series is deleted and all the image series are requested.
+
+If **fluoroscopy** exams were requested, and a study has ``RF`` or ``XA`` in:
+
+* Any ``SR`` series are checked at 'image' level to see if they are RDSRs.
+* All non-``SR`` series are deleted from the request.
+
+If **CT**
 
 .. _qrtroubleshooting:
 
