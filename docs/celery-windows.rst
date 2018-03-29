@@ -23,11 +23,11 @@ An example batch file is shown below:
     celery worker -n default -P solo -Ofair -A openremproject -c 4 -Q default --pidfile=e:\media_root\celery\default.pid --logfile=e:\media_root\celery\default.log
 
 Line 1 kills any celery.exe processes that are currently running. Line 2 deletes
-any process ID file that exists in the celery log file location. Celery won't
-restart if this pid file exists. Lines 3 and 4 navigate to the OpenREM drive
-and folder. Finally, line 5 runs celery. If you wish to use this example you
-will have to ensure that the drive letters and paths are changed to match your
-own OpenREM system installation.
+the ``default.pid`` process ID file that exists in the celery log file
+location. Celery won't restart if this pid file exists. Lines 3 and 4 navigate
+to the OpenREM drive and folder. Finally, line 5 runs celery. If you wish to
+use this example you will have to ensure that the drive letters and paths are
+changed to match your own OpenREM system installation.
 
 Figure 1 shows the ``OpenREM - start celery`` task in the task list.
 
