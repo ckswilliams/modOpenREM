@@ -95,10 +95,11 @@ Configure IIS
     - Under ``FastCGI properties`` find the ``Activity Timeout`` entry and increase the value to 300. This is to ensure
       that the server allows enough time for skin dose map data to be calculated.
     - Click ``Ok`` to close the ``Add FastCGI Application dialog``
-    - Start Windows Explorer and browse to the openrem directory, e.g. ``C:\Python27\Lib\site-packages\openrem``
-    - Right click on the folder and choose properties. In the security tab, make sure ``IIS_IUSRS`` has
+    - Start Windows Explorer and browse to the Python folder, e.g. ``C:\Python27``, or if using a virtualenv browse to that
+    - Right click on the ``Lib`` sub-folder and choose properties. In the security tab, make sure ``IIS_IUSRS`` has
       ``Read``, ``Write``, ``Execute`` and ``Change`` permissions for this directory and the subdirectories.
-    - The same applies for the ``MEDIA_ROOT`` (as configured in ``local_settings.py``; default ``c:/Temp/OpenREM/media``)
+    - Repeat the above step for the ``Scripts`` sub-folder, and also for the ``MEDIA_ROOT`` folder (as configured in
+      ``local_settings.py``; default ``c:/Temp/OpenREM/media``)
 
 
 Create a new website
