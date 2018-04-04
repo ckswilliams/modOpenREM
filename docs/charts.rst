@@ -43,9 +43,9 @@ corresponding series on the chart.
 
    Figure 3: Histogram of abdomen DLP values
 
-Clicking on an individual data point on a bar chart will take you to a
-histogram of the data for that point so that you can see the shape of the
-value's distribution (figure 3).
+If you have histogram calculation switched on then clicking on an individual
+data point on a bar chart will take you to a histogram of the data for that
+point so that you can see the shape of the value's distribution (figure 3).
 
 Bar charts can be plotted with a series per x-ray system (figure 4). This can
 be toggled using the `Plot a series per system` checkbox in the `Chart options`.
@@ -242,55 +242,6 @@ Exporting chart data
 An image file of a chart can be saved using the menu in the top-right hand side
 of any of the charts. The same menu can be used to save the data used to plot a
 chart: the data can be downloaded in either csv or xls format.
-
-************
-New in 0.8.0
-************
-
-* Mammography scatter plots of kVp and mAs against compressed breast thickness.
-
-* CT charts of average number of irradiation evens per study and per requested procedure name.
-
-* Histogram and series-per-system options now available on each modality page.
-
-************
-New in 0.7.0
-************
-
-* Charts for fluoroscopy and mammography.
-
-* New scatter plot chart type.
-
-* Chart plotting options can be configured by choosing ``Chart options`` from
-  the ``User options`` menu at the top of the OpenREM homepage.
-
-* Chart average values can be set to either mean or median. Bar charts can be
-  configured to plot both mean and median values as seperate series.
-
-* Bar charts can be plotted with a series per x-ray system. This option can be
-  switched on or off via the ``Chart options``.
-
-* The number of histogram data bins can be set to a value between 2 and 40
-  in ``Chart options``. The default value is 20.
-
-* Histogram calculation can be switched on or off in ``Chart options``. The
-  default is off. Performance is significantly better when set to off.
-
-* Histogram plots can toggle between absolute or normalised values via the
-  ``Toggle Normalised histograms`` button that is visible when viewing a
-  histogram plot.
-
-* The data in the bar charts can be sorted interactively by clicking on the
-  sorting options below the individual chart. The default sorting type and
-  direction can be set by choosing the ``Chart options`` item from the
-  ``User options`` menu on the OpenREM homepage.
-
-* Individual charts can be displayed full-screen by clicking on the
-  ``Toggle fullscreen`` button that is positioned below each chart.
-
-* The chart plotting status is displayed on the OpenREM homepage.
-
-* The colours used for plotting have been updated.
 
 *************
 Chart options
