@@ -43,9 +43,9 @@ corresponding series on the chart.
 
    Figure 3: Histogram of abdomen DLP values
 
-Clicking on an individual data point on a bar chart will take you to a
-histogram of the data for that point so that you can see the shape of the
-value's distribution (figure 3).
+If you have histogram calculation switched on then clicking on an individual
+data point on a bar chart will take you to a histogram of the data for that
+point so that you can see the shape of the value's distribution (figure 3).
 
 Bar charts can be plotted with a series per x-ray system (figure 4). This can
 be toggled using the `Plot a series per system` checkbox in the `Chart options`.
@@ -67,9 +67,27 @@ the chart rescales the y-axis after the zoom.
 
    Figure 4: Bar chart of mean DLP (one system per series)
 
+Clicking on the `Toggle data table` button toggles the display of an HTML table
+containing the data from the current chart. This button is hidden if you are
+viewing the chart in full screen mode. An example showing a data table is shown
+in figure 5.
+
+.. figure:: img/ChartCTDataTable.png
+   :figwidth: 50%
+   :align: right
+   :alt: Bar chart with data table displayed
+   :target: _images/ChartCTDataTable.png
+
+   Figure 5: Bar chart with data table displayed
+
 If the the bar chart that you are viewing shows more than one series then
 clicking on a category name on the x-axis will take you to a plot that shows
-multiple histograms: one for each series (figure 5).
+multiple histograms: one for each series (figure 6).
+
+If the bar chart that you are viewing shows more than one series then buttons
+are available to `Hide all series`, `Show all series`, and `Toggle all series`.
+These provide a quick way to switch which series are being displayed without
+having to click on individual series in the chart legend.
 
 .. figure:: img/ChartCTMeanDLPhistogramPerSystem.png
    :figwidth: 50%
@@ -77,10 +95,10 @@ multiple histograms: one for each series (figure 5).
    :alt: Histogram of abdomen DLP (one series per system)
    :target: _images/ChartCTMeanDLPhistogramPerSystem.png
 
-   Figure 5: Histogram of abdomen DLP values, one series per system
+   Figure 6: Histogram of abdomen DLP values, one series per system
 
 The histogram data can be plotted as absolute values, or be normalised to a
-value of 1.0 (figure 6). This can be toggled by clicking on the button that is
+value of 1.0 (figure 7). This can be toggled by clicking on the button that is
 shown below the histogram plots. The normalisation can be useful when trying to
 compare the shape of several histograms, especially when some histograms have
 much less data than others.
@@ -91,7 +109,7 @@ much less data than others.
    :alt: Normalised histogram of abdomen DLP (one series per system)
    :target: _images/ChartCTMeanDLPhistogramPerSystemNorm.png
 
-   Figure 6: Normalised histogram of abdomen DLP, one series per system
+   Figure 7: Normalised histogram of abdomen DLP, one series per system
 
 Each histogram data point includes a text link that appears when the mouse
 pointer moves over it. Clicking on this link will filter the displayed studies,
@@ -112,9 +130,9 @@ data calculations.
    :alt: Pie chart of acquisition frequency
    :target: _images/ChartCTacquisitionFreq.png
 
-   Figure 7: Pie chart of acquisition frequency
+   Figure 8: Pie chart of acquisition frequency
 
-Figure 7 shows a pie chart of the number of acquisitions made for every
+Figure 8 shows a pie chart of the number of acquisitions made for every
 acquisition protocol present in the tabulated data.
 
 Clicking on any of the pie chart segments will filter the displayed studies,
@@ -136,12 +154,12 @@ data calculations.
    :alt: Line chart of mean DLP per study type over time
    :target: _images/ChartCTMeanDLPoverTime.png
 
-   Figure 8: Line chart of mean DLP per study type over time
+   Figure 9: Line chart of mean DLP per study type over time
 
 A line is plotted for each category, with a point calculated every day, week,
 month or year. This can be a good way of looking at how things have changed
 over time. For example, the mean DLP of each study type, calculated with a
-data point per month is shown in figure 8.
+data point per month is shown in figure 9.
 
 Clicking the left-hand mouse button on the chart and dragging left or right
 across a range of dates and then releasing the mouse button will zoom in on
@@ -162,7 +180,7 @@ data calculations.
    :alt: Pie chart of study workload per day of the week
    :target: _images/ChartCTworkload.png
 
-   Figure 9: Pie chart of study workload per day of the week
+   Figure 10: Pie chart of study workload per day of the week
 
 .. figure:: img/ChartCTworkload24hours.png
    :figwidth: 50%
@@ -170,12 +188,12 @@ data calculations.
    :alt: Pie chart of study workload per hour in a day
    :target: _images/ChartCTworkload24hours.png
 
-   Figure 10: Pie chart of study workload per hour in a day
+   Figure 11: Pie chart of study workload per hour in a day
 
 Each segment represents a day of the week, and shows the number of events that
-have taken place on that day (figure 9). Clicking on one of the segments will
+have taken place on that day (figure 10). Clicking on one of the segments will
 take you to a pie chart that shows the number of events per on that day (figure
-10).
+11).
 
 All data, including zero blank dose values are included in the data
 calculations for this chart type.
@@ -190,7 +208,7 @@ calculations for this chart type.
    :alt: Scatter plot of average glandular dose vs. compressed thickness
    :target: _images/ChartMGScatter.png
 
-   Figure 11: Scatter plot of average glandular dose vs. compressed thickness
+   Figure 12: Scatter plot of average glandular dose vs. compressed thickness
 
 .. figure:: img/ChartMGScatterPerSystem.png
    :figwidth: 50%
@@ -198,12 +216,12 @@ calculations for this chart type.
    :alt: Scatter plot of average glandular dose vs. compressed thickness; one series per system
    :target: _images/ChartMGScatterPerSystem.png
 
-   Figure 12: Scatter plot of average glandular dose vs. compressed thickness; one series per system
+   Figure 13: Scatter plot of average glandular dose vs. compressed thickness; one series per system
 
-This plot type shows a data point per event (figure 11). The series name and
+This plot type shows a data point per event (figure 12). The series name and
 data values are shown when the mouse cursor is positioned over a data point.
 
-These can be plotted with a series per x-ray system (figure 12). This can be
+These can be plotted with a series per x-ray system (figure 13). This can be
 toggled using the `Plot a series per system` checkbox in the `Chart options`.
 
 Clicking the left-hand mouse button on the chart and dragging a rectangular
@@ -224,55 +242,6 @@ Exporting chart data
 An image file of a chart can be saved using the menu in the top-right hand side
 of any of the charts. The same menu can be used to save the data used to plot a
 chart: the data can be downloaded in either csv or xls format.
-
-************
-New in 0.8.0
-************
-
-* Mammography scatter plots of kVp and mAs against compressed breast thickness.
-
-* CT charts of average number of irradiation evens per study and per requested procedure name.
-
-* Histogram and series-per-system options now available on each modality page.
-
-************
-New in 0.7.0
-************
-
-* Charts for fluoroscopy and mammography.
-
-* New scatter plot chart type.
-
-* Chart plotting options can be configured by choosing ``Chart options`` from
-  the ``User options`` menu at the top of the OpenREM homepage.
-
-* Chart average values can be set to either mean or median. Bar charts can be
-  configured to plot both mean and median values as seperate series.
-
-* Bar charts can be plotted with a series per x-ray system. This option can be
-  switched on or off via the ``Chart options``.
-
-* The number of histogram data bins can be set to a value between 2 and 40
-  in ``Chart options``. The default value is 20.
-
-* Histogram calculation can be switched on or off in ``Chart options``. The
-  default is off. Performance is significantly better when set to off.
-
-* Histogram plots can toggle between absolute or normalised values via the
-  ``Toggle Normalised histograms`` button that is visible when viewing a
-  histogram plot.
-
-* The data in the bar charts can be sorted interactively by clicking on the
-  sorting options below the individual chart. The default sorting type and
-  direction can be set by choosing the ``Chart options`` item from the
-  ``User options`` menu on the OpenREM homepage.
-
-* Individual charts can be displayed full-screen by clicking on the
-  ``Toggle fullscreen`` button that is positioned below each chart.
-
-* The chart plotting status is displayed on the OpenREM homepage.
-
-* The colours used for plotting have been updated.
 
 *************
 Chart options

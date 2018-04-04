@@ -4,6 +4,8 @@ OpenREM version history
 
 0.8.0b2 (2018-03-??)
 --------------------
+* `#609`_  Interface: fixed the feature that toggles the selection when clicking anywhere on a display name table row
+* `#608`_  Interface: fixed the broken sorting of display name table
 * `#603`_  Interface: fixed JavaScript error if there are any None values in fluoro detail irradiation type table
 * `#602`_  Skin dose maps: fixed error when there are multiple kVp values for a single irradiation event
 * `#599`_  Installation: postgres instructions now include note about differing security choices
@@ -39,24 +41,29 @@ OpenREM version history
 * `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
 * `#552`_  Documentation: documented extractor for older Toshiba CT scanners
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
+* `#549`_  Documentation: added procedure for fixing laterality on Hologic studies, ref `#411`_
 * `#544`_  Interface: added procedure, requested procedure to summary listings and details and filtering
 * `#543`_  Interface: added drop-down box to choose how many studies are displayed on filtered pages
 * `#542`_  Interface: added display name to all detailed html pages
+* `#541`_  Documentation: updated for celery on Windows
+* `#540`_  Documentation: updated for current skinDose functionality
+* `#539`_  Documentation: updated chart document to include series toggle buttons
 * `#536`_  Code quality: reduced javascript duplication and collected file groups into subfolders
 * `#535`_  Interface: fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#532`_  DICOM: documented how to work-around missing encoding charsets due to old pydicom
-* `#529`_  Charts: Added CT charts of number of irradiation events per study description and requested procedure
-* `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
-* `#526`_  Code quality: Addressed some of the code quality/style issues raised by `Codacy`_
-* `#525`_  Importing: Improved mammo import by checking compression force before converting to float
-* `#524`_  Importing: Improved mammo import by checking anode exists before converting to DICOM terms
-* `#523`_  Importing: Changed mammo import to use del_no_match instead of del_mg_im if not mammo
-* `#521`_  Testing: Added tests for dual source CT imports
-* `#520`_  Imports: Removed XML styling from Philips legacy CT comment creation
-* `#518`_  Importing: Fixed imports where CT Target Region isn't specified
-* `#517`_  Interface: Operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
+* `#529`_  Charts: added CT charts of number of irradiation events per study description and requested procedure
+* `#528`_  Query Retrieve: reduced number of simultaneous associations to one, reused for everything
+* `#526`_  Code quality: addressed some of the code quality/style issues raised by `Codacy`_
+* `#525`_  Importing: improved mammo import by checking compression force before converting to float
+* `#524`_  Importing: improved mammo import by checking anode exists before converting to DICOM terms
+* `#523`_  Importing: changed mammo import to use del_no_match instead of del_mg_im if not mammo
+* `#522`_  Documentation: made it clearer on offline-install docs that version numbers will change
+* `#521`_  Testing: added tests for dual source CT imports
+* `#520`_  Imports: removed XML styling from Philips legacy CT comment creation
+* `#518`_  Importing: fixed imports where CT Target Region isn't specified
+* `#517`_  Interface: operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
 * `#516`_  Imports: MultiValue person names are now stored as a decoded string, not a list
 * `#511`_  Testing: develop and other branches can now be deployed to dev.openrem.org and testing.openrem.org automatically
 * `#509`_  Skin dose maps: now recalculated on view if recorded height or weight has changed since last calculation
@@ -119,7 +126,7 @@ OpenREM version history
 * `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
 * `#414`_  Reduced use of JavaScript global variables and improved JavaScript objects
-* `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
+* `#411`_  Imports: fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
 * `#318`_  Database management: Display names view can be used to review and delete all studies from one source
 * `#114`_  Imports: Subsequent RDSRs of the same study will now replace existing study in database
 * `#61`_  Skin dose maps: These have been re-enabled, and currently work for Siemens systems

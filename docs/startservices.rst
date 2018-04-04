@@ -234,6 +234,8 @@ Daemonising Celery
 
 In a production environment, Celery will need to start automatically and
 not depend on a particular user being logged in. Therefore, much like
-the webserver, it will need to be daemonised. For now, please refer to the
-instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html.
+the webserver, it will need to be daemonised.
 
+For Linux please refer to the instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html.
+
+For Windows please see the :doc:`celery-windows` document.

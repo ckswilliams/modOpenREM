@@ -1,5 +1,5 @@
 <p>There are {{ name_set.count }} entries in this table. Back to the <a href="#top">top</a>.</p>
-<table class="table table-bordered table-hover row-clickable sortable">
+<table class="table table-bordered table-hover row-clickable sortable" id="display_name_table_{{ modality }}">
   <tr>
     {% if admin.admingroup %}
       <th>Update?</th>
@@ -17,6 +17,7 @@
     <th>Software version</th>
     <th>Gantry ID</th>
     <th>How many studies</th>
+    <th>Date of last study</th>
     {% if admin.admingroup %}
     <th>Review</th>
     {% endif %}
@@ -45,13 +46,14 @@
       <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
       <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
-      <td id="{{ modality }}-count-{{ eachrow.pk }}">
+      <td id="{{ modality }}-count-{{ eachrow.pk }}"></td>
+      <td id="{{ modality }}-latest-{{ eachrow.pk }}"></td>
         <script>
             $(document).ready(
                 function get_latest_studies(json) {
                     $.ajax(
                         {
-                            url: "/admin/equipmentcount",
+                            url: "/admin/equipmentlastdateandcount",
                             data: {
                                 modality: '{{ modality }}',
                                 equip_name_pk: '{{ eachrow.pk }}',
@@ -59,14 +61,15 @@
                             },
                             type: "POST",
                             success: function (data) {
-                                $('#{{ modality }}-count-{{ eachrow.pk }}').html(data);
+                                $('#{{ modality }}-count-{{ eachrow.pk }}').html(data.count_html);
+                                $('#{{ modality }}-latest-{{ eachrow.pk }}').html(data.latest_html);
                             }
                         }
                     )
+
                 }
             )
         </script>
-      </td>
     {% if admin.admingroup %}
       <td><a href="/admin/review/{{ eachrow.pk }}/{{ modality }}/">Review</a></td>
     {% endif %}
