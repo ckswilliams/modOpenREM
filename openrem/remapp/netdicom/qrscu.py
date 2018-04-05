@@ -296,12 +296,19 @@ def _prune_study_responses(query, filters):
 
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
 def _check_sr_type_in_study(assoc, study, query_id):
+    """Checks at an image level whether SR in study is RDSR, ESR, or something else (Radiologist's report for example)
+
+    * If RDSR is found, all non-RDSR SR series responses are deleted
+    * Otherwise, if an ESR is found, all non-ESR series responses are deleted
+    * Otherwise, all SR series responses are deleted
+
+    The function returns one of 'RDSR', 'ESR', 'no_dose_report'.
+
+    :param assoc: Current DICOM query object
+    :param study: study level C-Find response object in database
+    :param query_id: current query ID for logging
+    :return: string indicating SR type remaining in study
     """
-    Checks at an image level whether SR in study is RDSR, ESR, or something else (Radiologist's report for example)
-    :param study: Study to check SR type of
-    :return: String of 'RDSR', 'ESR', or 'no_dose_report'
-    """
-    # select series with modality SR
     series_sr = study.dicomqrrspseries_set.filter(modality__exact='SR')
     logger.info(u"Number of series with SR {0}".format(series_sr.count()))
     sopclasses = set()
@@ -309,7 +316,7 @@ def _check_sr_type_in_study(assoc, study, query_id):
         _query_images(assoc, sr, query_id)
         images = sr.dicomqrrspimage_set.all()
         if images.count() == 0:
-            logger.debug(u"Oops, series {0} of study instance UID {1} doesn't have any images in!".format(
+            logger.debug(u"Oops, series {0} of study instance UID {1} doesn't have any objects in!".format(
                 sr.series_number, study.study_instance_uid))
             continue
         sopclasses.add(images[0].sop_class_uid)
