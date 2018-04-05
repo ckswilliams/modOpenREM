@@ -141,6 +141,8 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
     for study in study_rsp:
         logger.debug("at study in study_resp in series prune. modalities in study are: {0}".format(study.get_modalities_in_study()))
         if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
+            # If _check_sr_type_in_study returns an RDSR, all other SR series will have been deleted and then all images
+            # are deleted. If _check_sr_type_in_study returns an ESR or no_dose_report, everything else is kept.
             study.modality = u'MG'
             study.save()
 
@@ -149,14 +151,11 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                 logger.debug(u"Found RDSR in MG study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
-            elif 'SR' in study.get_modalities_in_study():
-                logger.debug(u"SR in DX study not RDSR, so deleting")
-                series = study.dicomqrrspseries_set.all()
-                series.filter(modality__exact='SR').delete()
+            # ToDo: see if there is a mechanism to remove duplicate 'for processing' 'for presentation' images.
 
-            # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
-            # be weeded out
         elif all_mods['DX']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('CR', 'DX')):
+            # If _check_sr_type_in_study returns an RDSR, all other SR series will have been deleted and then all images
+            # are deleted. If _check_sr_type_in_study returns an ESR or no_dose_report, everything else is kept.
             study.modality = u'DX'
             study.save()
 
@@ -165,12 +164,9 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                 logger.debug(u"Found RDSR in DX study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
-            elif 'SR' in study.get_modalities_in_study():
-                logger.debug(u"SR in DX study not RDSR, so deleting")
-                series = study.dicomqrrspseries_set.all()
-                series.filter(modality__exact='SR').delete()
 
         elif all_mods['FL']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('XA', 'RF')):
+            # If _check_sr_type_in_study will delete any SR that is not RDSR or ESR. All other series are then deleted.
             study.modality = 'FL'
             study.save()
             sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
