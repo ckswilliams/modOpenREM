@@ -230,6 +230,8 @@ def _get_philips_dose_images(series, get_toshiba_images, assoc, query_id):
             _get_toshiba_dose_images(series, assoc, query_id)
         else:
             series.delete()
+    elif get_toshiba_images:
+        _get_toshiba_dose_images(series, assoc, query_id)
     else:
         series.filter(number_of_series_related_instances__gt=5).delete()
 
