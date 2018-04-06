@@ -67,7 +67,7 @@ The progress of the query is reported on the right hand side. If nothing happens
 celery queue is running.
 
 Once all the responses have been purged of unwanted modalities, study descriptions or study UIDs, the number of studies
-of each type will be displayed and a button appears. Click ``Retreive`` to request the remote server send the selected
+of each type will be displayed and a button appears. Click ``Retrieve`` to request the remote server send the selected
 objects to your selected Store node. This will be based on your original selection - changing the node on the left hand
 side at this stage will have no effect.
 
@@ -182,20 +182,41 @@ If **mammography** exams were requested, and a study has ``MG`` in:
 * If one of the series is of type ``SR``, an image level query is done to see if it is an RDSR. If it is, all the
   other series responses are deleted (i.e. when the move request/'retrieve' is sent only the RDSR is requested
   not the images.
-* Otherwise the ``SR`` series is deleted and all the image series are requested.
+* Otherwise the ``SR`` series responses are deleted and all the image series are requested.
 
 If **planar radiographic** exams were requested, and a study has ``DX`` or ``CR`` in:
 
 * Any ``SR`` series are checked at 'image' level to see if they are RDSRs. If they are, the other series level responses
   for that study are deleted.
-* Otherwise the ``SR`` series is deleted and all the image series are requested.
+* Otherwise the ``SR`` series responses are deleted and all the image series are requested.
 
 If **fluoroscopy** exams were requested, and a study has ``RF`` or ``XA`` in:
 
-* Any ``SR`` series are checked at 'image' level to see if they are RDSRs.
-* All non-``SR`` series are deleted from the request.
+* Any ``SR`` series are checked at 'image' level to see if they are RDSRs or ESRs (Enhanced Structured Reports - not
+  currently used but will be in the future). Any other ``SR`` series responses are deleted.
+* All non-``SR`` series responses are deleted.
 
-If **CT**
+If **CT** exams were requested, and a study has ``CT`` in:
+
+* Any ``SR`` series are checked at 'image' level to see if they are RDSRs. If they are, all other SR and image series
+  responses are deleted. Otherwise, if it has an ESR series, again all other SR and image series responses are deleted.
+* If there are no RDSR or ESR series, the other series are checked to see if they are Philips 'Dose info' series. If
+  there are, other series responses are deleted.
+* If there are no RDSR, ESR or 'Dose info' series and the option to get Toshiba images has been selected, then an image
+  level query is performed for the first image in each series. If the image is not a secondary capture, all but the
+  first image are deleted from the image level responses and the image_level_move flag is set. If the image is a
+  secondary capture, the whole series response is kept.
+* If there are no RDSR or ESR, series descriptions aren't returned and the Toshiba option has been set, the image level
+  query is performed as per the previous point. This process will keep the responses that might have Philips 'Dose info'
+  series.
+* If there are no RDSR, ESR, series descriptions aren't returned and the Toshiba option has not been set, each series
+  with more than five images in is deleted from the series response list - the remaining ones might be Philips 'Dose
+  info' series.
+
+If **SR only studies** were requested:
+
+* Each series response is checked at 'image' level to see which type of SR it is. If is not RDSR or ESR, the study
+  response is deleted.
 
 .. _qrtroubleshooting:
 
