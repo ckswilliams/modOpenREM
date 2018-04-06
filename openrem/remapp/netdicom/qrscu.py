@@ -166,7 +166,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                 series.exclude(modality__exact='SR').delete()
 
         elif all_mods['FL']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('XA', 'RF')):
-            # If _check_sr_type_in_study will delete any SR that is not RDSR or ESR. All other series are then deleted.
+            # _check_sr_type_in_study will delete any SR that is not RDSR or ESR. All other series are then deleted.
             study.modality = 'FL'
             study.save()
             sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
@@ -175,23 +175,28 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             series.exclude(modality__exact='SR').delete()
 
         elif all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
+            # If _check_sr_type_in_study returns RDSR, all other SR series responses will have been deleted and then all
+            # other series responses will be deleted too.
+            # If _check_sr_type_in_study returns ESR, all other SR series responses will have been deleted and then all
+            # other series responses will be deleted too.
+            # Otherwise, we pass the study response to _get_philips_dose_images to see if there is a Philips dose info
+            # series and optionally get samples from each series for the Toshiba RDSR creation routine.
             study.modality = 'CT'
             study.save()
             logger.debug("Filtering CT at series level")
             series = study.dicomqrrspseries_set.all()
             if 'SR' in study.get_modalities_in_study():
-                SR_type = _check_sr_type_in_study(assoc, study, query.query_id)
-                if SR_type == 'RDSR':
+                sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
+                if sr_type == 'RDSR':
                     logger.debug(u"Found RDSR in CT study, so keep SR and delete all other series")
                     series.exclude(modality__exact='SR').delete()
-                elif SR_type == 'ESR':  # GE CT's with ESR instead of RDSR
+                elif sr_type == 'ESR':  # GE CT's with ESR instead of RDSR
                     logger.debug(u"Found ESR in CT study, so keep SR and delete all other series")
                     series.exclude(modality__exact='SR').delete()
                 else:
-                    # non-dose SR, so check for Philips dose info
                     _get_philips_dose_images(series, get_toshiba_images, assoc, query.query_id)
             else:
-                # if SR not present in study, only keep Philips dose info series
+                # if SR not present in study
                 _get_philips_dose_images(series, get_toshiba_images, assoc, query.query_id)
 
         elif all_mods['SR']['inc']:
