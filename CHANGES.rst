@@ -46,7 +46,9 @@ OpenREM version history
 * `#544`_  Interface: added procedure, requested procedure to summary listings and details and filtering
 * `#543`_  Interface: added drop-down box to choose how many studies are displayed on filtered pages
 * `#542`_  Interface: added display name to all detailed html pages
+* `#541`_  Documentation: updated for celery on Windows
 * `#540`_  Documentation: updated for current skinDose functionality
+* `#539`_  Documentation: updated chart document to include series toggle buttons
 * `#536`_  Code quality: reduced javascript duplication and collected file groups into subfolders
 * `#535`_  Interface: fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: chart drilldown reported as not working - was actually due to a user's database migrations
