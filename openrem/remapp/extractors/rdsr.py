@@ -474,7 +474,10 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
             event.irradiation_event_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                              cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
-            event.acquisition_protocol = safe_strings(cont.TextValue, char_set=ch)
+            try:
+                event.acquisition_protocol = safe_strings(cont.TextValue, char_set=ch)
+            except AttributeError:
+                event.acquisition_protocol = None
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anatomical structure':
             event.anatomical_structure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                            cont.ConceptCodeSequence[0].CodeMeaning)
