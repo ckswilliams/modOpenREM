@@ -938,6 +938,8 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         return
     equip = GeneralEquipmentModuleAttr.objects.get(general_study_module_attributes=g)
     proj.general_study_module_attributes.modality_type = equip.unique_equipment_name.user_defined_modality
+    if proj.general_study_module_attributes.modality_type == u'dual':
+        proj.general_study_module_attributes.modality_type = None
 
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Procedure reported':
