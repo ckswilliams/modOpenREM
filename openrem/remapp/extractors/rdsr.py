@@ -934,8 +934,8 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
     elif reporttype == 'ct':
         proj = CtRadiationDose.objects.create(general_study_module_attributes=g)
     else:
-        pass
-    # set modality to user defined modality type for this system (if not set it is set to an empty value)
+        logger.error("Attempt to create ProjectionXRayRadiationDose failed as report type incorrect")
+        return
     equip = GeneralEquipmentModuleAttr.objects.get(general_study_module_attributes=g)
     proj.general_study_module_attributes.modality_type = equip.unique_equipment_name.user_defined_modality
 
