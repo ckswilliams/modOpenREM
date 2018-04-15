@@ -5,7 +5,6 @@ import os
 from django.test import TestCase
 from remapp.extractors import rdsr
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, UniqueEquipmentNames, SkinDoseMapCalcSettings
-from remapp.views import reset_dual
 
 
 class ImportDualRDSRs(TestCase):
@@ -43,6 +42,8 @@ class ImportDualRDSRs(TestCase):
 
         unique_equip.user_defined_modality = 'dual'
         unique_equip.save()
+
+        from remapp.views import reset_dual
         reset_dual(unique_equip.pk)
 
         rdsr(rf_path)
@@ -95,6 +96,8 @@ class ImportDualRDSRs(TestCase):
 
         unique_equip.user_defined_modality = 'dual'
         unique_equip.save()
+
+        from remapp.views import reset_dual
         reset_dual(unique_equip.pk)
         reset_dual(unique_equip.pk)
 
