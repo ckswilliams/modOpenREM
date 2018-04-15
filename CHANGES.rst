@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0b2 (2018-03-??)
 --------------------
+* `#610`_  DICOM: query-retrieve changed to work for duplicate RDSRs, ref `#114`_
 * `#609`_  Interface: fixed the feature that toggles the selection when clicking anywhere on a display name table row
 * `#608`_  Interface: fixed the broken sorting of display name table
 * `#603`_  Interface: fixed JavaScript error if there are any None values in fluoro detail irradiation type table
@@ -69,6 +70,7 @@ OpenREM version history
 * `#509`_  Skin dose maps: now recalculated on view if recorded height or weight has changed since last calculation
 * `#508`_  Testing: DX sample files are now tested
 * `#507`_  Interface: Mammo now filterable by study description, procedure, requested procedure and acquisition protocol
+* `#506`_  Documentation: updated query-retrieve docs
 * `#505`_  Charts: n is now displayed on charts
 * `#504`_  Charts: Fixed issue with null values
 * `#503`_  Internationalisation: more robust decoding and use of unicode throughout

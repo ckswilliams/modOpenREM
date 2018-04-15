@@ -1142,6 +1142,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
     from remapp.tools.hash_id import hash_id
 
     g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
+    g.series_instance_uid = get_value_kw('SeriesInstanceUID', dataset)
     g.study_date = get_date('StudyDate', dataset)
     g.study_time = get_time('StudyTime', dataset)
     g.series_time = get_time('SeriesTime', dataset)

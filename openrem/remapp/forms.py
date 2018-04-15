@@ -260,9 +260,11 @@ class DicomQueryForm(forms.Form):
             attrs={"checked": ""}), required=False, help_text=("At least one modality must be ticked - if SR only is "
                                                               "ticked (Advanced) these modalities will be ignored"))
     inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=False,
-                                      help_text="Normally only useful if querying a store holding just DICOM Radiation Dose Structured Reports")
+                                      help_text="Only use with stores containing only RDSRs, "
+                                                "with no accompanying images")
     duplicates_field = forms.BooleanField(label='Ignore studies already in the database?', required=False, initial=True,
-                                          help_text="Studies with the same study UID won't be imported, so there isn't any point getting them!")
+                                          help_text="Studies with the same study UID won't be imported, so there isn't "
+                                                    "any point getting them!")
     desc_exclude_field = forms.CharField(required=False,
                                          label="Exclude studies with these terms in the study description:",
                                          help_text="Comma separated list of terms")
@@ -276,7 +278,8 @@ class DicomQueryForm(forms.Form):
                                          label="Only keep studies or series with these terms in the station name:",
                                          help_text="Comma separated list of terms")
     get_toshiba_images_field = forms.BooleanField(label=u"Attempt to get Toshiba dose images", required=False,
-                                            help_text=u"Only applicable if using Toshiba RDSR generator extension")
+                                            help_text=u"Only applicable if using Toshiba RDSR generator extension, "
+                                                      u"see Docs")
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
@@ -306,9 +309,9 @@ class DicomQueryForm(forms.Form):
                 Accordion(
                     AccordionGroup(
                         'Advanced',
-                        'inc_sr_field',
-                        'duplicates_field',
                         'get_toshiba_images_field',
+                        'duplicates_field',
+                        'inc_sr_field',
                         active=False
                     )
                 ),

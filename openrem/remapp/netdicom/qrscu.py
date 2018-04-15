@@ -22,7 +22,7 @@ import sys
 import uuid
 import collections
 
-
+logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
@@ -31,9 +31,53 @@ if projectpath not in sys.path:
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
-logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 
 from remapp.netdicom.tools import _create_ae
+
+
+def _remove_duplicates(query, study_rsp, assoc, query_id):
+    """
+    Checks for objects in C-Find response already being in the OpenREM database to remove them from the C-Move request
+    :param query: Query object in database
+    :param study_rsp: study level C-Find response object in database
+    :param assoc: current DICOM Query object
+    :param query_id: current query ID for logging
+    :return: Study, series and image level responses deleted if not useful
+    """
+    from remapp.models import GeneralStudyModuleAttr
+
+    logger.debug(u"About to remove any studies we already have in the database")
+    query.stage = u'Checking to see if any response studies are already in the OpenREM database'
+    try:
+        query.save()
+    except Exception as e:
+        logger.error(u"query.save in remove duplicates didn't work because of {0}".format(e))
+    logger.info(
+        u'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
+    for study in study_rsp:
+        existing_study = GeneralStudyModuleAttr.objects.filter(study_instance_uid=study.study_instance_uid)
+        if existing_study.exists():
+            existing_series_instance_uid = existing_study[0].series_instance_uid
+            existing_series_time = existing_study[0].series_time
+            for series_rsp in study.dicomqrrspseries_set.all():
+                if series_rsp.modality == 'SR':
+                    if series_rsp.series_instance_uid == existing_series_instance_uid:
+                        series_rsp.delete()
+                    elif existing_series_time and series_rsp.series_time and (
+                            series_rsp.series_time < existing_series_time
+                    ):
+                        series_rsp.delete()
+                elif series_rsp.modality in ['MG', 'DX', 'CR']:
+                    _query_images(assoc, series_rsp, query_id)
+                    for image_rsp in series_rsp.dicomqrrspimage_set.all():
+                        if existing_study.filter(
+                                projectionxrayradiationdose__irradeventxraydata__irradiation_event_uid=
+                                image_rsp.sop_instance_uid).exists():
+                            image_rsp.delete()
+                            series_rsp.image_level_move = True  # If we have deleted images we need to set this flag
+                            series_rsp.save()
+    study_rsp = query.dicomqrrspstudy_set.all()
+    logger.info(u'After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
 
 
 def _filter(query, level, filter_name, filter_list, filter_type):
@@ -97,6 +141,8 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
     for study in study_rsp:
         logger.debug("at study in study_resp in series prune. modalities in study are: {0}".format(study.get_modalities_in_study()))
         if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
+            # If _check_sr_type_in_study returns an RDSR, all other SR series will have been deleted and then all images
+            # are deleted. If _check_sr_type_in_study returns an ESR or no_dose_report, everything else is kept.
             study.modality = u'MG'
             study.save()
 
@@ -105,14 +151,11 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                 logger.debug(u"Found RDSR in MG study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
-            elif 'SR' in study.get_modalities_in_study():
-                logger.debug(u"SR in DX study not RDSR, so deleting")
-                series = study.dicomqrrspseries_set.all()
-                series.filter(modality__exact='SR').delete()
+            # ToDo: see if there is a mechanism to remove duplicate 'for processing' 'for presentation' images.
 
-            # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
-            # be weeded out
         elif all_mods['DX']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('CR', 'DX')):
+            # If _check_sr_type_in_study returns an RDSR, all other SR series will have been deleted and then all images
+            # are deleted. If _check_sr_type_in_study returns an ESR or no_dose_report, everything else is kept.
             study.modality = u'DX'
             study.save()
 
@@ -121,12 +164,9 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                 logger.debug(u"Found RDSR in DX study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
-            elif 'SR' in study.get_modalities_in_study():
-                logger.debug(u"SR in DX study not RDSR, so deleting")
-                series = study.dicomqrrspseries_set.all()
-                series.filter(modality__exact='SR').delete()
 
         elif all_mods['FL']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('XA', 'RF')):
+            # _check_sr_type_in_study will delete any SR that is not RDSR or ESR. All other series are then deleted.
             study.modality = 'FL'
             study.save()
             sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
@@ -135,23 +175,28 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             series.exclude(modality__exact='SR').delete()
 
         elif all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
+            # If _check_sr_type_in_study returns RDSR, all other SR series responses will have been deleted and then all
+            # other series responses will be deleted too.
+            # If _check_sr_type_in_study returns ESR, all other SR series responses will have been deleted and then all
+            # other series responses will be deleted too.
+            # Otherwise, we pass the study response to _get_philips_dose_images to see if there is a Philips dose info
+            # series and optionally get samples from each series for the Toshiba RDSR creation routine.
             study.modality = 'CT'
             study.save()
             logger.debug("Filtering CT at series level")
             series = study.dicomqrrspseries_set.all()
             if 'SR' in study.get_modalities_in_study():
-                SR_type = _check_sr_type_in_study(assoc, study, query.query_id)
-                if SR_type == 'RDSR':
+                sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
+                if sr_type == 'RDSR':
                     logger.debug(u"Found RDSR in CT study, so keep SR and delete all other series")
                     series.exclude(modality__exact='SR').delete()
-                elif SR_type == 'ESR':  # GE CT's with ESR instead of RDSR
+                elif sr_type == 'ESR':  # GE CT's with ESR instead of RDSR
                     logger.debug(u"Found ESR in CT study, so keep SR and delete all other series")
                     series.exclude(modality__exact='SR').delete()
                 else:
-                    # non-dose SR, so check for Philips dose info
                     _get_philips_dose_images(series, get_toshiba_images, assoc, query.query_id)
             else:
-                # if SR not present in study, only keep Philips dose info series
+                # if SR not present in study
                 _get_philips_dose_images(series, get_toshiba_images, assoc, query.query_id)
 
         elif all_mods['SR']['inc']:
@@ -185,6 +230,8 @@ def _get_philips_dose_images(series, get_toshiba_images, assoc, query_id):
             _get_toshiba_dose_images(series, assoc, query_id)
         else:
             series.delete()
+    elif get_toshiba_images:
+        _get_toshiba_dose_images(series, assoc, query_id)
     else:
         series.filter(number_of_series_related_instances__gt=5).delete()
 
@@ -252,12 +299,19 @@ def _prune_study_responses(query, filters):
 
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
 def _check_sr_type_in_study(assoc, study, query_id):
+    """Checks at an image level whether SR in study is RDSR, ESR, or something else (Radiologist's report for example)
+
+    * If RDSR is found, all non-RDSR SR series responses are deleted
+    * Otherwise, if an ESR is found, all non-ESR series responses are deleted
+    * Otherwise, all SR series responses are deleted
+
+    The function returns one of 'RDSR', 'ESR', 'no_dose_report'.
+
+    :param assoc: Current DICOM query object
+    :param study: study level C-Find response object in database
+    :param query_id: current query ID for logging
+    :return: string indicating SR type remaining in study
     """
-    Checks at an image level whether SR in study is RDSR, ESR, or something else (Radiologist's report for example)
-    :param study: Study to check SR type of
-    :return: String of 'RDSR', 'ESR', or 'no_dose_report'
-    """
-    # select series with modality SR
     series_sr = study.dicomqrrspseries_set.filter(modality__exact='SR')
     logger.info(u"Number of series with SR {0}".format(series_sr.count()))
     sopclasses = set()
@@ -265,7 +319,7 @@ def _check_sr_type_in_study(assoc, study, query_id):
         _query_images(assoc, sr, query_id)
         images = sr.dicomqrrspimage_set.all()
         if images.count() == 0:
-            logger.debug(u"Oops, series {0} of study instance UID {1} doesn't have any images in!".format(
+            logger.debug(u"Oops, series {0} of study instance UID {1} doesn't have any objects in!".format(
                 sr.series_number, study.study_instance_uid))
             continue
         sopclasses.add(images[0].sop_class_uid)
@@ -339,6 +393,7 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False, msg_id=N
 
 
 def _query_series(assoc, d2, studyrsp, query_id):
+    from remapp.tools.dcmdatetime import get_time
     from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspSeries
     d2.QueryRetrieveLevel = "SERIES"
@@ -349,6 +404,7 @@ def _query_series(assoc, d2, studyrsp, query_id):
     d2.NumberOfSeriesRelatedInstances = ''
     d2.StationName = ''
     d2.SpecificCharacterSet = ''
+    d2.SeriesTime = ''
 
     logger.debug(u'Query_id {0}: In _query_series'.format(query_id))
     logger.debug(u'Query_id {0}: series query is {1}'.format(query_id, d2))
@@ -380,6 +436,7 @@ def _query_series(assoc, d2, studyrsp, query_id):
         if not seriesrsp.number_of_series_related_instances:
             seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
         seriesrsp.station_name = get_value_kw('StationName', series[1])
+        seriesrsp.series_time = get_time('SeriesTime', series[1])
         logger.debug(u"Series Response {0}: Modality {1}, StationName {2}, StudyUID {3}, Series No. {4}, "
                      u"Series description {5}".format(
                             seRspNo, seriesrsp.modality, seriesrsp.station_name, d2.StudyInstanceUID,
@@ -556,7 +613,7 @@ def qrscu(
 
     from dicom.dataset import Dataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
-    from remapp.models import GeneralStudyModuleAttr, DicomQuery, DicomRemoteQR, DicomStoreSCP
+    from remapp.models import DicomQuery, DicomRemoteQR, DicomStoreSCP
     from remapp.tools.dcmdatetime import make_dcm_date_range
 
     debug_timer = datetime.now()
@@ -681,23 +738,6 @@ def qrscu(
                 study.delete()
         logger.debug(u"Finished removing studies that have anything other than SR in.")
 
-    # FIXME: why not perform at series level? Fixes the problem of additional series that might be missed, but
-    # would need to be  combined with changes to extractor scripts
-    if remove_duplicates:
-        logger.debug(u"About to remove any studies we already have in the database")
-        query.stage = u'Checking to see if any response studies are already in the OpenREM database'
-        try:
-            query.save()
-        except Exception as e:
-            logger.error(u"query.save in remove duplicates didn't work because of {0}".format(e))
-        logger.info(
-            u'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
-        for uid in study_rsp.values_list('study_instance_uid', flat=True):
-            if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
-                study_rsp.filter(study_instance_uid__exact=uid).delete()
-        study_rsp = query.dicomqrrspstudy_set.all()
-        logger.info(u'After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
-
     filter_logs = []
     if filters['study_desc_inc']:
         filter_logs += [u"study description includes {0}, ".format(u", ".join(filters['study_desc_inc']))]
@@ -752,6 +792,9 @@ def qrscu(
 
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info(u'Now have {0} studies'.format(study_rsp.count()))
+
+    if remove_duplicates:
+        _remove_duplicates(query, study_rsp, assoc, query_id)
 
     # done
     my_ae.Quit()
@@ -920,7 +963,7 @@ def parse_args(argv):
     parser.add_argument('-toshiba', action="store_true",
                         help='Advanced: Attempt to retrieve CT dose summary objects and one image from each series')
     parser.add_argument('-sr', action="store_true",
-                        help='Advanced: Query for structured report only studies. Cannot be used with -ct, -mg, -fl, -dx')
+                        help='Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx')
     parser.add_argument('-dup', action="store_true",
                         help="Advanced: Retrieve duplicates (studies that are already in database)")
     args = parser.parse_args(argv)
