@@ -474,7 +474,10 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
             event.irradiation_event_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                              cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
-            event.acquisition_protocol = safe_strings(cont.TextValue, char_set=ch)
+            try:
+                event.acquisition_protocol = safe_strings(cont.TextValue, char_set=ch)
+            except AttributeError:
+                event.acquisition_protocol = None
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anatomical structure':
             event.anatomical_structure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                            cont.ConceptCodeSequence[0].CodeMeaning)
@@ -931,10 +934,12 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
     elif reporttype == 'ct':
         proj = CtRadiationDose.objects.create(general_study_module_attributes=g)
     else:
-        pass
-    # set modality to user defined modality type for this system (if not set it is set to an empty value)
+        logger.error("Attempt to create ProjectionXRayRadiationDose failed as report type incorrect")
+        return
     equip = GeneralEquipmentModuleAttr.objects.get(general_study_module_attributes=g)
     proj.general_study_module_attributes.modality_type = equip.unique_equipment_name.user_defined_modality
+    if proj.general_study_module_attributes.modality_type == u'dual':
+        proj.general_study_module_attributes.modality_type = None
 
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Procedure reported':
