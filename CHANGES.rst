@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0b2 (2018-03-??)
 --------------------
 * `#613`_  Imports: fixed dual modality type imports after 'dual' designation from ref `#580`_
+* `#612`_  Imports: prevented crash when RDSR was imported with AcquisitionProtocol sequence with no TextValue
 * `#610`_  DICOM: query-retrieve changed to work for duplicate RDSRs, ref `#114`_
 * `#609`_  Interface: fixed the feature that toggles the selection when clicking anywhere on a display name table row
 * `#608`_  Interface: fixed the broken sorting of display name table
