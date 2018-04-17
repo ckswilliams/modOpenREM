@@ -2273,29 +2273,20 @@ def reset_dual(pk=None):
         return
 
     studies = GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)
+    not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
+        modality_type__exact='RF').exclude(modality_type__exact='CR')
     message_start = "Reprocessing dual for {0}. Number of studies is {1}, of which {2} are " \
-                    "DX, {3} are CR, {4} are RF and {5} are OT before processing,".format(
+                    "DX, {3} are CR, {4} are RF and {5} are something else before processing,".format(
         studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
         studies.count(),
         studies.filter(modality_type__exact='DX').count(),
         studies.filter(modality_type__exact='CR').count(),
         studies.filter(modality_type__exact='RF').count(),
-        studies.filter(modality_type__exact='OT').count()
+        not_dx_rf_cr.count(),
     )
-    not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
-        modality_type__exact='RF').exclude(modality_type__exact='CR').exclude(modality_type__exact='OT')
 
-    logger.debug(
-        "Reprocessed dual for {0}. Number of studies is {1}, of which {2} are DX, {3} are "
-        "CR, {4} are RF and {5} are OT, leaving {6} that are not.".format(
-            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name, studies.count(),
-            studies.filter(modality_type__exact='DX').count(),
-            studies.filter(modality_type__exact='CR').count(),
-            studies.filter(modality_type__exact='RF').count(),
-            studies.filter(modality_type__exact='OT').count(),
-            not_dx_rf_cr.count(),
-        )
-    )
+    logger.debug(message_start)
+
     for study in studies:
         try:
             projection_xray_dose = study.projectionxrayradiationdose_set.get()
@@ -2346,23 +2337,16 @@ def reset_dual(pk=None):
             study.modality_type = 'OT'
             study.save()
             logger.debug("Unable to reprocess study - no device type or accumulated data to go on. Modality set to OT.")
-    logger.debug(
-        "Reprocess dual complete for {0}. Number of studies is {1}, of which {2} are DX, "
-        "{3} are CR, {4} are RF and {5} are 'OT'.".format(
-            studies[0].generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-            studies.count(),
-            studies.filter(modality_type='DX').count(),
-            studies.filter(modality_type='CR').count(),
-            studies.filter(modality_type='RF').count(),
-            studies.filter(modality_type__exact='OT').count())
-    )
-    message_finish = "and after processing  {0} are DX, {1} are CR, {2} are RF and {3} are OT because" \
-                     " they are incomplete.".format(
+
+    not_dx_rf_cr = studies.exclude(modality_type__exact='DX').exclude(
+        modality_type__exact='RF').exclude(modality_type__exact='CR')
+    message_finish = "and after processing  {0} are DX, {1} are CR, {2} are RF and {3} are something else".format(
                                                         studies.filter(modality_type='DX').count(),
                                                         studies.filter(modality_type='CR').count(),
                                                         studies.filter(modality_type='RF').count(),
-                                                        studies.filter(modality_type__exact='OT').count(),
-                                                    )
+                                                        not_dx_rf_cr.count(),
+    )
+    logger.debug(message_finish)
     return " ".join([message_start, message_finish])
 
 
