@@ -152,17 +152,22 @@ def generate_sheets(studies, book, protocol_headers, modality=None, pid=False, n
     sheet_list = {}
     protocols_list = []
     for exams in studies:
-        if modality in [u"DX", u"RF", u"MG"]:
-            events = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')
-        elif modality in u"CT":
-            events =  exams.ctradiationdose_set.get().ctirradiationeventdata_set.all()
-        for s in events:
-            if s.acquisition_protocol:
-                safe_protocol = s.acquisition_protocol
-            else:
-                safe_protocol = u'Unknown'
-            if safe_protocol not in protocols_list:
-                protocols_list.append(safe_protocol)
+        try:
+            if modality in [u"DX", u"RF", u"MG"]:
+                events = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')
+            elif modality in u"CT":
+                events = exams.ctradiationdose_set.get().ctirradiationeventdata_set.all()
+            for s in events:
+                if s.acquisition_protocol:
+                    safe_protocol = s.acquisition_protocol
+                else:
+                    safe_protocol = u'Unknown'
+                if safe_protocol not in protocols_list:
+                    protocols_list.append(safe_protocol)
+        except ObjectDoesNotExist:
+            logger.error(u"Study missing during generation of sheet names; most likely due to study being deleted "
+                         u"whilst export in progress to be replace by later version of RDSR.")
+            continue
     protocols_list.sort()
 
     for protocol in protocols_list:
