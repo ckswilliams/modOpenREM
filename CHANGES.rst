@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.8.0b2 (2018-03-??)
+0.8.0b2 (2018-04-18)
 --------------------
 * `#614`_  Exports: handle error when study is deleted during sheet creation for exports
 * `#613`_  Imports: fixed dual modality type imports after 'dual' designation from ref `#580`_
