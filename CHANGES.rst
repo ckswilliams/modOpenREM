@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0b2 (2018-03-??)
 --------------------
+* `#615`_  Exports: added Target Exposure Index and Deviation Index to radiographic exports
 * `#614`_  Exports: handle error when study is deleted during sheet creation for exports
 * `#613`_  Imports: fixed dual modality type imports after 'dual' designation from ref `#580`_
 * `#612`_  Imports: prevented crash when RDSR was imported with AcquisitionProtocol sequence with no TextValue

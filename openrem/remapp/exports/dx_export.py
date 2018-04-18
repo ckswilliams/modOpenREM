@@ -60,6 +60,8 @@ def _series_headers(max_events):
             u'E' + str(series_number+1) + u' Filters',
             u'E' + str(series_number+1) + u' Filter thicknesses (mm)',
             u'E' + str(series_number+1) + u' Exposure index',
+            u'E' + str(series_number+1) + u' Target exposure index',
+            u'E' + str(series_number+1) + u' Deviation index',
             u'E' + str(series_number+1) + u' Relative x-ray exposure',
             u'E' + str(series_number+1) + u' DAP (cGy.cm^2)',
             u'E' + str(series_number+1) + u' Entrance Exposure at RP (mGy)',
@@ -99,9 +101,13 @@ def _dx_get_series_data(s):
     try:
         detector_data = s.irradeventxraydetectordata_set.get()
         exposure_index = detector_data.exposure_index
+        target_exposure_index = detector_data.target_exposure_index
+        deviation_index = detector_data.deviation_index
         relative_xray_exposure = detector_data.relative_xray_exposure
     except ObjectDoesNotExist:
         exposure_index = None
+        target_exposure_index = None
+        deviation_index = None
         relative_xray_exposure = None
 
     cgycm2 = s.convert_gym2_to_cgycm2()
@@ -136,6 +142,8 @@ def _dx_get_series_data(s):
         filters,
         filter_thicknesses,
         exposure_index,
+        target_exposure_index,
+        deviation_index,
         relative_xray_exposure,
         cgycm2,
         entrance_exposure_at_rp,
@@ -186,7 +194,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     tsk.progress = u'Required study filter complete.'
     tsk.save()
-        
+
     tsk.num_records = e.count()
     if abort_if_zero_studies(tsk.num_records, tsk):
         return
@@ -311,6 +319,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         u'Filters',
         u'Filter thicknesses (mm)',
         u'Exposure index',
+        u'Target exposure index',
+        u'Deviation index',
         u'Relative x-ray exposure',
         u'DAP (cGy.cm^2)',
         u'Entrance exposure at RP',
