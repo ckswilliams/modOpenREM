@@ -18,15 +18,23 @@ Headline changes
 * Interface: More and better charts, including scatter plots for mammography
 * Exports: Much faster, and more consistent
 
+Changes since release 0.8.0b1
+=============================
+
+* Lots of documentation updates
+* Imports: changes to how 'dual' RF/DX modalities are handled, improvements to handling MultiValue filters, bug fixes
+* Interface: bug fix for bi-plane fluoroscopy systems DAP and RP Dose display
+* Exports: added target exposure index and deviation index to DX exports, bug fixes
+
 ***************************************************
 Upgrading an OpenREM server with no internet access
 ***************************************************
 
 Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
-****************************
-Upgrading from version 0.7.4
-****************************
+***************************************
+Upgrading from version 0.7.4 or 0.8.0b1
+***************************************
 
 Upgrade
 =======
