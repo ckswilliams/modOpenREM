@@ -1,5 +1,5 @@
-Diagram showing the OpenREM system components
-=============================================
+Diagram of system components
+============================
 
 .. graphviz::
 

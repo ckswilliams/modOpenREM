@@ -79,10 +79,7 @@ Extremely minor change to the documenation links
 Upgrading an OpenREM server with no internet access
 ***************************************************
 
-..  toctree::
-    :maxdepth: 1
-
-    upgrade-offline
+Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
 ..  _upgradefrom060:
 

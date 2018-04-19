@@ -18,6 +18,12 @@ download them all:
     mkdir openremfiles
     pip install -d openremfiles openrem==0.8.0b2
 
+.. note::
+
+    If ``pip install`` complains that ``-d`` is not a valid option, then use the following command instead:
+
+    ``pip download -d openremfiles openrem==0.8.0b2``
+
 Copy everything to the OpenREM server
 -------------------------------------
 

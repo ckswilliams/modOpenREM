@@ -1,10 +1,10 @@
-#########################################
-Calculation and display of skin dose maps
-#########################################
+##############
+Skin dose maps
+##############
 
-************************************
+*******************************
 Functionality that is available
-************************************
+*******************************
 
 * Skin dose map data is calculated to the surface of a simple geometric phantom
   using the in-built `openSkin`_ routines (3D phantom)
