@@ -1102,6 +1102,13 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
                 logger.debug('Trying to make initial DICOM RDSR object in {0}'.format(sub_folder))
                 combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
                 _make_dicom_rdsr(sub_folder, combined_command, rdsr_name)
+                # Check that the initial RDSR exists
+                initial_rdsr_name_and_path = os.path.join(sub_folder, rdsr_name)
+                if not os.path.isfile(initial_rdsr_name_and_path):
+                    logger.debug('Failed to create initial DICOM RDSR object created in {0}. Skipping.'.format(sub_folder))
+                    # Remove this sub_folder from subfolder_paths list as it can't be used
+                    subfolder_paths.remove(sub_folder)
+                    continue
                 logger.debug('Initial DICOM RDSR object created in {0}'.format(sub_folder))
 
                 logger.debug('Gathering extra information from images in {0}'.format(sub_folder))
@@ -1112,11 +1119,17 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
 
                 # Use the extra information to update the initial rdsr file created by DoseUtility
                 logger.debug('Updating information in rdsr in {0}'.format(sub_folder))
-                initial_rdsr_name_and_path = os.path.join(sub_folder, rdsr_name)
                 updated_rdsr_name_and_path = os.path.join(sub_folder, updated_rdsr_name)
                 result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information,
                                             extra_acquisition_information, updated_rdsr_name_and_path)
-                logger.debug('Updated information in rdsr')
+                # Check that the updated RDSR exists
+                if result == 1:
+                    logger.debug('Updated information in rdsr')
+                else:
+                    logger.debug('Failed to update the initial DICOM RDSR object in {0}. Skipping.'.format(sub_folder))
+                    # Remove this sub_folder from subfolder_paths list as it can't be used
+                    subfolder_paths.remove(sub_folder)
+                    continue
 
             # Now combine the data contained in the RDSRs
             first_subfolder = True
@@ -1192,43 +1205,50 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
                                         logger.debug("Current total DLP is zero. Replacing with extra {0} mGy.cm.".format(additional_amount))
                                         combined_rdsr_accumulated_dose_data.ContentSequence[i] = extra_ct_dlp_total_content_sequence
 
-            combined_rdsr.save_as(os.path.join(folder, combined_rdsr_name+'_updated'))
-            logger.debug('Importing updated combined rdsr in to OpenREM ({0})'.format(os.path.join(folder, combined_rdsr_name+'_updated')))
-            rdsr(os.path.join(folder, combined_rdsr_name+'_updated'))
-            logger.debug('Imported in to OpenREM')
+            if len(subfolder_paths) > 0:
+                combined_rdsr.save_as(os.path.join(folder, combined_rdsr_name+'_updated'))
+                logger.debug('Importing updated combined rdsr in to OpenREM ({0})'.format(os.path.join(folder, combined_rdsr_name+'_updated')))
+                rdsr(os.path.join(folder, combined_rdsr_name+'_updated'))
+                logger.debug('Imported in to OpenREM')
+            else:
+                logger.debug('RDSRs could not be created for any subfolders')
 
         else:
             # Create a DICOM RDSR for the sub-folder using pixelmed.jar.
             logger.debug('Trying to make initial DICOM RDSR object in {0}'.format(folder))
             combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
             _make_dicom_rdsr(folder, combined_command, rdsr_name)
-            logger.debug('Initial DICOM RDSR object created in {0}'.format(folder))
-
-            logger.debug('Gathering extra information from images in {0}'.format(folder))
-            extra_information = _find_extra_info(folder)
-            extra_study_information = extra_information[0]
-            extra_acquisition_information = extra_information[1]
-            logger.debug('Gathered extra information from images in {0}'.format(folder))
-
-            # Use the extra information to update the initial rdsr file created by DoseUtility
-            logger.debug('Updating information in rdsr in {0}'.format(folder))
+            # Check that the initial RDSR exists
             initial_rdsr_name_and_path = os.path.join(folder, rdsr_name)
-            updated_rdsr_name_and_path = os.path.join(folder, updated_rdsr_name)
-            result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information,
-                                        extra_acquisition_information, updated_rdsr_name_and_path)
-            logger.debug('Updated information in rdsr')
+            if os.path.isfile(initial_rdsr_name_and_path):
+                logger.debug('Initial DICOM RDSR object created in {0}'.format(folder))
 
-            # Now import the updated rdsr into OpenREM using the Toshiba extractor
-            if result == 1:
-                logger.debug('Importing updated rdsr in to OpenREM ({0})'.format(updated_rdsr_name_and_path))
-                rdsr(updated_rdsr_name_and_path)
-                logger.debug('Imported in to OpenREM')
+                logger.debug('Gathering extra information from images in {0}'.format(folder))
+                extra_information = _find_extra_info(folder)
+                extra_study_information = extra_information[0]
+                extra_acquisition_information = extra_information[1]
+                logger.debug('Gathered extra information from images in {0}'.format(folder))
+
+                # Use the extra information to update the initial rdsr file created by DoseUtility
+                logger.debug('Updating information in rdsr in {0}'.format(folder))
+                updated_rdsr_name_and_path = os.path.join(folder, updated_rdsr_name)
+                result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information,
+                                            extra_acquisition_information, updated_rdsr_name_and_path)
+                logger.debug('Updated information in rdsr')
+
+                # Now import the updated rdsr into OpenREM using the Toshiba extractor
+                if result == 1:
+                    logger.debug('Importing updated rdsr in to OpenREM ({0})'.format(updated_rdsr_name_and_path))
+                    rdsr(updated_rdsr_name_and_path)
+                    logger.debug('Imported in to OpenREM')
+                else:
+                    logger.debug('Not imported to OpenREM. Result is: {0}'.format(result))
             else:
-                logger.debug('Not imported to OpenREM. Result is: {0}'.format(result))
+                logger.debug('Failed to create initial DICOM RDSR object created in {0}. Skipping.'.format(folder))
 
     # Now delete the image folder
     logger.debug('Removing study folder')
-    #shutil.rmtree(folder_name)
+    shutil.rmtree(folder_name)
     logger.debug('Removing study folder complete')
     logger.debug('Reached end of rdsr_toshiba_ct_from_dose_images routine')
     return 0
@@ -1239,3 +1259,4 @@ if __name__ == "__main__":
         sys.exit('Error: supply exactly one argument - the folder containing the DICOM objects')
 
     sys.exit(rdsr_toshiba_ct_from_dose_images(sys.argv[1]))
+
