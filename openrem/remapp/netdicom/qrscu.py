@@ -302,6 +302,7 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False, msg_id=N
     d3 = Dataset()
     d3.QueryRetrieveLevel = "IMAGE"
     d3.SeriesInstanceUID = seriesrsp.series_instance_uid
+    d3.StudyInstanceUID = seriesrsp.dicom_qr_rsp_study.study_instance_uid
     d3.SOPInstanceUID = ''
     d3.SOPClassUID = ''
     d3.InstanceNumber = ''
