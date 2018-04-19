@@ -259,7 +259,7 @@ def _check_sr_type_in_study(assoc, study, query_id):
     """
     # select series with modality SR
     series_sr = study.dicomqrrspseries_set.filter(modality__exact='SR')
-    logger.info(u"Number of series with SR {0}".format(series_sr.count()))
+    logger.debug(u"Number of series with SR {0}".format(series_sr.count()))
     sopclasses = set()
     for sr in series_sr:
         _query_images(assoc, sr, query_id)
@@ -271,9 +271,9 @@ def _check_sr_type_in_study(assoc, study, query_id):
         sopclasses.add(images[0].sop_class_uid)
         sr.sop_class_in_series = images[0].sop_class_uid
         sr.save()
-        logger.info(u"studyuid: {0}   seriesuid: {1}   nrimages: {2}   sopclasses: {3}".format(
+        logger.debug(u"studyuid: {0}   seriesuid: {1}   nrimages: {2}   sopclasses: {3}".format(
             study.study_instance_uid, sr.series_instance_uid, images.count(), sopclasses))
-    logger.info(u"sopclasses: {0}".format(sopclasses))
+    logger.debug(u"sopclasses: {0}".format(sopclasses))
     if '1.2.840.10008.5.1.4.1.1.88.67' in sopclasses:
         for sr in series_sr:
             if sr.sop_class_in_series != '1.2.840.10008.5.1.4.1.1.88.67':
@@ -313,8 +313,8 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False, msg_id=N
     if not msg_id:
         msg_id = 1
 
-    # logger.debug(u'Query_id {0}: query is {1}, intial_imge_only is {2}, msg_id is {3}'.format(
-    #     query_id, d3, initial_image_only, msg_id))
+    logger.debug(u'Query_id {0}: query is {1}, intial_imge_only is {2}, msg_id is {3}'.format(
+                    query_id, d3, initial_image_only, msg_id))
 
     st3 = assoc.StudyRootFindSOPClass.SCU(d3, msg_id)
 
@@ -712,7 +712,6 @@ def qrscu(
     logger.info(u"Pruning study responses based on inc/exc options: {0}".format(u"".join(filter_logs)))
     _prune_study_responses(query, filters)
     study_rsp = query.dicomqrrspstudy_set.all()
-    logger.info(u'Now have {0} studies'.format(study_rsp.count()))
 
     for rsp in study_rsp:
         # Series level query
