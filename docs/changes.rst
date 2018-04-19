@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0b3 (2018-04-19)
 --------------------
 * `#618`_  DICOM: fixed image level query that prevented RDSRs from being found
+* `#617`_  Imports: fixed issue with multi study exams crashing the Toshiba extractor
 * `#616`_  Documentation: added information for pip download -d
 * `#615`_  Exports: added Target Exposure Index and Deviation Index to radiographic exports
 * `#614`_  Exports: handle error when study is deleted during sheet creation for exports
