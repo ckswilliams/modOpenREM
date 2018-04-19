@@ -26,15 +26,21 @@ Changes since release 0.8.0b1
 * Interface: bug fix for bi-plane fluoroscopy systems DAP and RP Dose display
 * Exports: added target exposure index and deviation index to DX exports, bug fixes
 
+Changes since release 0.8.0b2
+=============================
+
+* A few documentation updates
+* Imports: fix for query retrieve of RDSRs in studies
+
 ***************************************************
 Upgrading an OpenREM server with no internet access
 ***************************************************
 
 Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
-***************************************
-Upgrading from version 0.7.4 or 0.8.0b1
-***************************************
+*********************************************
+Upgrading from version 0.7.4 or 0.8.0b1 or b2
+*********************************************
 
 Upgrade
 =======
@@ -52,7 +58,7 @@ Upgrade
 
 .. sourcecode:: bash
 
-    pip install openrem==0.8.0b2
+    pip install openrem==0.8.0b3
 
 ..  _upgradefrom074:
 
