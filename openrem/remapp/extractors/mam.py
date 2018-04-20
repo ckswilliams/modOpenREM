@@ -556,12 +556,6 @@ def mam(mg_file):
     :param mg_file: relative or absolute path to mammography DICOM image file.
     :type mg_file: str.
 
-    Tested with:
-        * GE Senographe DS software versions ADS_43.10.1 and ADS_53.10.10 only.
-        * Limited testing: GE Senographe Essential
-        * Limited testing: Hologic Selenia
-        * Limited testing: Siemens Inspiration
-    
     """
 
     import os

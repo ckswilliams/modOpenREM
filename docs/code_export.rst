@@ -11,16 +11,15 @@ order, with one series per line. If one study has three series with the
 same protocol name, each one has a line of its own.
 
 .. autotask:: remapp.exports.rf_export.rfxlsx
-.. autotask:: remapp.exports.ct_export.ctxlsx(filterdict, pid=False, name=False, patid=False, user=False)
+.. autotask:: remapp.exports.ct_export.ctxlsx
 .. autotask:: remapp.exports.dx_export.dxxlsx
-.. autotask:: remapp.exports.mg_export.exportMG2excel(filterdict, pid=False, name=False, patid=False, user=False, xlsx=True)
-
+.. autotask:: remapp.exports.mg_export.exportMG2excel
 
 Single sheet CSV exports
 ++++++++++++++++++++++++
    
 .. autotask:: remapp.exports.rf_export.exportFL2excel
-.. autotask:: remapp.exports.ct_export.ct_csv(filterdict, pid=False, name=False, patid=False, user=False)
+.. autotask:: remapp.exports.ct_export.ct_csv
 .. autotask:: remapp.exports.mg_export.exportMG2excel
 .. autotask:: remapp.exports.dx_export.exportDX2excel
 
