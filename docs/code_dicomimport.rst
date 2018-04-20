@@ -7,7 +7,7 @@ RDSR module
 Ultimately this should be the only module required as it deals with all Radiation Dose Structured Reports. This is used
 for CT, fluoroscopy, mammography and digital radiography.
 
-.. autotask:: remapp.extractors.rdsr.rdsr
+.. autotask:: openrem.remapp.extractors.rdsr.rdsr
 
 .. _mammo-module:
 
