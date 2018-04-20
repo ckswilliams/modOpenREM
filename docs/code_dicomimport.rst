@@ -20,8 +20,7 @@ However the disadvantage over an RSDR is the requirement to process each
 individual image rather than a single report for the study, which would
 also capture any rejected images.
 
-.. autotask:: openrem.remapp.extractors.mam
-    :members:
+.. autotask:: openrem.remapp.extractors.mam.mam
 
 CR and DR module
 ++++++++++++++++
@@ -30,8 +29,7 @@ In practice this is only useful for DR modalities, but most of them use the
 CR IOD instead of the DX one, so both are catered for. This module makes use
 of the image headers much like the mammography module.
 
-.. autotask:: openrem.remapp.extractors.dx
-    :members:
+.. autotask:: openrem.remapp.extractors.dx.dx
 
 CT non-standard modules
 +++++++++++++++++++++++
@@ -40,7 +38,7 @@ Philips CT dose report images are catered for. These have all the information
 that could be derived from the images also held in the DICOM header
 information, making harvesting relatively easy.
 
-.. autotask:: openrem.remapp.extractors.ct_philips
+.. autotask:: openrem.remapp.extractors.ct_philips.ct_philips
     :members:
 
 Older Toshiba CT systems that create dose summary images but cannot create
