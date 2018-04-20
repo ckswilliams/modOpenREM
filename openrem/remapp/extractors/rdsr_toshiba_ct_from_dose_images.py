@@ -60,6 +60,7 @@ def find_dose_summary_objects(folder_path):
         ImageType is ['DERIVED', 'SECONDARY', 'MULTI_FORMAT_RASTER']
         ImageType is ['DERIVED', 'SECONDARY', 'DISPLAY']
         ImageType is ['DERIVED', 'SECONDARY', 'MPR']
+
     The above are from a virtual colonoscopy study.
 
     Args:
