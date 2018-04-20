@@ -7,6 +7,8 @@ Troubleshooting
 
     trouble500
     troubleencoding
+    trouble_dictionary
+    troubledbtlaterality
 
 If you have a modality where every study has one event (usually CT), review
 
