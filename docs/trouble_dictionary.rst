@@ -26,3 +26,21 @@ The error message will look something like this. The actual tag can be different
 
 Work-around
 ===========
+
+The workaround is to replace the ``_dicom_dict.py`` with the version in the current master of pydicom.
+
+First, download the current file (right click 'Save link as...' or similar): `_dicom_dict.py`_
+
+Next, find the location of your pydicom install -- it should be at one of the following paths:
+
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/dicom/``
+* Other linux: ``/usr/lib/python2.7/site-packages/dicom/``
+* Linux virtualenv: ``lib/python2.7/site-packages/dicom/``
+* Windows: ``C:\Python27\Lib\site-packages\dicom\``
+* Windows virtualenv: ``Lib\site-packages\dicom\``
+
+Replace the existing ``_dicom_dict.py`` file with the one you have downloaded.
+
+Try and import the file again - it should now work.
+
+..  _\_dicom_dict.py: https://raw.githubusercontent.com/pydicom/pydicom/master/pydicom/_dicom_dict.py
