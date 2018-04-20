@@ -97,8 +97,9 @@ STATICFILES_DIRS = (
 )
 
 #
-# SECRET_KEY moved to local_settings.py
+# SECRET_KEY must be changed in local_settings.py
 #
+SECRET_KEY = 'youmustchangethiskeyinlocal_settings'
 
 # URL of the login page
 LOGIN_URL = '/login/'
