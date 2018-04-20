@@ -573,7 +573,6 @@ def _query_for_each_modality(all_mods, query, d, assoc):
     return modalities_returned, modality_matching
 
 
-
 @shared_task(name='remapp.netdicom.qrscu.qrscu')  # (name='remapp.netdicom.qrscu.qrscu', queue='qr')
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
