@@ -929,8 +929,6 @@ def parse_args(argv):
     """
 
     import argparse
-    import datetime
-    from remapp.netdicom.tools import echoscu
 
     parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
     parser.add_argument('qr_id', type=int, help='Database ID of the remote QR node')
@@ -959,6 +957,15 @@ def parse_args(argv):
                         help='Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx')
     parser.add_argument('-dup', action="store_true",
                         help="Advanced: Retrieve duplicates (studies that are already in database)")
+
+    return parser
+
+
+def _process_args(argv):
+    import datetime
+    from remapp.netdicom.tools import echoscu
+
+    parser = parse_args(argv)
     args = parser.parse_args(argv)
 
     logger.info(u"qrscu script called")
@@ -1049,6 +1056,8 @@ def parse_args(argv):
     return processed_args
 
 
+
+
 def qrscu_script():
     """Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
 
@@ -1056,17 +1065,18 @@ def qrscu_script():
     :return:
     """
 
-    parsed_args = parse_args(sys.argv[1:])
+#    parsed_args = parse_args(sys.argv[1:])
+    processed_args = _process_args(sys.argv[1:])
     sys.exit(
-        qrscu.delay(qr_scp_pk=parsed_args['qr_id'],
-                    store_scp_pk=parsed_args['store_id'],
+        qrscu.delay(qr_scp_pk=processed_args['qr_id'],
+                    store_scp_pk=processed_args['store_id'],
                     move=True,
-                    modalities=parsed_args['modalities'],
-                    remove_duplicates=parsed_args['remove_duplicates'],
-                    date_from=parsed_args['dfrom'],
-                    date_until=parsed_args['duntil'],
-                    filters=parsed_args['filters'],
-                    get_toshiba_images=parsed_args['get_toshiba']
+                    modalities=processed_args['modalities'],
+                    remove_duplicates=processed_args['remove_duplicates'],
+                    date_from=processed_args['dfrom'],
+                    date_until=processed_args['duntil'],
+                    filters=processed_args['filters'],
+                    get_toshiba_images=processed_args['get_toshiba']
                     )
     )
 
