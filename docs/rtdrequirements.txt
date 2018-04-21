@@ -17,3 +17,4 @@ testfixtures
 mock
 django-debug-toolbar
 https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+sphinxcontrib-programoutput

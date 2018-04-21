@@ -26,3 +26,8 @@ With the args parsed by:
 
 ..  autofunction:: openrem.remapp.netdicom.qrscu.parse_args
 
+
+As program output
+=================
+
+..  program-output:: openrem_qr.py -h
