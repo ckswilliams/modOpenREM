@@ -37,8 +37,8 @@ As program output
 ..  program-output:: python -V
 
 
-Autoprogram
-===========
+argparse
+========
 
-..  autoprogram:: openrem.remapp.netdicom.qrscu:parse_args()
+..  autoprogram:: openrem.remapp.netdicom.qrscu:parse_args
     :prog: qrscu
