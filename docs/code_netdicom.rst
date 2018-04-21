@@ -23,3 +23,9 @@ Command line script
 ..  automodule:: openrem.remapp.netdicom.qrscu
     :members: qrscu_script, parse_args
 
+
+
+Trying autofunction
+===================
+
+..  autofunction:: openrem.remapp.netdicom.qrscu.qrscu_script
