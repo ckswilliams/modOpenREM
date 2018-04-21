@@ -30,8 +30,15 @@ With the args parsed by:
 As program output
 =================
 
-..  program-output:: openrem_qr2.py -h
+..  program-output:: openrem_qr.py -h
 
 ..  program-output:: openrem_rdsr.py
 
 ..  program-output:: python -V
+
+
+Autoprogram
+===========
+
+..  autoprogram:: openrem.remapp.netdicom.qrscu:parser
+    :prog: qrscu
