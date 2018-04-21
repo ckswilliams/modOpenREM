@@ -40,5 +40,7 @@ As program output
 argparse
 ========
 
-..  autoprogram:: openrem.remapp.netdicom.qrscu:parse_args
-    :prog: qrscu
+.. argparse::
+   :module: openrem.remapp.netdicom.qrscu
+   :func: parse_args
+   :prog: qrscu
