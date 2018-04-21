@@ -31,3 +31,5 @@ As program output
 =================
 
 ..  program-output:: openrem_qr.py -h
+
+..  program-output:: openrem_rdsr.py
