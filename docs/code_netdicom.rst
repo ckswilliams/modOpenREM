@@ -30,6 +30,8 @@ With the args parsed by:
 As program output
 =================
 
-..  program-output:: openrem_qr.py -h
+..  program-output:: bin/openrem_qr.py -h
 
 ..  program-output:: openrem_rdsr.py
+
+..  program-output:: python -V
