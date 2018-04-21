@@ -40,5 +40,5 @@ As program output
 Autoprogram
 ===========
 
-..  autoprogram:: openrem.remapp.netdicom.qrscu:parser
+..  autoprogram:: openrem.remapp.netdicom.qrscu.parse_args:parser
     :prog: qrscu
