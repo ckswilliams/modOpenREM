@@ -922,11 +922,11 @@ def movescu(query_id):
 
 
 def parse_args():
-    """Parse the command line args for the openrem_qr.py script.
-
-    :param argv: sys.argv[1:] from command line call
-    :return: Dict of processed args
-    """
+    # """Parse the command line args for the openrem_qr.py script.
+    #
+    # :param argv: sys.argv[1:] from command line call
+    # :return: Dict of processed args
+    # """
 
     import argparse
 
