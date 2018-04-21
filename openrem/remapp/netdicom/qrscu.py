@@ -921,7 +921,7 @@ def movescu(query_id):
     query.delete()
 
 
-def parse_args(argv):
+def parse_args():
     """Parse the command line args for the openrem_qr.py script.
 
     :param argv: sys.argv[1:] from command line call
