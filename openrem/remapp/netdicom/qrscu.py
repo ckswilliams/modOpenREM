@@ -2,16 +2,10 @@
 #!/usr/bin/python
 
 """
-Query/Retrieve SCU AE example.
+Query/Retrieve SCU AE
 
-This demonstrates a simple application entity that support the Patient
-Root Find and Move SOP Classes as SCU. In order to receive retrieved
-datasets, this application entity must support the CT Image Storage
-SOP Class as SCP as well. For this example to work, there must be an
-SCP listening on the specified host and port.
-
-For help on usage,
-python qrscu.py -h
+Specialised QR routine to get just the objects that might be useful for dose related metrics from a remote PACS or
+modality
 """
 
 from celery import shared_task
@@ -928,8 +922,8 @@ def movescu(query_id):
 
 
 def parse_args(argv):
-    """
-    Parse the command line args for the openrem_qr.py script.
+    """Parse the command line args for the openrem_qr.py script.
+
     :param argv: sys.argv[1:] from command line call
     :return: Dict of processed args
     """
@@ -1056,8 +1050,8 @@ def parse_args(argv):
 
 
 def qrscu_script():
-    """
-    Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
+    """Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
+
     :param args: sys.argv from command line call
     :return:
     """

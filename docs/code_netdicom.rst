@@ -20,12 +20,9 @@ Move function
 Command line script
 ===================
 
-..  automodule:: openrem.remapp.netdicom.qrscu
-    :members: qrscu_script, parse_args
-
-
-
-Trying autofunction
-===================
-
 ..  autofunction:: openrem.remapp.netdicom.qrscu.qrscu_script
+
+With the args parsed by:
+
+..  autofunction:: openrem.remapp.netdicom.qrscu.parse_args
+
