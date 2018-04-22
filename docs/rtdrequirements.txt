@@ -20,4 +20,3 @@ https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.
 sphinxcontrib-programoutput
 sphinxcontrib-autoprogram
 sphinx-argparse
-openrem
