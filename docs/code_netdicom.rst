@@ -33,6 +33,6 @@ argparse
 ========
 
 .. argparse::
-   :module: openrem.remapp.netdicom.qrscu
+   :module: openrem.remapp.netdicom.sample
    :func: parser
    :prog: openrem_qr.py
