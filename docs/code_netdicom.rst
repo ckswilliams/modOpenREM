@@ -21,5 +21,5 @@ openrem_qr.py script
 
 .. argparse::
    :module: openrem.remapp.netdicom.qrscu
-   :func: parser
+   :func: create_parser
    :prog: openrem_qr.py

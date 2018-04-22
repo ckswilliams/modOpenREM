@@ -927,38 +927,38 @@ def movescu(query_id):
     # :param argv: sys.argv[1:] from command line call
     # :return: Dict of processed args
     # """
-# def create_parser():
-import argparse
+def create_parser():
+    import argparse
 
-parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
-parser.add_argument('qr_id', type=int, help='Database ID of the remote QR node')
-parser.add_argument('store_id', type=int, help='Database ID of the local store node')
-parser.add_argument('-ct', action="store_true", help='Query for CT studies. Do not use with -sr')
-parser.add_argument('-mg', action="store_true", help='Query for mammography studies. Do not use with -sr')
-parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies. Do not use with -sr')
-parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies. Do not use with -sr')
-parser.add_argument('-f', '--dfrom', help='Date from, format yyyy-mm-dd', metavar='yyyy-mm-dd')
-parser.add_argument('-t', '--duntil', help='Date until, format yyyy-mm-dd', metavar='yyyy-mm-dd')
-parser.add_argument('-e', '--desc_exclude',
-                    help='Terms to exclude in study description, comma separated, quote whole string',
-                    metavar='string')
-parser.add_argument('-i', '--desc_include',
-                    help='Terms that must be included in study description, comma separated, quote whole string',
-                    metavar='string')
-parser.add_argument('-sne', '--stationname_exclude',
-                    help='Terms to exclude in station name, comma separated, quote whole string',
-                    metavar='string')
-parser.add_argument('-sni', '--stationname_include',
-                    help='Terms to include in station name, comma separated, quote whole string',
-                    metavar='string')
-parser.add_argument('-toshiba', action="store_true",
-                    help='Advanced: Attempt to retrieve CT dose summary objects and one image from each series')
-parser.add_argument('-sr', action="store_true",
-                    help='Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx')
-parser.add_argument('-dup', action="store_true",
-                    help="Advanced: Retrieve duplicates (studies that are already in database)")
+    parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
+    parser.add_argument('qr_id', type=int, help='Database ID of the remote QR node')
+    parser.add_argument('store_id', type=int, help='Database ID of the local store node')
+    parser.add_argument('-ct', action="store_true", help='Query for CT studies. Do not use with -sr')
+    parser.add_argument('-mg', action="store_true", help='Query for mammography studies. Do not use with -sr')
+    parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies. Do not use with -sr')
+    parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies. Do not use with -sr')
+    parser.add_argument('-f', '--dfrom', help='Date from, format yyyy-mm-dd', metavar='yyyy-mm-dd')
+    parser.add_argument('-t', '--duntil', help='Date until, format yyyy-mm-dd', metavar='yyyy-mm-dd')
+    parser.add_argument('-e', '--desc_exclude',
+                        help='Terms to exclude in study description, comma separated, quote whole string',
+                        metavar='string')
+    parser.add_argument('-i', '--desc_include',
+                        help='Terms that must be included in study description, comma separated, quote whole string',
+                        metavar='string')
+    parser.add_argument('-sne', '--stationname_exclude',
+                        help='Terms to exclude in station name, comma separated, quote whole string',
+                        metavar='string')
+    parser.add_argument('-sni', '--stationname_include',
+                        help='Terms to include in station name, comma separated, quote whole string',
+                        metavar='string')
+    parser.add_argument('-toshiba', action="store_true",
+                        help='Advanced: Attempt to retrieve CT dose summary objects and one image from each series')
+    parser.add_argument('-sr', action="store_true",
+                        help='Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx')
+    parser.add_argument('-dup', action="store_true",
+                        help="Advanced: Retrieve duplicates (studies that are already in database)")
 
-    # return parser
+    return parser
 
 
 def _process_args(parser_args):
@@ -1076,7 +1076,7 @@ def _process_args(parser_args):
 
 
 if __name__ == "__main__":
-    # parser = create_parser()
+    parser = create_parser()
     args = parser.parse_args()
     processed_args = _process_args(args)
     sys.exit(
