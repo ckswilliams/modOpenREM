@@ -29,4 +29,13 @@ autoprogram
 ===========
 
 .. autoprogram:: openrem.remapp.netdicom.qrscu:parser
-   :prog: qrscu.py
+   :prog: openrem_qr.py
+
+
+argparse
+========
+
+.. argparse::
+   :module: openrem.remapp.netdicom.qrscu
+   :func: parser
+   :prog: openrem_qr.py
