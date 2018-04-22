@@ -34,5 +34,5 @@ argparse
 
 .. argparse::
    :module: openrem.remapp.netdicom.qrscu
-   :func: create_parser
+   :func: create_parser()
    :prog: openrem_qr.py
