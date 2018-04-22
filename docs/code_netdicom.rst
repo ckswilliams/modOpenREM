@@ -29,16 +29,7 @@ With the args parsed by:
 
 
 
-argparse
-========
+is it even there?
+=================
 
-.. argparse::
-   :module: openrem.remapp.netdicom.sample
-   :func: my_func_that_return_parser
-   :prog: openrem_qr.py
-
-autoprogram
-===========
-
-.. autoprogram:: openrem.remapp.netdicom.sample:m_func_that_returns_parser
-   :prog: sample.py
+.. autofunction:: openrem.remapp.netdicom.sample.my_func_that_return_parser
