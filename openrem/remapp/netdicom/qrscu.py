@@ -921,65 +921,62 @@ def movescu(query_id):
     query.delete()
 
 
-def parse_args():
+# def parse_args():
     # """Parse the command line args for the openrem_qr.py script.
     #
     # :param argv: sys.argv[1:] from command line call
     # :return: Dict of processed args
     # """
 
-    import argparse
+import argparse
 
-    parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
-    parser.add_argument('qr_id', type=int, help='Database ID of the remote QR node')
-    parser.add_argument('store_id', type=int, help='Database ID of the local store node')
-    parser.add_argument('-ct', action="store_true", help='Query for CT studies. Do not use with -sr')
-    parser.add_argument('-mg', action="store_true", help='Query for mammography studies. Do not use with -sr')
-    parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies. Do not use with -sr')
-    parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies. Do not use with -sr')
-    parser.add_argument('-f', '--dfrom', help='Date from, format yyyy-mm-dd', metavar='yyyy-mm-dd')
-    parser.add_argument('-t', '--duntil', help='Date until, format yyyy-mm-dd', metavar='yyyy-mm-dd')
-    parser.add_argument('-e', '--desc_exclude',
-                        help='Terms to exclude in study description, comma separated, quote whole string',
-                        metavar='string')
-    parser.add_argument('-i', '--desc_include',
-                        help='Terms that must be included in study description, comma separated, quote whole string',
-                        metavar='string')
-    parser.add_argument('-sne', '--stationname_exclude',
-                        help='Terms to exclude in station name, comma separated, quote whole string',
-                        metavar='string')
-    parser.add_argument('-sni', '--stationname_include',
-                        help='Terms to include in station name, comma separated, quote whole string',
-                        metavar='string')
-    parser.add_argument('-toshiba', action="store_true",
-                        help='Advanced: Attempt to retrieve CT dose summary objects and one image from each series')
-    parser.add_argument('-sr', action="store_true",
-                        help='Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx')
-    parser.add_argument('-dup', action="store_true",
-                        help="Advanced: Retrieve duplicates (studies that are already in database)")
+parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
+parser.add_argument('qr_id', type=int, help='Database ID of the remote QR node')
+parser.add_argument('store_id', type=int, help='Database ID of the local store node')
+parser.add_argument('-ct', action="store_true", help='Query for CT studies. Do not use with -sr')
+parser.add_argument('-mg', action="store_true", help='Query for mammography studies. Do not use with -sr')
+parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies. Do not use with -sr')
+parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies. Do not use with -sr')
+parser.add_argument('-f', '--dfrom', help='Date from, format yyyy-mm-dd', metavar='yyyy-mm-dd')
+parser.add_argument('-t', '--duntil', help='Date until, format yyyy-mm-dd', metavar='yyyy-mm-dd')
+parser.add_argument('-e', '--desc_exclude',
+                    help='Terms to exclude in study description, comma separated, quote whole string',
+                    metavar='string')
+parser.add_argument('-i', '--desc_include',
+                    help='Terms that must be included in study description, comma separated, quote whole string',
+                    metavar='string')
+parser.add_argument('-sne', '--stationname_exclude',
+                    help='Terms to exclude in station name, comma separated, quote whole string',
+                    metavar='string')
+parser.add_argument('-sni', '--stationname_include',
+                    help='Terms to include in station name, comma separated, quote whole string',
+                    metavar='string')
+parser.add_argument('-toshiba', action="store_true",
+                    help='Advanced: Attempt to retrieve CT dose summary objects and one image from each series')
+parser.add_argument('-sr', action="store_true",
+                    help='Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx')
+parser.add_argument('-dup', action="store_true",
+                    help="Advanced: Retrieve duplicates (studies that are already in database)")
 
-    return parser
+    # return parser
 
 
-def _process_args(argv):
+def _process_args(parser_args):
     import datetime
     from remapp.netdicom.tools import echoscu
-
-    parser = parse_args(argv)
-    args = parser.parse_args(argv)
 
     logger.info(u"qrscu script called")
 
     modalities = []
-    if args.ct:
+    if parser_args.ct:
         modalities += ['CT']
-    if args.mg:
+    if parser_args.mg:
         modalities += ['MG']
-    if args.fl:
+    if parser_args.fl:
         modalities += ['FL']
-    if args.dx:
+    if parser_args.dx:
         modalities += ['DX']
-    if args.sr:
+    if parser_args.sr:
         if modalities:
             parser.error(u"The sr option can not be combined with any other modalities")
         else:
@@ -992,34 +989,34 @@ def _process_args(argv):
 
     # Check if dates are in the right format, but keep them as strings
     try:
-        if args.dfrom:
-            datetime.datetime.strptime(args.dfrom, '%Y-%m-%d')
-            logger.info(u"Date from: {0}".format(args.dfrom))
-        if args.duntil:
-            datetime.datetime.strptime(args.duntil, '%Y-%m-%d')
-            logger.info(u"Date until: {0}".format(args.duntil))
+        if parser_args.dfrom:
+            datetime.datetime.strptime(parser_args.dfrom, '%Y-%m-%d')
+            logger.info(u"Date from: {0}".format(parser_args.dfrom))
+        if parser_args.duntil:
+            datetime.datetime.strptime(parser_args.duntil, '%Y-%m-%d')
+            logger.info(u"Date until: {0}".format(parser_args.duntil))
     except ValueError:
         parser.error(u"Incorrect data format, should be YYYY-MM-DD")
 
-    if args.desc_exclude:
+    if parser_args.desc_exclude:
 
-        study_desc_exc = [x.strip().lower() for x in args.desc_exclude.split(u',')]
+        study_desc_exc = [x.strip().lower() for x in parser_args.desc_exclude.split(u',')]
         logger.info(u"Study description exclude terms are {0}".format(study_desc_exc))
     else:
         study_desc_exc = None
-    if args.desc_include:
-        study_desc_inc = [x.strip().lower() for x in args.desc_include.split(u',')]
+    if parser_args.desc_include:
+        study_desc_inc = [x.strip().lower() for x in parser_args.desc_include.split(u',')]
         logger.info(u"Study description include terms are {0}".format(study_desc_inc))
     else:
         study_desc_inc = None
 
-    if args.stationname_exclude:
-        stationname_exc = [x.strip().lower() for x in args.stationname_exclude.split(u',')]
+    if parser_args.stationname_exclude:
+        stationname_exc = [x.strip().lower() for x in parser_args.stationname_exclude.split(u',')]
         logger.info(u"Stationname exclude terms are {0}".format(stationname_exc))
     else:
         stationname_exc = None
-    if args.stationname_include:
-        stationname_inc = [x.strip().lower() for x in args.stationname_include.split(u',')]
+    if parser_args.stationname_include:
+        stationname_inc = [x.strip().lower() for x in parser_args.stationname_include.split(u',')]
         logger.info(u"Stationname include terms are {0}".format(stationname_inc))
     else:
         stationname_inc = None
@@ -1031,12 +1028,12 @@ def _process_args(argv):
                 'study_desc_exc'  : study_desc_exc,
               }
 
-    remove_duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
+    remove_duplicates = not(parser_args.dup)  # if flag, duplicates will be retrieved.
 
-    get_toshiba = args.toshiba
+    get_toshiba = parser_args.toshiba
 
-    qr_node_up = echoscu(args.qr_id, qr_scp=True)
-    store_node_up = echoscu(args.store_id, store_scp=True)
+    qr_node_up = echoscu(parser_args.qr_id, qr_scp=True)
+    store_node_up = echoscu(parser_args.store_id, store_scp=True)
 
     if qr_node_up is not "Success" or store_node_up is not "Success":
         logger.error(u"Query-retrieve aborted: DICOM nodes not ready. QR SCP echo is {0}, Store SCP echo is {1}".format(
@@ -1044,29 +1041,43 @@ def _process_args(argv):
         sys.exit(u"Query-retrieve aborted: DICOM nodes not ready. QR SCP echo is {0}, Store SCP echo is {1}".format(
             qr_node_up, store_node_up))
 
-    processed_args = {'qr_id': args.qr_id,
-                      'store_id': args.store_id,
-                      'modalities': modalities,
-                      'remove_duplicates': remove_duplicates,
-                      'dfrom': args.dfrom,
-                      'duntil': args.duntil,
-                      'filters': filters,
-                      'get_toshiba': get_toshiba}
+    return_args = {'qr_id': parser_args.qr_id,
+                   'store_id': parser_args.store_id,
+                   'modalities': modalities,
+                   'remove_duplicates': remove_duplicates,
+                   'dfrom': parser_args.dfrom,
+                   'duntil': parser_args.duntil,
+                   'filters': filters,
+                   'get_toshiba': get_toshiba}
 
-    return processed_args
+    return return_args
+
+# def qrscu_script():
+#     """Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
+#
+#     :param args: sys.argv from command line call
+#     :return:
+#     """
+#
+# #    parsed_args = parse_args(sys.argv[1:])
+#     processed_args = _process_args(sys.argv[1:])
+#     sys.exit(
+#         qrscu.delay(qr_scp_pk=processed_args['qr_id'],
+#                     store_scp_pk=processed_args['store_id'],
+#                     move=True,
+#                     modalities=processed_args['modalities'],
+#                     remove_duplicates=processed_args['remove_duplicates'],
+#                     date_from=processed_args['dfrom'],
+#                     date_until=processed_args['duntil'],
+#                     filters=processed_args['filters'],
+#                     get_toshiba_images=processed_args['get_toshiba']
+#                     )
+#     )
 
 
-
-
-def qrscu_script():
-    """Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
-
-    :param args: sys.argv from command line call
-    :return:
-    """
-
-#    parsed_args = parse_args(sys.argv[1:])
-    processed_args = _process_args(sys.argv[1:])
+if __name__ == "__main__":
+    args = parser.parse_args()
+    processed_args = _process_args(args)
     sys.exit(
         qrscu.delay(qr_scp_pk=processed_args['qr_id'],
                     store_scp_pk=processed_args['store_id'],
@@ -1079,7 +1090,3 @@ def qrscu_script():
                     get_toshiba_images=processed_args['get_toshiba']
                     )
     )
-
-
-if __name__ == "__main__":
-    qrscu_script()

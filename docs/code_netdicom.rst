@@ -27,20 +27,10 @@ With the args parsed by:
 ..  autofunction:: openrem.remapp.netdicom.qrscu.parse_args
 
 
-As program output
-=================
-
-..  program-output:: openrem_qr.py -h
-
-..  program-output:: openrem_rdsr.py
-
-..  program-output:: python -V
 
 
-argparse
-========
+autoprogram
+===========
 
-.. argparse::
-   :module: openrem.remapp.netdicom.qrscu
-   :func: parse_args
-   :prog: qrscu
+.. autoprogram:: openrem.remapp.netdicom.qrscu:parser
+   :prog: qrscu.py
