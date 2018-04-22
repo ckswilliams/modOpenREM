@@ -29,8 +29,10 @@ With the args parsed by:
 
 
 
-autoprogram
-===========
+argparse
+========
 
-.. autoprogram:: openrem.remapp.netdicom.qrscu:parser
-   :prog: qrscu.py
+.. argparse::
+   :module: openrem.remapp.netdicom.qrscu
+   :func: create_parser
+   :prog: openrem_qr.py
