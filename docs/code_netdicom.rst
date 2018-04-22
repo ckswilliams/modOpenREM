@@ -16,24 +16,8 @@ Move function
 
 ..  autotask:: openrem.remapp.netdicom.qrscu.movescu
 
-
-
-
-is it even there?
-=================
-
-.. autofunction:: openrem.remapp.netdicom.sample.my_func_that_return_parser
-
-
-autoprogram
-===========
-
-.. autoprogram:: openrem.remapp.netdicom.qrscu:parser
-   :prog: openrem_qr.py
-
-
-argparse
-========
+openrem_qr.py script
+====================
 
 .. argparse::
    :module: openrem.remapp.netdicom.qrscu
