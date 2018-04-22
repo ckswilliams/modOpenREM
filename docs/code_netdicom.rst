@@ -39,5 +39,5 @@ argparse
 
 .. argparse::
    :module: openrem.remapp.netdicom.qrscu
-   :func: parse_args
+   :func: _process_args
    :prog: qrscu
