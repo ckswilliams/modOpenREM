@@ -33,3 +33,11 @@ is it even there?
 =================
 
 .. autofunction:: openrem.remapp.netdicom.sample.my_func_that_return_parser
+
+argparse
+========
+
+.. argparse::
+   :module: openrem.remapp.netdicom.qrscu
+   :func: parse_args
+   :prog: qrscu
