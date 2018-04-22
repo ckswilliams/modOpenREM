@@ -28,5 +28,5 @@ is it even there?
 autoprogram
 ===========
 
-.. autoprogram:: openrem.remapp.netdicom.qrscu:_process_args
+.. autoprogram:: openrem.remapp.netdicom.qrscu:parser
    :prog: qrscu.py
