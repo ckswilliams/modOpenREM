@@ -34,5 +34,5 @@ argparse
 
 .. argparse::
    :module: openrem.remapp.netdicom.sample
-   :func: parser
+   :func: my_func_that_return_parser
    :prog: openrem_qr.py
