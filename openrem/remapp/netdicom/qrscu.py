@@ -927,7 +927,7 @@ def movescu(query_id):
     # :param argv: sys.argv[1:] from command line call
     # :return: Dict of processed args
     # """
-def create_parser():
+def _create_parser():
     import argparse
 
     parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
@@ -961,7 +961,7 @@ def create_parser():
     return parser
 
 
-def _process_args(parser_args):
+def _process_args(parser_args, parser):
     import datetime
     from remapp.netdicom.tools import echoscu
 
@@ -1076,9 +1076,9 @@ def _process_args(parser_args):
 
 
 if __name__ == "__main__":
-    parser = create_parser()
+    parser = _create_parser()
     args = parser.parse_args()
-    processed_args = _process_args(args)
+    processed_args = _process_args(args, parser)
     sys.exit(
         qrscu.delay(qr_scp_pk=processed_args['qr_id'],
                     store_scp_pk=processed_args['store_id'],

@@ -1101,9 +1101,10 @@ class QRSCUScriptArgParsing(TestCase):
         :return:
         """
 
-        from remapp.netdicom.qrscu import parse_args
+        from remapp.netdicom.qrscu import _create_parser, _process_args
 
-        parsed_args = parse_args(['1', '2', '-ct', '-mg'])
+        parser = _create_parser()
+        parsed_args = _process_args(parser.parse_args(['1', '2', '-ct', '-mg']), parser)
 
         self.assertEqual(parsed_args['qr_id'], 1)
         self.assertEqual(parsed_args['store_id'], 2)
@@ -1118,9 +1119,10 @@ class QRSCUScriptArgParsing(TestCase):
         :return:
         """
 
-        from remapp.netdicom.qrscu import parse_args
+        from remapp.netdicom.qrscu import _create_parser, _process_args
 
-        parsed_args = parse_args(['1', '2', '-ct', '-e Thorax, Neck '])
+        parser = _create_parser()
+        parsed_args = _process_args(parser.parse_args(['1', '2', '-ct', '-e Thorax, Neck ']), parser)
 
         self.assertEqual(parsed_args['qr_id'], 1)
         self.assertEqual(parsed_args['store_id'], 2)
@@ -1138,9 +1140,12 @@ class QRSCUScriptArgParsing(TestCase):
         :return:
         """
 
-        from remapp.netdicom.qrscu import parse_args
+        from remapp.netdicom.qrscu import _create_parser, _process_args
 
-        parsed_args = parse_args(['1', '2', '-ct', '--desc_exclude', 'Thorax, Neck ', '-sni', 'MyStn'])
+        parser = _create_parser()
+        parsed_args = _process_args(parser.parse_args(
+            ['1', '2', '-ct', '--desc_exclude', 'Thorax, Neck ', '-sni', 'MyStn']),
+            parser)
 
         self.assertEqual(parsed_args['qr_id'], 1)
         self.assertEqual(parsed_args['store_id'], 2)
