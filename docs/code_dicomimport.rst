@@ -38,16 +38,20 @@ of the image headers much like the mammography module.
 CT non-standard modules
 +++++++++++++++++++++++
 
-Philips CT dose report images are catered for. These have all the information
-that could be derived from the images also held in the DICOM header
-information, making harvesting relatively easy.
+Philips CT dose info reports
+----------------------------
+
+These have all the information that could be derived from the images also held in the DICOM header
+information, making harvesting relatively easy. Used where RDSR is not available from older Philips systems.
 
 .. autotask:: openrem.remapp.extractors.ct_philips.ct_philips
 
-Older Toshiba CT systems that create dose summary images but cannot create
-RDSR objects are also catered for. These have some information that can be derived
-from the dose summary objects and CT image tags. This extractor requires that
-the DICOM toolkit, java.exe and pixelmed.jar are available to the system.
+Toshiba dose summary and images
+-------------------------------
+
+OpenREM can harvest information from older Toshiba CT systems that create dose summary images but cannot create
+RDSR objects by using a combination of tools to create an RDSR that can then be imported in the normal manner.
+This extractor requires that the Offis DICOM toolkit, java.exe and pixelmed.jar are available to the system.
 
 .. autotask:: openrem.remapp.extractors.rdsr_toshiba_ct_from_dose_images.rdsr_toshiba_ct_from_dose_images
 
