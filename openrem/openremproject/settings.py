@@ -78,7 +78,8 @@ XLSX_TIME = 'hh:mm:ss'
 
 #
 # MEDIA_ROOT filepath has been moved to local_settings.py
-#
+# Line below will be overwritten there. Included here for docs issue
+MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
