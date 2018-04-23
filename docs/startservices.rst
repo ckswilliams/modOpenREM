@@ -241,4 +241,4 @@ Daemonising Celery on Linux: http://celery.readthedocs.org/en/latest/tutorials/d
 ..  toctree::
     :maxdepth: 1
 
-    celery-window
+    celery-windows

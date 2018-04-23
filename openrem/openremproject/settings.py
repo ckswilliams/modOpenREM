@@ -45,7 +45,7 @@ ROOT_PROJECT = os.path.join(os.path.split(__file__)[0], "..")
 #
 # Database settings have been moved to local_settings.py
 # Line below will be overwritten there. Included here for docs issue
-DATABASES = {}
+DATABASES = {'default': {'ENGINE': ''}}
 #
 # **********************************************************************
 
