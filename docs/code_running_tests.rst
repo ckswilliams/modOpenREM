@@ -77,3 +77,9 @@ If you wish to make use of the debug toolbar on machines other than the one the 
 INTERNAL_IPS address list to include your client machine.
 
 Now when ``DEBUG = True`` the toolbar should appear.
+
+Creating test versions of production systems
+============================================
+
+If you wish to create a duplicate install to test upgrades etc, refer to :ref:`restore-psql-linux` and the preceding
+text regarding making backups.
