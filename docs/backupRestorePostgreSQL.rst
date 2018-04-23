@@ -1,5 +1,5 @@
-Backing up a PostgreSQL database
-================================
+Backing up a PostgreSQL database (Windows)
+==========================================
 
 ..  Note::  Content contributed by DJ Platten
 

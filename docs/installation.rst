@@ -41,6 +41,7 @@ are repeated here.
 
     postgresql
     postgresql_windows
+    backupRestorePostgreSQL
     backupMySQLWindows
 
 .. _webservers:
