@@ -36,8 +36,8 @@ Now install the dependencies:
 
 .. sourcecode:: console
 
-    pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
     pip install -e openremrepo/
+    pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 In the future it might be necessary to install numpy too for testing.
 
