@@ -9,9 +9,6 @@ for CT, fluoroscopy, mammography and digital radiography.
 
 .. autotask:: openrem.remapp.extractors.rdsr.rdsr
 
-Once installed, the following script is used:
-
-.. automodule:: openrem.scripts.openrem_dx.py
 
 .. _mammo-module:
 
