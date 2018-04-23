@@ -11,6 +11,16 @@ Install OpenREM 0.8.0b2
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
+Install pynetdicom (edited version)
+===================================
+
+Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See :doc:`netdicom` for details.
+
+.. sourcecode:: bash
+
+    pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+
+
 .. _localsettingsconfig:
 
 Configuration
