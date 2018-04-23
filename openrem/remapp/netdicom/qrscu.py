@@ -1052,30 +1052,14 @@ def _process_args(parser_args, parser):
 
     return return_args
 
-# def qrscu_script():
-#     """Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
-#
-#     :param args: sys.argv from command line call
-#     :return:
-#     """
-#
-# #    parsed_args = parse_args(sys.argv[1:])
-#     processed_args = _process_args(sys.argv[1:])
-#     sys.exit(
-#         qrscu.delay(qr_scp_pk=processed_args['qr_id'],
-#                     store_scp_pk=processed_args['store_id'],
-#                     move=True,
-#                     modalities=processed_args['modalities'],
-#                     remove_duplicates=processed_args['remove_duplicates'],
-#                     date_from=processed_args['dfrom'],
-#                     date_until=processed_args['duntil'],
-#                     filters=processed_args['filters'],
-#                     get_toshiba_images=processed_args['get_toshiba']
-#                     )
-#     )
 
+def qrscu_script():
+    """Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
 
-if __name__ == "__main__":
+    :param args: sys.argv from command line call
+    :return:
+    """
+
     parser = _create_parser()
     args = parser.parse_args()
     processed_args = _process_args(args, parser)
@@ -1091,3 +1075,21 @@ if __name__ == "__main__":
                     get_toshiba_images=processed_args['get_toshiba']
                     )
     )
+
+
+# if __name__ == "__main__":
+#     parser = _create_parser()
+#     args = parser.parse_args()
+#     processed_args = _process_args(args, parser)
+#     sys.exit(
+#         qrscu.delay(qr_scp_pk=processed_args['qr_id'],
+#                     store_scp_pk=processed_args['store_id'],
+#                     move=True,
+#                     modalities=processed_args['modalities'],
+#                     remove_duplicates=processed_args['remove_duplicates'],
+#                     date_from=processed_args['dfrom'],
+#                     date_until=processed_args['duntil'],
+#                     filters=processed_args['filters'],
+#                     get_toshiba_images=processed_args['get_toshiba']
+#                     )
+#     )
