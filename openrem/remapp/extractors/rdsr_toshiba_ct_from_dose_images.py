@@ -1052,6 +1052,8 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
 @shared_task(name="remapp.extractors.rdsr_toshiba_ct_from_dose_images.rdsr_toshiba_ct_from_dose_images")
 def rdsr_toshiba_ct_from_dose_images(folder_name):
     """Function to create radiation dose structured reports from a folder of dose images.
+
+    :param folder_name: Path to folder containing Toshiba DICOM objects - dose summary and images
     """
     import dicom
 
