@@ -43,13 +43,11 @@ that could be derived from the images also held in the DICOM header
 information, making harvesting relatively easy.
 
 .. autotask:: openrem.remapp.extractors.ct_philips.ct_philips
-    :members:
 
 Older Toshiba CT systems that create dose summary images but cannot create
 RDSR objects are also catered for. These have some information that can be derived
 from the dose summary objects and CT image tags. This extractor requires that
 the DICOM toolkit, java.exe and pixelmed.jar are available to the system.
 
-.. automodule:: openrem.remapp.extractors.rdsr_toshiba_ct_from_dose_images
-    :members:
+.. autotask:: openrem.remapp.extractors.rdsr_toshiba_ct_from_dose_images.rdsr_toshiba_ct_from_dose_images
 
