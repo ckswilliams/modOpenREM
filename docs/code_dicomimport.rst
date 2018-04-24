@@ -50,5 +50,5 @@ OpenREM can harvest information from older Toshiba CT systems that create dose s
 RDSR objects by using a combination of tools to create an RDSR that can then be imported in the normal manner.
 This extractor requires that the Offis DICOM toolkit, java.exe and pixelmed.jar are available to the system.
 
-.. autotask:: openrem.remapp.extractors.rdsr_toshiba_ct_from_dose_images.rdsr_toshiba_ct_from_dose_images
+.. autotask:: openrem.remapp.extractors.ct_toshiba.ct_toshiba
 

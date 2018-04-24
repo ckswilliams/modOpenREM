@@ -47,7 +47,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
 # logger is explicitly named so that it is still handled when using __main__
-logger = logging.getLogger('remapp.extractors.rdsr_toshiba_ct_from_dose_images')
+logger = logging.getLogger('remapp.extractors.ct_toshiba')
 
 
 def find_dose_summary_objects(folder_path):
@@ -1049,8 +1049,8 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     return 1
 
 
-@shared_task(name="remapp.extractors.rdsr_toshiba_ct_from_dose_images.rdsr_toshiba_ct_from_dose_images")
-def rdsr_toshiba_ct_from_dose_images(folder_name):
+@shared_task(name="remapp.extractors.ct_toshiba.ct_toshiba")
+def ct_toshiba(folder_name):
     """Function to create radiation dose structured reports from a folder of dose images.
 
     :param folder_name: Path to folder containing Toshiba DICOM objects - dose summary and images
@@ -1253,7 +1253,7 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
     logger.debug('Removing study folder')
     shutil.rmtree(folder_name)
     logger.debug('Removing study folder complete')
-    logger.debug('Reached end of rdsr_toshiba_ct_from_dose_images routine')
+    logger.debug('Reached end of ct_toshiba routine')
     return 0
 
 
@@ -1261,5 +1261,5 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         sys.exit('Error: supply exactly one argument - the folder containing the DICOM objects')
 
-    sys.exit(rdsr_toshiba_ct_from_dose_images(sys.argv[1]))
+    sys.exit(ct_toshiba(sys.argv[1]))
 
