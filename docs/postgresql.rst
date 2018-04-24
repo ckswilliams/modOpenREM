@@ -184,7 +184,7 @@ Create a fresh database and restore from the backup:
     sudo -u postgres createdb -T template0 new_openremdb_name
     sudo -u postgres psql new_openremdb_name < /path/to/db/backups/openrem.bak
 
-Introduce OpenREM to the restored database:
+Reconfigure ``local_settings.py`` with the new database details and introduce OpenREM to the restored database:
 
 .. sourcecode:: console
 
