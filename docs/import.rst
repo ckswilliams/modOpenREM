@@ -64,7 +64,7 @@ For CT dose summary files from older Toshiba CT scanners
 --------------------------------------------------------
 .. sourcecode:: bash
 
-    openrem_rdsr_toshiba_ct_from_dose_images.py path_to_files
+    openrem_cttoshiba.py path_to_files
 
 This extractor is designed to create a DICOM radiation dose structured report
 from the information contained in secondary capture dose summary images,
