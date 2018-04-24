@@ -1,0 +1,22 @@
+django>=1.8,<1.9
+django-filter >= 0.10,<0.15
+pytz >= 0a
+humanize
+pydicom == 0.9.9
+django-pagination
+xlsxwriter
+celery >= 3.1
+argparse >= 1.2.1
+django-qsstats-magic
+python-dateutil
+django-solo
+django-crispy-forms
+pandas
+xlrd
+testfixtures
+mock
+django-debug-toolbar
+https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+sphinxcontrib-programoutput
+sphinxcontrib-autoprogram
+sphinx-argparse

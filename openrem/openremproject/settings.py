@@ -44,6 +44,8 @@ ROOT_PROJECT = os.path.join(os.path.split(__file__)[0], "..")
 # **********************************************************************
 #
 # Database settings have been moved to local_settings.py
+# Line below will be overwritten there. Included here for docs issue
+DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': 'openrem.db', 'USER': '', 'PASSWORD': '', 'HOST': '', 'PORT': '', }}
 #
 # **********************************************************************
 
@@ -76,7 +78,8 @@ XLSX_TIME = 'hh:mm:ss'
 
 #
 # MEDIA_ROOT filepath has been moved to local_settings.py
-#
+# Line below will be overwritten there. Included here for docs issue
+MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -97,8 +100,9 @@ STATICFILES_DIRS = (
 )
 
 #
-# SECRET_KEY moved to local_settings.py
+# SECRET_KEY must be changed in local_settings.py
 #
+SECRET_KEY = 'youmustchangethiskeyinlocal_settings'
 
 # URL of the login page
 LOGIN_URL = '/login/'
@@ -240,7 +244,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'remapp.extractors.rdsr_toshiba_ct_from_dose_images': {
+        'remapp.extractors.ct_toshiba': {
             'handlers': ['extractor_file'],
             'level': 'INFO',
             'propagate': False,

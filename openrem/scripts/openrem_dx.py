@@ -7,8 +7,9 @@
     :param filename: relative or absolute path to radiographic DICOM image file.
     :type filename: str.
 
-    Tested with:
-        * Nothing yet...
+    Example::
+
+        openrem_dx.py dximage.dcm
 
 """
 

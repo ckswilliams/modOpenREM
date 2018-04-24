@@ -164,32 +164,37 @@ Automated backup with a bash script
 
 This script could be called by a cron task, or by a backup system such as backuppc prior to running the system backup.
 
+.. _restore-psql-linux:
+
 ********************
 Restore the database
 ********************
 
-If the restore is taking place on a different system, ensure that PostgreSQL is installed and the same user has been
-added as was used to create the initial database (see :ref:`create-psql-db`)
+If the restore is taking place on a different system,
 
-Create a fresh database and restore from the backup
-===================================================
+* ensure that PostgreSQL is installed and the same user has been added as was used to create the initial database
+  (see :ref:`create-psql-db`).
+* Ensure that the new system has the same version of OpenREM installed as the system the database was backed up from.
+* Ensure the ``openrem/remapp/migrations/`` folder has no files in except __init__.py
+
+Create a fresh database and restore from the backup:
 
 .. sourcecode:: console
 
     sudo -u postgres createdb -T template0 new_openremdb_name
     sudo -u postgres psql new_openremdb_name < /path/to/db/backups/openrem.bak
 
+Reconfigure ``local_settings.py`` with the new database details and introduce OpenREM to the restored database:
 
-**********************************************
-Alternative instructions and further reference
-**********************************************
+.. sourcecode:: console
 
-Previous versions had instructions that used different backup options and the ``pg_restore`` command. To review these,
-please refer to the 0.6.2 documentation at
-`docs.openrem.org/en/0.6.2/  <http://docs.openrem.org/en/0.6.2/backupRestorePostgreSQL.html>`_
+    python manage.py migrate --fake-initial
+    python manage.py makemigrations remapp
+    python manage.py migrate remapp --fake
 
-Further details can be found on the
-`PostgreSQL website <http://www.postgresql.org/docs/9.4/static/backup-dump.html#BACKUP-DUMP-RESTORE>`_
+If you are creating a second system in order to test upgrading, you can do this now followed by the usual ``python
+manage.py makemigrations remapp`` then ``python manage.py migrate remapp`` as per the upgrade instructions.
+
 
 **************************
 Useful PostgreSQL commands

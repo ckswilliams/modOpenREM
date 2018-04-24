@@ -10,9 +10,10 @@ remaining sheets are specific to each series protocol, in alphabetical
 order, with one series per line. If one study has three series with the
 same protocol name, each one has a line of its own.
 
+.. autotask:: remapp.exports.rf_export.rfxlsx
 .. autotask:: remapp.exports.ct_export.ctxlsx
 .. autotask:: remapp.exports.dx_export.dxxlsx
-
+.. autotask:: remapp.exports.mg_export.exportMG2excel
 
 Single sheet CSV exports
 ++++++++++++++++++++++++

@@ -112,14 +112,6 @@ Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
     pip install numpy‑1.14.0+mkl‑cp27‑cp27m‑win_amd64.whl  # update the version number
     # changing the filename appropriately
 
-Install pynetdicom (edited version)
-===================================
-
-Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See :doc:`netdicom` for details.
-
-.. sourcecode:: bash
-
-    pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 .. _installpreppostgres:
 

@@ -2,7 +2,7 @@
 # This Python file uses the following encoding: utf-8
 # scripts/openrem_rdsr_toshiba_ct_from_dose_images
 
-"""Script to launch the rdsr_toshiba_ct_from_dose_images module to import information from
+"""Script to launch the ct_toshiba module to import information from
    Toshiba CT dose images and additional information from image tags.
 
     :param folder_name: absolute path to Toshiba CT study DICOM files.
@@ -17,13 +17,13 @@
 
 import sys
 from glob import glob
-from openrem.remapp.extractors.rdsr_toshiba_ct_from_dose_images import rdsr_toshiba_ct_from_dose_images
+from openrem.remapp.extractors.ct_toshiba import ct_toshiba
 
 if len(sys.argv) < 2:
     sys.exit('Error: supply at least one argument - the folder containing the DICOM objects')
 
 for arg in sys.argv[1:]:
     for folder_name in glob(arg):
-        rdsr_toshiba_ct_from_dose_images(folder_name)
+        ct_toshiba(folder_name)
 
 sys.exit()

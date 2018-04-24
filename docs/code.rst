@@ -1,5 +1,5 @@
-OpenREM code and tests
-**********************
+Developers
+**********
 
 Contents:
 

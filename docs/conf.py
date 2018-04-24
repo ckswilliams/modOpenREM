@@ -36,6 +36,9 @@ extensions = [
     'celery.contrib.sphinx',
     'sphinx.ext.napoleon',
     'sphinx.ext.graphviz',
+    'sphinxcontrib.programoutput',
+    'sphinxcontrib.autoprogram',
+    'sphinxarg.ext'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

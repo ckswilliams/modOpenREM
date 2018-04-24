@@ -15,7 +15,7 @@
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
 #    Foundation trust in connection with this Program in any press or
-#    other public announcement without the prior written consent of 
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -163,8 +163,8 @@ def _irradiationeventxraymechanicaldata(dataset, event):
     _doserelateddistancemeasurements(dataset, mech)
 
 
-def _accumulatedmammo_update(dataset, event):  # TID 10005
-    from remapp.tools.get_values import get_value_kw, get_or_create_cid
+def _accumulatedmammo_update(event):  # TID 10005
+    from remapp.tools.get_values import get_or_create_cid
     from remapp.models import AccumMammographyXRayDose
     accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
     accummams = accum.accummammographyxraydose_set.all()
@@ -234,12 +234,12 @@ def _irradiationeventxraydata(dataset, proj):  # TID 10003
     _irradiationeventxraysourcedata(dataset, event)
     _irradiationeventxraymechanicaldata(dataset, event)
     if event.laterality and event.irradeventxraysourcedata_set.get().average_glandular_dose:
-        _accumulatedmammo_update(dataset, event)
+        _accumulatedmammo_update(event)
 
 
-def _accumulatedxraydose(dataset, proj):
+def _accumulatedxraydose(proj):
     from remapp.models import AccumXRayDose, AccumMammographyXRayDose
-    from remapp.tools.get_values import get_value_kw, get_or_create_cid
+    from remapp.tools.get_values import get_or_create_cid
     accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
     accum.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     accum.save()
@@ -248,7 +248,7 @@ def _accumulatedxraydose(dataset, proj):
     accummam.save()
 
 
-def _projectionxrayradiationdose(dataset, g, ch):
+def _projectionxrayradiationdose(dataset, g):
     from remapp.models import ProjectionXRayRadiationDose
     from remapp.tools.get_values import get_or_create_cid
     proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
@@ -260,11 +260,11 @@ def _projectionxrayradiationdose(dataset, g, ch):
     proj.xray_source_data_available = get_or_create_cid('R-0038D', 'Yes')
     proj.xray_mechanical_data_available = get_or_create_cid('R-0038D', 'Yes')
     proj.save()
-    _accumulatedxraydose(dataset, proj)
+    _accumulatedxraydose(proj)
     _irradiationeventxraydata(dataset, proj)
 
 
-def _generalequipmentmoduleattributes(dataset, study, ch):
+def _generalequipmentmoduleattributes(dataset, study):
     from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.get_values import get_value_kw
@@ -273,7 +273,7 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip.manufacturer = get_value_kw("Manufacturer", dataset)
     equip.institution_name = get_value_kw("InstitutionName", dataset)
     try:
-        test_unicode = u"In extractor, {0} of type {1}".format(equip.institution_name, type(equip.institution_name))
+        u"In extractor, {0} of type {1}".format(equip.institution_name, type(equip.institution_name))
     except UnicodeDecodeError:
         logger.error("Non ASCII string not properly decoded: {0}".format(equip.institution_name))
     equip.institution_address = get_value_kw("InstitutionAddress", dataset)
@@ -336,7 +336,7 @@ def _patientstudymoduleattributes(dataset, g):  # C.7.2.2
     patientatt.save()
 
 
-def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
+def _patientmoduleattributes(dataset, g):  # C.7.1.1
     from decimal import Decimal
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.models import PatientIDSettings
@@ -389,7 +389,6 @@ def _generalstudymoduleattributes(dataset, g):
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.hash_id import hash_id
 
-    ch = get_value_kw('SpecificCharacterSet', dataset)
     g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
     logger.debug("Populating mammo study %s", g.study_instance_uid)
     g.study_date = get_date('StudyDate', dataset)
@@ -415,10 +414,10 @@ def _generalstudymoduleattributes(dataset, g):
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset)
     g.save()
 
-    _generalequipmentmoduleattributes(dataset, g, ch)
-    _projectionxrayradiationdose(dataset, g, ch)
+    _generalequipmentmoduleattributes(dataset, g)
+    _projectionxrayradiationdose(dataset, g)
     _patientstudymoduleattributes(dataset, g)
-    _patientmoduleattributes(dataset, g, ch)
+    _patientmoduleattributes(dataset, g)
 
 
 def _test_if_mammo(dataset):
@@ -477,7 +476,6 @@ def _create_event(dataset):
 
 
 def _mammo2db(dataset):
-    import os, sys
     import openrem_settings
     from time import sleep
     from random import random
@@ -552,19 +550,12 @@ def _mammo2db(dataset):
 @shared_task(name="remapp.extractors.mam.mam")
 def mam(mg_file):
     """Extract radiation dose structured report related data from mammography images
-    
+
     :param mg_file: relative or absolute path to mammography DICOM image file.
     :type mg_file: str.
 
-    Tested with:
-        * GE Senographe DS software versions ADS_43.10.1 and ADS_53.10.10 only.
-        * Limited testing: GE Senographe Essential
-        * Limited testing: Hologic Selenia
-        * Limited testing: Siemens Inspiration
-    
     """
 
-    import os
     import dicom
     from django.core.exceptions import ObjectDoesNotExist
     from remapp.models import DicomDeleteSettings
@@ -574,6 +565,7 @@ def mam(mg_file):
         del_no_match = del_settings.del_no_match
     except ObjectDoesNotExist:
         del_mg_im = False
+        del_no_match = True
 
     dataset = dicom.read_file(mg_file)
     dataset.decode()
@@ -596,7 +588,6 @@ def mam(mg_file):
 
 
 if __name__ == "__main__":
-    import sys
 
     if len(sys.argv) != 2:
         sys.exit(u'Error: Supply exactly one argument - the DICOM mammography image file')

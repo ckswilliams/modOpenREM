@@ -64,13 +64,13 @@ For CT dose summary files from older Toshiba CT scanners
 --------------------------------------------------------
 .. sourcecode:: bash
 
-    openrem_rdsr_toshiba_ct_from_dose_images.py path_to_files
+    openrem_cttoshiba.py path_to_files
 
 This extractor is designed to create a DICOM radiation dose structured report
 from the information contained in secondary capture dose summary images,
 supplemented by data stored in image tags. It requires a folder of DICOM
 objects as input (suitable data can be retrieved from a DICOM node using the
-`qrscu.py` command with the `-toshiba` switch - see :ref:`qrcommandlineinterface`).
+``qrscu.py`` command with the ``-toshiba`` switch - see :ref:`qrcommandlineinterface`).
 It creates an initial RDSR from the secondary capture dose summary, and then
 tries to enrich this with additional information contained in image tags. The
 routine attempts to extract the following information from the image tags and

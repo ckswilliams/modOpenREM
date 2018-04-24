@@ -201,7 +201,6 @@ def csv2db(*args, **kwargs):
     import django
     import openrem_settings
 
-    
     # Required and optional arguments
     parser = argparse.ArgumentParser(description="Import height and weight data into an OpenREM database. If either is missing just add a blank column with appropriate title.")
     parser.add_argument("-u", "--si-uid", action="store_true", help="Use Study Instance UID instead of Accession Number")

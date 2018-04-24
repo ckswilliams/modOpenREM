@@ -47,10 +47,10 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
 # logger is explicitly named so that it is still handled when using __main__
-logger = logging.getLogger('remapp.extractors.rdsr_toshiba_ct_from_dose_images')
+logger = logging.getLogger('remapp.extractors.ct_toshiba')
 
 
-def find_dose_summary_objects(folder_path):
+def _find_dose_summary_objects(folder_path):
     """ This function looks for objects with a SOPClassUID of "Secondary
     Capture Image Storage" and an ImageType with a length of 2.
 
@@ -60,6 +60,7 @@ def find_dose_summary_objects(folder_path):
         ImageType is ['DERIVED', 'SECONDARY', 'MULTI_FORMAT_RASTER']
         ImageType is ['DERIVED', 'SECONDARY', 'DISPLAY']
         ImageType is ['DERIVED', 'SECONDARY', 'MPR']
+
     The above are from a virtual colonoscopy study.
 
     Args:
@@ -1048,9 +1049,11 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     return 1
 
 
-@shared_task(name="remapp.extractors.rdsr_toshiba_ct_from_dose_images.rdsr_toshiba_ct_from_dose_images")
-def rdsr_toshiba_ct_from_dose_images(folder_name):
+@shared_task(name="remapp.extractors.ct_toshiba.ct_toshiba")
+def ct_toshiba(folder_name):
     """Function to create radiation dose structured reports from a folder of dose images.
+
+    :param folder_name: Path to folder containing Toshiba DICOM objects - dose summary and images
     """
     import dicom
 
@@ -1070,7 +1073,7 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
     for folder in folders:
 
         # Check to see if there's just one dose summary in the folder
-        dose_summary_object_info = find_dose_summary_objects(folder)
+        dose_summary_object_info = _find_dose_summary_objects(folder)
         logger.debug("dose_summary_object_info is {0}".format(dose_summary_object_info))
 
         # For Toshiba scanners each dose summary consists of two objects
@@ -1250,7 +1253,7 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
     logger.debug('Removing study folder')
     shutil.rmtree(folder_name)
     logger.debug('Removing study folder complete')
-    logger.debug('Reached end of rdsr_toshiba_ct_from_dose_images routine')
+    logger.debug('Reached end of ct_toshiba routine')
     return 0
 
 
@@ -1258,5 +1261,5 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         sys.exit('Error: supply exactly one argument - the folder containing the DICOM objects')
 
-    sys.exit(rdsr_toshiba_ct_from_dose_images(sys.argv[1]))
+    sys.exit(ct_toshiba(sys.argv[1]))
 

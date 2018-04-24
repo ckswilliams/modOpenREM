@@ -1,5 +1,5 @@
-Backing up a PostgreSQL database
-================================
+Backing up a PostgreSQL database (Windows)
+==========================================
 
 ..  Note::  Content contributed by DJ Platten
 
@@ -24,8 +24,8 @@ To backup the contents of ``openrempostgresql`` to a file called ``backup.sql`` 
 
 Note that the ``pg_dump`` command needs to be in your path for this to work exactly as written. The ``-U backup`` indicates that the ``backup`` user is to carry out the task. The ``-F c`` option archives in a suitable format for input into the ``pg_restore`` command. Further information on ``pg_dump`` and backing up a PostgreSQL database can be found here: http://www.postgresql.org/docs/9.3/static/app-pgdump.html and here: http://www.postgresql.org/docs/9.3/static/backup-dump.html
 
-Restoring a PostgreSQL database
-===============================
+Restoring a PostgreSQL database (Windows)
+=========================================
 
 The ``pg_restore`` command can be used to restore the database using one of the backed-up SQL files that were produced using the ``pg_dump`` command.
 

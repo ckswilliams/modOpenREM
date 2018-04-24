@@ -789,9 +789,6 @@ def dx(dig_file):
     :param filename: relative or absolute path to DICOM DX radiographic image file.
     :type filename: str.
 
-    Tested with:
-        Nothing yet
-
     """
 
     import dicom
