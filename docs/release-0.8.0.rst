@@ -68,22 +68,6 @@ Upgrade
 
 ..  _upgradefrom074:
 
-Migrate the database
-====================
-
-In a shell/command window, move into the openrem folder:
-
-* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
-* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
-
-.. sourcecode:: bash
-
-    python manage.py makemigrations remapp
-    python manage.py migrate remapp
-
 Update the configuration
 ========================
 
@@ -116,6 +100,15 @@ Add the new extractor log file configuration to the ``local_settings.py`` - you 
 configuration' section from  ``local_settings.py.example`` if you haven't made many changes to this section. See the
 :ref:`local_settings_logfile` settings in the install instructions.
 
+.. warning::
+
+    If you are upgrading from an earlier beta with the Toshiba RDSR creation logs defined, this has changed names
+    and must be modified in ``local_settings.py`` before the migration below. It should be changed to::
+
+        LOGGING['loggers']['remapp.extractors.ct_toshiba']['level'] = 'INFO'  # Toshiba RDSR creation extractor logs
+
+    substituting ``INFO`` for whichever level of logging is desired.
+
 Adding legacy Toshiba CT functionality
 ======================================
 
@@ -145,6 +138,23 @@ configuration above using the command ``which dcmconv``. This will be something 
 ``DCMTK_PATH`` would be ``'/usr/bin`` and the ``DCMCONV`` would be ``os.path.join(DCMTK_PATH, 'dcmconv')``. Similarly
 for ``DCMMKDIR`` and ``JAVA_EXE``, which might be ``/usr/bin/java``. The pixelmed.jar file should be downloaded from
 the link above, and you will need to provide the path to where you have saved it.
+
+
+Migrate the database
+====================
+
+In a shell/command window, move into the openrem folder:
+
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
+
+.. sourcecode:: bash
+
+    python manage.py makemigrations remapp
+    python manage.py migrate remapp
 
 
 Restart all the services
