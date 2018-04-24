@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.8.0b4 (2018-04-xx)
+0.8.0b4 (2018-04-24)
 --------------------
 * `#623`_  Imports: changed name of Toshiba image based extractor routine
 * `#621`_  Documentation: reversed install order of openrem and pynetdicom due to new pydicom release

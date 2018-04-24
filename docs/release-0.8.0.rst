@@ -38,9 +38,9 @@ Upgrading an OpenREM server with no internet access
 
 Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
-*********************************************
-Upgrading from version 0.7.4 or 0.8.0b1 or b2
-*********************************************
+**********************************************
+Upgrading from version 0.7.4 or 0.8.0b1,2 or 3
+**********************************************
 
 Upgrade
 =======
@@ -58,7 +58,7 @@ Upgrade
 
 .. sourcecode:: bash
 
-    pip install openrem==0.8.0b3
+    pip install openrem==0.8.0b4
 
 ..  _upgradefrom074:
 
