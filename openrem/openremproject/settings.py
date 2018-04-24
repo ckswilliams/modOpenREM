@@ -244,7 +244,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'remapp.extractors.rdsr_toshiba_ct_from_dose_images': {
+        'remapp.extractors.ct_toshiba': {
             'handlers': ['extractor_file'],
             'level': 'INFO',
             'propagate': False,
