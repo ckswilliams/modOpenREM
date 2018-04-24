@@ -32,6 +32,12 @@ Changes since release 0.8.0b2
 * A few documentation updates
 * Imports: fix for query retrieve of RDSRs in studies
 
+Changes since release 0.8.0b3
+=============================
+
+* Extensive documentation updates, particularly on the code side, as well as fixing install order
+* Chagned the name of the Toshiba import function and script
+
 ***************************************************
 Upgrading an OpenREM server with no internet access
 ***************************************************
