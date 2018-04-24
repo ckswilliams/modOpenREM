@@ -36,7 +36,7 @@ Changes since release 0.8.0b3
 =============================
 
 * Extensive documentation updates, particularly on the code side, as well as fixing install order
-* Chagned the name of the Toshiba import function and script
+* Changed the name of the Toshiba import function and script
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
