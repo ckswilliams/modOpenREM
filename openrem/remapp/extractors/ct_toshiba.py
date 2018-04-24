@@ -50,7 +50,7 @@ django.setup()
 logger = logging.getLogger('remapp.extractors.ct_toshiba')
 
 
-def find_dose_summary_objects(folder_path):
+def _find_dose_summary_objects(folder_path):
     """ This function looks for objects with a SOPClassUID of "Secondary
     Capture Image Storage" and an ImageType with a length of 2.
 
@@ -1073,7 +1073,7 @@ def ct_toshiba(folder_name):
     for folder in folders:
 
         # Check to see if there's just one dose summary in the folder
-        dose_summary_object_info = find_dose_summary_objects(folder)
+        dose_summary_object_info = _find_dose_summary_objects(folder)
         logger.debug("dose_summary_object_info is {0}".format(dose_summary_object_info))
 
         # For Toshiba scanners each dose summary consists of two objects
