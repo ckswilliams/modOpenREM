@@ -44,9 +44,9 @@ Upgrading an OpenREM server with no internet access
 
 Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
-**********************************************
-Upgrading from version 0.7.4 or 0.8.0b1,2 or 3
-**********************************************
+***********************************************
+Upgrading from version 0.7.4 or 0.8.0b1, 2 or 3
+***********************************************
 
 Upgrade
 =======
