@@ -157,6 +157,18 @@ In a shell/command window, move into the openrem folder:
     python manage.py migrate remapp
 
 
+Update static files
+===================
+
+In the same shell/command window as you used above run the following command to clear the static files
+belonging to your previous OpenREM version and replace them with those belonging to the version you have
+just installed:
+
+.. sourcecode:: bash
+
+    python manage.py collectstatic --clear
+
+
 Restart all the services
 ========================
 
