@@ -803,8 +803,8 @@
                 field_name_max = 'study_dlp_max';
                 field_multiplier = 1.0;
                 field_cat_name = 'study_description';
-                tooltip_filters = tooltipFiltersStudy;
-                href_start = '/openrem/ct/?studyhist=1&';
+                tooltip_filters = 0;
+                href_start = 0;
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -1026,8 +1026,8 @@
                 field_name_max = 'study_dlp_max';
                 field_multiplier = 1.0;
                 field_cat_name = 'requested_procedure';
-                tooltip_filters = tooltipFiltersRequest;
-                href_start = '/openrem/ct/?requesthist=1&';
+                tooltip_filters = 0;
+                href_start = 0;
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
