@@ -68,7 +68,7 @@ function chartAverageAndHistogram(defaultTitle, normBtnClass, instrClass, render
                         max: (typeof(e.seriesOptions) !== "undefined") ? e.seriesOptions.data.length - 1 : this.xAxis[0].max
                     }, false);
                     this.tooltip.options.formatter = function (e) {
-                        if (hrefStart != 0) {
+                        if (hrefStart !== 0) {
                             var linkText = fldMin + "=" + (bins[this.x])*fldMultiplier + "&" + fldMax + "=" + (bins[this.x + 1])*fldMultiplier + "&" + fldCatName + "=" + name;
                             if (this.series.name !== "All systems") {
                                 linkText += "&display_name=" + this.series.name;
@@ -87,7 +87,7 @@ function chartAverageAndHistogram(defaultTitle, normBtnClass, instrClass, render
                         } else {
                             valueToWrite = this.y;
                         }
-                        if (hrefStart != 0) {
+                        if (hrefStart !== 0) {
                             return "<table style='text-align: center'><tr><td>" + valueToWrite.toFixed(0) + " " + catCounter + "</td></tr><tr><td><a href='" + encodeURI(hrefStart + linkText + tooltipFilters).replace("+", encodeURIComponent("+")) + "'>Click to view</a></td></tr></table>";
                         } else {
                             return "<table style='text-align: center'><tr><td>" + valueToWrite.toFixed(0) + " " + catCounter + "</td></tr></table>";
