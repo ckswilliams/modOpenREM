@@ -1,4 +1,4 @@
-    # This Python file uses the following encoding: utf-8
+# This Python file uses the following encoding: utf-8
 # Original code from: Test-Driven Development with Python by Harry Percival (O’Reilly).
 # Copyright 2014 Harry Percival, 978-1-449-36482-3.”
 
