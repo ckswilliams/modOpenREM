@@ -1282,6 +1282,11 @@ def _rsdr2db(dataset):
                             logger.debug(u"Import match on StudyInstUID {0}. Event level match after delay, will not "
                                          u"import.".format(study_uid))
                             return
+                        elif new_event_uids.issubset(existing_event_uids_post_delay):
+                            # Existing now has more events including those in the new RDSR
+                            logger.debug(u"Import match on StudyInstUID {0}. Existing has more events than the new RDSR"
+                                         u"after the delay, including the new ones, so will not import")
+                            return
                         # Can't be fewer in new RDSR at this point, so new must still have more, so use new one
                         existing_study_uid_match[study_index].delete()
                         logger.debug(u"Import match on StudyInstUID {0}. After delay, new RDSR has more events than "
