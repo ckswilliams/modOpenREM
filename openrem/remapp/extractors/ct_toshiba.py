@@ -68,7 +68,7 @@ def _find_dose_summary_objects(folder_path):
         DICOM objects
 
     Returns:
-        A list of structures, each containing the elements "file_name",
+        A list of structures, each containing the elements "fileName",
         "studyTime" and "instanceNumber".
     """
     import dicom
@@ -82,7 +82,7 @@ def _find_dose_summary_objects(folder_path):
             try:
                 dcm = dicom.read_file(os.path.join(folder_path, file_name))
                 if str(dcm.SOPClassUID) == str(sop_class_uid) and len(dcm.ImageType) == 2:
-                    dose_summary_object_list.append({"file_name": file_name,
+                    dose_summary_object_list.append({"fileName": file_name,
                                                      "studyTime": dcm.StudyTime,
                                                      "instanceNumber": dcm.InstanceNumber})
 
