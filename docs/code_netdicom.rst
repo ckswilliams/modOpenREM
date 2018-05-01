@@ -24,3 +24,10 @@ openrem_qr.py script
     :func: _create_parser
     :prog: openrem_qr.py
 
+
+*************************
+NetDICOM common functions
+*************************
+
+..  automodule:: openrem.remapp.netdicom.tools
+    :members: echoscu, create_ae

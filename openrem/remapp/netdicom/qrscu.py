@@ -25,8 +25,7 @@ if projectpath not in sys.path:
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
-
-from remapp.netdicom.tools import _create_ae
+from remapp.netdicom.tools import create_ae
 
 
 def _remove_duplicates(query, study_rsp, assoc, query_id):
@@ -652,7 +651,7 @@ def qrscu(
             ExplicitVRBigEndian
         ]
 
-    my_ae = _create_ae(aet.encode('ascii', 'ignore'), transfer_syntax=ts)
+    my_ae = create_ae(aet.encode('ascii', 'ignore'), transfer_syntax=ts)
     my_ae.start()
     logger.debug(u"my_ae {0} started".format(my_ae))
 
@@ -836,7 +835,7 @@ def movescu(query_id):
     qr_scp = query.qr_scp_fk
     store_scp = query.store_scp_fk
 
-    my_ae = _create_ae(store_scp.aetitle.encode('ascii', 'ignore'))
+    my_ae = create_ae(store_scp.aetitle.encode('ascii', 'ignore'))
     my_ae.start()
     logger.debug(u"Move AE my_ae {0} started".format(my_ae))
 
