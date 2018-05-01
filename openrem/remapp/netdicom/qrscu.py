@@ -28,6 +28,17 @@ django.setup()
 from remapp.netdicom.tools import create_ae
 
 
+def _generate_modalities_in_study(study_rsp):
+    """Generates modalities in study from series level Modality information
+
+    :param study_rsp: study level C-Find response object in database
+    :return: response updated with ModalitiesInStudy
+    """
+    logger.debug(u"modalities_returned = False, so building from series info")
+    series_rsp = study_rsp.dicomqrrspseries_set.all()
+    study_rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
+
+
 def _remove_duplicates(query, study_rsp, assoc, query_id):
     """
     Checks for objects in C-Find response already being in the OpenREM database to remove them from the C-Move request
@@ -751,10 +762,7 @@ def qrscu(
         d2.StudyInstanceUID = rsp.study_instance_uid
         _query_series(assoc, d2, rsp, query_id)
         if not modalities_returned:
-            logger.debug(u"modalities_returned = False, so building from series info")
-            series_rsp = rsp.dicomqrrspseries_set.all()
-            rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
-            rsp.save()
+            _generate_modalities_in_study(rsp)
 
     if not modality_matching:
         mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
