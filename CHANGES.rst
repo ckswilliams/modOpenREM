@@ -2,8 +2,9 @@
 OpenREM version history
 =======================
 
-0.8.0b4 (2018-04-24)
+0.8.0b5 (2018-05-xx)
 --------------------
+* `#625`_  Imports: now using event level UIDs to process continued, cumulative and duplicate RDSRs
 * `#624`_  Charts: removed filter link on number of events histogram as it was not functioning correctly
 * `#623`_  Imports: changed name of Toshiba image based extractor routine
 * `#621`_  Documentation: reversed install order of openrem and pynetdicom due to new pydicom release
