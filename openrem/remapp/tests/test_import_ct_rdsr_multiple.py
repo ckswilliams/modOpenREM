@@ -101,3 +101,26 @@ class ImportContinuedRDSRs(TestCase):
         self.assertEqual(GeneralStudyModuleAttr.objects.count(), 2)
         self.assertEqual(GeneralStudyModuleAttr.objects.all().order_by('pk').last().pk, latest_study_pk)
 
+
+class ImportDuplicateNonCTRDSRs(TestCase):
+    """Tests for non-CT RDSRs
+
+    """
+    def test_import_duplicate_dx(self):
+        """
+
+        :return:
+        """
+        PatientIDSettings.objects.create()
+
+        dicom_file_1 = "test_files/DX-RDSR-Canon_CXDI.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path_1 = os.path.join(root_tests, dicom_file_1)
+
+        rdsr(dicom_path_1)
+        # Test that there is one study, and it has one event
+        self.assertEqual(GeneralStudyModuleAttr.objects.count(), 1)
+
+        rdsr(dicom_path_1)
+        # Test that there is one study, and it has one event
+        self.assertEqual(GeneralStudyModuleAttr.objects.count(), 1)
