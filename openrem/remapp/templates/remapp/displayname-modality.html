@@ -25,8 +25,7 @@
   {% for eachrow in name_set %}
     <tr class="clickable-row" row_name="{{ eachrow.id }}">
       {% if admin.admingroup %}
-        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}"
-                                                                       value="{{ eachrow.id }}"/></td>
+        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" onclick="$(this).prop('checked', !$(this).prop('checked'))"/></td>
       {% endif %}
       <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
       {% if dual %}

@@ -1201,48 +1201,97 @@ def _rsdr2db(dataset):
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
 
     openrem_settings.add_project_to_path()
+    from collections import OrderedDict
     from django.db.models import ObjectDoesNotExist
     from time import sleep
     from remapp.models import GeneralStudyModuleAttr, SkinDoseMapCalcSettings
     from remapp.tools.get_values import get_value_kw
-    from remapp.tools.dcmdatetime import get_time
 
     if 'StudyInstanceUID' in dataset:
-        uid = dataset.StudyInstanceUID
-        existing_study_inst_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=uid)
-        if existing_study_inst_uid:
-            if existing_study_inst_uid.count() > 1:
-                logger.error("More than one study in database with study instance UID of {0}, attempting to import"
-                             "another! Comparison will be made with first instance, which will be replaced if new"
-                             "RDSR is newer.".format(uid))
-            new_series_time = get_time('SeriesTime', dataset).time()
-            new_content_time = get_time('ContentTime', dataset).time()
-            existing_series_time = existing_study_inst_uid[0].series_time
-            existing_content_time = existing_study_inst_uid[0].content_time
-            logger.debug("Importing duplicate RDSR, study UID {0}. Existing series time {1}, content time {2} "
-                         "new series time is {3}, content time is {4}".format(
-                                uid, existing_series_time, existing_content_time, new_series_time, new_content_time))
-            if not existing_series_time:
-                logger.warning("Importing an RDSR with duplicate study instance UID ({0}), but existing one was"
-                               " imported without recording series time so we can't tell which is newer. This RDSR is"
-                               " going to replace the existing one.".format(uid))
-                existing_study_inst_uid[0].delete()
-            elif (new_series_time > existing_series_time) or (
-                    new_series_time == existing_series_time and new_content_time > existing_content_time):
-                # delete existing and start again with new - after checking patient_module_attributes exists or wait
+        study_uid = dataset.StudyInstanceUID
+        existing_study_uid_match = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
+        if existing_study_uid_match:
+
+            # First find the event UIDs in the RDSR being imported
+            new_event_uids = set()
+            for content in dataset.ContentSequence:
+                if content.ValueType and content.ValueType == 'CONTAINER':
+                    if content.ConceptNameCodeSequence[0].CodeMeaning in (
+                            'CT Acquisition', 'Irradiation Event X-Ray Data'):
+                        for item in content.ContentSequence:
+                            if item.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
+                                new_event_uids.add(u"{0}".format(item.UID))
+            logger.debug(u"Import match on StudyInstUID {0}. New RDSR event UIDs {1}".format(study_uid, new_event_uids))
+
+            # Now check which event UIDs are in the database already
+            existing_event_uids = OrderedDict()
+            for i, existing_study in enumerate(existing_study_uid_match.order_by('pk')):
+                existing_event_uids[i] = set()
                 try:
-                    existing_study_inst_uid[0].patientmoduleattr_set.get()
-                    # previous one probably finished
-                    existing_study_inst_uid[0].delete()
-                    logger.debug("New RDSR will replace old one. Old one deleted, new one about to import")
+                    for event in existing_study.ctradiationdose_set.get().ctirradiationeventdata_set.all():
+                        existing_event_uids[i].add(event.irradiation_event_uid)
                 except ObjectDoesNotExist:
-                    sleep(30.)  # give the previous one a little extra time to import
-                    existing_study_inst_uid[0].delete()
-                    logger.warning("New RDSR replacing old one, but old one didn't appear to be finished importing so"
-                                   "we waited an extra 30 seconds before deleting it and importing the new one.")
-            else:
-                # New RDSR not newer than existing one, don't proceed
-                return
+                    for event in existing_study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+                        existing_event_uids[i].add(event.irradiation_event_uid)
+            logger.debug(u"Import match on StudyInstUID {0}. Existing event UIDs {1}".format(
+                study_uid, existing_event_uids))
+
+            # Now compare the two
+            for study_index, uid_list in existing_event_uids.items():
+                if uid_list == new_event_uids:
+                    # New RDSR is the same as the existing one
+                    logger.debug(u"Import match on StudyInstUID {0}. Event level match, will not import.".format(
+                        study_uid))
+                    return
+                elif new_event_uids.issubset(uid_list):
+                    # New RDSR has the same but fewer events than existing one
+                    logger.debug(u"Import match on StudyInstUID {0}. New RDSR events are subset of existing events. "
+                                 u"Will not import.".format(study_uid))
+                    return
+                elif uid_list.issubset(new_event_uids):
+                    # New RDSR has the existing events and more
+                    # Check existing one had finished importing
+                    try:
+                        existing_study_uid_match[study_index].patientmoduleattr_set.get()
+                        # probably had, so
+                        existing_study_uid_match[study_index].delete()
+                        logger.debug(u"Import match on StudyInstUID {0}. Existing events are subset of new events. Will"
+                                     u"import.".format(study_uid))
+                    except ObjectDoesNotExist:
+                        # Give existing one time to complete
+                        sleep_time = 20.
+                        logger.debug(u"Import match on StudyInstUID {0}. Existing events are subset of new events. "
+                                     u"However, existing study appears not to have finished importing. Waiting {1} s"
+                                     u"before trying again.".format(study_uid, sleep_time))
+                        sleep(sleep_time)
+                        existing_event_uids_post_delay = set()
+                        try:
+                            for event in existing_study_uid_match.order_by(
+                                    'pk')[study_index].ctradiationdose_set.get().ctirradiationeventdata_set.all():
+                                existing_event_uids_post_delay.add(event.irradiation_event_uid)
+                        except ObjectDoesNotExist:
+                            for event in existing_study_uid_match.order_by(
+                                    'pk')[study_index].projectionxrayradiationdose_set.get(
+                                    ).irradeventxraydata_set.all():
+                                existing_event_uids_post_delay.add(event.irradiation_event_uid)
+
+                        logger.debug(u"Import match on StudyInstUID {0}. After {1} s, existing event UIDs are {2}."
+                                     u"".format(study_uid, sleep_time, existing_event_uids_post_delay))
+                        if existing_event_uids_post_delay == new_event_uids:
+                            # Now they are the same
+                            logger.debug(u"Import match on StudyInstUID {0}. Event level match after delay, will not "
+                                         u"import.".format(study_uid))
+                            return
+                        elif new_event_uids.issubset(existing_event_uids_post_delay):
+                            # Existing now has more events including those in the new RDSR
+                            logger.debug(u"Import match on StudyInstUID {0}. Existing has more events than the new RDSR"
+                                         u"after the delay, including the new ones, so will not import")
+                            return
+                        # Can't be fewer in new RDSR at this point, so new must still have more, so use new one
+                        existing_study_uid_match[study_index].delete()
+                        logger.debug(u"Import match on StudyInstUID {0}. After delay, new RDSR has more events than "
+                                     u"existing. Not certain that existing had finished importing. Existing will be"
+                                     u"deleted and replaced.".format(study_uid))
 
     g = GeneralStudyModuleAttr.objects.create()
     if not g:  # Allows import to be aborted if no template found

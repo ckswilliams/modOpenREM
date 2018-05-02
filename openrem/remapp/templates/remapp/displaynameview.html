@@ -42,13 +42,6 @@
 
   {% if admin.admingroup %}
     <form action="/openrem/updatedisplaynames/" method="get">
-    <script>
-        jQuery(document).ready(function ($) {
-            $('input').click(function () {
-                $(this).prop("checked", !$(this).prop("checked"));
-            });
-        });
-    </script>
   {% endif %}
 
 {% for modality in modalities %}
