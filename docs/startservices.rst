@@ -93,7 +93,7 @@ Linux - ``\`` is the line continuation character:
 
 .. sourcecode:: console
 
-    celery multi start default -A openremproject -c 4 -Q default \
+    celery multi start default -Ofair -A openremproject -c 4 -Q default \
     --pidfile=/path/to/media/celery/%N.pid --logfile=/path/to/media/celery/%N.log
 
 Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuation character:
@@ -108,6 +108,17 @@ For production use, see `Daemonising Celery`_ below
 Set the number of workers (concurrency, ``-c``) as you see fit. The more you have, the more processes (imports, exports,
 query-retrieve operations etc) can take place simultaneously. However, each extra worker uses extra memory and if you
 have too many they will be competing for CPU resources too.
+
+.. note::
+
+    Problems with Celery 4 on Windows
+
+    Full support for Celery on Windows was dropped with version 4 due to lack of Windows based developers. However,
+    using the settings above (and as suggested in :doc:`celery-windows`) have been shown to work well in production.
+    It is possible that there may be issues with particular releases though - Celery 4.0.0 his known to work well.
+    If you need to install a particular version of Celery, use::
+
+        pip install celery==4.0.0
 
 To stop the celery queues in Linux:
 
