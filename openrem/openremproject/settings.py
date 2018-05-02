@@ -1,33 +1,31 @@
 # Django settings for OpenREM project.
 
 from __future__ import absolute_import
-
 # ^^^ The above is required if you want to import from the celery
 # library.  If you don't have this then `from celery.schedules import`
 # becomes `proj.celery.schedules` in Python 2.x since it allows
 # for relative imports by default.
+from celery.schedules import crontab
+import os
+
 
 # Debug is now set to false - you can turn it back on in local_settings if you need to
 DEBUG = False
 TEMPLATE_DEBUG = False
 
 # Celery settings
-
 BROKER_URL = 'amqp://guest:guest@localhost//'
-CELERY_RESULT_BACKEND = 'amqp'
+CELERY_RESULT_BACKEND = 'rpc://'
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
 CELERY_DEFAULT_QUEUE = 'default'
-# Added by DJP on 16/3/2017 to see if it stops Rabbit / Celery from timing out
-# Also see http://stackoverflow.com/questions/35325207/celery-and-rabbitmq-timeouts-and-connection-resets
-# Also see http://stackoverflow.com/questions/16040039/understanding-celery-task-prefetching
-# Both of the above suggest adding CELERY_ACKS_LATE = True, and adding '-Ofair' to the celery worker options
-# The concurrency in the celery task is also now set to 1 rather than 4 ("-c 4" to "-c 1")
+
 CELERY_ACKS_LATE = True
 CELERYD_PREFETCH_MULTIPLIER = 1
 
-from celery.schedules import crontab
 
 CELERYBEAT_SCHEDULE = {
     'trigger-dicom-keep-alive': {
@@ -37,7 +35,6 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-import os
 
 ROOT_PROJECT = os.path.join(os.path.split(__file__)[0], "..")
 
