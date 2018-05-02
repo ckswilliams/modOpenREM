@@ -49,11 +49,12 @@ OpenREM version history
 * `#561`_  Imports: patient orientation modifier now correctly extracted from RDSR
 * `#560`_  Exports: added study level comments
 * `#559`_  Interface: date pickers inconsistent start day fixed
-* `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector postition are missing
+* `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector position are missing
 * `#557`_  Skin dose maps: improved construction of patient orientation code
 * `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
 * `#552`_  Documentation: documented extractor for older Toshiba CT scanners
 * `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
+* `#550`_  Documentation: added a note to describe exposure time and duration for fluoroscopy studies
 * `#549`_  Documentation: added procedure for fixing laterality on Hologic studies, ref `#411`_
 * `#544`_  Interface: added procedure, requested procedure to summary listings and details and filtering
 * `#543`_  Interface: added drop-down box to choose how many studies are displayed on filtered pages
