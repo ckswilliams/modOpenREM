@@ -38,15 +38,23 @@ Changes since release 0.8.0b3
 * Extensive documentation updates, particularly on the code side, as well as fixing install order
 * Changed the name of the Toshiba import function and script
 
+Changes since release 0.8.0b5
+=============================
+
+* Changed duplicate RDSR processing method to work with CT and projection, duplicate, continued and cumulative using
+  UIDs
+* Changed Celery results backend to rpc
+* Minor documentation and interface updates
+
 ***************************************************
 Upgrading an OpenREM server with no internet access
 ***************************************************
 
 Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
-***********************************************
-Upgrading from version 0.7.4 or 0.8.0b1, 2 or 3
-***********************************************
+****************************************************
+Upgrading from version 0.7.4 or previous 0.8.0 betas
+****************************************************
 
 Upgrade
 =======
@@ -58,13 +66,16 @@ Upgrade
 
 * Stop any Celery workers
 
+* Consider temporarily disabling your DICOM StoreSCP if it is Conquest, or redirecting the data in Conquest to be
+  processed later
+
 * If you are using a virtualenv, activate it
 
 * Install the new version of OpenREM:
 
 .. sourcecode:: bash
 
-    pip install openrem==0.8.0b4
+    pip install openrem==0.8.0b5
 
 ..  _upgradefrom074:
 

@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.8.0b5 (2018-05-xx)
+0.8.0b5 (2018-05-02)
 --------------------
 * `#626`_  DICOM: isolated the generate modalities in study function and added testing
 * `#625`_  Imports: now using event level UIDs to process continued, cumulative and duplicate RDSRs
