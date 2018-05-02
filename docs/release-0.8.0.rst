@@ -162,7 +162,7 @@ Update static files
 
 In the same shell/command window as you used above run the following command to clear the static files
 belonging to your previous OpenREM version and replace them with those belonging to the version you have
-just installed:
+just installed (assuming you are using a production web server...):
 
 .. sourcecode:: bash
 
