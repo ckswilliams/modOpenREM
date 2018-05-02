@@ -25,8 +25,18 @@ if projectpath not in sys.path:
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
+from remapp.netdicom.tools import create_ae
 
-from remapp.netdicom.tools import _create_ae
+
+def _generate_modalities_in_study(study_rsp):
+    """Generates modalities in study from series level Modality information
+
+    :param study_rsp: study level C-Find response object in database
+    :return: response updated with ModalitiesInStudy
+    """
+    logger.debug(u"modalities_returned = False, so building from series info")
+    series_rsp = study_rsp.dicomqrrspseries_set.all()
+    study_rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
 
 
 def _remove_duplicates(query, study_rsp, assoc, query_id):
@@ -652,7 +662,7 @@ def qrscu(
             ExplicitVRBigEndian
         ]
 
-    my_ae = _create_ae(aet.encode('ascii', 'ignore'), transfer_syntax=ts)
+    my_ae = create_ae(aet.encode('ascii', 'ignore'), transfer_syntax=ts)
     my_ae.start()
     logger.debug(u"my_ae {0} started".format(my_ae))
 
@@ -752,9 +762,7 @@ def qrscu(
         d2.StudyInstanceUID = rsp.study_instance_uid
         _query_series(assoc, d2, rsp, query_id)
         if not modalities_returned:
-            logger.debug(u"modalities_returned = False, so building from series info")
-            series_rsp = rsp.dicomqrrspseries_set.all()
-            rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
+            _generate_modalities_in_study(rsp)
 
     if not modality_matching:
         mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
@@ -835,7 +843,7 @@ def movescu(query_id):
     qr_scp = query.qr_scp_fk
     store_scp = query.store_scp_fk
 
-    my_ae = _create_ae(store_scp.aetitle.encode('ascii', 'ignore'))
+    my_ae = create_ae(store_scp.aetitle.encode('ascii', 'ignore'))
     my_ae.start()
     logger.debug(u"Move AE my_ae {0} started".format(my_ae))
 

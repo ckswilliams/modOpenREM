@@ -121,7 +121,7 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
         return "EchoFail"
 
 
-def _create_ae(aet, port=None, sop_scu=None, sop_scp=None, transfer_syntax=None):
+def create_ae(aet, port=None, sop_scu=None, sop_scp=None, transfer_syntax=None):
     """
     Function to create an application entity
     :param aet: string, AE Title
