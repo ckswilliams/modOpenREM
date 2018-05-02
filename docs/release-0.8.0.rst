@@ -82,6 +82,14 @@ Upgrade
 Update the configuration
 ========================
 
+Locate and edit your local_settings file
+
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openremproject/local_settings.py``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\openremproject\local_settings.py``
+* Windows virtualenv: ``Lib\site-packages\openrem\openremproject\local_settings.py``
+
 Date format
 ^^^^^^^^^^^
 Set the date format for xlsx exports (need to check csv situation). Copy the following code into your
@@ -165,6 +173,7 @@ In a shell/command window, move into the openrem folder:
 .. sourcecode:: bash
 
     python manage.py makemigrations remapp
+    # if changes are detected (not expected between most beta versions)
     python manage.py migrate remapp
 
 
