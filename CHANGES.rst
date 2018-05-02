@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0b4 (2018-04-24)
 --------------------
+* `#626`_  DICOM: isolated the generate modalities in study function and added testing
 * `#623`_  Imports: changed name of Toshiba image based extractor routine
 * `#621`_  Documentation: reversed install order of openrem and pynetdicom due to new pydicom release
 * `#619`_  Documentation: added workaround for outdated dictionary issues
