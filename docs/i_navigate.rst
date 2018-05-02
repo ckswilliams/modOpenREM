@@ -90,10 +90,10 @@ A note on time data for fluoroscopy studies
 
 On the page showing a specific fluoroscopy study there is a table that shows the
 details of each irradiation event in the study. This table includes a column
-labelled as:
+labelled as::
 
-   ``Duration (ms)``
-   ``Exposure time (ms)``
+    ``Duration (ms)``
+    ``Exposure time (ms)``
 
 The ``Duration`` value is the amount of time that the exposure switch or pedal was
 pressed (technically, this should be the time from the loading of the first x-ray
