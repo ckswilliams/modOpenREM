@@ -485,7 +485,7 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
         return self.study_instance_uid
 
 
-class ObjectUIDsProcssed(models.Model):
+class ObjectUIDsProcessed(models.Model):
     """Table to hold the SOP Instance UIDs of the objects that have been processed against this study to enable
     duplicate sorting.
 

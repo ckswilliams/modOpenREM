@@ -37,7 +37,6 @@ def check_uid(uid, level='Study'):
     :type uid:          str.
     :returns:           1 if it does exist, 0 otherwise
     """
-    import sys
     from remapp.models import GeneralStudyModuleAttr
     
     if level == 'Study':
@@ -45,7 +44,25 @@ def check_uid(uid, level='Study'):
     elif level == 'Event':
         existing = GeneralStudyModuleAttr.objects.filter(
             projectionxrayradiationdose__irradeventxraydata__irradiation_event_uid__exact=uid)
+    else:
+        return 0
     if existing:
         return existing.count()
 
     return 0
+
+
+def record_sop_instance_uid(study, sop_instance_uid):
+    """Record the object's SOP Instance UID so we can ignore it next time. If an object does need to be imported again,
+    the original one needs to be deleted first.
+
+    :param study: GeneralStudyModuleAttr database object
+    :param sop_instance_uid: SOP Instance UID of object being imported
+    :return:
+    """
+    from remapp.models import ObjectUIDsProcessed
+
+    new_object = ObjectUIDsProcessed.objects.create(general_study_module_attributes=study)
+    new_object.sop_instance_uid = sop_instance_uid
+    new_object.save()
+

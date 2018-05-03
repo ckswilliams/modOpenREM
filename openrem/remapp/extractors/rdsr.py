@@ -1205,14 +1205,23 @@ def _rsdr2db(dataset):
     from django.db.models import ObjectDoesNotExist
     from time import sleep
     from remapp.models import GeneralStudyModuleAttr, SkinDoseMapCalcSettings
+    from remapp.tools.check_uid import record_sop_instance_uid
     from remapp.tools.get_values import get_value_kw
 
     if 'StudyInstanceUID' in dataset:
         study_uid = dataset.StudyInstanceUID
         existing_study_uid_match = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
         if existing_study_uid_match:
-
-            # First find the event UIDs in the RDSR being imported
+            new_sop_instance_uid = dataset.SOPInstanceUID
+            existing_sop_instance_uids = set()
+            for existing_study in existing_study_uid_match.order_by('pk'):
+                for sop_instance_uid in existing_study.objectuidsprocessed_set.all():
+                    existing_sop_instance_uids.add(sop_instance_uid)
+            if new_sop_instance_uid in existing_sop_instance_uids:
+                # We've dealt with this object before...
+                return
+            # Either we've not seen it before, or it wasn't recorded when we did.
+            # Next find the event UIDs in the RDSR being imported
             new_event_uids = set()
             for content in dataset.ContentSequence:
                 if content.ValueType and content.ValueType == 'CONTAINER':
@@ -1242,11 +1251,13 @@ def _rsdr2db(dataset):
                     # New RDSR is the same as the existing one
                     logger.debug(u"Import match on StudyInstUID {0}. Event level match, will not import.".format(
                         study_uid))
+                    record_sop_instance_uid(existing_study_uid_match[study_index], new_sop_instance_uid)
                     return
                 elif new_event_uids.issubset(uid_list):
                     # New RDSR has the same but fewer events than existing one
                     logger.debug(u"Import match on StudyInstUID {0}. New RDSR events are subset of existing events. "
                                  u"Will not import.".format(study_uid))
+                    record_sop_instance_uid(existing_study_uid_match[study_index], new_sop_instance_uid)
                     return
                 elif uid_list.issubset(new_event_uids):
                     # New RDSR has the existing events and more
@@ -1281,11 +1292,13 @@ def _rsdr2db(dataset):
                             # Now they are the same
                             logger.debug(u"Import match on StudyInstUID {0}. Event level match after delay, will not "
                                          u"import.".format(study_uid))
+                            record_sop_instance_uid(existing_study_uid_match[study_index], new_sop_instance_uid)
                             return
                         elif new_event_uids.issubset(existing_event_uids_post_delay):
                             # Existing now has more events including those in the new RDSR
                             logger.debug(u"Import match on StudyInstUID {0}. Existing has more events than the new RDSR"
                                          u"after the delay, including the new ones, so will not import")
+                            record_sop_instance_uid(existing_study_uid_match[study_index], new_sop_instance_uid)
                             return
                         # Can't be fewer in new RDSR at this point, so new must still have more, so use new one
                         existing_study_uid_match[study_index].delete()
@@ -1296,6 +1309,8 @@ def _rsdr2db(dataset):
     g = GeneralStudyModuleAttr.objects.create()
     if not g:  # Allows import to be aborted if no template found
         return
+    new_sop_instance_uid = dataset.SOPInstanceUID
+    record_sop_instance_uid(g, new_sop_instance_uid)
     ch = get_value_kw('SpecificCharacterSet', dataset)
     _generalequipmentmoduleattributes(dataset, g, ch)
     _generalstudymoduleattributes(dataset, g, ch)
