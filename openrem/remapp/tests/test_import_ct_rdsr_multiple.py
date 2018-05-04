@@ -94,35 +94,52 @@ class ImportContinuedRDSRs(TestCase):
         """
         PatientIDSettings.objects.create()
 
-        dicom_file_1 = "test_files/CT-RDSR-Siemens-Continued-1.dcm"
-        dicom_file_2 = "test_files/CT-RDSR-Siemens-Continued-2.dcm"
-        root_tests = os.path.dirname(os.path.abspath(__file__))
-        dicom_path_1 = os.path.join(root_tests, dicom_file_1)
-        dicom_path_2 = os.path.join(root_tests, dicom_file_2)
+        with LogCapture() as log:
+            dicom_file_1 = "test_files/CT-RDSR-Siemens-Continued-1.dcm"
+            dicom_file_2 = "test_files/CT-RDSR-Siemens-Continued-2.dcm"
+            root_tests = os.path.dirname(os.path.abspath(__file__))
+            dicom_path_1 = os.path.join(root_tests, dicom_file_1)
+            dicom_path_2 = os.path.join(root_tests, dicom_file_2)
 
-        rdsr(dicom_path_1)
-        study = GeneralStudyModuleAttr.objects.order_by('pk')[0]
-        num_events = study.ctradiationdose_set.get().ctirradiationeventdata_set.count()
-
-        # Test that there is one study, and it has one event
-        self.assertEqual(GeneralStudyModuleAttr.objects.count(), 1)
-        self.assertEqual(num_events, 2)
-
-        rdsr(dicom_path_2)
-        # Test the the new study has been imported separately
-        self.assertEqual(GeneralStudyModuleAttr.objects.count(), 2)
-
-        # Test that each study has two events in
-        studies = GeneralStudyModuleAttr.objects.all().order_by('pk')
-        for study in studies:
+            rdsr(dicom_path_1)
+            study = GeneralStudyModuleAttr.objects.order_by('pk')[0]
             num_events = study.ctradiationdose_set.get().ctirradiationeventdata_set.count()
-            self.assertEqual(num_events, 2)
+            study_uid = study.study_instance_uid
+            sop_instance_uid_list1 = Counter(study.objectuidsprocessed_set.values_list('sop_instance_uid', flat=True))
+            uid_list1 = Counter([u'1.3.6.1.4.1.5962.99.1.64928122.996247427.1524778350970.8.0', ])
 
-        latest_study_pk = GeneralStudyModuleAttr.objects.all().order_by('pk').last().pk
-        rdsr(dicom_path_2)
-        # Test that it doesn't import a second time...
-        self.assertEqual(GeneralStudyModuleAttr.objects.count(), 2)
-        self.assertEqual(GeneralStudyModuleAttr.objects.all().order_by('pk').last().pk, latest_study_pk)
+            # Test that there is one study, and it has one event
+            self.assertEqual(GeneralStudyModuleAttr.objects.count(), 1)
+            self.assertEqual(num_events, 2)
+            self.assertEqual(sop_instance_uid_list1, uid_list1)
+
+            rdsr(dicom_path_2)
+            # Test the the new study has been imported separately
+            self.assertEqual(GeneralStudyModuleAttr.objects.count(), 2)
+
+            # Test that each study has two events in
+            studies = GeneralStudyModuleAttr.objects.all().order_by('pk')
+            for study in studies:
+                num_events = study.ctradiationdose_set.get().ctirradiationeventdata_set.count()
+                self.assertEqual(num_events, 2)
+
+            # Test that each study has only the object sop instance UID that relates to it
+            sop_instance_uid_list1 = Counter(studies[0].objectuidsprocessed_set.values_list('sop_instance_uid', flat=True))
+            sop_instance_uid_list2 = Counter(studies[1].objectuidsprocessed_set.values_list('sop_instance_uid', flat=True))
+            uid_2 = u'1.3.6.1.4.1.5962.99.1.64928122.996247427.1524778350970.13.0'
+            uid_list2 = Counter([uid_2, ])
+            self.assertEqual(sop_instance_uid_list1, uid_list1)
+            self.assertEqual(sop_instance_uid_list2, uid_list2)
+
+            latest_study_pk = GeneralStudyModuleAttr.objects.all().order_by('pk').last().pk
+            rdsr(dicom_path_2)
+            # Test that it doesn't import a second time...
+            self.assertEqual(GeneralStudyModuleAttr.objects.count(), 2)
+            self.assertEqual(GeneralStudyModuleAttr.objects.all().order_by('pk').last().pk, latest_study_pk)
+            # Test that the attempt to import a duplicate is stopped at the instance UID check
+            log.check_present(('remapp.extractors.rdsr', 'DEBUG',
+                               u"Import match on Study Instance UID {0} and object SOP Instance UID {1}. "
+                               u"Will not import.".format(study_uid, uid_2)))
 
 
 class ImportDuplicateNonCTRDSRs(TestCase):
