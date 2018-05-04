@@ -1208,17 +1208,20 @@ def _rsdr2db(dataset):
     from remapp.tools.check_uid import record_sop_instance_uid
     from remapp.tools.get_values import get_value_kw
 
+    existing_sop_instance_uids = set()
     if 'StudyInstanceUID' in dataset:
         study_uid = dataset.StudyInstanceUID
         existing_study_uid_match = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
         if existing_study_uid_match:
             new_sop_instance_uid = dataset.SOPInstanceUID
-            existing_sop_instance_uids = set()
             for existing_study in existing_study_uid_match.order_by('pk'):
-                for sop_instance_uid in existing_study.objectuidsprocessed_set.all():
-                    existing_sop_instance_uids.add(sop_instance_uid)
+                for processed_object in existing_study.objectuidsprocessed_set.all():
+                    existing_sop_instance_uids.add(processed_object.sop_instance_uid)
             if new_sop_instance_uid in existing_sop_instance_uids:
                 # We've dealt with this object before...
+                logger.debug(u"Import match on Study Instance UID {0} and object SOP Instance UID {1}. "
+                             u"Will not import.".format(study_uid, new_sop_instance_uid))
+                print("Duplicate! {0}".format(new_sop_instance_uid))
                 return
             # Either we've not seen it before, or it wasn't recorded when we did.
             # Next find the event UIDs in the RDSR being imported
@@ -1311,6 +1314,8 @@ def _rsdr2db(dataset):
         return
     new_sop_instance_uid = dataset.SOPInstanceUID
     record_sop_instance_uid(g, new_sop_instance_uid)
+    for sop_instance_uid in existing_sop_instance_uids:
+        record_sop_instance_uid(g, sop_instance_uid)
     ch = get_value_kw('SpecificCharacterSet', dataset)
     _generalequipmentmoduleattributes(dataset, g, ch)
     _generalstudymoduleattributes(dataset, g, ch)
