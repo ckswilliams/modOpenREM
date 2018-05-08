@@ -652,13 +652,38 @@ def _create_event(dataset):
     inst_in_db = check_uid.check_uid(event_uid, 'Event')
     if inst_in_db:
         return 0
-    same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
-    if same_study_uid.count() != 1:
+    this_study = None
+    same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid).order_by('pk')
+    if same_study_uid.count() > 1:
         logger.warning(u"Duplicate study UIDs in database! Could be a problem.")
-        for dup in same_study_uid:
-            if dup.modality_type:
-                same_study_uid = dup
+        # Studies are ordered by study level pk. FInd the first one that has a modality type, and replace our
+        # filter_set with the study we have found.
+        for study in same_study_uid.order_by('pk'):
+            if study.modality_type:
+                this_study = study
                 continue
+        if not this_study:
+            logger.warning(u"Duplicate study UID {0}, none of which have modality_type assigned!"
+                           u" Setting first instance to DX".format(study_uid))
+            this_study = same_study_uid[0]
+            this_study.modality_type = u'DX'
+            this_study.save()
+    elif same_study_uid.count() == 1:
+        this_study = same_study_uid[0]
+    else:
+        logger.error(u"Attempting to add DX event {0} to study UID {0}, but it isn't there anymore. Stopping.".format(
+            event_uid, study_uid))
+        return 0
+    existing_sop_instance_uids = set()
+    for previous_object in this_study.objectuidsprocessed_set.all():
+        existing_sop_instance_uids.add(previous_object.sop_instance_uid)
+    if event_uid in existing_sop_instance_uids:
+        # We might get here if object has previously been rejected for being a for processing/presentation duplicate
+        logger.debug(u"DX instance UID {0} of study UID {1} previously processed, stopping.".format(
+            event_uid, study_uid))
+        return 0
+    # New event - record the SOP instance UID
+    check_uid.record_sop_instance_uid(this_study, event_uid)
     # further check required to ensure 'for processing' and 'for presentation'
     # versions of the same irradiation event don't get imported twice
     event_time = get_value_kw('AcquisitionTime', dataset)
@@ -669,15 +694,17 @@ def _create_event(dataset):
         event_date = get_value_kw('ContentDate', dataset)
     event_date_time = make_date_time('{0}{1}'.format(event_date, event_time))
     try:
-        for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+        for events in this_study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             if event_date_time == events.date_time_started:
+                logger.debug(u"A previous object with this study UID ({0}) and time ([1}) has been imported."
+                             u" Stopping".format(study_uid, event_date_time.isoformat()))
                 return 0
     except Exception as e:
         logger.warning(u"DX study UID %s, event UID %s failed at check for identical event. Error %s",
                        study_uid, event_uid, e)
     # study exists, but event doesn't
     ch = get_value_kw('SpecificCharacterSet', dataset)
-    _irradiationeventxraydata(dataset, same_study_uid.get().projectionxrayradiationdose_set.get(), ch)
+    _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
     # update the accumulated tables
     return 0
 
