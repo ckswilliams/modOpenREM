@@ -737,7 +737,9 @@ def _dx2db(dataset):
         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
         g.save()
         logger.debug("Started importing DX with Study Instance UID of {0}".format(g.study_instance_uid))
-        # check again
+        event_uid = get_value_kw('SOPInstanceUID', dataset)
+        check_uid.record_sop_instance_uid(g, event_uid)
+        # check study again
         study_in_db = check_uid.check_uid(study_uid)
         if study_in_db == 1:
             _generalstudymoduleattributes(dataset, g)
@@ -764,6 +766,7 @@ def _dx2db(dataset):
                         g = GeneralStudyModuleAttr.objects.create()
                         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
                         g.save()
+                        check_uid.record_sop_instance_uid(g, event_uid)
                         # check again
                         study_in_db = check_uid.check_uid(study_uid)
                         if study_in_db == 1:
