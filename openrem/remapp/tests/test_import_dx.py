@@ -394,8 +394,6 @@ class ImportDuplicateDX(TestCase):
         from remapp.extractors import dx
 
         dx_ge_xr220_1 = os.path.join("test_files", "DX-Im-GE_XR220-1.dcm")
-        dx_ge_xr220_2 = os.path.join("test_files", "DX-Im-GE_XR220-2.dcm")
-        dx_ge_xr220_3 = os.path.join("test_files", "DX-Im-GE_XR220-3.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
         dx(os.path.join(root_tests, dx_ge_xr220_1))
@@ -435,6 +433,8 @@ class ImportDuplicateDX(TestCase):
 
         self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 2)
 
+        study_1_pk = GeneralStudyModuleAttr.objects.order_by('pk').first().pk
+
         with LogCapture() as log:
             dx(os.path.join(root_tests, dx_ge_xr220_2))
 
@@ -445,7 +445,8 @@ class ImportDuplicateDX(TestCase):
                           ('remapp.extractors.dx',
                            'DEBUG',
                            u'Duplicate DX study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 - '
-                           u'first instance (pk=1) with modality type assigned (DX) selected to import new event into.')
+                           u'first instance (pk={0}) with modality type assigned (DX) selected to import new event '
+                           u'into.'.format(study_1_pk))
                           )
 
         number_of_events_study_1 = GeneralStudyModuleAttr.objects.order_by('pk').first(
@@ -471,6 +472,8 @@ class ImportDuplicateDX(TestCase):
         study_1.modality_type = None
         study_1.save()
 
+        study_2_pk = GeneralStudyModuleAttr.objects.order_by('pk')[1].pk
+
         with LogCapture() as log:
             dx(os.path.join(root_tests, dx_ge_xr220_2))
 
@@ -481,7 +484,8 @@ class ImportDuplicateDX(TestCase):
                           ('remapp.extractors.dx',
                            'DEBUG',
                            u'Duplicate DX study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 - '
-                           u'first instance (pk=2) with modality type assigned (DX) selected to import new event into.')
+                           u'first instance (pk={0}) with modality type assigned (DX) selected to import new event '
+                           u'into.'.format(study_2_pk))
                           )
 
         number_of_events_study_1 = GeneralStudyModuleAttr.objects.order_by('pk').first(
