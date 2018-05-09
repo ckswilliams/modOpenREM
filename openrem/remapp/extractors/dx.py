@@ -651,6 +651,7 @@ def _create_event(dataset):
     event_uid = get_value_kw('SOPInstanceUID', dataset)
     inst_in_db = check_uid.check_uid(event_uid, 'Event')
     if inst_in_db:
+        logger.debug(u"DX instance UID {0} of study UID {1} already imported, stopping.".format(event_uid, study_uid))
         return 0
     this_study = None
     same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid).order_by('pk')
@@ -669,6 +670,7 @@ def _create_event(dataset):
             this_study.modality_type = u'DX'
             this_study.save()
     elif same_study_uid.count() == 1:
+        logger.debug(u"Importing event {0} into study {1}".format(event_uid, study_uid))
         this_study = same_study_uid[0]
     else:
         logger.error(u"Attempting to add DX event {0} to study UID {0}, but it isn't there anymore. Stopping.".format(

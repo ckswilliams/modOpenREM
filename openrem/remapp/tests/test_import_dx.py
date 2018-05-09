@@ -2,13 +2,16 @@
 # test_get_values.py
 
 from __future__ import unicode_literals
-import os, datetime
+import os
+from collections import Counter
+import datetime
 from decimal import Decimal
 from django.contrib.auth.models import User, Group
 from django.test import TestCase
 from dicom.dataset import Dataset
 from dicom.dataelem import DataElement
 from dicom.multival import MultiValue
+from testfixtures import LogCapture
 from remapp.extractors.dx import _xray_filters_prep
 from remapp.models import GeneralStudyModuleAttr, ProjectionXRayRadiationDose, IrradEventXRayData, \
     IrradEventXRaySourceData
@@ -97,17 +100,25 @@ class ImportCarestreamDR7500(TestCase):
         dx_carestream_dr7500_2 = os.path.join("test_files", "DX-Im-Carestream_DR7500-2.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
-        dx(os.path.join(root_tests, dx_ge_xr220_1))
-        dx(os.path.join(root_tests, dx_ge_xr220_2))
-        dx(os.path.join(root_tests, dx_ge_xr220_3))
-        dx(os.path.join(root_tests, dx_carestream_dr7500_1))
-        dx(os.path.join(root_tests, dx_carestream_dr7500_2))
+        with LogCapture() as self.log:
+            dx(os.path.join(root_tests, dx_ge_xr220_1))
+            dx(os.path.join(root_tests, dx_ge_xr220_2))
+            dx(os.path.join(root_tests, dx_ge_xr220_3))
+            dx(os.path.join(root_tests, dx_carestream_dr7500_1))
+            dx(os.path.join(root_tests, dx_carestream_dr7500_2))
+            dx(os.path.join(root_tests, dx_ge_xr220_2))
 
     def test_dr7500_and_xr220(self):
+
         studies = GeneralStudyModuleAttr.objects.order_by('id')
 
-        # Test that five studies have been imported
+        # Test that two studies have been imported
         self.assertEqual(studies.count(), 2)
+
+        # Test that the second attempt to import dx_ge_xr220_2 results in debug message
+        self.log.check_present(('remapp.extractors.dx', 'DEBUG',
+                       u'DX instance UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.26.0 of study UID '
+                       u'1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 already imported, stopping.'))
 
         # Test that study level data is recorded correctly
         self.assertEqual(studies[0].study_date, datetime.date(2014, 9, 30))
@@ -130,7 +141,16 @@ class ImportCarestreamDR7500(TestCase):
         self.assertEqual(studies[1].generalequipmentmoduleattr_set.get().software_versions, '4.0.3.B8.P6')
         self.assertEqual(studies[1].generalequipmentmoduleattr_set.get().device_serial_number, '00012345abc')
 
-
+        # Test the SOP instance UIDs have been recorded correctly
+        sop_instance_uid_list0 = Counter(studies[0].objectuidsprocessed_set.values_list('sop_instance_uid', flat=True))
+        sop_instance_uid_list1 = Counter(studies[1].objectuidsprocessed_set.values_list('sop_instance_uid', flat=True))
+        uid_list0 = Counter([u'1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.20.0',
+                             u'1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.26.0',
+                             u'1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.28.0'])
+        uid_list1 = Counter([u'1.2.276.0.7230010.3.1.4.8323329.11838.1483692281.541544',
+                             u'1.2.276.0.7230010.3.1.4.8323329.11853.1483692311.916929'])
+        self.assertEqual(sop_instance_uid_list0, uid_list0)
+        self.assertEqual(sop_instance_uid_list1, uid_list1)
 
         # Test that patient level data is recorded correctly
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_name, 'XR220^Samantha')
@@ -141,7 +161,7 @@ class ImportCarestreamDR7500(TestCase):
         self.assertEqual(studies[1].patientmoduleattr_set.get().patient_birth_date, datetime.date(2014, 6, 20))
         self.assertAlmostEqual(studies[0].patientstudymoduleattr_set.get().patient_age_decimal, Decimal(56.9))
 
-        #Test that irradiation event data is stored correctl
+        # Test that irradiation event data is stored correctl
         self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0].
             acquisition_protocol, 'ABD_1_VIEW')
         self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[1].
@@ -164,7 +184,7 @@ class ImportCarestreamDR7500(TestCase):
         self.assertAlmostEqual(studies[1].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[1].
             dose_area_product, Decimal(10.157 / 100000))
 
-        #Check that dose related distance measurement data is stored correctly
+        # Check that dose related distance measurement data is stored correctly
         self.assertAlmostEqual(studies[1].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0].
             irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().
                 distance_source_to_detector, Decimal(11.5 * 100))
@@ -172,8 +192,7 @@ class ImportCarestreamDR7500(TestCase):
             irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().
                 distance_source_to_detector, Decimal(11.5 * 100))
 
-
-        #Test that irradiation event source data is stored correctly
+        # Test that irradiation event source data is stored correctly
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0].
             irradeventxraysourcedata_set.get().exposure_time, Decimal(6))
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[1].
@@ -198,16 +217,12 @@ class ImportCarestreamDR7500(TestCase):
         self.assertAlmostEqual(studies[1].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[1].
             irradeventxraysourcedata_set.get().focal_spot_size, Decimal(1.2))
 
-
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0].
             irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(189))
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[1].
             irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(192))
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[2].
             irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(190))
-
-
-
 
         self.assertAlmostEqual(studies[1].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0].
             irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(500))
