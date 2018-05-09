@@ -373,3 +373,156 @@ class ImportCarestreamDRXRevolution(TestCase):
         study = GeneralStudyModuleAttr.objects.order_by('id')[0]
 
         self.assertEqual(study.requested_procedure_code_meaning, u'XR CHEST')
+
+
+class ImportDuplicateDX(TestCase):
+
+    def setUp(self):
+        """
+
+        """
+        from remapp.models import PatientIDSettings
+
+        pid = PatientIDSettings.objects.create()
+        pid.name_stored = True
+        pid.name_hashed = False
+        pid.id_stored = True
+        pid.id_hashed = False
+        pid.dob_stored = True
+        pid.save()
+
+        from remapp.extractors import dx
+
+        dx_ge_xr220_1 = os.path.join("test_files", "DX-Im-GE_XR220-1.dcm")
+        dx_ge_xr220_2 = os.path.join("test_files", "DX-Im-GE_XR220-2.dcm")
+        dx_ge_xr220_3 = os.path.join("test_files", "DX-Im-GE_XR220-3.dcm")
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+
+        dx(os.path.join(root_tests, dx_ge_xr220_1))
+        study_one = GeneralStudyModuleAttr.objects.order_by('pk')[0]
+        original_study_uid = study_one.study_instance_uid
+        original_sop_instance_uid = study_one.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradiation_event_uid
+        study_one.study_instance_uid = u'1.2.3.4.5.6.7.8'
+        study_one.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradiation_event_uid = u'2.3.4.5.6.7.8.9'
+        study_one.save()
+
+        # Check there is one study in the database
+        self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 1)
+
+        # Import the image again...
+        dx(os.path.join(root_tests, dx_ge_xr220_1))
+
+        # Check there are two studies now
+        self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 2)
+
+        study_one.study_instance_uid = original_study_uid
+        study_one.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+        ).irradiation_event_uid = original_sop_instance_uid
+        study_one.save()
+
+        # Now we are ready to test import with duplicate study UIDs.
+
+    def test_duplicate_study_dx(self):
+        """Imports second image, original two both have modality set.
+
+        """
+        from remapp.extractors import dx
+
+        dx_ge_xr220_2 = os.path.join("test_files", "DX-Im-GE_XR220-2.dcm")
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+
+        self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 2)
+
+        with LogCapture() as log:
+            dx(os.path.join(root_tests, dx_ge_xr220_2))
+
+        log.check_present(('remapp.extractors.dx',
+                           'WARNING',
+                           u'Duplicate DX study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 in '
+                           u'database - could be a problem! There are 2 copies.'),
+                          ('remapp.extractors.dx',
+                           'DEBUG',
+                           u'Duplicate DX study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 - '
+                           u'first instance (pk=1) with modality type assigned (DX) selected to import new event into.')
+                          )
+
+        number_of_events_study_1 = GeneralStudyModuleAttr.objects.order_by('pk').first(
+            ).projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
+        self.assertEqual(number_of_events_study_1, 2)
+        number_of_events_study_2 = GeneralStudyModuleAttr.objects.order_by('pk')[
+            1].projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
+        self.assertEqual(number_of_events_study_2, 1)
+
+    def test_duplicate_study_dx_second_mod(self):
+        """Imports second image, later existing has modality set.
+
+        """
+        from remapp.extractors import dx
+
+        dx_ge_xr220_2 = os.path.join("test_files", "DX-Im-GE_XR220-2.dcm")
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+
+        self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 2)
+
+        # Set first study modality to None
+        study_1 = GeneralStudyModuleAttr.objects.order_by('pk').first()
+        study_1.modality_type = None
+        study_1.save()
+
+        with LogCapture() as log:
+            dx(os.path.join(root_tests, dx_ge_xr220_2))
+
+        log.check_present(('remapp.extractors.dx',
+                           'WARNING',
+                           u'Duplicate DX study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 in '
+                           u'database - could be a problem! There are 2 copies.'),
+                          ('remapp.extractors.dx',
+                           'DEBUG',
+                           u'Duplicate DX study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 - '
+                           u'first instance (pk=2) with modality type assigned (DX) selected to import new event into.')
+                          )
+
+        number_of_events_study_1 = GeneralStudyModuleAttr.objects.order_by('pk').first(
+            ).projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
+        self.assertEqual(number_of_events_study_1, 1)
+        number_of_events_study_2 = GeneralStudyModuleAttr.objects.order_by('pk')[
+            1].projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
+        self.assertEqual(number_of_events_study_2, 2)
+
+    def test_duplicate_study_dx_no_mod(self):
+        """Imports second image, original two don't have modality set.
+
+        """
+        from remapp.extractors import dx
+
+        dx_ge_xr220_2 = os.path.join("test_files", "DX-Im-GE_XR220-2.dcm")
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+
+        self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 2)
+
+        # Set modality type to None
+        for study in GeneralStudyModuleAttr.objects.order_by('pk'):
+            study.modality_type = None
+            study.save()
+
+        with LogCapture() as log:
+            dx(os.path.join(root_tests, dx_ge_xr220_2))
+
+        log.check_present(('remapp.extractors.dx',
+                           'WARNING',
+                           u'Duplicate DX study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 in '
+                           u'database - could be a problem! There are 2 copies.'),
+                          ('remapp.extractors.dx',
+                           'WARNING',
+                           u'Duplicate DX study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0, '
+                           u'none of which have modality_type assigned! Setting first instance to DX')
+                          )
+
+        number_of_events_study_1 = GeneralStudyModuleAttr.objects.order_by('pk').first(
+            ).projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
+        self.assertEqual(number_of_events_study_1, 2)
+        number_of_events_study_2 = GeneralStudyModuleAttr.objects.order_by('pk')[
+            1].projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
+        self.assertEqual(number_of_events_study_2, 1)

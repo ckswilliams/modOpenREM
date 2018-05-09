@@ -656,15 +656,18 @@ def _create_event(dataset):
     this_study = None
     same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid).order_by('pk')
     if same_study_uid.count() > 1:
-        logger.warning(u"Duplicate study UIDs in database! Could be a problem.")
+        logger.warning(u"Duplicate DX study UID {0} in database - could be a problem! There are {1} copies.".format(
+            study_uid, same_study_uid.count()))
         # Studies are ordered by study level pk. FInd the first one that has a modality type, and replace our
         # filter_set with the study we have found.
         for study in same_study_uid.order_by('pk'):
             if study.modality_type:
                 this_study = study
-                continue
+                logger.debug(u"Duplicate DX study UID {0} - first instance (pk={1}) with modality type assigned ({2}) "
+                             u"selected to import new event into.".format(study_uid, study.pk, study.modality_type))
+                break
         if not this_study:
-            logger.warning(u"Duplicate study UID {0}, none of which have modality_type assigned!"
+            logger.warning(u"Duplicate DX study UID {0}, none of which have modality_type assigned!"
                            u" Setting first instance to DX".format(study_uid))
             this_study = same_study_uid[0]
             this_study.modality_type = u'DX'
@@ -712,7 +715,8 @@ def _create_event(dataset):
 
 
 def _dx2db(dataset):
-    import os, sys
+    import os
+    import sys
     import openrem_settings
     from time import sleep
     from random import random
@@ -729,7 +733,7 @@ def _dx2db(dataset):
         sys.exit('No UID returned')
     study_in_db = check_uid.check_uid(study_uid)
 
-    if study_in_db == 1:
+    if study_in_db:
         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
         _create_event(dataset)
 
@@ -784,7 +788,6 @@ def _dx2db(dataset):
                     sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
                     _create_event(dataset)
 
-
 def _fix_kodak_filters(dataset):
     """
     Replace floats with commas in with multivalue floats: as found in older Carestream/Kodak units such as the DR7500
@@ -832,6 +835,7 @@ def dx(dig_file):
     except ObjectDoesNotExist:
         del_dx_im = False
 
+    logger.debug(u"About to read DX")
     dataset = dicom.read_file(dig_file)
     try:
         dataset.decode()
@@ -843,6 +847,7 @@ def dx(dig_file):
     if not isdx:
         return u'{0} is not a DICOM DX radiographic image'.format(dig_file)
 
+    logger.debug(u"About to launch _dx2db")
     _dx2db(dataset)
 
     if del_dx_im:
