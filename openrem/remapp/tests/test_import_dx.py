@@ -11,6 +11,7 @@ from django.test import TestCase
 from dicom.dataset import Dataset
 from dicom.dataelem import DataElement
 from dicom.multival import MultiValue
+import logging
 from testfixtures import LogCapture
 from remapp.extractors.dx import _xray_filters_prep
 from remapp.models import GeneralStudyModuleAttr, ProjectionXRayRadiationDose, IrradEventXRayData, \
@@ -100,7 +101,7 @@ class ImportCarestreamDR7500(TestCase):
         dx_carestream_dr7500_2 = os.path.join("test_files", "DX-Im-Carestream_DR7500-2.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
-        with LogCapture() as self.log:
+        with LogCapture(level=logging.DEBUG) as self.log:
             dx(os.path.join(root_tests, dx_ge_xr220_1))
             dx(os.path.join(root_tests, dx_ge_xr220_2))
             dx(os.path.join(root_tests, dx_ge_xr220_3))
@@ -435,10 +436,8 @@ class ImportDuplicateDX(TestCase):
 
         study_1_pk = GeneralStudyModuleAttr.objects.order_by('pk').first().pk
 
-        with LogCapture() as log:
+        with LogCapture(level=logging.DEBUG) as log:
             dx(os.path.join(root_tests, dx_ge_xr220_2))
-
-        log.check(('remapp.extractors.dx', 'DEBUG', 'asdf'))
 
         log.check_present(('remapp.extractors.dx',
                            'WARNING',
@@ -476,7 +475,7 @@ class ImportDuplicateDX(TestCase):
 
         study_2_pk = GeneralStudyModuleAttr.objects.order_by('pk')[1].pk
 
-        with LogCapture() as log:
+        with LogCapture(level=logging.DEBUG) as log:
             dx(os.path.join(root_tests, dx_ge_xr220_2))
 
         log.check_present(('remapp.extractors.dx',
@@ -513,7 +512,7 @@ class ImportDuplicateDX(TestCase):
             study.modality_type = None
             study.save()
 
-        with LogCapture() as log:
+        with LogCapture(level=logging.DEBUG) as log:
             dx(os.path.join(root_tests, dx_ge_xr220_2))
 
         log.check_present(('remapp.extractors.dx',

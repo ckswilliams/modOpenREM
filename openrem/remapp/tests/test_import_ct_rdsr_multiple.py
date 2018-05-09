@@ -4,6 +4,7 @@
 import os
 from collections import Counter
 from django.test import TestCase
+import logging
 from testfixtures import LogCapture
 from remapp.extractors import rdsr
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
@@ -20,7 +21,7 @@ class ImportMultipleRDSRs(TestCase):  # pylint: disable=unused-variable
         :return: None
         """
         PatientIDSettings.objects.create()
-        with LogCapture() as log:
+        with LogCapture(level=logging.DEBUG) as log:
 
             dicom_file_1 = "test_files/CT-RDSR-Siemens-Multi-1.dcm"
             dicom_file_2 = "test_files/CT-RDSR-Siemens-Multi-2.dcm"
@@ -94,7 +95,7 @@ class ImportContinuedRDSRs(TestCase):
         """
         PatientIDSettings.objects.create()
 
-        with LogCapture() as log:
+        with LogCapture(level=logging.DEBUG) as log:
             dicom_file_1 = "test_files/CT-RDSR-Siemens-Continued-1.dcm"
             dicom_file_2 = "test_files/CT-RDSR-Siemens-Continued-2.dcm"
             root_tests = os.path.dirname(os.path.abspath(__file__))
