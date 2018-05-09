@@ -438,6 +438,8 @@ class ImportDuplicateDX(TestCase):
         with LogCapture() as log:
             dx(os.path.join(root_tests, dx_ge_xr220_2))
 
+        log.check(('remapp.extractors.dx', 'DEBUG', 'asdf'))
+
         log.check_present(('remapp.extractors.dx',
                            'WARNING',
                            u'Duplicate DX study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 in '
