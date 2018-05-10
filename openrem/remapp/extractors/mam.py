@@ -574,7 +574,7 @@ def mam(mg_file):
         if del_no_match:
             logger.debug("%s id not a mammo file, deleting", mg_file)
             os.remove(mg_file)
-        return (1)
+        return 1
 
     _mammo2db(dataset)
 

@@ -724,6 +724,7 @@ def _dx2db(dataset):
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
 
     openrem_settings.add_project_to_path()
+    from remapp.extractors.extract_common import image_import_create_event
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
@@ -732,10 +733,14 @@ def _dx2db(dataset):
     if not study_uid:
         sys.exit('No UID returned')
     study_in_db = check_uid.check_uid(study_uid)
+    ch = get_value_kw('SpecificCharacterSet', dataset)
 
     if study_in_db:
         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-        _create_event(dataset)
+        # _create_event(dataset)
+        this_study = image_import_create_event(dataset, modality='DX')
+        if this_study:
+            _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
 
     if not study_in_db:
         # study doesn't exist, start from scratch
@@ -767,7 +772,9 @@ def _dx2db(dataset):
                     study_in_db = check_uid.check_uid(study_uid)
                     if study_in_db == 1:
                         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                        _create_event(dataset)
+                        this_study = image_import_create_event(dataset, modality='DX')
+                        if this_study:
+                            _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
                     while not study_in_db:
                         g = GeneralStudyModuleAttr.objects.create()
                         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
@@ -783,10 +790,16 @@ def _dx2db(dataset):
                             study_in_db = check_uid.check_uid(study_uid)
                             if study_in_db == 1:
                                 sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                                _create_event(dataset)
+                                this_study = image_import_create_event(dataset, modality='DX')
+                                if this_study:
+                                    _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(),
+                                                              ch)
                 elif study_in_db == 1:
                     sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                    _create_event(dataset)
+                    this_study = image_import_create_event(dataset, modality='DX')
+                    if this_study:
+                        _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
+
 
 def _fix_kodak_filters(dataset):
     """
