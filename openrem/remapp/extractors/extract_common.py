@@ -49,9 +49,12 @@ def image_import_create_event(dataset, modality='DX'):
 
     study_uid = get_value_kw('StudyInstanceUID', dataset)
     event_uid = get_value_kw('SOPInstanceUID', dataset)
+    logger.debug(u"In image_import_create_event for {0}. Study UID {1}, event UID {2}".format(
+        modality, study_uid, event_uid))
     inst_in_db = check_uid.check_uid(event_uid, 'Event')
     if inst_in_db:
-        logger.debug(u"DX instance UID {0} of study UID {1} already imported, stopping.".format(event_uid, study_uid))
+        logger.debug(u"{2} instance UID {0} of study UID {1} already imported, stopping.".format(
+            event_uid, study_uid, modality))
         return 0
     this_study = None
     same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid).order_by('pk')
@@ -63,53 +66,52 @@ def image_import_create_event(dataset, modality='DX'):
         for study in same_study_uid.order_by('pk'):
             if study.modality_type:
                 this_study = study
-                logger.debug(u"Duplicate DX study UID {0} - first instance (pk={1}) with modality type assigned ({2}) "
-                             u"selected to import new event into.".format(study_uid, study.pk, study.modality_type))
+                logger.debug(u"Duplicate {3} study UID {0} - first instance (pk={1}) with modality type assigned ({2}) "
+                             u"selected to import new event into.".format(
+                                study_uid, study.pk, study.modality_type, modality))
                 break
         if not this_study:
-            logger.warning(u"Duplicate DX study UID {0}, none of which have modality_type assigned!"
-                           u" Setting first instance to DX".format(study_uid))
+            logger.warning(u"Duplicate {1} study UID {0}, none of which have modality_type assigned!"
+                           u" Setting first instance to DX".format(study_uid, modality))
             this_study = same_study_uid[0]
-            this_study.modality_type = u'DX'
+            this_study.modality_type = modality
             this_study.save()
     elif same_study_uid.count() == 1:
         logger.debug(u"Importing event {0} into study {1}".format(event_uid, study_uid))
         this_study = same_study_uid[0]
     else:
-        logger.error(u"Attempting to add DX event {0} to study UID {0}, but it isn't there anymore. Stopping.".format(
-            event_uid, study_uid))
+        logger.error(u"Attempting to add {0} event {1} to study UID {2}, but it isn't there anymore. Stopping.".format(
+            modality, event_uid, study_uid))
         return 0
     existing_sop_instance_uids = set()
     for previous_object in this_study.objectuidsprocessed_set.all():
         existing_sop_instance_uids.add(previous_object.sop_instance_uid)
     if event_uid in existing_sop_instance_uids:
         # We might get here if object has previously been rejected for being a for processing/presentation duplicate
-        logger.debug(u"DX instance UID {0} of study UID {1} previously processed, stopping.".format(
-            event_uid, study_uid))
+        logger.debug(u"{2} instance UID {0} of study UID {1} previously processed, stopping.".format(
+            event_uid, study_uid, modality))
         return 0
     # New event - record the SOP instance UID
     check_uid.record_sop_instance_uid(this_study, event_uid)
     # further check required to ensure 'for processing' and 'for presentation'
     # versions of the same irradiation event don't get imported twice
-    event_time = get_value_kw('AcquisitionTime', dataset)
-    if not event_time:
-        event_time = get_value_kw('ContentTime', dataset)
-    event_date = get_value_kw('AcquisitionDate', dataset)
-    if not event_date:
-        event_date = get_value_kw('ContentDate', dataset)
-    event_date_time = make_date_time('{0}{1}'.format(event_date, event_time))
-    try:
-        for events in this_study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-            if event_date_time == events.date_time_started:
-                logger.debug(u"A previous object with this study UID ({0}) and time ([1}) has been imported."
-                             u" Stopping".format(study_uid, event_date_time.isoformat()))
-                return 0
-    except Exception as e:
-        logger.warning(u"DX study UID %s, event UID %s failed at check for identical event. Error %s",
-                       study_uid, event_uid, e)
+    # Also check it isn't a Hologic SC tomo file
+    if modality == u'DX' or (modality == u'MG' and dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7'):
+        event_time = get_value_kw('AcquisitionTime', dataset)
+        if not event_time:
+            event_time = get_value_kw('ContentTime', dataset)
+        event_date = get_value_kw('AcquisitionDate', dataset)
+        if not event_date:
+            event_date = get_value_kw('ContentDate', dataset)
+        event_date_time = make_date_time('{0}{1}'.format(event_date, event_time))
+        try:
+            for events in this_study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+                if event_date_time == events.date_time_started:
+                    logger.debug(u"A previous {2} object with this study UID ({0}) and time ([1}) has been imported."
+                                 u" Stopping".format(study_uid, event_date_time.isoformat(), modality))
+                    return 0
+        except Exception as e:
+            logger.warning(u"{0} study UID {1}, event UID {2} failed at check for identical event. Error {3}",
+                           modality, study_uid, event_uid, e)
     # study exists, but event doesn't
     return this_study
-    # ch = get_value_kw('SpecificCharacterSet', dataset)
-    # _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
-    # # update the accumulated tables
-    # return 0
