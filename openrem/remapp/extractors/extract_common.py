@@ -30,12 +30,12 @@
 import logging
 
 
-def image_import_create_event(dataset, modality='DX'):
+def get_study_check_dup(dataset, modality='DX'):
     """
     If study exists, create new event
     :param dataset: DICOM object
     :param modality: Modality of image object being imported; 'MG' or 'DX'
-    :return: Nothing
+    :return: Study object to proceed with
     """
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
@@ -49,7 +49,7 @@ def image_import_create_event(dataset, modality='DX'):
 
     study_uid = get_value_kw('StudyInstanceUID', dataset)
     event_uid = get_value_kw('SOPInstanceUID', dataset)
-    logger.debug(u"In image_import_create_event for {0}. Study UID {1}, event UID {2}".format(
+    logger.debug(u"In get_study_check_dup for {0}. Study UID {1}, event UID {2}".format(
         modality, study_uid, event_uid))
     inst_in_db = check_uid.check_uid(event_uid, 'Event')
     if inst_in_db:
