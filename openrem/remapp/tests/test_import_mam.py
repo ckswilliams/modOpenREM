@@ -5,6 +5,8 @@ import os
 import datetime
 from decimal import Decimal
 from django.test import TestCase
+import logging
+from testfixtures import LogCapture
 from remapp.extractors import mam
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
 
@@ -162,3 +164,27 @@ class ImportMGImg(TestCase):
         self.assertEqual(study.patientmoduleattr_set.get().patient_id,
                          '1635c8525afbae58c37bede3c9440844e9143727cc7c160bed665ec378d8a262')
         self.assertEqual(study.accession_number, '8f541d3a1bdab5e197e3acb3b51419b162809c926ee7f45044aca9aef9d6e22d')
+
+
+class ImportDuplicatesMG(TestCase):
+
+    def setUp(self):
+
+        from remapp.models import PatientIDSettings
+
+        pid = PatientIDSettings.objects.create()
+        pid.name_stored = True
+        pid.name_hashed = False
+        pid.id_stored = True
+        pid.id_hashed = False
+        pid.dob_stored = True
+        pid.save()
+
+        from remapp.extractors import mam
+
+        mg_im1_for_proc = os.path.join("test_files", "MG-Im-GE_Seno_1_ForProcessing.dcm")
+        mg_im1_for_pres = os.path.join("test_files", "MG-Im-GE_Seno_1_ForPresentation.dcm")
+        mg_im2_for_pres = os.path.join("test_files", "MG-Im-GE_Seno_2_ForPresentation.dcm")
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+
+        mam(os.path.join(root_tests, mg_im1_for_pres))
