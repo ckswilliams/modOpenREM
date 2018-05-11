@@ -167,8 +167,15 @@ class ImportMGImg(TestCase):
 
 
 class ImportDuplicatesMG(TestCase):
+    """Test the following:
 
-    def setUp(self):
+    * Import of second image of same study, different time
+    * Rejection of third image of same study, same time
+    * Rejection of third image, this time because SOPInstanceUID is recognised
+
+    """
+
+    def test_duplicate_event(self):
 
         from remapp.models import PatientIDSettings
 
@@ -187,4 +194,27 @@ class ImportDuplicatesMG(TestCase):
         mg_im2_for_pres = os.path.join("test_files", "MG-Im-GE_Seno_2_ForPresentation.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
-        mam(os.path.join(root_tests, mg_im1_for_pres))
+        with LogCapture(level=logging.DEBUG) as log:
+            mam(os.path.join(root_tests, mg_im1_for_pres))
+
+            # Check study has been imported, with one event
+            self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 1)
+            number_events = GeneralStudyModuleAttr.objects.order_by('pk')[0].projectionxrayradiationdose_set.get(
+                ).irradeventxraydata_set.all().count()
+            self.assertEqual(number_events, 1)
+
+            # Import second object, same time etc
+            mam(os.path.join(root_tests, mg_im1_for_proc))
+
+            # Check still one study, one event
+            self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 1)
+            number_events = GeneralStudyModuleAttr.objects.order_by('pk')[0].projectionxrayradiationdose_set.get(
+                ).irradeventxraydata_set.all().count()
+            self.assertEqual(number_events, 1)
+
+            # Check log message
+            log.check_present(('remapp.extractors.mam', 'DEBUG',
+                               u'A previous MG object with this study UID (1.3.6.1.4.1.5962.99.1.1270844358.1571783457'
+                               u'.1525984267206.3.0) and time (2013-04-12T13:22:23) has been imported. Stopping'),)
+
+

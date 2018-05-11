@@ -104,14 +104,10 @@ def get_study_check_dup(dataset, modality='DX'):
         if not event_date:
             event_date = get_value_kw('ContentDate', dataset)
         event_date_time = make_date_time('{0}{1}'.format(event_date, event_time))
-        try:
-            for events in this_study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-                if event_date_time == events.date_time_started:
-                    logger.debug(u"A previous {2} object with this study UID ({0}) and time ([1}) has been imported."
-                                 u" Stopping".format(study_uid, event_date_time.isoformat(), modality))
-                    return 0
-        except Exception as e:
-            logger.warning(u"{0} study UID {1}, event UID {2} failed at check for identical event. Error {3}",
-                           modality, study_uid, event_uid, e)
+        for events in this_study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+            if event_date_time == events.date_time_started:
+                logger.debug(u"A previous {2} object with this study UID ({0}) and time ({1}) has been imported."
+                             u" Stopping".format(study_uid, event_date_time.isoformat(), modality))
+                return 0
     # study exists, but event doesn't
     return this_study
