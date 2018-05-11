@@ -34,7 +34,7 @@ import sys
 import django
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('remapp.extractors.mam')
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -461,6 +461,7 @@ def _mammo2db(dataset):
         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
         g.save()
         event_uid = get_value_kw('SOPInstanceUID', dataset)
+        check_uid.record_sop_instance_uid(g, event_uid)
         logger.debug(u"Created new mammo study %s, event %s", study_uid, event_uid)
         # check again
         study_in_db = check_uid.check_uid(study_uid)
@@ -491,6 +492,7 @@ def _mammo2db(dataset):
                         g = GeneralStudyModuleAttr.objects.create()
                         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
                         g.save()
+                        check_uid.record_sop_instance_uid(g, event_uid)
                         # check again
                         study_in_db = check_uid.check_uid(study_uid)
                         if study_in_db == 1:

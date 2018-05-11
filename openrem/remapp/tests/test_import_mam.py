@@ -194,15 +194,15 @@ class ImportDuplicatesMG(TestCase):
         mg_im2_for_pres = os.path.join("test_files", "MG-Im-GE_Seno_2_ForPresentation.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
-        with LogCapture(level=logging.DEBUG) as log:
-            mam(os.path.join(root_tests, mg_im1_for_pres))
+        mam(os.path.join(root_tests, mg_im1_for_pres))
 
-            # Check study has been imported, with one event
-            self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 1)
-            number_events = GeneralStudyModuleAttr.objects.order_by('pk')[0].projectionxrayradiationdose_set.get(
-                ).irradeventxraydata_set.all().count()
-            self.assertEqual(number_events, 1)
+        # Check study has been imported, with one event
+        self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 1)
+        number_events = GeneralStudyModuleAttr.objects.order_by('pk')[0].projectionxrayradiationdose_set.get(
+            ).irradeventxraydata_set.all().count()
+        self.assertEqual(number_events, 1)
 
+        with LogCapture(level=logging.DEBUG) as log1:
             # Import second object, same time etc
             mam(os.path.join(root_tests, mg_im1_for_proc))
 
@@ -213,8 +213,33 @@ class ImportDuplicatesMG(TestCase):
             self.assertEqual(number_events, 1)
 
             # Check log message
-            log.check_present(('remapp.extractors.mam', 'DEBUG',
+            log1.check_present(('remapp.extractors.mam', 'DEBUG',
                                u'A previous MG object with this study UID (1.3.6.1.4.1.5962.99.1.1270844358.1571783457'
                                u'.1525984267206.3.0) and time (2013-04-12T13:22:23) has been imported. Stopping'),)
 
+        # Import third object, different event
+        mam(os.path.join(root_tests, mg_im2_for_pres))
 
+        # Check one study, two events
+        self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 1)
+        number_events = GeneralStudyModuleAttr.objects.order_by('pk')[0].projectionxrayradiationdose_set.get(
+        ).irradeventxraydata_set.all().count()
+        self.assertEqual(number_events, 2)
+
+        with LogCapture(level=logging.DEBUG) as log2:
+            # Import second object again - should be stopped on event UID this time
+            mam(os.path.join(root_tests, mg_im1_for_proc))
+
+            # Check one study, two events
+            self.assertEqual(GeneralStudyModuleAttr.objects.all().count(), 1)
+            number_events = GeneralStudyModuleAttr.objects.order_by('pk')[0].projectionxrayradiationdose_set.get(
+            ).irradeventxraydata_set.all().count()
+            self.assertEqual(number_events, 2)
+
+            # Check log message
+            log2.check_present(
+                ('remapp.extractors.mam',
+                 'DEBUG',
+                 u'MG instance UID 1.3.6.1.4.1.5962.99.1.1270844358.1571783457.1525984267206.2.0 of study UID '
+                 u'1.3.6.1.4.1.5962.99.1.1270844358.1571783457.1525984267206.3.0 previously processed, stopping.'),
+            )
