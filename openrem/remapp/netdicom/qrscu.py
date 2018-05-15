@@ -59,27 +59,35 @@ def _remove_duplicates(query, study_rsp, assoc, query_id):
     logger.info(
         u'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
     for study in study_rsp:
-        existing_study = GeneralStudyModuleAttr.objects.filter(study_instance_uid=study.study_instance_uid)
-        if existing_study.exists():
-            existing_series_instance_uid = existing_study[0].series_instance_uid
-            existing_series_time = existing_study[0].series_time
-            for series_rsp in study.dicomqrrspseries_set.all():
-                if series_rsp.modality == 'SR':
-                    if series_rsp.series_instance_uid == existing_series_instance_uid:
+        existing_studies = GeneralStudyModuleAttr.objects.filter(study_instance_uid=study.study_instance_uid)
+        if existing_studies.exists():
+            for existing_study in existing_studies:
+                existing_sop_instance_uids = set()
+                for previous_object in existing_study.objectuidsprocessed_set.all():
+                    existing_sop_instance_uids.add(previous_object.sop_instance_uid)
+                for series_rsp in study.dicomqrrspseries_set.all():
+                    if series_rsp.modality == 'SR':
+                        for image_rsp in series_rsp.dicomqrrspimage_set.all():
+                            if image_rsp.sop_instance_uid in existing_sop_instance_uids:
+                                image_rsp.delete()
+                                series_rsp.image_level_move = True  # If we have deleted images we need to set this flag
+                                series_rsp.save()
+                        if not series_rsp.dicomqrrspimage_set.order_by('pk'):
+                            series_rsp.delete()
+                    elif series_rsp.modality in ['MG', 'DX', 'CR']:
+                        _query_images(assoc, series_rsp, query_id)
+                        for image_rsp in series_rsp.dicomqrrspimage_set.all():
+                            if image_rsp.sop_instance_uid in existing_sop_instance_uids:
+                                image_rsp.delete()
+                                series_rsp.image_level_move = True  # If we have deleted images we need to set this flag
+                                series_rsp.save()
+                        if not series_rsp.dicomqrrspimage_set.order_by('pk'):
+                            series_rsp.delete()
+                    else:
                         series_rsp.delete()
-                    elif existing_series_time and series_rsp.series_time and (
-                            series_rsp.series_time < existing_series_time
-                    ):
-                        series_rsp.delete()
-                elif series_rsp.modality in ['MG', 'DX', 'CR']:
-                    _query_images(assoc, series_rsp, query_id)
-                    for image_rsp in series_rsp.dicomqrrspimage_set.all():
-                        if existing_study.filter(
-                                projectionxrayradiationdose__irradeventxraydata__irradiation_event_uid=
-                                image_rsp.sop_instance_uid).exists():
-                            image_rsp.delete()
-                            series_rsp.image_level_move = True  # If we have deleted images we need to set this flag
-                            series_rsp.save()
+        if not study.dicomqrrspseries_set.order_by('pk'):
+            study.delete()
+
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info(u'After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
 

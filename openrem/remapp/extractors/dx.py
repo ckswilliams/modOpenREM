@@ -636,54 +636,8 @@ def _test_if_dx(dataset):
     return 1
 
 
-def _create_event(dataset):
-    """
-    If study exists, create new event
-    :param dataset: DICOM object
-    :return: Nothing
-    """
-    from remapp.models import GeneralStudyModuleAttr
-    from remapp.tools import check_uid
-    from remapp.tools.get_values import get_value_kw
-    from remapp.tools.dcmdatetime import make_date_time
-
-    study_uid = get_value_kw('StudyInstanceUID', dataset)
-    event_uid = get_value_kw('SOPInstanceUID', dataset)
-    inst_in_db = check_uid.check_uid(event_uid, 'Event')
-    if inst_in_db:
-        return 0
-    same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
-    if same_study_uid.count() != 1:
-        logger.warning(u"Duplicate study UIDs in database! Could be a problem.")
-        for dup in same_study_uid:
-            if dup.modality_type:
-                same_study_uid = dup
-                continue
-    # further check required to ensure 'for processing' and 'for presentation'
-    # versions of the same irradiation event don't get imported twice
-    event_time = get_value_kw('AcquisitionTime', dataset)
-    if not event_time:
-        event_time = get_value_kw('ContentTime', dataset)
-    event_date = get_value_kw('AcquisitionDate', dataset)
-    if not event_date:
-        event_date = get_value_kw('ContentDate', dataset)
-    event_date_time = make_date_time('{0}{1}'.format(event_date, event_time))
-    try:
-        for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-            if event_date_time == events.date_time_started:
-                return 0
-    except Exception as e:
-        logger.warning(u"DX study UID %s, event UID %s failed at check for identical event. Error %s",
-                       study_uid, event_uid, e)
-    # study exists, but event doesn't
-    ch = get_value_kw('SpecificCharacterSet', dataset)
-    _irradiationeventxraydata(dataset, same_study_uid.get().projectionxrayradiationdose_set.get(), ch)
-    # update the accumulated tables
-    return 0
-
-
 def _dx2db(dataset):
-    import os, sys
+    import sys
     import openrem_settings
     from time import sleep
     from random import random
@@ -691,6 +645,7 @@ def _dx2db(dataset):
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
 
     openrem_settings.add_project_to_path()
+    from remapp.extractors.extract_common import get_study_check_dup
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
@@ -699,10 +654,13 @@ def _dx2db(dataset):
     if not study_uid:
         sys.exit('No UID returned')
     study_in_db = check_uid.check_uid(study_uid)
+    ch = get_value_kw('SpecificCharacterSet', dataset)
 
-    if study_in_db == 1:
+    if study_in_db:
         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-        _create_event(dataset)
+        this_study = get_study_check_dup(dataset, modality='DX')
+        if this_study:
+            _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
 
     if not study_in_db:
         # study doesn't exist, start from scratch
@@ -710,7 +668,9 @@ def _dx2db(dataset):
         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
         g.save()
         logger.debug("Started importing DX with Study Instance UID of {0}".format(g.study_instance_uid))
-        # check again
+        event_uid = get_value_kw('SOPInstanceUID', dataset)
+        check_uid.record_sop_instance_uid(g, event_uid)
+        # check study again
         study_in_db = check_uid.check_uid(study_uid)
         if study_in_db == 1:
             _generalstudymoduleattributes(dataset, g)
@@ -732,11 +692,14 @@ def _dx2db(dataset):
                     study_in_db = check_uid.check_uid(study_uid)
                     if study_in_db == 1:
                         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                        _create_event(dataset)
+                        this_study = get_study_check_dup(dataset, modality='DX')
+                        if this_study:
+                            _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
                     while not study_in_db:
                         g = GeneralStudyModuleAttr.objects.create()
                         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
                         g.save()
+                        check_uid.record_sop_instance_uid(g, event_uid)
                         # check again
                         study_in_db = check_uid.check_uid(study_uid)
                         if study_in_db == 1:
@@ -747,10 +710,15 @@ def _dx2db(dataset):
                             study_in_db = check_uid.check_uid(study_uid)
                             if study_in_db == 1:
                                 sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                                _create_event(dataset)
+                                this_study = get_study_check_dup(dataset, modality='DX')
+                                if this_study:
+                                    _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(),
+                                                              ch)
                 elif study_in_db == 1:
                     sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                    _create_event(dataset)
+                    this_study = get_study_check_dup(dataset, modality='DX')
+                    if this_study:
+                        _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
 
 
 def _fix_kodak_filters(dataset):
@@ -800,6 +768,7 @@ def dx(dig_file):
     except ObjectDoesNotExist:
         del_dx_im = False
 
+    logger.debug(u"About to read DX")
     dataset = dicom.read_file(dig_file)
     try:
         dataset.decode()
@@ -811,6 +780,7 @@ def dx(dig_file):
     if not isdx:
         return u'{0} is not a DICOM DX radiographic image'.format(dig_file)
 
+    logger.debug(u"About to launch _dx2db")
     _dx2db(dataset)
 
     if del_dx_im:

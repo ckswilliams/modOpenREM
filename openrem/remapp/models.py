@@ -485,6 +485,15 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
         return self.study_instance_uid
 
 
+class ObjectUIDsProcessed(models.Model):
+    """Table to hold the SOP Instance UIDs of the objects that have been processed against this study to enable
+    duplicate sorting.
+
+    """
+    general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
+    sop_instance_uid = models.TextField(blank=True, null=True)
+
+
 class ProjectionXRayRadiationDose(models.Model):  # TID 10001
     """Projection X-Ray Radiation Dose template TID 10001
 

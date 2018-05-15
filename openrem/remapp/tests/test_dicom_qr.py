@@ -1,19 +1,21 @@
 # This Python file uses the following encoding: utf-8
 # test_dicom_qr.py
 
+import collections
 import os
-from dicom.dataset import Dataset
+import uuid
+
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+from dicom.dataset import Dataset
 from django.test import TestCase
 from mock import patch
-from netdicom.applicationentity import AE
 from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
-import uuid
+from netdicom.applicationentity import AE
+
 from remapp.extractors import rdsr
-from remapp.netdicom import qrscu
 from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomQRRspImage, DicomRemoteQR, \
     DicomStoreSCP, GeneralStudyModuleAttr, PatientIDSettings
-import collections
+from remapp.netdicom import qrscu
 
 
 def _fake_check_sr_type_in_study_with_rdsr(assoc, study, query_id):
@@ -1193,30 +1195,21 @@ class RemoveDuplicates(TestCase):
     Test the routine to remove any responses that correspond to information already in the database
     """
 
-    def test_rdsr_with_time(self):
-        """
-        Test importing RDSR where
-        * same study, same RDSR exists
-        * same study, newer remote RDSR
-        * same study, older remote RDSR
-        :return:
+    def test_rdsr_new(self):
+        """Inital test that _remove_duplicates doesn't remove new RDSR
+
         """
 
         from remapp.netdicom.qrscu import _remove_duplicates
-        from remapp.tools.dcmdatetime import make_time
 
         PatientIDSettings.objects.create()
 
-        dicom_file_1 = "test_files/CT-RDSR-Siemens-Multi-2.dcm"
-        root_tests = os.path.dirname(os.path.abspath(__file__))
-        dicom_path_1 = os.path.join(root_tests, dicom_file_1)
-        rdsr(dicom_path_1)
+        # Nothing imported into the database
 
         query = DicomQuery.objects.create()
         query.query_id = "CT"
         query.save()
 
-        # Same RDSR - expect series level to be deleted (post count = 0)
         st1 = DicomQRRspStudy.objects.create(dicom_query=query)
         st1.query_id = query.query_id
         st1.study_instance_uid = "1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.3.0"
@@ -1226,34 +1219,16 @@ class RemoveDuplicates(TestCase):
 
         st1_se1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
         st1_se1.query_id = query.query_id
-        st1_se1.series_instance_uid = "1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.7.0"
+        st1_se1.series_instance_uid = "1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.12.0"
         st1_se1.modality = u"SR"
-        st1_se1.series_number = 501
+        st1_se1.series_number = 502
         st1_se1.number_of_series_related_instances = 1
         st1_se1.save()
 
-        study_responses_pre = DicomQRRspStudy.objects.all()
-        self.assertEqual(study_responses_pre.count(), 1)
-        self.assertEqual(study_responses_pre[0].dicomqrrspseries_set.count(), 1)
-
-        study_rsp = query.dicomqrrspstudy_set.all()
-        assoc = None
-        query_id = None
-        _remove_duplicates(query, study_rsp, assoc, query_id)
-
-        study_responses_post = DicomQRRspStudy.objects.all()
-        self.assertEqual(study_responses_post.count(), 1)
-        self.assertEqual(study_responses_post[0].dicomqrrspseries_set.count(), 0)
-
-        # Remote RDSR is newer - expect series level to be kept (post count = 1)
-        st1_se1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
-        st1_se1.query_id = query.query_id
-        st1_se1.series_instance_uid = "1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.10.0"
-        st1_se1.modality = u"SR"
-        st1_se1.series_number = 501
-        st1_se1.series_time = make_time("172840.681000")
-        st1_se1.number_of_series_related_instances = 1
-        st1_se1.save()
+        st1_se1_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st1_se1)
+        st1_se1_im1.query_id = query.query_id
+        st1_se1_im1.sop_instance_uid = u'1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.11.0'
+        st1_se1_im1.save()
 
         study_responses_pre = DicomQRRspStudy.objects.all()
         self.assertEqual(study_responses_pre.count(), 1)
@@ -1268,15 +1243,57 @@ class RemoveDuplicates(TestCase):
         self.assertEqual(study_responses_post.count(), 1)
         self.assertEqual(study_responses_post[0].dicomqrrspseries_set.count(), 1)
 
-        # Remote RDSR is older - expect older series to be deleted, newer one to be kept (post count = 1)
+
+    def test_rdsr_same(self):
+        """Now testing _remove_duplicates will remove an identical RDSR, but retain a new one.
+        """
+
+        from remapp.netdicom.qrscu import _remove_duplicates
+
+        PatientIDSettings.objects.create()
+
+        dicom_file_1 = "test_files/CT-RDSR-Siemens-Multi-1.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path_1 = os.path.join(root_tests, dicom_file_1)
+        rdsr(dicom_path_1)
+
+        query = DicomQuery.objects.create()
+        query.query_id = "CT"
+        query.save()
+
+        # Same RDSR - expect study response to be deleted (post count = 0)
+        st1 = DicomQRRspStudy.objects.create(dicom_query=query)
+        st1.query_id = query.query_id
+        st1.study_instance_uid = "1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.3.0"
+        st1.study_description = u"CT study"
+        st1.set_modalities_in_study(['CT', 'SR'])
+        st1.save()
+
         st1_se1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
         st1_se1.query_id = query.query_id
         st1_se1.series_instance_uid = "1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.12.0"
         st1_se1.modality = u"SR"
         st1_se1.series_number = 501
-        st1_se1.series_time = make_time("172108.929000")
         st1_se1.number_of_series_related_instances = 1
         st1_se1.save()
+
+        st1_se1_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st1_se1)
+        st1_se1_im1.query_id = query.query_id
+        st1_se1_im1.sop_instance_uid = u'1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.11.0'
+        st1_se1_im1.save()
+
+        st1_se2 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
+        st1_se2.query_id = query.query_id
+        st1_se2.series_instance_uid = "1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.7.0"
+        st1_se2.modality = u"SR"
+        st1_se2.series_number = 501
+        st1_se2.number_of_series_related_instances = 1
+        st1_se2.save()
+
+        st1_se2_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st1_se2)
+        st1_se2_im1.query_id = query.query_id
+        st1_se2_im1.sop_instance_uid = u'1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.6.0'
+        st1_se2_im1.save()
 
         study_responses_pre = DicomQRRspStudy.objects.all()
         self.assertEqual(study_responses_pre.count(), 1)
@@ -1290,11 +1307,13 @@ class RemoveDuplicates(TestCase):
         study_responses_post = DicomQRRspStudy.objects.all()
         self.assertEqual(study_responses_post.count(), 1)
         self.assertEqual(study_responses_post[0].dicomqrrspseries_set.count(), 1)
+        self.assertEqual(study_responses_post[0].dicomqrrspseries_set.all()[0].series_instance_uid,
+                         u"1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.7.0")
 
-    def test_rdsr_no_time(self):
+    def test_rdsr_no_objectuids(self):
         """
         Test importing RDSR where
-        * same study, Series UID and time not recorded
+        * same study, ObjectUIDsProcessed not populated
         :return:
         """
 
@@ -1307,15 +1326,13 @@ class RemoveDuplicates(TestCase):
         dicom_path_1 = os.path.join(root_tests, dicom_file_1)
         rdsr(dicom_path_1)
         imported_study = GeneralStudyModuleAttr.objects.order_by('pk')[0]
-        imported_study.series_time = None
-        imported_study.series_instance_uid = None
+        imported_study.objectuidsprocessed_set.all().delete()
         imported_study.save()
 
         query = DicomQuery.objects.create()
         query.query_id = "CT"
         query.save()
 
-        # Same RDSR, can't tell as RDSR imported prior to series time and UID being recorded. Therefore keep remote
         st1 = DicomQRRspStudy.objects.create(dicom_query=query)
         st1.query_id = query.query_id
         st1.study_instance_uid = "1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.3.0"
@@ -1330,6 +1347,11 @@ class RemoveDuplicates(TestCase):
         st1_se1.series_number = 501
         st1_se1.number_of_series_related_instances = 1
         st1_se1.save()
+
+        st1_se1_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st1_se1)
+        st1_se1_im1.query_id = query.query_id
+        st1_se1_im1.sop_instance_uid = u'1.3.6.1.4.1.5962.99.1.792239193.1702185591.1516915727449.6.0'
+        st1_se1_im1.save()
 
         study_responses_pre = DicomQRRspStudy.objects.all()
         self.assertEqual(study_responses_pre.count(), 1)
