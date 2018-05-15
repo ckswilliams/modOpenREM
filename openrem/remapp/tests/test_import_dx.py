@@ -118,8 +118,9 @@ class ImportCarestreamDR7500(TestCase):
 
         # Test that the second attempt to import dx_ge_xr220_2 results in debug message
         self.log.check_present(('remapp.extractors.dx', 'DEBUG',
-                       u'DX instance UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.26.0 of study UID '
-                       u'1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 already imported, stopping.'))
+                                u'DX instance UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.26.0 of '
+                                u'study UID 1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.24.0 '
+                                u'previously processed, stopping.'))
 
         # Test that study level data is recorded correctly
         self.assertEqual(studies[0].study_date, datetime.date(2014, 9, 30))
