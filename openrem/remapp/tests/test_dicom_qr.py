@@ -1,19 +1,21 @@
 # This Python file uses the following encoding: utf-8
 # test_dicom_qr.py
 
+import collections
 import os
-from dicom.dataset import Dataset
+import uuid
+
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+from dicom.dataset import Dataset
 from django.test import TestCase
 from mock import patch
-from netdicom.applicationentity import AE
 from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
-import uuid
+from netdicom.applicationentity import AE
+
 from remapp.extractors import rdsr
-from remapp.netdicom import qrscu
 from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomQRRspImage, DicomRemoteQR, \
     DicomStoreSCP, GeneralStudyModuleAttr, PatientIDSettings
-import collections
+from remapp.netdicom import qrscu
 
 
 def _fake_check_sr_type_in_study_with_rdsr(assoc, study, query_id):
@@ -1199,7 +1201,6 @@ class RemoveDuplicates(TestCase):
         """
 
         from remapp.netdicom.qrscu import _remove_duplicates
-        from remapp.tools.dcmdatetime import make_time
 
         PatientIDSettings.objects.create()
 
@@ -1248,7 +1249,6 @@ class RemoveDuplicates(TestCase):
         """
 
         from remapp.netdicom.qrscu import _remove_duplicates
-        from remapp.tools.dcmdatetime import make_time
 
         PatientIDSettings.objects.create()
 

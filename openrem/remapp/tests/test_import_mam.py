@@ -1,15 +1,16 @@
 # This Python file uses the following encoding: utf-8
 # test_import_mam.py
 
-import os
 import datetime
-from decimal import Decimal
-from django.test import TestCase
 import logging
+import os
+from decimal import Decimal
+
+from django.test import TestCase
 from testfixtures import LogCapture
+
 from remapp.extractors import mam
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
-
 
 
 class ImportMGImg(TestCase):
@@ -177,8 +178,6 @@ class ImportDuplicatesMG(TestCase):
 
     def test_duplicate_event(self):
 
-        from remapp.models import PatientIDSettings
-
         pid = PatientIDSettings.objects.create()
         pid.name_stored = True
         pid.name_hashed = False
@@ -186,8 +185,6 @@ class ImportDuplicatesMG(TestCase):
         pid.id_hashed = False
         pid.dob_stored = True
         pid.save()
-
-        from remapp.extractors import mam
 
         mg_im1_for_proc = os.path.join("test_files", "MG-Im-GE_Seno_1_ForProcessing.dcm")
         mg_im1_for_pres = os.path.join("test_files", "MG-Im-GE_Seno_1_ForPresentation.dcm")
