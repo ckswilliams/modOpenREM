@@ -637,7 +637,6 @@ def _test_if_dx(dataset):
 
 
 def _dx2db(dataset):
-    import os
     import sys
     import openrem_settings
     from time import sleep
