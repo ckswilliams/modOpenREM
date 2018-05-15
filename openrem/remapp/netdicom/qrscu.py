@@ -995,7 +995,7 @@ def _create_parser():
     parser.add_argument('-sr', action="store_true",
                         help='Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx')
     parser.add_argument('-dup', action="store_true",
-                        help="Advanced: Retrieve duplicates (studies that are already in database)")
+                        help="Advanced: Retrieve duplicates (objects that have been processed before)")
 
     return parser
 
