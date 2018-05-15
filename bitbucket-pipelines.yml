@@ -18,7 +18,7 @@ pipelines:
             - mv openrem/openremproject/wsgi.py{.example,}
             - pip install -U tox
             - tox -e ci
-            - pip install fabric
+            - pip install "fabric < 2"
             - mkdir -p ~/.ssh
             - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
             - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
@@ -31,7 +31,7 @@ pipelines:
             - mv openrem/openremproject/wsgi.py{.example,}
             - pip install -U tox
             - tox -e ci
-            - pip install fabric
+            - pip install "fabric < 2"
             - mkdir -p ~/.ssh
             - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
             - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
