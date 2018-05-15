@@ -154,7 +154,8 @@ def q_update(request):
         table.append(u'</table>')
         tablestr = u''.join(table)
         resp['status'] = u'complete'
-        resp['message'] = u'<h4>Query complete</h4> {0}'.format(tablestr)
+        resp['message'] = u'<h4>Query complete - there are {1} studies we can move</h4> {0}'.format(
+            tablestr, study_rsp.count())
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 

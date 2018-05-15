@@ -51,11 +51,6 @@ def get_study_check_dup(dataset, modality='DX'):
     event_uid = get_value_kw('SOPInstanceUID', dataset)
     logger.debug(u"In get_study_check_dup for {0}. Study UID {1}, event UID {2}".format(
         modality, study_uid, event_uid))
-    inst_in_db = check_uid.check_uid(event_uid, 'Event')
-    if inst_in_db:
-        logger.debug(u"{2} instance UID {0} of study UID {1} already imported, stopping.".format(
-            event_uid, study_uid, modality))
-        return 0
     this_study = None
     same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid).order_by('pk')
     if same_study_uid.count() > 1:
@@ -92,6 +87,8 @@ def get_study_check_dup(dataset, modality='DX'):
             event_uid, study_uid, modality))
         return 0
     # New event - record the SOP instance UID
+    logger.debug(u"{0} Event {1} we haven't seen before. Adding to list for study {2}".format(
+        modality, event_uid, study_uid))
     check_uid.record_sop_instance_uid(this_study, event_uid)
     # further check required to ensure 'for processing' and 'for presentation'
     # versions of the same irradiation event don't get imported twice
