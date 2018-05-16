@@ -124,7 +124,7 @@ Allowed hosts
 ^^^^^^^^^^^^^
 
 The ``ALLOWED_HOSTS`` needs to be defined, as the ``DEBUG`` mode is now
-set to ``False``. This needs to contain the server name or IP address that
+set to ``False``. This needs to contain the OpenREM server hostname or IP address that
 will be used in the URL in the web browser. For example::
 
     ALLOWED_HOSTS = [

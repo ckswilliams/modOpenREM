@@ -49,7 +49,12 @@ a new instance of celery. If you wish to use this example you will have to
 ensure that the drive letters and paths are changed to match your own OpenREM
 system installation.
 
-Figure 1 shows the ``OpenREM - start celery`` task in the task list.
+Setting up a scheduled task
+===========================
+
+Open ``Task Scheduler`` on the OpenREM server and then click on the ``Task Scheduler Library``
+item in the left-hand pane. This should look something like figure 1 below, but without the
+OpenREM tasks present.
 
 .. figure:: img/010_taskOverview.png
    :figwidth: 100%
@@ -59,10 +64,21 @@ Figure 1 shows the ``OpenREM - start celery`` task in the task list.
 
    Figure 1: An overview of Windows Task Scheduler
 
+To create a new task for celery click on ``Create Task...`` in the ``Actions`` menu in the
+right-hand pane. Give the task a name and description. You may wish to use something similar
+to the following::
 
-Figure 2 shows the general task settings. The task has been set to run using
-the Windows ``SYSTEM`` user, whether the user is logged in or not, and with
-the highest privileges.
+    Attempts to gracefully shutdown any existing celery instances, then kills any remaining
+    celery instances after 10 seconds. Deletes the celery pid file and then starts a new
+    instance of celery. This is used to queue tasks for the OpenREM patient dose management
+    system. Celery can fail after running a long task and does not automtically restart.
+    This task is therefore also set to run 15 minutes before each scheduled OpenREM PACS
+    query to ensure that celery is up and running for these.
+
+Next, click on the ``Change User or Group`` button and type ``system`` in to the box, then
+click ``Check Names``, then click ``OK``. This sets the server's ``SYSTEM`` user to run the
+task. Also check the ``Run with highest prilileges`` box. Your task should now look similar
+to figure 2.
 
 .. figure:: img/020_taskPropertiesGeneral.png
    :figwidth: 100%
@@ -72,10 +88,14 @@ the highest privileges.
 
    Figure 2: General properties
 
+Next, click on the ``Triggers`` tab so that you can set when the task will be run. As a
+minimum you should add an ``At startup`` trigger. To do this, click ``New...``. In the
+dialogue box that appears select ``At startup`` from the ``Begin the task`` options and ensure
+that the ``Enabled`` checkbox is selected. Then click ``OK``. You may wish to add other
+triggers that take place at specific times during the day, as shown in figure 3.
 
-Figure 3 shows the times when the task will be triggered. In the example
-celery is started at system start up, and restarted multiple times each day
-to ensure that it is running before any PACS queries. Your requirements may
+In the example shown in figure 3 celery is started at system start up, and restarted multiple
+times each day to ensure that it is running before any PACS queries. Your requirements may
 be more straightforward than this example.
 
 .. figure:: img/030_taskPropertiesTriggers.png
@@ -86,9 +106,11 @@ be more straightforward than this example.
 
    Figure 3: Trigger properties
 
-
-Figure 4 shows the action that is taken when the task is executed: it is set to
-run the batch file that is described at the top of this document.
+Now click on the ``Actions`` tab so that you can add the action that is taken when
+the task is run. Click on ``New...``, and in the dialogue box that appears select
+``Start a program`` as the ``Action``. Click on ``Browse`` and select the celery
+batch file that you created earlier. Click ``OK`` to close the ``New Action``
+dialogue box. Figure 4 shows an example of the the ``Actions`` tab.
 
 .. figure:: img/040_taskPropertiesActions.png
    :figwidth: 100%
@@ -99,7 +121,7 @@ run the batch file that is described at the top of this document.
    Figure 4: Action properties
 
 
-Figure 5 shows that there are no particular conditions set for the task.
+There are no particular conditions set for the task, as shown in figure 5.
 
 .. figure:: img/050_taskPropertiesConditions.png
    :figwidth: 100%
@@ -110,9 +132,10 @@ Figure 5 shows that there are no particular conditions set for the task.
    Figure 5: Condition properties
 
 
-Finally, figure 6 shows the task settings. The task is set so that it can be
-run on demand if required. It is also set so that it is forced to stop when
-requested to do so.
+Finally, click on the ``Settings`` tab (figure 6). Check the ``Allow task to be run on demand``
+box, and also the ``If the running task does not end when requested, force it to stop`` box.
+Choose ``Stop the existing instance`` from the ``If the task is already running, then the following rule applies:``
+list. Then click the ``OK`` button to add the task to the scheduler library.
 
 .. figure:: img/060_taskPropertiesSettings.png
    :figwidth: 100%

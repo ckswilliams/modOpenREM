@@ -79,7 +79,7 @@ The progress of the retrieve is displayed in the same place until the retrieve i
 Query-retrieve using the command line interface
 ***********************************************
 
-In a command window/shell, ``openrem_qr.py -h`` should present you with the following output:
+In a command window/shell, ``python openrem_qr.py -h`` should present you with the following output:
 
 .. sourcecode:: console
 
@@ -132,7 +132,7 @@ Assuming the PACS database ID is 2, and the store node ID is 1, the command woul
 
 .. sourcecode:: console
 
-    openrem_qr.py 2 1 -dx -f 2010-04-05 -t 2010-04-05 -e "imported"
+    python openrem_qr.py 2 1 -dx -f 2010-04-05 -t 2010-04-05 -e "imported"
 
 If you want to do this regularly to catch new studies, you might like to use a script something like this on linux:
 
@@ -144,7 +144,7 @@ If you want to do this regularly to catch new studies, you might like to use a s
 
     ONEHOURAGO=$(date -d "1 hour ago" "+%Y-%m-%d")
 
-    openrem_qr.py 2 1 -dx -f $ONEHOURAGO -t $ONEHOURAGO  -e "Imported"
+    python openrem_qr.py 2 1 -dx -f $ONEHOURAGO -t $ONEHOURAGO  -e "Imported"
 
 
 This script could be run once an hour using a cron job. By asking for the date an hour ago, you shouldn't miss exams

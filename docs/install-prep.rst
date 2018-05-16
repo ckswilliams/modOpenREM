@@ -67,6 +67,8 @@ Install RabbitMQ
 * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
 
 For either install, just follow the defaults – no special configurations required.
+Please note that RabbitMQ requires that Erlang is installed first, as described in
+the above links.
 
 ..  Note::
 
@@ -107,10 +109,10 @@ Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
 
 .. sourcecode:: console
 
-    pip install numpy‑1.14.0+mkl‑cp27-cp27m‑win32.whl  # update the version number
+    pip install C:\path\to\numpy‑1.14.0+mkl‑cp27-cp27m‑win32.whl  # update the version number
     # or
-    pip install numpy‑1.14.0+mkl‑cp27‑cp27m‑win_amd64.whl  # update the version number
-    # changing the filename appropriately
+    pip install C:\path\to\numpy‑1.14.0+mkl‑cp27‑cp27m‑win_amd64.whl  # update the version number
+    # changing the path and filename to the numpy appropriately
 
 
 .. _installpreppostgres:

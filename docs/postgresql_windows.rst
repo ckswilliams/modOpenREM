@@ -32,10 +32,11 @@ Open pgAdmin
 + Double click on PostgreSQL 9.6 (or whichever version you have installed)
 + Enter your superuser password
 + Right click on "login roles" and choose "New login role"
-+ Create the openremuser (or whatever you want your user to be called) and under definition add a password.
++ Create the openremuser (or whatever you want your user to be called) and under "Definition" add a password
++ Under "Privileges" ensure that "Can login" and "Create databases" are set to "Yes"
 + Click OK
 + Right click on databases and choose "New database"
-+ Name the database (openremdb is fine) and assign the the owner to the user you just created.
++ Name the database (openremdb is fine) and assign the the owner to the user you just created
 
 
 Install psycopg2
@@ -60,7 +61,7 @@ Find and edit the settings file (notepad works fine). The path depends on your p
 
 Set the following (changing name, user and password as appropriate):
     + ``'ENGINE': 'django.db.backends.postgresql_psycopg2',``
-    + ``'NAME': 'openrem_db',``
+    + ``'NAME': 'openremdb',``
     + ``'USER': 'openremuser',``
     + ``'PASSWORD': 'openrem_pw',``
 
