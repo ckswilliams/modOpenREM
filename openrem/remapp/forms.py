@@ -263,8 +263,8 @@ class DicomQueryForm(forms.Form):
                                       help_text="Only use with stores containing only RDSRs, "
                                                 "with no accompanying images")
     duplicates_field = forms.BooleanField(label='Ignore studies already in the database?', required=False, initial=True,
-                                          help_text="Studies with the same study UID won't be imported, so there isn't "
-                                                    "any point getting them!")
+                                          help_text="Objects that have already been processed won't be imported, so "
+                                                    "there isn't any point getting them!")
     desc_exclude_field = forms.CharField(required=False,
                                          label="Exclude studies with these terms in the study description:",
                                          help_text="Comma separated list of terms")

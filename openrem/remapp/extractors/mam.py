@@ -34,7 +34,7 @@ import sys
 import django
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('remapp.extractors.mam')
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -430,51 +430,6 @@ def _test_if_mammo(dataset):
     return 0
 
 
-def _create_event(dataset):
-    """
-    If study exists, create new event
-    :param dataset: DICOM object
-    :return: Nothing
-    """
-    from remapp.models import GeneralStudyModuleAttr
-    from remapp.tools import check_uid
-    from remapp.tools.get_values import get_value_kw
-    from remapp.tools.dcmdatetime import make_date_time
-
-    study_uid = get_value_kw('StudyInstanceUID', dataset)
-    event_uid = get_value_kw('SOPInstanceUID', dataset)
-    logger.debug(u"In _create_event. Study %s, event %s", study_uid, event_uid)
-    inst_in_db = check_uid.check_uid(event_uid, 'Event')
-    if inst_in_db:
-        logger.debug(u"Instance %s already in db", event_uid)
-        return 0
-    same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
-    if same_study_uid.count() != 1:
-        print(u"Duplicate study UIDs in database! Could be a problem.")
-        for dup in same_study_uid:
-            if dup.modality_type:
-                same_study_uid = dup
-                continue
-    if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7':
-        # further check required to ensure 'for processing' and 'for presentation'
-        # versions of the same irradiation event don't get imported twice
-        # check first to make sure this isn't a Hologic SC tomo file
-        event_time = get_value_kw('AcquisitionTime', dataset)
-        event_date = get_value_kw('AcquisitionDate', dataset)
-        event_date_time = make_date_time('{0}{1}'.format(event_date, event_time))
-        try:
-            for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-                if event_date_time == events.date_time_started:
-                    return 0
-        except Exception as e:
-            logger.warning(u"MG study UID %s, event UID %s failed at check for identical event. Error %s",
-                           study_uid, event_uid, e)
-    # study exists, but event doesn't
-    _irradiationeventxraydata(dataset, same_study_uid.get().projectionxrayradiationdose_set.get())
-    # update the accumulated tables
-    return 0
-
-
 def _mammo2db(dataset):
     import openrem_settings
     from time import sleep
@@ -483,6 +438,7 @@ def _mammo2db(dataset):
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
 
     openrem_settings.add_project_to_path()
+    from remapp.extractors.extract_common import get_study_check_dup
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
@@ -493,9 +449,11 @@ def _mammo2db(dataset):
     study_in_db = check_uid.check_uid(study_uid)
     logger.debug(u"In mam.py. Study_UID %s, study_in_db %s", study_uid, study_in_db)
 
-    if study_in_db == 1:
+    if study_in_db:
         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-        _create_event(dataset)
+        this_study = get_study_check_dup(dataset, modality='MG')
+        if this_study:
+            _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get())
 
     if not study_in_db:
         # study doesn't exist, start from scratch
@@ -503,6 +461,7 @@ def _mammo2db(dataset):
         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
         g.save()
         event_uid = get_value_kw('SOPInstanceUID', dataset)
+        check_uid.record_sop_instance_uid(g, event_uid)
         logger.debug(u"Created new mammo study %s, event %s", study_uid, event_uid)
         # check again
         study_in_db = check_uid.check_uid(study_uid)
@@ -526,11 +485,14 @@ def _mammo2db(dataset):
                     study_in_db = check_uid.check_uid(study_uid)
                     if study_in_db == 1:
                         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                        _create_event(dataset)
+                        this_study = get_study_check_dup(dataset, modality='MG')
+                        if this_study:
+                            _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get())
                     while not study_in_db:
                         g = GeneralStudyModuleAttr.objects.create()
                         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
                         g.save()
+                        check_uid.record_sop_instance_uid(g, event_uid)
                         # check again
                         study_in_db = check_uid.check_uid(study_uid)
                         if study_in_db == 1:
@@ -541,10 +503,14 @@ def _mammo2db(dataset):
                             study_in_db = check_uid.check_uid(study_uid)
                             if study_in_db == 1:
                                 sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                                _create_event(dataset)
+                                this_study = get_study_check_dup(dataset, modality='MG')
+                                if this_study:
+                                    _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get())
                 elif study_in_db == 1:
                     sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                    _create_event(dataset)
+                    this_study = get_study_check_dup(dataset, modality='MG')
+                    if this_study:
+                        _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get())
 
 
 @shared_task(name="remapp.extractors.mam.mam")
@@ -574,7 +540,7 @@ def mam(mg_file):
         if del_no_match:
             logger.debug("%s id not a mammo file, deleting", mg_file)
             os.remove(mg_file)
-        return (1)
+        return 1
 
     _mammo2db(dataset)
 

@@ -5,6 +5,7 @@ pipelines:
     - step:
         script:
           - mv openrem/openremproject/local_settings.py{.example,}
+          - sed -i "s/INFO/DEBUG/g" openrem/openremproject/local_settings.py
           - mv openrem/openremproject/wsgi.py{.example,}
           - pip install -U tox
           - tox -e ci
@@ -13,10 +14,11 @@ pipelines:
       - step:
           script:
             - mv openrem/openremproject/local_settings.py{.example,}
+            - sed -i "s/INFO/DEBUG/g" openrem/openremproject/local_settings.py
             - mv openrem/openremproject/wsgi.py{.example,}
             - pip install -U tox
             - tox -e ci
-            - pip install fabric
+            - pip install "fabric < 2"
             - mkdir -p ~/.ssh
             - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
             - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
@@ -25,10 +27,11 @@ pipelines:
       - step:
           script:
             - mv openrem/openremproject/local_settings.py{.example,}
+            - sed -i "s/INFO/DEBUG/g" openrem/openremproject/local_settings.py
             - mv openrem/openremproject/wsgi.py{.example,}
             - pip install -U tox
             - tox -e ci
-            - pip install fabric
+            - pip install "fabric < 2"
             - mkdir -p ~/.ssh
             - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
             - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)

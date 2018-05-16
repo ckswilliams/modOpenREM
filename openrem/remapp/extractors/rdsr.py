@@ -1181,8 +1181,8 @@ def _generalstudymoduleattributes(dataset, g, ch):
         _projectionxrayradiationdose(dataset, g, 'ct', ch)
     g.save()
     if not g.requested_procedure_code_meaning:
-        if (('RequestAttributesSequence' in dataset) and dataset[
-            0x40, 0x275].VM):  # Ugly hack to prevent issues with zero length LS16 sequence
+        if 'RequestAttributesSequence' in dataset and dataset[0x40, 0x275].VM:
+                # Ugly hack to prevent issues with zero length LS16 sequence
             req = dataset.RequestAttributesSequence
             g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', req[0])
             # Sometimes the above is true, but there is no RequestedProcedureDescription in that sequence, but
@@ -1205,14 +1205,26 @@ def _rsdr2db(dataset):
     from django.db.models import ObjectDoesNotExist
     from time import sleep
     from remapp.models import GeneralStudyModuleAttr, SkinDoseMapCalcSettings
+    from remapp.tools.check_uid import record_sop_instance_uid
     from remapp.tools.get_values import get_value_kw
 
+    existing_sop_instance_uids = set()
+    keep_existing_sop_instance_uids = False
     if 'StudyInstanceUID' in dataset:
         study_uid = dataset.StudyInstanceUID
         existing_study_uid_match = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
         if existing_study_uid_match:
-
-            # First find the event UIDs in the RDSR being imported
+            new_sop_instance_uid = dataset.SOPInstanceUID
+            for existing_study in existing_study_uid_match.order_by('pk'):
+                for processed_object in existing_study.objectuidsprocessed_set.all():
+                    existing_sop_instance_uids.add(processed_object.sop_instance_uid)
+            if new_sop_instance_uid in existing_sop_instance_uids:
+                # We've dealt with this object before...
+                logger.debug(u"Import match on Study Instance UID {0} and object SOP Instance UID {1}. "
+                             u"Will not import.".format(study_uid, new_sop_instance_uid))
+                return
+            # Either we've not seen it before, or it wasn't recorded when we did.
+            # Next find the event UIDs in the RDSR being imported
             new_event_uids = set()
             for content in dataset.ContentSequence:
                 if content.ValueType and content.ValueType == 'CONTAINER':
@@ -1242,11 +1254,13 @@ def _rsdr2db(dataset):
                     # New RDSR is the same as the existing one
                     logger.debug(u"Import match on StudyInstUID {0}. Event level match, will not import.".format(
                         study_uid))
+                    record_sop_instance_uid(existing_study_uid_match[study_index], new_sop_instance_uid)
                     return
                 elif new_event_uids.issubset(uid_list):
                     # New RDSR has the same but fewer events than existing one
                     logger.debug(u"Import match on StudyInstUID {0}. New RDSR events are subset of existing events. "
                                  u"Will not import.".format(study_uid))
+                    record_sop_instance_uid(existing_study_uid_match[study_index], new_sop_instance_uid)
                     return
                 elif uid_list.issubset(new_event_uids):
                     # New RDSR has the existing events and more
@@ -1255,8 +1269,9 @@ def _rsdr2db(dataset):
                         existing_study_uid_match[study_index].patientmoduleattr_set.get()
                         # probably had, so
                         existing_study_uid_match[study_index].delete()
+                        keep_existing_sop_instance_uids = True
                         logger.debug(u"Import match on StudyInstUID {0}. Existing events are subset of new events. Will"
-                                     u"import.".format(study_uid))
+                                     u" import.".format(study_uid))
                     except ObjectDoesNotExist:
                         # Give existing one time to complete
                         sleep_time = 20.
@@ -1281,14 +1296,17 @@ def _rsdr2db(dataset):
                             # Now they are the same
                             logger.debug(u"Import match on StudyInstUID {0}. Event level match after delay, will not "
                                          u"import.".format(study_uid))
+                            record_sop_instance_uid(existing_study_uid_match[study_index], new_sop_instance_uid)
                             return
                         elif new_event_uids.issubset(existing_event_uids_post_delay):
                             # Existing now has more events including those in the new RDSR
                             logger.debug(u"Import match on StudyInstUID {0}. Existing has more events than the new RDSR"
                                          u"after the delay, including the new ones, so will not import")
+                            record_sop_instance_uid(existing_study_uid_match[study_index], new_sop_instance_uid)
                             return
                         # Can't be fewer in new RDSR at this point, so new must still have more, so use new one
                         existing_study_uid_match[study_index].delete()
+                        keep_existing_sop_instance_uids = True
                         logger.debug(u"Import match on StudyInstUID {0}. After delay, new RDSR has more events than "
                                      u"existing. Not certain that existing had finished importing. Existing will be"
                                      u"deleted and replaced.".format(study_uid))
@@ -1296,6 +1314,11 @@ def _rsdr2db(dataset):
     g = GeneralStudyModuleAttr.objects.create()
     if not g:  # Allows import to be aborted if no template found
         return
+    new_sop_instance_uid = dataset.SOPInstanceUID
+    record_sop_instance_uid(g, new_sop_instance_uid)
+    if keep_existing_sop_instance_uids:
+        for sop_instance_uid in existing_sop_instance_uids:
+            record_sop_instance_uid(g, sop_instance_uid)
     ch = get_value_kw('SpecificCharacterSet', dataset)
     _generalequipmentmoduleattributes(dataset, g, ch)
     _generalstudymoduleattributes(dataset, g, ch)

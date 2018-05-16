@@ -24,7 +24,7 @@ requires = [
     'django-crispy-forms',
     'pandas',
     'xlrd',
-    'testfixtures',
+    'testfixtures >= 6.0',
     'mock',
     'django-debug-toolbar',
     ]
