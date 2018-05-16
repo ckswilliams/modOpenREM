@@ -2,7 +2,7 @@
 Installing OpenREM
 ******************
 
-Install OpenREM 0.8.0b2
+Install OpenREM 0.8.0b6
 =======================
 
 .. sourcecode:: bash
