@@ -1271,7 +1271,7 @@ def _rsdr2db(dataset):
                         existing_study_uid_match[study_index].delete()
                         keep_existing_sop_instance_uids = True
                         logger.debug(u"Import match on StudyInstUID {0}. Existing events are subset of new events. Will"
-                                     u"import.".format(study_uid))
+                                     u" import.".format(study_uid))
                     except ObjectDoesNotExist:
                         # Give existing one time to complete
                         sleep_time = 20.
