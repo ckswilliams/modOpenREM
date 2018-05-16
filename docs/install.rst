@@ -24,7 +24,7 @@ Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See
 
     You must install the ``pynetdicom`` package from the link above - the version in pypi or the newer versions in
     GitHub won't work with the current version of OpenREM. Future versions of OpenREM will be adapted to work with
-    ``pynetdicom3`` and ``pydicom>2.0``.
+    ``pynetdicom3`` and ``pydicom>1.0``.
 
     If you are using the latest version of ``pip`` you will get error messages including the phrase
     ``Failed building wheel for pynetdicom`` - it should be ok to ignore this message as long as you end up with the
