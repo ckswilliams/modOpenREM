@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.8.0b6 (2018-05-15)
+0.8.0b6 (2018-05-16)
 --------------------
 * `#628`_  Imports: fixed code for importing when there are duplicate DX or MG studies in the database
 * `#626`_  DICOM: isolated the generate modalities in study function and added testing
