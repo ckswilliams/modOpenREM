@@ -819,19 +819,16 @@ def rf_detail_view_skin_map(request, pk=None):
     # If patient weight is missing from the database then db_pat_mass will be undefined
     try:
         db_pat_mass = float(GeneralStudyModuleAttr.objects.get(pk=pk).patientstudymoduleattr_set.get().patient_weight)
-    except ValueError:
-        db_pat_mass = 73.2
-    except TypeError:
+    except (ValueError, TypeError):
         db_pat_mass = 73.2
     if not db_pat_mass:
         db_pat_mass = 73.2
 
     # If patient weight is missing from the database then db_pat_mass will be undefined
     try:
-        db_pat_height = float(GeneralStudyModuleAttr.objects.get(pk=pk).patientstudymoduleattr_set.get().patient_size) * 100
-    except ValueError:
-        db_pat_height = 178.6
-    except TypeError:
+        db_pat_height = float(
+            GeneralStudyModuleAttr.objects.get(pk=pk).patientstudymoduleattr_set.get().patient_size) * 100
+    except (ValueError, TypeError):
         db_pat_height = 178.6
     if not db_pat_height:
         db_pat_height = 178.6
