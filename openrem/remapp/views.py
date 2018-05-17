@@ -823,6 +823,8 @@ def rf_detail_view_skin_map(request, pk=None):
         db_pat_mass = 73.2
     except TypeError:
         db_pat_mass = 73.2
+    if not db_pat_mass:
+        db_pat_mass = 73.2
 
     # If patient weight is missing from the database then db_pat_mass will be undefined
     try:
@@ -830,6 +832,8 @@ def rf_detail_view_skin_map(request, pk=None):
     except ValueError:
         db_pat_height = 178.6
     except TypeError:
+        db_pat_height = 178.6
+    if not db_pat_height:
         db_pat_height = 178.6
 
     loaded_existing_data = False
