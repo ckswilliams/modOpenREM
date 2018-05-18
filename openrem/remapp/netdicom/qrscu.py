@@ -15,6 +15,8 @@ import os
 import sys
 import uuid
 import collections
+from django.core.exceptions import ObjectDoesNotExist
+
 
 logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 # setup django/OpenREM
@@ -867,7 +869,11 @@ def movescu(query_id):
     from remapp.models import DicomQuery
 
     logger.debug(u"Query_id {0}: Starting move request".format(query_id))
-    query = DicomQuery.objects.get(query_id=query_id)
+    try:
+        query = DicomQuery.objects.get(query_id=query_id)
+    except ObjectDoesNotExist:
+        logger.warning(u"Move called with invalid query_id {0}. Move abandoned.".format(query_id))
+        return 0
     query.move_complete = False
     query.failed = False
     query.save()
