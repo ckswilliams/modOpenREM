@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0b6 (2018-05-16)
 --------------------
+* `#632`_  DICOM: move requests for queries that don't exist now fail gracefully
 * `#628`_  Imports: fixed code for importing when there are duplicate DX or MG studies in the database
 * `#626`_  DICOM: isolated the generate modalities in study function and added testing
 * `#625`_  Imports: now using event level UIDs to process continued, cumulative and duplicate RDSRs
