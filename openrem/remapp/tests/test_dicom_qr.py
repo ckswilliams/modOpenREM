@@ -11,6 +11,7 @@ from django.test import TestCase
 from mock import patch
 from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
 from netdicom.applicationentity import AE
+from testfixtures import LogCapture
 
 from remapp.extractors import rdsr
 from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomQRRspImage, DicomRemoteQR, \
@@ -1430,4 +1431,27 @@ class RemoveDuplicates(TestCase):
         remaining_image_rsp = study_responses_pre[0].dicomqrrspseries_set.get().dicomqrrspimage_set.get()
         self.assertEqual(
             remaining_image_rsp.sop_instance_uid, "1.3.6.1.4.1.5962.99.1.2282339064.1266597797.1479751121656.26.0")
+
+
+class InvalidMove(TestCase):
+    """Small test class to check passing an invalid query ID to movescu fails gracefully
+
+    """
+
+    def test_invalid_query_id(self):
+        """Pass invalid query_id to movescu, expect log update and return False/0
+
+        """
+        from remapp.netdicom.qrscu import movescu
+
+        PatientIDSettings.objects.create()
+
+        with LogCapture('remapp.netdicom.qrscu') as log:
+            movestatus = movescu('not_a_query_ID')
+            self.assertEqual(movestatus, False)
+
+            log.check_present(('remapp.netdicom.qrscu', 'WARNING',
+                               u"Move called with invalid query_id not_a_query_ID. Move abandoned."))
+
+
 
