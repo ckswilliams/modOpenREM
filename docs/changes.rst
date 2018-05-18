@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0b6 (2018-05-16)
 --------------------
+* `#633`_  Charts: fixed issue where charts failed if bar chart series name was null
 * `#628`_  Imports: fixed code for importing when there are duplicate DX or MG studies in the database
 * `#626`_  DICOM: isolated the generate modalities in study function and added testing
 * `#625`_  Imports: now using event level UIDs to process continued, cumulative and duplicate RDSRs
