@@ -5,7 +5,7 @@ Some modalities are configured to send an RDSR after every exposure, with each n
 the examination up to that point. For example this is what the current version of the Siemens CT scanner software does.
 
 The other circumstance where this might happen is when an initial exam is aborted and then continued, with two RDSRs
-being sent as a result.
+being sent as a result, each with a record of just the initial or subsequent exam components.
 
 Pre-0.8.0 OpenREM behaviour
 ===========================
@@ -22,22 +22,23 @@ Post-0.8.0 OpenREM behaviour
 New imports
 -----------
 
-On import of the first RDSR in a study, the series time and content time are both recorded in the database. Both of
-these would normally change with each subsequent RDSR for the same study.
+On import of the first RDSR in a study, the SOP Instance UID of the RDSR is recorded with the study. This is an ID
+that is unique to that RDSR - any further RDSRs might have the same Study Instance UID, but will always have a different
+SOP Instance UID.
 
-When the second RDSR is imported, the duplicate StudyInstanceUID will trigger OpenREM to check the series time and
-content time. If the new study has a later time than the existing study, OpenREM will attempt to check if the first
-RDSR has finished importing, and then delete the existing study from the database and replace it with the new one.
-
-If the existing study has not finished importing, OpenREM will pause for 30 seconds before proceeding.
+When the second RDSR is imported, the duplicate StudyInstanceUID will trigger OpenREM to check the SOP Instance UID of
+the new RDSR against the one(s) stored with that study. If there is a match, the new RDSR is ignored as it has already
+been processed. If it does not match, then the Irradiation Event UID of each exposure in the new RDSR is compared to the
+Irradiation Event UIDs already in the database for that study, to establish if the new RDSR carries new information that
+should be imported. In the case of a cumulative RDSR that is sent after each event, the original study is deleted from
+the database and is replaced by the newer one if it has additional events. In the case of a continuation RDSR which has
+a completely different set of events, the new RDSR is imported alongside the existing one.
 
 Imports from before upgrading to 0.8.0
 --------------------------------------
 
-RDSRs imported before upgrading to 0.8.0 will not have the series and content time recorded in the database and so
-it is difficult to be sure that the new file coming in is later than the original RDSR previously imported. Therefore
-OpenREM will assume that the new RDSR is newer than the existing one, deleted the existing one, logs a warning message
-in the logs and then imports the new RDSR.
+RDSRs imported before upgrading to 0.8.0 will not have the SOP Instance UID recorded in the database and so the new
+RDSR will be compared at event level with the existing study before making an import decision as with new studies.
 
 Importing from file
 ^^^^^^^^^^^^^^^^^^^
@@ -57,7 +58,7 @@ I found the RDSRs from that date to the date I upgraded and imported them:
 Importing via query-retrieve
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you are using query retrieve web interface to get the RDSRs, you will need to expand the **Advanced** box and
-de-select the checkbox labelled ``Ignore studies already in the database?``.
-
-If you are using the command line, you will need the ``-dup`` flag.
+The query-retrieve duplicates processing has been updated to compare SOP Instance UIDs returned by the remote node (the
+PACS) with the SOP Instance UIDs stored with each study in OpenREM. Therefore, after an initial import of each RDSR
+in your search, any subsequent query should drop any RDSRs that have previously been processed and not move them a
+second time.
