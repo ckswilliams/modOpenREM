@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.0b6 (2018-05-16)
 --------------------
+* `#634`_  Documentation: updated docs for import and query-retrieve duplicates porcessing
 * `#633`_  Charts: fixed issue where charts failed if bar chart series name was null
 * `#632`_  DICOM: move requests for queries that don't exist now fail gracefully
 * `#631`_  Skin dose maps: bug fixed that prevented message from displaying on screen when skin dose map cannot be calculated
