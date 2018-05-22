@@ -229,6 +229,29 @@ If **SR only studies** were requested:
 * Each series response is checked at 'image' level to see which type of SR it is. If is not RDSR or ESR, the study
   response is deleted.
 
+Duplicates processing
+=====================
+
+For each remaining study in the query response, the Study Instance UID is checked against the studies already in
+the OpenREM database.
+
+If there is a match and the series level modality is **SR** (from a CT, or RF etc):
+
+* The image level response will have the SOP Instance UID - this is checked against the SOP Instance UIDs recorded
+  with the matching study. If a match is found, the 'image' level response is deleted.
+
+If there is a match and the series level modality is **MG**, **DX** or **CR**:
+
+* An image level query is made which will populate the image level responses with SOP Instance UIDs
+* Each image level response is then processed and the SOP Instance UID is checked against the SOP Instance UIDs
+  recorded with the matching study. If a match is found, the 'image' level response is deleted.
+
+Once each series level response is processed:
+
+* If the series no longer has any image  level responses the series level response is deleted.
+* If the study no longer has any series level responses the study level response is deleted.
+
+
 .. _qrtroubleshooting:
 
 *******************************
