@@ -7,7 +7,7 @@ Background
 Cumulative RDSRs
 ----------------
 Some modalities are configured to send an RDSR after every exposure, with each new RDSR containing a complete record of
-the examination up to that point. For example this is what the current version of the Siemens CT scanner software does.
+the examination up to that point. For example, this is what the current version of the Siemens CT scanner software does.
 
 Continued study RDSRs
 ---------------------
@@ -50,7 +50,7 @@ Existing studies imported before 0.8.0
 --------------------------------------
 
 RDSRs imported before upgrading to 0.8.0 will not have the SOP Instance UID recorded in the database and so the new
-RDSR will be compared at event level with the existing study before making an import decision as with new studies.
+RDSR will be compared at event level with the existing study before making an import decision, as with new studies.
 
 Fixing existing studies
 =======================
@@ -62,7 +62,7 @@ If you are have a store of the RDSRs that were previously rejected, import them 
 processed properly.
 
 For example on my system, using linux, each scanner started sending per-exposure RDSRs from the date they were upgraded.
-I found the RDSRs from that date to the date I upgraded and imported them:
+I found the RDSRs from that date to the date I upgraded OpenREM and imported them:
 
 ..  sourcecode:: bash
 
