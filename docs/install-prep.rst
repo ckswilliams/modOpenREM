@@ -131,6 +131,22 @@ of the in-built SQLite database. However, you should expect to start again when 
 * :doc:`postgresql`
 * :doc:`postgresql_windows`
 
+Install a DICOM Store service
+=============================
+
+To have modalities send DICOM objects to your OpenREM server, or to use query-retrieve from a PACS, you need to install
+a DICOM Store service. For testing, you can make use of the DICOM Store OpenREM can provide. However, because this is not
+stable over longer periods of time we recommend using a third-party DICOM Store service. You can use any one you like,
+as long as it can be scripted to call OpenREM scripts when DICOM objects are received. We recommend Conquest for this
+and provide details of how to use it in the :doc:`netdicom` section.
+
+* Download Conquest DICOM server from https://ingenium.home.xs4all.nl/dicom.html
+* Install using the instructions included in the download.
+* Alternatively, Ubuntu 16.04 users can use ``sudo apt install conquest-sqlite`` - however, this isn't being kept up
+  to date and other versions of Ubuntu do not have this packaged.
+
+Unlike with the database, it is possible to change DICOM Store service at a later point.
+
 Resources for creating RDSR for older Toshiba CT scanners
 =========================================================
 
