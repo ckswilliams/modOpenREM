@@ -1,5 +1,5 @@
-Modality send
-*************
+DICOM Send from modalities
+**************************
 
 If you are able to configure your modalities to send DICOM Radiation Dose Structured Reports, DX images or MG images
 directly to the OpenREM server automatically this is an ideal method to ensure all activity is recorded.

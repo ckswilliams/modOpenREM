@@ -7,3 +7,4 @@ Importing data to OpenREM
 
     import-from-file
     netdicom-store
+    netdicom-qr
