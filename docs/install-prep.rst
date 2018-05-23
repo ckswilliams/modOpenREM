@@ -131,6 +131,8 @@ of the in-built SQLite database. However, you should expect to start again when 
 * :doc:`postgresql`
 * :doc:`postgresql_windows`
 
+.. _installdicomstore:
+
 Install a DICOM Store service
 =============================
 
@@ -144,8 +146,12 @@ and provide details of how to use it in the :doc:`netdicom` section.
 * Install using the instructions included in the download - there is a PDF with Windows install instructions and general
   usage instructions, and another PDF with Linux install instructions. The guides in :doc:`netdicom` should be
   consulted when making configuration decisions.
-* Alternatively, Ubuntu 16.04 users can use ``sudo apt install conquest-sqlite`` - however, this isn't being kept up
-  to date and other versions of Ubuntu do not have this packaged.
+* Alternatively, Ubuntu 16.04 users can use the following instructions:
+
+..  toctree::
+    :maxdepth: 1
+
+    conquestUbuntu
 
 Unlike with the database, it is possible to change DICOM Store service at a later point.
 

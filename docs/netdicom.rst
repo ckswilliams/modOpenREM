@@ -14,7 +14,6 @@ DICOM store.
     :maxdepth: 2
 
     netdicom-nodes
-    conquestUbuntu
     netdicom-qr
 
 The following instructions might also be useful with a Conquest setup, but they need review and updating:

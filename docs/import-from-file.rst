@@ -1,5 +1,5 @@
-Importing dose related data from DICOM files
-********************************************
+Importing from DICOM files
+**************************
 
 If you are using linux, or for Windows if you have put
 ``C:\Python27\;C:\Python27\Lib\site-packages;C:\Python27\Scripts`` onto

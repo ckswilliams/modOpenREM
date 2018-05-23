@@ -1,13 +1,14 @@
-###################################
-Conquest DICOM store node on Ubuntu
-###################################
+#########################################
+Conquest DICOM store node on Ubuntu 16.04
+#########################################
 
 ************
 Installation
 ************
 
-Ubuntu has reasonably up to date versions of the Conquest DICOM server `in its repositories,`_ so this makes
-installation very easy.
+Ubuntu 16.04 has the Conquest DICOM server `in its repositories,`_ so this makes
+installation very easy. However, it isn't the latest version and isn't going to be updated further. However, if you are
+using Ubuntu 16.04 then it does make for a relatively easy install.
 
 There are options to install with different databases – for OpenREM we're not really going to use the
 database so the easiest option is to use SQLite:
@@ -45,6 +46,16 @@ PuTTY in Windows to interact with Ubuntu, a right click on the mouse or ``Shift-
 terminal.
 
 To save and exit from nano, use ``Ctrl-o`` (out), press return to confirm the filename and then ``Ctrl-x`` (exit).
+
+Configuration
+=============
+
+Here will be a link to the dicom.ini config... the text below will be subsumed into it
+
+
+
+
+
 
 Configure the Store SCP
 =======================
