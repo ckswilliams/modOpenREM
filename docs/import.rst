@@ -6,3 +6,4 @@ Importing data to OpenREM
     :maxdepth: 2
 
     import-from-file
+    netdicom-store
