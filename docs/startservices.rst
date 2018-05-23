@@ -227,14 +227,10 @@ Configure the settings
 
 
 
-Start using it!
-===============
+Start using it - add some data!
+===============================
 
-Add some data!
-
-.. sourcecode:: bash
-
-    openrem_rdsr.py rdsrfile.dcm
+See :doc:`import`
 
 
 Further instructions

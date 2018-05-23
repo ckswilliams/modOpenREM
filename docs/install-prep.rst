@@ -141,7 +141,9 @@ as long as it can be scripted to call OpenREM scripts when DICOM objects are rec
 and provide details of how to use it in the :doc:`netdicom` section.
 
 * Download Conquest DICOM server from https://ingenium.home.xs4all.nl/dicom.html
-* Install using the instructions included in the download.
+* Install using the instructions included in the download - there is a PDF with Windows install instructions and general
+  usage instructions, and another PDF with Linux install instructions. The guides in :doc:`netdicom` should be
+  consulted when making configuration decisions.
 * Alternatively, Ubuntu 16.04 users can use ``sudo apt install conquest-sqlite`` - however, this isn't being kept up
   to date and other versions of Ubuntu do not have this packaged.
 
