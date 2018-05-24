@@ -28,6 +28,7 @@ dicom.ini configuration
 
 * Add Linux examples
 
+..  toctree::
+    :maxdepth: 2
 
-
-*TODO: Here will be instructions for dicom.ini and import scripts for Windows and linux*
+    conquestAsWindowsService
