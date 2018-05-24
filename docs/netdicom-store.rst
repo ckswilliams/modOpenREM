@@ -42,7 +42,7 @@ dicom.ini configuration
 ..  toctree::
     :maxdepth: 2
 
-    conquestExampleDicomini
+    conquestExampleDicomIni
     conquestImportConfig
 
 
