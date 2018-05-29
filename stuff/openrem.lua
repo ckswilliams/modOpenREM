@@ -30,6 +30,12 @@ function OnStoredInstance(instanceId, tags)
     elseif tags['SOPClassUID'] == '1.2.840.10008.5.1.4.1.1.7' then
         -- Secondary Capture object that might be Philips CT Dose Info image
         import_script = 'openrem_ctphilips.py'
+    elseif (tags['Modality'] == 'CT') and (string.lower(tags['Manufacturer']) == 'toshiba') then
+        -- Might be useful Toshiba import, leave it in the database until the study has finished importing
+        return true
+    else
+        Delete(instanceId)
+        return true
     end
 
     -- Write the DICOM content to some temporary file
@@ -48,4 +54,11 @@ function OnStoredInstance(instanceId, tags)
     -- Remove study from Orthanc
     Delete(instanceId)
 
+end
+
+function OnStableStudy(studyId, tags, metadata)
+    if (tags['Modality'] == 'CT') and (string.lower(tags['Manufacturer']) == 'toshiba') then
+        -- need to make a directory, which might be platform specific
+        -- then save the files  to that directory
+        -- and pass directory to function.
 end
