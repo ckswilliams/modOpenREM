@@ -80,7 +80,7 @@ function OnStableStudy(studyId, tags, metadata)
 
         -- Create the folder
         os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
-        -- print('Trying to create folder: ' .. mkdir_cmd .. ' "' .. path .. '"')
+        -- print('Trying to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
 
         -- Loop through each series in the study
         for i, each_series in pairs(series) do
