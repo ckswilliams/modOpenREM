@@ -38,6 +38,12 @@ recommend Conquest DICOM server:
 
     netdicom-store
 
+Orthanc alternative
+
+..  toctree::
+    :maxdepth: 2
+
+    netdicom-orthanc-config
 
 Query-retrieve from a PACS or similar
 =====================================
