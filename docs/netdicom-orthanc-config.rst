@@ -196,6 +196,14 @@ Windows (note the double back-slash):
     "C:\\path\\to\\openrem.lua"
     ],
 
+Check permissions
+-----------------
+
+**Stub**
+
+* Linux: orthanc user needs to be able to write to the OpenREM logs
+* Linux: orthanc user needs to be able to write to the temp directory we specified
+
 Restart Orthanc
 ---------------
 
