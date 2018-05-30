@@ -4,15 +4,15 @@ Orthanc Store configuration
 Create Lua file
 ---------------
 
-Create a file called =openrem.lua= *somewhere*, and copy and paste the following content into the file:
+Create a file called ``openrem.lua`` *somewhere*, and copy and paste the following content into the file:
 
 ..  sourcecode:: lua
 
-    local python_bin_path = 'D:\\David\\Documents\\Code\\Python\\OpenREM\\testbed\\openrem_develop\\Scripts\\'
-    local python_executable = 'python.exe'
-    local temp_path = 'D:\\David\\Temp\\'
-    local mkdir_cmd = 'mkdir'
-    local dir_sep = '\\'
+    local python_bin_path = ''
+    local python_executable = ''
+    local temp_path = ''
+    local mkdir_cmd = ''
+    local dir_sep = ''
 
     function ToAscii(s)
        -- http://www.lua.org/manual/5.1/manual.html#pdf-string.gsub
@@ -124,7 +124,7 @@ Customise Lua file
 
 Five variables need to be set in the Lua file:
 
-``local python_bin_path = ``
+**local python_bin_path = ''**
 
 This should be set to the full path to where the Python executables are, including ``openrem_rdsr.py`` and python
 itself. This might be similar one of the following examples and needs to include the final slash. On Windows, each
@@ -133,33 +133,33 @@ slash needs to be a double slash:
 * Linux, not using virtualenv: ``local python_bin_path = '/usr/bin/'``
 * Linux, using virtualenv: ``local python_bin_path = '/home/username/veopenrem/bin/'``
 * Windows, not using virtualenv: ``local python_bin_path = 'C:\\Python27\\'``
-* Windows, using virtualenv: ``local python_bin_path = 'C:\\path\\to\\virtualenv\\'``
+* Windows, using virtualenv: ``local python_bin_path = 'C:\\path\\to\\virtualenv\\Scripts\\'``
 
-``local python_executable = ''``
+**local python_executable = ''**
 
 This needs to be the name of the Python executable:
 
 * Linux: ``local python_executable = 'python'``
 * Windows: ``local python_executable = 'python.exe'``
 
-``local temp_path = ''``
+**local temp_path = ''**
 
 This needs to be a folder where Orthanc can write files temporarily while they are imported by OpenREM. **The folder
 should exist**:
 
-* Linux: ``local temp_path = '\tmp\orthanc\'``
+* Linux: ``local temp_path = '/tmp/orthanc/'``
 * Windows: ``local temp_path = 'C:\\Temp\\orthanc\\'``
 
 *Remember to create the folder*
 
-``local mkdir_cmd = ''``
+**local mkdir_cmd = ''**
 
 This needs to be the command used to create a folder path on your system:
 
 * Linux ``local mkdir_cmd = 'mkdir -p'``
 * Windows ``local mkdir_cmd = 'mkdir'``
 
-``local dir_sep = ''``
+**local dir_sep = ''**
 
 Finally, the directory separator used on your system:
 
