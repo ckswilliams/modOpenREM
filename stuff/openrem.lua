@@ -1,5 +1,5 @@
-local python_path = 'D:\\David\\Documents\\Code\\Python\\OpenREM\\testbed\\openrem_develop\\Scripts\\python.exe'
-local openrem_exe_path = 'D:\\David\\Documents\\Code\\Python\\OpenREM\\testbed\\openrem_develop\\Scripts\\'
+local python_bin_path = 'D:\\David\\Documents\\Code\\Python\\OpenREM\\testbed\\openrem_develop\\Scripts\\'
+local python_executable = 'python.exe'
 local temp_path = 'D:\\David\\Temp\\'
 local mkdir_cmd = 'mkdir'
 local dir_sep = '\\'
@@ -54,7 +54,7 @@ function OnStoredInstance(instanceId, tags)
 
     -- Call OpenREM import script
     -- Runs as orthanc user in linux, so log files must be writable by orthanc
-    os.execute(python_path .. ' ' .. openrem_exe_path .. import_script .. ' ' .. temp_file_path)
+    os.execute(python_bin_path .. python_executable .. ' ' .. python_bin_path .. import_script .. ' ' .. temp_file_path)
 
     -- Remove the temporary DICOM file
     os.remove(temp_file_path)
@@ -104,7 +104,7 @@ function OnStableStudy(studyId, tags, metadata)
         end
 
         -- Run the Toshiba extractor on the folder
-        os.execute(python_path .. ' ' .. openrem_exe_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
+        os.execute(python_bin_path .. python_executable.. ' ' .. python_bin_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
 
     end
 end
