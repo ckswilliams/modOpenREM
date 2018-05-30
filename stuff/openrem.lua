@@ -35,7 +35,7 @@ function OnStoredInstance(instanceId, tags)
         import_script = 'openrem_mg.py'
     elseif (tags['Modality'] == 'CR') or (tags['Modality'] == 'DX') then
         import_script = 'openrem_dx.py'
-    elseif tags['SOPClassUID'] == '1.2.840.10008.5.1.4.1.1.7' then
+    elseif (tags['SOPClassUID'] == '1.2.840.10008.5.1.4.1.1.7') and string.match(string.lower(tags['Manufacturer']), 'philips') then
         -- Secondary Capture object that might be Philips CT Dose Info image
         import_script = 'openrem_ctphilips.py'
     elseif (tags['Modality'] == 'CT') and (string.lower(tags['Manufacturer']) == 'toshiba') then
@@ -99,7 +99,7 @@ function OnStableStudy(studyId, tags, metadata)
                 target:close()
 
                 -- Remove the instance from Orthanc
-                Delete(instanceId)
+                Delete(instance)
             end
         end
 
