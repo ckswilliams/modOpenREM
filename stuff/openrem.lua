@@ -60,7 +60,7 @@ function OnStoredInstance(instanceId, tags)
     os.remove(path)
 
     -- Remove study from Orthanc
-    -- Delete(instanceId)
+    Delete(instanceId)
 end
 
 function OnStableStudy(studyId, tags, metadata)
