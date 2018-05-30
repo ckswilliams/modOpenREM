@@ -47,17 +47,17 @@ function OnStoredInstance(instanceId, tags)
     end
 
     -- Write the DICOM content to some temporary file
-    local path = temp_path .. instanceId .. '.dcm'
-    local target = assert(io.open(path, 'wb'))
+    local temp_file_path = temp_path .. instanceId .. '.dcm'
+    local target = assert(io.open(temp_file_path, 'wb'))
     target:write(dicom)
     target:close()
 
     -- Call OpenREM import script
     -- Runs as orthanc user in linux, so log files must be writable by orthanc
-    os.execute(python_path .. ' ' .. openrem_exe_path .. import_script .. ' ' .. path)
+    os.execute(python_path .. ' ' .. openrem_exe_path .. import_script .. ' ' .. temp_file_path)
 
     -- Remove the temporary DICOM file
-    os.remove(path)
+    os.remove(temp_file_path)
 
     -- Remove study from Orthanc
     Delete(instanceId)
@@ -73,13 +73,13 @@ function OnStableStudy(studyId, tags, metadata)
         local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
 
         -- Create a string containing the folder path
-        local path = ToAscii(temp_path ..
+        local temp_files_path = ToAscii(temp_path ..
                               patient['PatientID'] .. dir_sep ..
                               study['StudyDate'] .. dir_sep .. studyId)
-        -- print('path is: ' .. path)
+        -- print('path is: ' .. temp_files_path)
 
         -- Create the folder
-        os.execute(mkdir_cmd .. ' "' .. path .. '"')
+        os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
         -- print('Trying to create folder: ' .. mkdir_cmd .. ' "' .. path .. '"')
 
         -- Loop through each series in the study
@@ -93,8 +93,8 @@ function OnStableStudy(studyId, tags, metadata)
                 local dicom = RestApiGet('/instances/' .. instance .. '/file')
 
                 -- Write the DICOM file to the folder created earlier
-                local target = assert(io.open(path .. dir_sep .. instance .. '.dcm', 'wb'))
-                -- print('Trying to write file: ' .. path .. dir_sep .. instance .. '.dcm')
+                local target = assert(io.open(temp_files_path .. dir_sep .. instance .. '.dcm', 'wb'))
+                -- print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
                 target:write(dicom)
                 target:close()
 
@@ -104,7 +104,7 @@ function OnStableStudy(studyId, tags, metadata)
         end
 
         -- Run the Toshiba extractor on the folder
-        os.execute(python_path .. ' ' .. openrem_exe_path .. 'openrem_cttoshiba.py' .. ' ' .. path)
+        os.execute(python_path .. ' ' .. openrem_exe_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
 
     end
 end
