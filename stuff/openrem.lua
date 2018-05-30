@@ -1,6 +1,14 @@
-local python_path = '/home/mcdonaghe/research/veOpenREM/bin/python'
-local openrem_exe_path = '/home/mcdonaghe/research/veOpenREM/bin/'
-local temp_path = '/tmp/'
+local python_path = 'D:\\David\\Documents\\Code\\Python\\OpenREM\\testbed\\openrem_develop\\Scripts\\python.exe'
+local openrem_exe_path = 'D:\\David\\Documents\\Code\\Python\\OpenREM\\testbed\\openrem_develop\\Scripts\\'
+local temp_path = 'D:\\David\\Temp\\'
+local mkdir_cmd = 'mkdir'
+local dir_sep = '\\'
+
+function ToAscii(s)
+   -- http://www.lua.org/manual/5.1/manual.html#pdf-string.gsub
+   -- https://groups.google.com/d/msg/orthanc-users/qMLgkEmwwPI/6jRpCrlgBwAJ
+   return s:gsub('[^a-zA-Z0-9-/-:-\\ ]', '_')
+end
 
 function ReceivedInstanceFilter(dicom, origin)
     -- Only allow incoming objects we can use
@@ -52,13 +60,51 @@ function OnStoredInstance(instanceId, tags)
     os.remove(path)
 
     -- Remove study from Orthanc
-    Delete(instanceId)
-
+    -- Delete(instanceId)
 end
 
 function OnStableStudy(studyId, tags, metadata)
     if (tags['Modality'] == 'CT') and (string.lower(tags['Manufacturer']) == 'toshiba') then
-        -- need to make a directory, which might be platform specific
-        -- then save the files  to that directory
-        -- and pass directory to function.
+
+        print('This study is now stable, writing its instances on the disk: ' .. studyId)
+
+        local patient = ParseJson(RestApiGet('/studies/' .. studyId .. '/patient')) ['MainDicomTags']
+        local study = ParseJson(RestApiGet('/studies/' .. studyId)) ['MainDicomTags']
+        local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
+
+        -- Create a string containing the folder path
+        local path = ToAscii(temp_path ..
+                              patient['PatientID'] .. dir_sep ..
+                              study['StudyDate'] .. dir_sep .. studyId)
+        -- print('path is: ' .. path)
+
+        -- Create the folder
+        os.execute(mkdir_cmd .. ' "' .. path .. '"')
+        -- print('Trying to create folder: ' .. mkdir_cmd .. ' "' .. path .. '"')
+
+        -- Loop through each series in the study
+        for i, each_series in pairs(series) do
+            -- Obtain a table of instances in the series
+            local instances = ParseJson(RestApiGet('/series/' .. each_series)) ['Instances']
+
+            -- Loop through each instance
+            for j, instance in pairs(instances) do
+                -- Retrieve the DICOM file from Orthanc
+                local dicom = RestApiGet('/instances/' .. instance .. '/file')
+
+                -- Write the DICOM file to the folder created earlier
+                local target = assert(io.open(path .. dir_sep .. instance .. '.dcm', 'wb'))
+                -- print('Trying to write file: ' .. path .. dir_sep .. instance .. '.dcm')
+                target:write(dicom)
+                target:close()
+
+                -- Remove the instance from Orthanc
+                Delete(instanceId)
+            end
+        end
+
+        -- Run the Toshiba extractor on the folder
+        os.execute(python_path .. ' ' .. openrem_exe_path .. 'openrem_cttoshiba.py' .. ' ' .. path)
+
+    end
 end
