@@ -1,6 +1,7 @@
-local python_bin_path = 'D:\\David\\Documents\\Code\\Python\\OpenREM\\testbed\\openrem_develop\\Scripts\\'
+local python_executable_path = 'D:\\Server_Apps\\python27\\'
 local python_executable = 'python.exe'
-local temp_path = 'D:\\David\\Temp\\'
+local python_scripts_path = 'D:\\Server_Apps\\python27\\Scripts\\'
+local temp_path = 'E:\\conquest\\dicom\\'
 local mkdir_cmd = 'mkdir'
 local dir_sep = '\\'
 
@@ -54,7 +55,7 @@ function OnStoredInstance(instanceId, tags)
 
     -- Call OpenREM import script
     -- Runs as orthanc user in linux, so log files must be writable by orthanc
-    os.execute(python_bin_path .. python_executable .. ' ' .. python_bin_path .. import_script .. ' ' .. temp_file_path)
+    os.execute(python_executable_path .. python_executable .. ' ' .. python_scripts_path .. import_script .. ' ' .. temp_file_path)
 
     -- Remove the temporary DICOM file
     os.remove(temp_file_path)
@@ -64,28 +65,39 @@ function OnStoredInstance(instanceId, tags)
 end
 
 function OnStableStudy(studyId, tags, metadata)
-    if (tags['Modality'] == 'CT') and (string.lower(tags['Manufacturer']) == 'toshiba') then
+    print('This study is now stable, writing its instances on the disk: ' .. studyId)
 
-        print('This study is now stable, writing its instances on the disk: ' .. studyId)
+    local patient = ParseJson(RestApiGet('/studies/' .. studyId .. '/patient')) ['MainDicomTags']
+    local study = ParseJson(RestApiGet('/studies/' .. studyId)) ['MainDicomTags']
+    local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
 
-        local patient = ParseJson(RestApiGet('/studies/' .. studyId .. '/patient')) ['MainDicomTags']
-        local study = ParseJson(RestApiGet('/studies/' .. studyId)) ['MainDicomTags']
-        local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
+    local first_series = 1
 
-        -- Create a string containing the folder path
-        local temp_files_path = ToAscii(temp_path ..
-                              patient['PatientID'] .. dir_sep ..
-                              study['StudyDate'] .. dir_sep .. studyId)
-        -- print('path is: ' .. temp_files_path)
+    local temp_files_path = ''
+    
+    for i, current_series in pairs(series) do
+        print('Modality of series is: '     .. ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Modality'])
+        print('Manufacturer of series is: ' .. ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Manufacturer'])
+        local series_modality = ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Modality']
+        local series_manufacturer = ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Manufacturer']
 
-        -- Create the folder
-        os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
-        -- print('Trying to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
+        if (series_modality == 'CT') and (string.lower(series_manufacturer) == 'toshiba') then
+            if first_series == 1 then
+                -- Create a string containing the folder path
+                temp_files_path = ToAscii(temp_path ..
+                                    patient['PatientID'] .. dir_sep ..
+                                    study['StudyDate'] .. dir_sep .. studyId)
+                print('path is: ' .. temp_files_path)
 
-        -- Loop through each series in the study
-        for i, each_series in pairs(series) do
+                -- Create the folder
+                os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
+                print('Trying to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
+                
+                first_series = 0
+            end
+
             -- Obtain a table of instances in the series
-            local instances = ParseJson(RestApiGet('/series/' .. each_series)) ['Instances']
+            local instances = ParseJson(RestApiGet('/series/' .. current_series)) ['Instances']
 
             -- Loop through each instance
             for j, instance in pairs(instances) do
@@ -94,17 +106,24 @@ function OnStableStudy(studyId, tags, metadata)
 
                 -- Write the DICOM file to the folder created earlier
                 local target = assert(io.open(temp_files_path .. dir_sep .. instance .. '.dcm', 'wb'))
-                -- print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
+                print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
                 target:write(dicom)
                 target:close()
 
                 -- Remove the instance from Orthanc
                 Delete(instance)
             end
+        else
+            -- The series is not CT and Toshiba, so delete it from Orthanc
+            Delete(current_series)
         end
-
-        -- Run the Toshiba extractor on the folder
-        os.execute(python_bin_path .. python_executable.. ' ' .. python_bin_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
-
     end
+
+    print('first_series is: ' .. first_series)
+    if first_series == 0 then
+        -- Run the Toshiba extractor on the folder because at least one series is CT and toshiba
+        print('Trying to run: ' .. python_executable_path .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
+        os.execute(python_executable_path .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
+    end
+    
 end
