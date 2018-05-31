@@ -213,4 +213,5 @@ Ubuntu linux::
 
 Windows::
 
-    ?
+    Run ``Services.msc`` as an administrator
+    Right-hand click on the Orthanc entry and select ``Restart``
