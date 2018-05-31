@@ -65,7 +65,7 @@ function OnStoredInstance(instanceId, tags)
 end
 
 function OnStableStudy(studyId, tags, metadata)
-    print('This study is now stable, writing its instances on the disk: ' .. studyId)
+    -- print('This study is now stable, writing its instances on the disk: ' .. studyId)
 
     local patient = ParseJson(RestApiGet('/studies/' .. studyId .. '/patient')) ['MainDicomTags']
     local study = ParseJson(RestApiGet('/studies/' .. studyId)) ['MainDicomTags']
@@ -74,25 +74,23 @@ function OnStableStudy(studyId, tags, metadata)
     local first_series = 1
 
     local temp_files_path = ''
-    
+
     for i, current_series in pairs(series) do
-        print('Modality of series is: '     .. ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Modality'])
-        print('Manufacturer of series is: ' .. ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Manufacturer'])
         local series_modality = ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Modality']
         local series_manufacturer = ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Manufacturer']
+        -- print('Modality and manufacturer of series are: ' .. series_modality .. '; ' .. series_manufacturer)
 
         if (series_modality == 'CT') and (string.lower(series_manufacturer) == 'toshiba') then
             if first_series == 1 then
-                -- Create a string containing the folder path
-                temp_files_path = ToAscii(temp_path ..
-                                    patient['PatientID'] .. dir_sep ..
-                                    study['StudyDate'] .. dir_sep .. studyId)
-                print('path is: ' .. temp_files_path)
+                -- Create a string containing the folder path. This needs to be a single folder so that the Toshiba CT extractor
+                -- is able to remove it once the data has been imported into OpenREM.
+                temp_files_path = ToAscii(temp_path .. study['StudyDate'] .. '_' .. patient['PatientID'] .. '_' .. studyId)
+                -- print('temp_files_path is: ' .. temp_files_path)
 
                 -- Create the folder
                 os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
-                print('Trying to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
-                
+                -- print('Just tried to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
+
                 first_series = 0
             end
 
@@ -106,7 +104,7 @@ function OnStableStudy(studyId, tags, metadata)
 
                 -- Write the DICOM file to the folder created earlier
                 local target = assert(io.open(temp_files_path .. dir_sep .. instance .. '.dcm', 'wb'))
-                print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
+                -- print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
                 target:write(dicom)
                 target:close()
 
@@ -119,11 +117,11 @@ function OnStableStudy(studyId, tags, metadata)
         end
     end
 
-    print('first_series is: ' .. first_series)
+    -- print('first_series is: ' .. first_series)
     if first_series == 0 then
-        -- Run the Toshiba extractor on the folder because at least one series is CT and toshiba
-        print('Trying to run: ' .. python_executable_path .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
+        -- Run the Toshiba extractor on the folder because at least one series is CT and toshiba. The extractor will remove the temp_files_path folder.
+        -- print('Trying to run: ' .. python_executable_path .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
         os.execute(python_executable_path .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
     end
-    
+
 end
