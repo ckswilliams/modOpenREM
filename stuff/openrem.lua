@@ -320,13 +320,11 @@ function OnStableStudy(studyId, tags, metadata)
     -------------------------------------------------------------------------------------
     -- Use the CT Toshiba extractor on the study if the manufacturer and model are in the
     -- toshiba_extractor_systems list.
-    local use_toshiba_extractor = 0
     for i = 1, #toshiba_extractor_systems do
-        if (instance_tags['Modality'] == 'CT')
+        if (study_tags['Modality'] == 'CT')
               and (string.lower(study_tags['Manufacturer']) == string.lower(toshiba_extractor_systems[i][1]))
               and (string.lower(study_tags['ManufacturerModelName']) == string.lower(toshiba_extractor_systems[i][2])) then
 
-            local use_toshiba_extractor = 1
             first_series = 1
             temp_files_path = ''
 
