@@ -4,167 +4,99 @@ Orthanc Store configuration
 Create Lua file
 ---------------
 
-Create a file called ``openrem.lua`` *somewhere*, and copy and paste the following content into the file:
+Open the following link in a new tab, create a file called ``openrem.lua`` *somewhere*, and copy and paste the
+content into the file:
 
-..  sourcecode:: lua
+* https://bitbucket.org/openrem/openrem/src/issue635OrthancExperiment/stuff/openrem.lua
 
-    local python_bin_path = ''
-    local python_executable = ''
-    local temp_path = ''
-    local mkdir_cmd = ''
-    local dir_sep = ''
+Customise OpenREM python environment and other settings
+-------------------------------------------------------
 
-    function ToAscii(s)
-       -- http://www.lua.org/manual/5.1/manual.html#pdf-string.gsub
-       -- https://groups.google.com/d/msg/orthanc-users/qMLgkEmwwPI/6jRpCrlgBwAJ
-       return s:gsub('[^a-zA-Z0-9-/-:-\\ ]', '_')
-    end
+* Set this to the path and name of the python executable used by OpenREM::
 
-    function ReceivedInstanceFilter(dicom, origin)
-        -- Only allow incoming objects we can use
-        local mod = dicom.Modality
-        if (mod ~= 'SR') and (mod ~= 'CT') and (mod ~= 'MG') and (mod ~= 'CR') and (mod ~= 'DX') then
-            return false
-        else
-            return true
-        end
-    end
+    # Linux, no virtualenv example:
+    local python_executable = '/usr/bin/python'
+    # Linux, using virtualenv example:
+    local python_executable = '/home/username/veopenrem/bin/python'
+    # Windows, not using virtualenv example:
+    local python_executable = 'C:\\Python27\\python.exe'
+    # Windows, using virtualenv example:
+    local python_executable = 'C:\\path\\to\\virtualenv\\Scripts\\python.exe'
 
-    function OnStoredInstance(instanceId, tags)
-        -- Retrieve the DICOM instance from Orthanc
-        local dicom = RestApiGet('/instances/' .. instanceId .. '/file')
+* Set this to the path of the python scripts folder used by OpenREM::
 
-        -- Work out if file can be used, if not delete from Orthanc?
-        local import_script = ''
-        if tags['SOPClassUID'] == '1.2.840.10008.5.1.4.1.1.88.67' then
-            import_script = 'openrem_rdsr.py'
-        elseif tags['SOPClassUID'] == '1.2.840.10008.5.1.4.1.1.88.22' then
-            -- Enhanced SR used by GE CT Scanners
-            import_script = 'openrem_rdsr.py'
-        elseif tags['Modality'] == 'MG' then
-            import_script = 'openrem_mg.py'
-        elseif (tags['Modality'] == 'CR') or (tags['Modality'] == 'DX') then
-            import_script = 'openrem_dx.py'
-        elseif (tags['SOPClassUID'] == '1.2.840.10008.5.1.4.1.1.7') and string.match(string.lower(tags['Manufacturer']), 'philips') then
-            -- Secondary Capture object that might be Philips CT Dose Info image
-            import_script = 'openrem_ctphilips.py'
-        elseif (tags['Modality'] == 'CT') and (string.lower(tags['Manufacturer']) == 'toshiba') then
-            -- Might be useful Toshiba import, leave it in the database until the study has finished importing
-            return true
-        else
-            Delete(instanceId)
-            return true
-        end
+    # Linux, no virtualenv example:
+    local python_scripts_path = '/usr/local/bin/'
+    # Linux, using virtualenv example:
+    local python_scripts_path = '/home/username/veopenrem/bin/'
+    # Windows, not using virtualenv example:
+    local python_scripts_path = 'C:\\Python27\\Scripts\\'
+    # Windows, using virtualenv example:
+    local python_scripts_path = 'C:\\path\\to\\virtualenv\\Scripts\\'
 
-        -- Write the DICOM content to some temporary file
-        local temp_file_path = temp_path .. instanceId .. '.dcm'
-        local target = assert(io.open(temp_file_path, 'wb'))
-        target:write(dicom)
-        target:close()
+* Set this to the path where you want Orthanc to temporarily store DICOM files. Note: the folder must exist::
 
-        -- Call OpenREM import script
-        -- Runs as orthanc user in linux, so log files must be writable by orthanc
-        os.execute(python_bin_path .. python_executable .. ' ' .. python_bin_path .. import_script .. ' ' .. temp_file_path)
+    # Linux example:
+    local temp_path = '/tmp/orthanc/'
+    # Windows example:
+    local temp_path = 'E:\\conquest\\dicom\\'
 
-        -- Remove the temporary DICOM file
-        os.remove(temp_file_path)
+* Set this to 'mkdir' on Windows, or 'mkdir -p' on Linux::
 
-        -- Remove study from Orthanc
-        Delete(instanceId)
-    end
+    # Linux:
+    local mkdir_cmd = 'mkdir -p'
+    # Windows:
+    local mkdir_cmd = 'mkdir'
 
-    function OnStableStudy(studyId, tags, metadata)
-        if (tags['Modality'] == 'CT') and (string.lower(tags['Manufacturer']) == 'toshiba') then
+* Set this to '\\'' on Windows, or '/' on Linux::
 
-            print('This study is now stable, writing its instances on the disk: ' .. studyId)
+    # Linux:
+    local dir_sep = '/'
+    # Windows:
+    local dir_sep = '\\'
 
-            local patient = ParseJson(RestApiGet('/studies/' .. studyId .. '/patient')) ['MainDicomTags']
-            local study = ParseJson(RestApiGet('/studies/' .. studyId)) ['MainDicomTags']
-            local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
+* *Optional* Set this to the path where you want to keep physics-related DICOM images::
 
-            -- Create a string containing the folder path
-            local temp_files_path = ToAscii(temp_path ..
-                                  patient['PatientID'] .. dir_sep ..
-                                  study['StudyDate'] .. dir_sep .. studyId)
-            -- print('path is: ' .. temp_files_path)
+    local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
 
-            -- Create the folder
-            os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
-            -- print('Trying to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
 
-            -- Loop through each series in the study
-            for i, each_series in pairs(series) do
-                -- Obtain a table of instances in the series
-                local instances = ParseJson(RestApiGet('/series/' .. each_series)) ['Instances']
+User-defined lists that determine how Orthanc deals with certain studies
+------------------------------------------------------------------------
 
-                -- Loop through each instance
-                for j, instance in pairs(instances) do
-                    -- Retrieve the DICOM file from Orthanc
-                    local dicom = RestApiGet('/instances/' .. instance .. '/file')
+* A list to check against patient name and ID to see if the images should be kept.
+  Orthanc will put anything that matches this in the ``physics_to_keep_folder``::
 
-                    -- Write the DICOM file to the folder created earlier
-                    local target = assert(io.open(temp_files_path .. dir_sep .. instance .. '.dcm', 'wb'))
-                    -- print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
-                    target:write(dicom)
-                    target:close()
+    local physics_to_keep = {'physics'}
 
-                    -- Remove the instance from Orthanc
-                    Delete(instance)
-                end
-            end
+* Lists of things to ignore. Orthanc will ignore anything matching the content of
+  these lists: they will not be imported into OpenREM::
 
-            -- Run the Toshiba extractor on the folder
-            os.execute(python_bin_path .. python_executable.. ' ' .. python_bin_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
+    local manufacturers_to_ignore = {'Agfa', 'Agfa-Gevaert', 'Agfa-Gevaert AG', 'Faxitron X-Ray LLC', 'Gendex-KaVo'}
+    local model_names_to_ignore = {'CR 85', 'CR 75', 'CR 35', 'CR 25', 'ADC_5146', 'CR975'}
+    local station_names_to_ignore = {'CR85 Main', 'CR75 Main'}
+    local software_versions_to_ignore = {'VixWin Platinum v3.3'}
+    local device_serial_numbers_to_ignore = {'SCB1312016'}
 
-        end
-    end
+* A list of CT make and model pairs that are known to have worked with the Toshiba CT extractor::
 
-Customise Lua file
--------------------
+    local toshiba_extractor_systems = {
+            {'GE Medical Systems', 'Discovery 710'},
+            {'GE Medical Systems', 'Discovery ste'},
+            {'GE Medical Systems', 'Brightspeed'},
+            {'GE Medical Systems', 'Lightspeed Plus'},
+            {'GE Medical Systems', 'Lightspeed16'},
+            {'GE Medical Systems', 'Lightspeed Pro 32'},
+            {'GE Medical Systems', 'Lightspeed VCT'},
+            {'Siemens', 'Biograph64'},
+            {'Siemens', 'Somatom Definition'},
+            {'Siemens', 'Somatom Definition Edge'},
+            {'Siemens', 'Somatom Definition Flash'},
+            {'Siemens', 'Somatom Force'},
+            {'Toshiba', 'Aquilion'},
+            {'Toshiba', 'Aquilion Prime'},
+            {'Toshiba', 'Aquilion One'}
+    }
 
-Five variables need to be set in the Lua file:
-
-**local python_bin_path = ''**
-
-This should be set to the full path to where the Python executables are, including ``openrem_rdsr.py`` and python
-itself. This might be similar one of the following examples and needs to include the final slash. On Windows, each
-slash needs to be a double slash:
-
-* Linux, not using virtualenv: ``local python_bin_path = '/usr/bin/'``
-* Linux, using virtualenv: ``local python_bin_path = '/home/username/veopenrem/bin/'``
-* Windows, not using virtualenv: ``local python_bin_path = 'C:\\Python27\\'``
-* Windows, using virtualenv: ``local python_bin_path = 'C:\\path\\to\\virtualenv\\Scripts\\'``
-
-**local python_executable = ''**
-
-This needs to be the name of the Python executable:
-
-* Linux: ``local python_executable = 'python'``
-* Windows: ``local python_executable = 'python.exe'``
-
-**local temp_path = ''**
-
-This needs to be a folder where Orthanc can write files temporarily while they are imported by OpenREM. **The folder
-should exist**:
-
-* Linux: ``local temp_path = '/tmp/orthanc/'``
-* Windows: ``local temp_path = 'C:\\Temp\\orthanc\\'``
-
-*Remember to create the folder*
-
-**local mkdir_cmd = ''**
-
-This needs to be the command used to create a folder path on your system:
-
-* Linux ``local mkdir_cmd = 'mkdir -p'``
-* Windows ``local mkdir_cmd = 'mkdir'``
-
-**local dir_sep = ''**
-
-Finally, the directory separator used on your system:
-
-* Linux ``local dir_sep = '/'``
-* Windows ``local dir_sep = '\\'``
 
 Configure Orthanc to make use of the openrem.lua file
 -----------------------------------------------------
