@@ -1,11 +1,8 @@
 -------------------------------------------------------------------------------------
 -- OpenREM python environment and other settings
 
--- Set this to the path of the python executable used by OpenREM
-local python_executable_path = 'D:\\Server_Apps\\python27\\'
-
--- Set this to the name of the python executable file (python on Linux, python.exe on Windows)
-local python_executable = 'python.exe'
+-- Set this to the path and name of the python executable used by OpenREM
+local python_executable = 'D:\\Server_Apps\\python27\\python.exe'
 
 -- Set this to the path of the python scripts folder used by OpenREM
 local python_scripts_path = 'D:\\Server_Apps\\python27\\Scripts\\'
@@ -80,9 +77,6 @@ end
 
 function OnStoredInstance(instanceId, tags)
     --print('Starting OnStoredInstance')
-
-    -- Retrieve the DICOM instance from Orthanc
-    local dicom = RestApiGet('/instances/' .. instanceId .. '/file')
 
     -- Retrieve the DICOM tags from the instance. The tags parameter doesn't include all the useful
     -- tags - this does.
@@ -195,14 +189,16 @@ function OnStoredInstance(instanceId, tags)
     -- Work out if the Toshiba CT extractor should be used - must be CT and a match with
     -- a make/model pair in toshiba_extractor_systems
     local use_toshiba_extractor = 0
-    for i = 1, #toshiba_extractor_systems do
-        if (instance_tags['Modality'] == 'CT')
-              and (string.lower(instance_tags['Manufacturer']) == string.lower(toshiba_extractor_systems[i][1]))
-              and (string.lower(instance_tags['ManufacturerModelName']) == string.lower(toshiba_extractor_systems[i][2])) then
-            -- Might be useful Toshiba import, leave it in the database until the study has finished importing
-            --print('I am going to use the Toshiba CT extractor on this study')
-            use_toshiba_extractor = 1
-            return true
+    if import_script == '' then
+        for i = 1, #toshiba_extractor_systems do
+            if (instance_tags['Modality'] == 'CT')
+                  and (string.lower(instance_tags['Manufacturer']) == string.lower(toshiba_extractor_systems[i][1]))
+                  and (string.lower(instance_tags['ManufacturerModelName']) == string.lower(toshiba_extractor_systems[i][2])) then
+                -- Might be useful Toshiba import, leave it in the database until the study has finished importing
+                --print('I am going to use the Toshiba CT extractor on this study')
+                use_toshiba_extractor = 1
+                return true
+            end
         end
     end
     -------------------------------------------------------------------------------------
@@ -224,11 +220,12 @@ function OnStoredInstance(instanceId, tags)
     -- it from Orthanc. First write the DICOM content to a temporary file
     local temp_file_path = temp_path .. instanceId .. '.dcm'
     local target = assert(io.open(temp_file_path, 'wb'))
+    local dicom = RestApiGet('/instances/' .. instanceId .. '/file')
     target:write(dicom)
     target:close()
 
     -- Call OpenREM import script. Runs as orthanc user in linux, so log files must be writable by Orthanc
-    os.execute(python_executable_path .. python_executable .. ' ' .. python_scripts_path .. import_script .. ' ' .. temp_file_path)
+    os.execute(python_executable .. ' ' .. python_scripts_path .. import_script .. ' ' .. temp_file_path)
 
     -- Remove the temporary DICOM file
     os.remove(temp_file_path)
@@ -241,9 +238,6 @@ end
 function OnStableStudy(studyId, tags, metadata)
     --print('This study is now stable, writing its instances on the disk: ' .. studyId)
 
-    -- Retrieve the IDs of all the series in this study
-    local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
-
     -- Retrieve the shared DICOM tags from the study. The tags parameter doesn't include
     -- all the useful tags - this does
     local study_tags = ParseJson(RestApiGet('/studies/' .. studyId .. '/shared-tags?simplify'))
@@ -251,10 +245,8 @@ function OnStableStudy(studyId, tags, metadata)
     -------------------------------------------------------------------------------------
     -- See if any of the physics strings are in patient name or ID. If they are then
     -- copy the image to the physics_to_keep_folder and then remove it from Orthanc
-    local first_series = 1
-    local temp_files_path = ''
-    local patient_name = ''
-    local patient_id = ''
+    local patient_name
+    local patient_id
     local patient_folder = 'blank'
     if study_tags['PatientName'] ~= nil then
         --print('PatientName is: ' .. patient['PatientName'])
@@ -277,6 +269,12 @@ function OnStableStudy(studyId, tags, metadata)
         if string.match(string.lower(patient_name), string.lower(physics_to_keep[i])) or string.match(string.lower(patient_id), string.lower(physics_to_keep[i])) then
             -- It is a physics patient - save them to the physics folder
             --print('It is physics')
+            local first_series = 1
+            local temp_files_path = ''
+
+            -- Retrieve the IDs of all the series in this study
+            local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
+
             for i, current_series in pairs(series) do
 
                 if first_series == 1 then
@@ -308,10 +306,10 @@ function OnStableStudy(studyId, tags, metadata)
                     Delete(instance)
                 end
             end
-            
+
             -- Exit the function, as a physics study was found and the images moved
             return true
-            
+
         end
     end
     -------------------------------------------------------------------------------------
@@ -321,6 +319,8 @@ function OnStableStudy(studyId, tags, metadata)
     -- Use the CT Toshiba extractor on the study if the manufacturer and model are in the
     -- toshiba_extractor_systems list.
     for i = 1, #toshiba_extractor_systems do
+        local first_series
+        local temp_files_path
         if (study_tags['Modality'] == 'CT')
               and (string.lower(study_tags['Manufacturer']) == string.lower(toshiba_extractor_systems[i][1]))
               and (string.lower(study_tags['ManufacturerModelName']) == string.lower(toshiba_extractor_systems[i][2])) then
@@ -328,10 +328,10 @@ function OnStableStudy(studyId, tags, metadata)
             first_series = 1
             temp_files_path = ''
 
+            -- Retrieve the IDs of all the series in this study
+            local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
+
             for i, current_series in pairs(series) do
-                local series_modality = ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Modality']
-                local series_manufacturer = ParseJson(RestApiGet('/series/' .. current_series)) ['MainDicomTags']['Manufacturer']
-                -- print('Modality and manufacturer of series are: ' .. series_modality .. '; ' .. series_manufacturer)
 
                 if first_series == 1 then
                     -- Create a string containing the folder path. This needs to be a single folder so that the Toshiba CT extractor
@@ -366,8 +366,8 @@ function OnStableStudy(studyId, tags, metadata)
             end
 
             -- Run the Toshiba extractor on the folder. The extractor will remove the temp_files_path folder.
-            -- print('Trying to run: ' .. python_executable_path .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
-            os.execute(python_executable_path .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
+            -- print('Trying to run: ' .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
+            os.execute(python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
 
             -- Exit the function
             return true
