@@ -7,7 +7,7 @@ Create Lua file
 Open the following link in a new tab, create a file called ``openrem.lua`` *somewhere*, and copy and paste the
 content into the file:
 
-* https://bitbucket.org/openrem/openrem/src/issue635OrthancExperiment/stuff/openrem.lua
+* https://bitbucket.org/openrem/openrem/raw/issue635OrthancExperiment/stuff/openrem.lua
 
 Edit the top two sections
 -------------------------
@@ -101,20 +101,6 @@ Edit the top two sections
     local temp_path = '/tmp/orthanc/'
     # Windows example:
     local temp_path = 'E:\\conquest\\dicom\\'
-
-* Set this to 'mkdir' on Windows, or 'mkdir -p' on Linux::
-
-    # Linux:
-    local mkdir_cmd = 'mkdir -p'
-    # Windows:
-    local mkdir_cmd = 'mkdir'
-
-* Set this to '\\'' on Windows, or '/' on Linux::
-
-    # Linux:
-    local dir_sep = '/'
-    # Windows:
-    local dir_sep = '\\'
 
 * *Optional* Set this to the path where you want to keep physics-related DICOM images::
 
