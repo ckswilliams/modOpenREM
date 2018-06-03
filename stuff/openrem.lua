@@ -88,7 +88,7 @@ function OnStoredInstance(instanceId)
     --print('Is it a physics test?')
     if instance_tags.PatientName ~= nil then
         for i = 1, #physics_to_keep do
-            if string.match(string.lower(instance_tagsPatientName), string.lower(physics_to_keep[i])) then
+            if string.match(string.lower(instance_tags.PatientName), string.lower(physics_to_keep[i])) then
                 --print('Yes, it is a physics test')
                 return true
             end
