@@ -64,7 +64,7 @@ function ToAscii(s)
 end
 
 
-function ReceivedInstanceFilter(dicom, origin)
+function ReceivedInstanceFilter(dicom)
     -- Only allow incoming objects we can use
     local mod = dicom.Modality
     if (mod ~= 'SR') and (mod ~= 'CT') and (mod ~= 'MG') and (mod ~= 'CR') and (mod ~= 'DX') then
@@ -75,7 +75,7 @@ function ReceivedInstanceFilter(dicom, origin)
 end
 
 
-function OnStoredInstance(instanceId, tags)
+function OnStoredInstance(instanceId)
     --print('Starting OnStoredInstance')
 
     -- Retrieve the DICOM tags from the instance. The tags parameter doesn't include all the useful
@@ -86,17 +86,17 @@ function OnStoredInstance(instanceId, tags)
     -------------------------------------------------------------------------------------
     -- See if the images are physics tests - if so, keep them and exit this function
     --print('Is it a physics test?')
-    if instance_tags['PatientName'] ~= nil then
+    if instance_tags.PatientName ~= nil then
         for i = 1, #physics_to_keep do
-            if string.match(string.lower(instance_tags['PatientName']), string.lower(physics_to_keep[i])) then
+            if string.match(string.lower(instance_tagsPatientName), string.lower(physics_to_keep[i])) then
                 --print('Yes, it is a physics test')
                 return true
             end
         end
     end
-    if instance_tags['PatientID'] ~= nil then
+    if instance_tags.PatientID ~= nil then
         for i = 1, #physics_to_keep do
-            if string.match(string.lower(instance_tags['PatientID']), string.lower(physics_to_keep[i])) then
+            if string.match(string.lower(instance_tags.PatientID), string.lower(physics_to_keep[i])) then
                 --print('Yes, it is a physics test')
                 return true
             end
@@ -108,55 +108,55 @@ function OnStoredInstance(instanceId, tags)
     -------------------------------------------------------------------------------------
     -- If the instance matches something in one of the "ignore" lists then remove the file
     -- and do not import it into Orthanc
-    if instance_tags['Manufacturer'] ~= nil then
+    if instance_tags.Manufacturer ~= nil then
         for i = 1, #manufacturers_to_ignore do
             --print('Checking against: ' .. manufacturers_to_ignore[i])
-            if string.lower(instance_tags['Manufacturer']) == string.lower(manufacturers_to_ignore[i]) then
-                --print('They match - ignoring ' .. instance_tags['Manufacturer'])
+            if string.lower(instance_tags.Manufacturer) == string.lower(manufacturers_to_ignore[i]) then
+                --print('They match - ignoring ' .. instance_tags.Manufacturer)
                 Delete(instanceId)
                 return true
             end
         end
     end
 
-    if instance_tags['ManufacturerModelName'] ~= nil then
+    if instance_tags.ManufacturerModelName ~= nil then
         for i = 1, #model_names_to_ignore do
             --print('Checking against: ' .. model_names_to_ignore[i])
-            if string.lower(instance_tags['ManufacturerModelName']) == string.lower(model_names_to_ignore[i]) then
-                --print('Ignoring ' .. instance_tags['ManufacturerModelName'])
+            if string.lower(instance_tags.ManufacturerModelName) == string.lower(model_names_to_ignore[i]) then
+                --print('Ignoring ' .. instance_tags.ManufacturerModelName)
                 Delete(instanceId)
                 return true
             end
         end
     end
 
-    if instance_tags['StationName'] ~= nil then
+    if instance_tags.StationName ~= nil then
         for i = 1, #station_names_to_ignore do
             --print('Checking against: ' .. station_names_to_ignore[i])
-            if string.lower(instance_tags['StationName']) == string.lower(station_names_to_ignore[i]) then
-                --print('Ignoring ' .. instance_tags['StationName'])
+            if string.lower(instance_tags.StationName) == string.lower(station_names_to_ignore[i]) then
+                --print('Ignoring ' .. instance_tags.StationName)
                 Delete(instanceId)
                 return true
             end
         end
     end
 
-    if instance_tags['SoftwareVersions'] ~= nil then
+    if instance_tags.SoftwareVersions ~= nil then
         for i = 1, #software_versions_to_ignore do
             --print('Checking against: ' .. software_versions_to_ignore[i])
-            if string.lower(instance_tags['SoftwareVersions']) == string.lower(software_versions_to_ignore[i]) then
-                --print('Ignoring ' .. instance_tags['SoftwareVersions'])
+            if string.lower(instance_tags.SoftwareVersions) == string.lower(software_versions_to_ignore[i]) then
+                --print('Ignoring ' .. instance_tags.SoftwareVersions)
                 Delete(instanceId)
                 return true
             end
         end
     end
 
-    if instance_tags['DeviceSerialNumber'] ~= nil then
+    if instance_tags.DeviceSerialNumber ~= nil then
         for i = 1, #device_serial_numbers_to_ignore do
             --print('Checking against: ' .. device_serial_numbers_to_ignore[i])
-            if string.lower(instance_tags['DeviceSerialNumber']) == string.lower(device_serial_numbers_to_ignore[i]) then
-                --print('Ignoring ' .. instance_tags['DeviceSerialNumber'])
+            if string.lower(instance_tags.DeviceSerialNumber) == string.lower(device_serial_numbers_to_ignore[i]) then
+                --print('Ignoring ' .. instance_tags.DeviceSerialNumber)
                 Delete(instanceId)
                 return true
             end
@@ -169,16 +169,16 @@ function OnStoredInstance(instanceId, tags)
     -------------------------------------------------------------------------------------
     -- Work out if file can be used by the RDSR, MG, DX or ctphilips extractors
     local import_script = ''
-    if instance_tags['SOPClassUID'] == '1.2.840.10008.5.1.4.1.1.88.67' then
+    if instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67' then
         import_script = 'openrem_rdsr.py'
-    elseif instance_tags['SOPClassUID'] == '1.2.840.10008.5.1.4.1.1.88.22' then
+    elseif instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22' then
         -- Enhanced SR used by GE CT Scanners
         import_script = 'openrem_rdsr.py'
-    elseif instance_tags['Modality'] == 'MG' then
+    elseif instance_tags.Modality == 'MG' then
         import_script = 'openrem_mg.py'
-    elseif (instance_tags['Modality'] == 'CR') or (instance_tags['Modality'] == 'DX') then
+    elseif (instance_tags.Modality == 'CR') or (instance_tags.Modality == 'DX') then
         import_script = 'openrem_dx.py'
-    elseif (instance_tags['SOPClassUID'] == '1.2.840.10008.5.1.4.1.1.7') and string.match(string.lower(instance_tags['Manufacturer']), 'philips') then
+    elseif (instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7') and string.match(string.lower(instance_tags.Manufacturer), 'philips') then
         -- Secondary Capture object that might be Philips CT Dose Info image
         import_script = 'openrem_ctphilips.py'
     end
@@ -191,9 +191,9 @@ function OnStoredInstance(instanceId, tags)
     local use_toshiba_extractor = 0
     if import_script == '' then
         for i = 1, #toshiba_extractor_systems do
-            if (instance_tags['Modality'] == 'CT')
-                  and (string.lower(instance_tags['Manufacturer']) == string.lower(toshiba_extractor_systems[i][1]))
-                  and (string.lower(instance_tags['ManufacturerModelName']) == string.lower(toshiba_extractor_systems[i][2])) then
+            if (instance_tags.Modality == 'CT')
+                  and (string.lower(instance_tags.Manufacturer) == string.lower(toshiba_extractor_systems[i][1]))
+                  and (string.lower(instance_tags.ManufacturerModelName) == string.lower(toshiba_extractor_systems[i][2])) then
                 -- Might be useful Toshiba import, leave it in the database until the study has finished importing
                 --print('I am going to use the Toshiba CT extractor on this study')
                 use_toshiba_extractor = 1
@@ -235,7 +235,7 @@ function OnStoredInstance(instanceId, tags)
     -------------------------------------------------------------------------------------
 end
 
-function OnStableStudy(studyId, tags, metadata)
+function OnStableStudy(studyId)
     --print('This study is now stable, writing its instances on the disk: ' .. studyId)
 
     -- Retrieve the shared DICOM tags from the study. The tags parameter doesn't include
@@ -248,16 +248,16 @@ function OnStableStudy(studyId, tags, metadata)
     local patient_name
     local patient_id
     local patient_folder = 'blank'
-    if study_tags['PatientName'] ~= nil then
-        --print('PatientName is: ' .. patient['PatientName'])
-        patient_name = study_tags['PatientName']
+    if study_tags.PatientName ~= nil then
+        --print('PatientName is: ' .. patient.PatientName)
+        patient_name = study_tags.PatientName
         patient_folder = patient_name
     else
         patient_name = 'blank'
     end
-    if study_tags['PatientID'] ~= nil then
-        --print('PatientID is: ' .. patient['PatientID'])
-        patient_id = study_tags['PatientID']
+    if study_tags.PatientID ~= nil then
+        --print('PatientID is: ' .. patient.PatientID)
+        patient_id = study_tags.PatientID
         if patient_folder == 'blank' then
             patient_folder = patient_id
         end
@@ -279,7 +279,7 @@ function OnStableStudy(studyId, tags, metadata)
 
                 if first_series == 1 then
                     -- Create a string containing the folder path.
-                    temp_files_path = ToAscii(physics_to_keep_folder .. study_tags['StudyDate'] .. dir_sep .. patient_folder)
+                    temp_files_path = ToAscii(physics_to_keep_folder .. study_tags.StudyDate .. dir_sep .. patient_folder)
                     -- print('temp_files_path is: ' .. temp_files_path)
 
                     -- Create the folder
@@ -321,9 +321,9 @@ function OnStableStudy(studyId, tags, metadata)
     for i = 1, #toshiba_extractor_systems do
         local first_series
         local temp_files_path
-        if (study_tags['Modality'] == 'CT')
-              and (string.lower(study_tags['Manufacturer']) == string.lower(toshiba_extractor_systems[i][1]))
-              and (string.lower(study_tags['ManufacturerModelName']) == string.lower(toshiba_extractor_systems[i][2])) then
+        if (study_tags.Modality == 'CT')
+              and (string.lower(study_tags.Manufacturer) == string.lower(toshiba_extractor_systems[i][1]))
+              and (string.lower(study_tags.ManufacturerModelName) == string.lower(toshiba_extractor_systems[i][2])) then
 
             first_series = 1
             temp_files_path = ''
@@ -336,7 +336,7 @@ function OnStableStudy(studyId, tags, metadata)
                 if first_series == 1 then
                     -- Create a string containing the folder path. This needs to be a single folder so that the Toshiba CT extractor
                     -- is able to remove it once the data has been imported into OpenREM.
-                    temp_files_path = ToAscii(temp_path .. study_tags['StudyDate'] .. '_' .. study_tags['PatientID'] .. '_' .. studyId)
+                    temp_files_path = ToAscii(temp_path .. study_tags.StudyDate .. '_' .. study_tags.PatientID .. '_' .. studyId)
                     -- print('temp_files_path is: ' .. temp_files_path)
 
                     -- Create the folder
