@@ -139,8 +139,8 @@ preference. The format is ``{{'manufacturer', 'model'}, {'manufacturer two'}, {'
 matched against the names presented in the DICOM headers. See :ref:`install_toshiba_resources`::
 
     local toshiba_extractor_systems = {
-            {'GE Medical Systems', 'Discovery 710'},
-            {'GE Medical Systems', 'Discovery ste'},
+            {'Toshiba', 'Aquilion'},
+            {'GE Medical Systems', 'Discovery STE'},
     }
     # If you haven't installed the additional resources, set
     local toshiba_extractor_systems = {}
@@ -191,7 +191,7 @@ Ubuntu linux::
 
     sudo service orthanc force-reload
 
-Windows::
+Windows:
 
-    Run ``Services.msc`` as an administrator
-    Right-hand click on the Orthanc entry and select ``Restart``
+* Run ``Services.msc`` as an administrator
+* Right-hand click on the Orthanc entry and select ``Restart``
