@@ -93,19 +93,21 @@ function OnStoredInstance(instanceId)
     -------------------------------------------------------------------------------------
     -- See if the images are physics tests - if so, keep them and exit this function
     --print('Is it a physics test?')
-    if instance_tags.PatientName ~= nil then
-        for i = 1, #physics_to_keep do
-            if string.match(string.lower(instance_tags.PatientName), string.lower(physics_to_keep[i])) then
-                --print('Yes, it is a physics test')
-                return true
+    if physics_to_keep[1] ~= nil then
+        if instance_tags.PatientName ~= nil then
+            for i = 1, #physics_to_keep do
+                if string.match(string.lower(instance_tags.PatientName), string.lower(physics_to_keep[i])) then
+                    --print('Yes, it is a physics test')
+                    return true
+                end
             end
         end
-    end
-    if instance_tags.PatientID ~= nil then
-        for i = 1, #physics_to_keep do
-            if string.match(string.lower(instance_tags.PatientID), string.lower(physics_to_keep[i])) then
-                --print('Yes, it is a physics test')
-                return true
+        if instance_tags.PatientID ~= nil then
+            for i = 1, #physics_to_keep do
+                if string.match(string.lower(instance_tags.PatientID), string.lower(physics_to_keep[i])) then
+                    --print('Yes, it is a physics test')
+                    return true
+                end
             end
         end
     end
@@ -198,22 +200,25 @@ function OnStoredInstance(instanceId)
     -- Work out if the Toshiba CT extractor should be used - must be CT and a match with
     -- a make/model pair in toshiba_extractor_systems
     local use_toshiba_extractor = 0
-    if import_script == '' then
-        if (instance_tags.Manufacturer == nil) or (instance_tags.ManufacturerModelName == nil) then
-            -- If the Manufacturer or ManufacturerModelName is nil then the Toshiba check cannot be made
-            print('Rejecting DICOM instance because one of both of Manufacturer or ManufacturerModelName tag are nil.')
-            -- Delete the DICOM instance and exit the function
-            Delete(instanceId)
-            return true
-        end
-        for i = 1, #toshiba_extractor_systems do
-            if (instance_tags.Modality == 'CT')
-                  and (string.lower(instance_tags.Manufacturer) == string.lower(toshiba_extractor_systems[i][1]))
-                  and (string.lower(instance_tags.ManufacturerModelName) == string.lower(toshiba_extractor_systems[i][2])) then
-                -- Might be useful Toshiba import, leave it in the database until the study has finished importing
-                --print('I am going to use the Toshiba CT extractor on this study')
-                use_toshiba_extractor = 1
+
+    if toshiba_extractor_systems[1][1] ~= nil then
+        if import_script == '' then
+            if (instance_tags.Manufacturer == nil) or (instance_tags.ManufacturerModelName == nil) then
+                -- If the Manufacturer or ManufacturerModelName is nil then the Toshiba check cannot be made
+                print('Rejecting DICOM instance because one of both of Manufacturer or ManufacturerModelName tag are nil: ' .. instanceId)
+                -- Delete the DICOM instance and exit the function
+                Delete(instanceId)
                 return true
+            end
+            for i = 1, #toshiba_extractor_systems do
+                if (instance_tags.Modality == 'CT')
+                      and (string.lower(instance_tags.Manufacturer) == string.lower(toshiba_extractor_systems[i][1]))
+                      and (string.lower(instance_tags.ManufacturerModelName) == string.lower(toshiba_extractor_systems[i][2])) then
+                    -- Might be useful Toshiba import, leave it in the database until the study has finished importing
+                    --print('I am going to use the Toshiba CT extractor on this study')
+                    use_toshiba_extractor = 1
+                    return true
+                end
             end
         end
     end
@@ -261,6 +266,7 @@ function OnStoredInstance(instanceId)
     -------------------------------------------------------------------------------------
 end
 
+
 function OnStableStudy(studyId)
     --print('This study is now stable, writing its instances on the disk: ' .. studyId)
 
@@ -271,77 +277,79 @@ function OnStableStudy(studyId)
     -------------------------------------------------------------------------------------
     -- See if any of the physics strings are in patient name or ID. If they are then
     -- copy the image to the physics_to_keep_folder and then remove it from Orthanc
-    local patient_name
-    local patient_id
-    local patient_folder = 'blank'
-    if study_tags.PatientName ~= nil then
-        --print('PatientName is: ' .. patient.PatientName)
-        patient_name = study_tags.PatientName
-        patient_folder = patient_name
-    else
-        patient_name = 'blank'
-    end
-    if study_tags.PatientID ~= nil then
-        --print('PatientID is: ' .. patient.PatientID)
-        patient_id = study_tags.PatientID
-        if patient_folder == 'blank' then
-            patient_folder = patient_id
+    if physics_to_keep[1] ~= nil then
+        local patient_name
+        local patient_id
+        local patient_folder = 'blank'
+        if study_tags.PatientName ~= nil then
+            --print('PatientName is: ' .. patient.PatientName)
+            patient_name = study_tags.PatientName
+            patient_folder = patient_name
+        else
+            patient_name = 'blank'
         end
-    else
-        patient_id = 'blank'
-    end
-
-    for i = 1, #physics_to_keep do
-        if string.match(string.lower(patient_name), string.lower(physics_to_keep[i])) or string.match(string.lower(patient_id), string.lower(physics_to_keep[i])) then
-            -- It is a physics patient - save them to the physics folder
-            --print('It is physics')
-            local first_series = 1
-            local temp_files_path = ''
-
-            -- Retrieve the IDs of all the series in this study
-            local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
-
-            for i, current_series in pairs(series) do
-
-                if first_series == 1 then
-                    -- Create a string containing the folder path.
-                    temp_files_path = ToAscii(physics_to_keep_folder .. study_tags.StudyDate .. dir_sep .. patient_folder)
-                    -- print('temp_files_path is: ' .. temp_files_path)
-
-                    -- Create the folder
-                    os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
-                    -- print('Just tried to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
-
-                    first_series = 0
-                end
-
-                local instances = ParseJson(RestApiGet('/series/' .. current_series)) ['Instances']
-
-                -- Loop through each instance in the current_series
-                for j, instance in pairs(instances) do
-                    -- Retrieve the DICOM file from Orthanc
-                    local dicom = RestApiGet('/instances/' .. instance .. '/file')
-
-                    -- Write the DICOM file to the folder created earlier
-                    local target = assert(io.open(temp_files_path .. dir_sep .. instance .. '.dcm', 'wb'))
-                    -- print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
-                    target:write(dicom)
-                    target:close()
-
-                    -- Remove the instance from Orthanc
-                    Delete(instance)
-                end
+        if study_tags.PatientID ~= nil then
+            --print('PatientID is: ' .. patient.PatientID)
+            patient_id = study_tags.PatientID
+            if patient_folder == 'blank' then
+                patient_folder = patient_id
             end
+        else
+            patient_id = 'blank'
+        end
 
-            -- Zip the study files to save space and remove the originals after zipping
-            print('Zipping physics imagess: ' .. zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '*.dcm"')
-            os.execute(zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '*.dcm"')
-            print('Removing physics study folder: ' .. rmdir_cmd .. ' "' .. temp_files_path .. '"')
-            os.execute(rmdir_cmd .. ' "' .. temp_files_path .. '"')
+        for i = 1, #physics_to_keep do
+            if string.match(string.lower(patient_name), string.lower(physics_to_keep[i])) or string.match(string.lower(patient_id), string.lower(physics_to_keep[i])) then
+                -- It is a physics patient - save them to the physics folder
+                --print('It is physics')
+                local first_series = 1
+                local temp_files_path = ''
 
-            -- Exit the function, as a physics study was found and the images moved
-            return true
+                -- Retrieve the IDs of all the series in this study
+                local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
 
+                for i, current_series in pairs(series) do
+
+                    if first_series == 1 then
+                        -- Create a string containing the folder path.
+                        temp_files_path = ToAscii(physics_to_keep_folder .. study_tags.StudyDate .. dir_sep .. patient_folder)
+                        -- print('temp_files_path is: ' .. temp_files_path)
+
+                        -- Create the folder
+                        os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
+                        -- print('Just tried to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
+
+                        first_series = 0
+                    end
+
+                    local instances = ParseJson(RestApiGet('/series/' .. current_series)) ['Instances']
+
+                    -- Loop through each instance in the current_series
+                    for j, instance in pairs(instances) do
+                        -- Retrieve the DICOM file from Orthanc
+                        local dicom = RestApiGet('/instances/' .. instance .. '/file')
+
+                        -- Write the DICOM file to the folder created earlier
+                        local target = assert(io.open(temp_files_path .. dir_sep .. instance .. '.dcm', 'wb'))
+                        -- print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
+                        target:write(dicom)
+                        target:close()
+
+                        -- Remove the instance from Orthanc
+                        Delete(instance)
+                    end
+                end
+
+                -- Zip the study files to save space and remove the originals after zipping
+                print('Zipping physics imagess: ' .. zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '*.dcm"')
+                os.execute(zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '*.dcm"')
+                print('Removing physics study folder: ' .. rmdir_cmd .. ' "' .. temp_files_path .. '"')
+                os.execute(rmdir_cmd .. ' "' .. temp_files_path .. '"')
+
+                -- Exit the function, as a physics study was found and the images moved
+                return true
+
+            end
         end
     end
     -------------------------------------------------------------------------------------
@@ -350,67 +358,69 @@ function OnStableStudy(studyId)
     -------------------------------------------------------------------------------------
     -- Use the CT Toshiba extractor on the study if the manufacturer and model are in the
     -- toshiba_extractor_systems list.
-    if (study_tags.Manufacturer == nil) or (study_tags.ManufacturerModelName == nil) then
-        -- If the Manufacturer or ManufacturerModelName is nil then the Toshiba check cannot be made
-        print('Rejecting DICOM instance because one of both of Manufacturer or ManufacturerModelName tag are nil.')
-        -- Delete the DICOM instance and exit the function
-        Delete(instance)
-        return true
-    end
-
-    for i = 1, #toshiba_extractor_systems do
-        local first_series
-        local temp_files_path
-        if (study_tags.Modality == 'CT')
-              and (string.lower(study_tags.Manufacturer) == string.lower(toshiba_extractor_systems[i][1]))
-              and (string.lower(study_tags.ManufacturerModelName) == string.lower(toshiba_extractor_systems[i][2])) then
-
-            first_series = 1
-            temp_files_path = ''
-
-            -- Retrieve the IDs of all the series in this study
-            local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
-
-            for i, current_series in pairs(series) do
-
-                if first_series == 1 then
-                    -- Create a string containing the folder path. This needs to be a single folder so that the Toshiba CT extractor
-                    -- is able to remove it once the data has been imported into OpenREM.
-                    temp_files_path = ToAscii(temp_path .. study_tags.StudyDate .. '_' .. study_tags.PatientID .. '_' .. studyId)
-                    -- print('temp_files_path is: ' .. temp_files_path)
-
-                    -- Create the folder
-                    os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
-                    -- print('Just tried to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
-
-                    first_series = 0
-                end
-
-                -- Obtain a table of instances in the series
-                local instances = ParseJson(RestApiGet('/series/' .. current_series)) ['Instances']
-
-                -- Loop through each instance
-                for j, instance in pairs(instances) do
-                    -- Retrieve the DICOM file from Orthanc
-                    local dicom = RestApiGet('/instances/' .. instance .. '/file')
-
-                    -- Write the DICOM file to the folder created earlier
-                    local target = assert(io.open(temp_files_path .. dir_sep .. instance .. '.dcm', 'wb'))
-                    -- print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
-                    target:write(dicom)
-                    target:close()
-
-                    -- Remove the instance from Orthanc
-                    Delete(instance)
-                end
-            end
-
-            -- Run the Toshiba extractor on the folder. The extractor will remove the temp_files_path folder.
-            -- print('Trying to run: ' .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
-            os.execute(python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
-
-            -- Exit the function
+    if toshiba_extractor_systems[1][1] ~= nil then
+        if (study_tags.Manufacturer == nil) or (study_tags.ManufacturerModelName == nil) then
+            -- If the Manufacturer or ManufacturerModelName is nil then the Toshiba check cannot be made
+            print('Rejecting DICOM study because one of both of Manufacturer or ManufacturerModelName tag are nil: ' .. studyId)
+            -- Delete the study and exit the function
+            Delete(studyId)
             return true
+        end
+
+        for i = 1, #toshiba_extractor_systems do
+            local first_series
+            local temp_files_path
+            if (study_tags.Modality == 'CT')
+                  and (string.lower(study_tags.Manufacturer) == string.lower(toshiba_extractor_systems[i][1]))
+                  and (string.lower(study_tags.ManufacturerModelName) == string.lower(toshiba_extractor_systems[i][2])) then
+
+                first_series = 1
+                temp_files_path = ''
+
+                -- Retrieve the IDs of all the series in this study
+                local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
+
+                for i, current_series in pairs(series) do
+
+                    if first_series == 1 then
+                        -- Create a string containing the folder path. This needs to be a single folder so that the Toshiba CT extractor
+                        -- is able to remove it once the data has been imported into OpenREM.
+                        temp_files_path = ToAscii(temp_path .. study_tags.StudyDate .. '_' .. study_tags.PatientID .. '_' .. studyId)
+                        -- print('temp_files_path is: ' .. temp_files_path)
+
+                        -- Create the folder
+                        os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
+                        -- print('Just tried to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
+
+                        first_series = 0
+                    end
+
+                    -- Obtain a table of instances in the series
+                    local instances = ParseJson(RestApiGet('/series/' .. current_series)) ['Instances']
+
+                    -- Loop through each instance
+                    for j, instance in pairs(instances) do
+                        -- Retrieve the DICOM file from Orthanc
+                        local dicom = RestApiGet('/instances/' .. instance .. '/file')
+
+                        -- Write the DICOM file to the folder created earlier
+                        local target = assert(io.open(temp_files_path .. dir_sep .. instance .. '.dcm', 'wb'))
+                        -- print('Trying to write file: ' .. temp_files_path .. dir_sep .. instance .. '.dcm')
+                        target:write(dicom)
+                        target:close()
+
+                        -- Remove the instance from Orthanc
+                        Delete(instance)
+                    end
+                end
+
+                -- Run the Toshiba extractor on the folder. The extractor will remove the temp_files_path folder.
+                -- print('Trying to run: ' .. python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
+                os.execute(python_executable.. ' ' .. python_scripts_path .. 'openrem_cttoshiba.py' .. ' ' .. temp_files_path)
+
+                -- Exit the function
+                return true
+            end
         end
     end
     -------------------------------------------------------------------------------------
