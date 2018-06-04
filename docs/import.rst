@@ -28,22 +28,24 @@ To get started, you can make use of the in-built DICOM store that can be configu
 
     netdicom-nodes
 
+..  _configure_third_party_DICOM:
+
+Third-party DICOM Stores
+------------------------
+
 However, this
 hasn't proved to be stable over the longer term with the current implementation and library that it depends on. This
-will be rectified in a future version, but for now we recommend you use a third-party DICOM store, and in particular we
-recommend Conquest DICOM server:
-
-..  toctree::
-    :maxdepth: 2
-
-    netdicom-store
-
-Orthanc alternative
+will be rectified in a future version, but for now we recommend you use a third-party DICOM store. Previous releases
+have recommended the Conquest DICOM server which is very good for this task. However, due to difficulties with
+installation on some platforms, we are now recommending the Orthanc DICOM server instead:
 
 ..  toctree::
     :maxdepth: 2
 
     netdicom-orthanc-config
+    netdicom-store
+
+You ony need one or other of these - if you have one installed it is probably easiest to stick to it.
 
 Query-retrieve from a PACS or similar
 =====================================

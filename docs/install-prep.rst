@@ -139,13 +139,21 @@ Install a DICOM Store service
 To have modalities send DICOM objects to your OpenREM server, or to use query-retrieve from a PACS, you need to install
 a DICOM Store service. For testing, you can make use of the DICOM Store OpenREM can provide. However, because this is not
 stable over longer periods of time we recommend using a third-party DICOM Store service. You can use any one you like,
-as long as it can be scripted to call OpenREM scripts when DICOM objects are received. We recommend Conquest for this
-and provide details of how to use it in the :doc:`netdicom` section.
+as long as it can be scripted to call OpenREM scripts when DICOM objects are received. We recommend Orthanc or Conquest
+for this and provide details of how to configure them in the :ref:`configure_third_party_DICOM` section.
 
+Orthanc
+-------
+* Ubuntu users: ``sudo apt install orthanc``
+* Windows users: Download from https://www.orthanc-server.com/download-windows.php after filling in the form
+* Configuration instructions can be found in the :ref:`configure_third_party_DICOM` section.
+
+Alternative - Conquest
+----------------------
 * Download Conquest DICOM server from https://ingenium.home.xs4all.nl/dicom.html
 * Install using the instructions included in the download - there is a PDF with Windows install instructions and general
-  usage instructions, and another PDF with Linux install instructions. The guides in :doc:`netdicom` should be
-  consulted when making configuration decisions.
+  usage instructions, and another PDF with Linux install instructions. The guides in :ref:`configure_third_party_DICOM`
+  should be consulted when making configuration decisions.
 * Alternatively, Ubuntu 16.04 users can use the following instructions:
 
 ..  toctree::
