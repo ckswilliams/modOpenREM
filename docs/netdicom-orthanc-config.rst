@@ -196,8 +196,8 @@ Check permissions
 
 **Linux**
 
-* Linux: orthanc user needs to be able to write to the OpenREM logs
-* Linux: orthanc user needs to be able to write to the temp directory we specified
+* orthanc user needs to be able to write to the OpenREM logs
+* orthanc user needs to be able to write to the temp directory we specified
 
 **Windows**
 
