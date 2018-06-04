@@ -185,9 +185,11 @@ function OnStoredInstance(instanceId)
         import_script = 'openrem_mg.py'
     elseif (instance_tags.Modality == 'CR') or (instance_tags.Modality == 'DX') then
         import_script = 'openrem_dx.py'
-    elseif (instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7') and string.match(string.lower(instance_tags.Manufacturer), 'philips') then
-        -- Secondary Capture object that might be Philips CT Dose Info image
-        import_script = 'openrem_ctphilips.py'
+    elseif instance_tags.Manufacturer ~= nil then
+        if (instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7') and string.match(string.lower(instance_tags.Manufacturer), 'philips') then
+            -- Secondary Capture object that might be Philips CT Dose Info image
+            import_script = 'openrem_ctphilips.py'
+        end
     end
     -------------------------------------------------------------------------------------
 
@@ -197,6 +199,13 @@ function OnStoredInstance(instanceId)
     -- a make/model pair in toshiba_extractor_systems
     local use_toshiba_extractor = 0
     if import_script == '' then
+        if (instance_tags.Manufacturer == nil) or (instance_tags.ManufacturerModelName == nil) then
+            -- If the Manufacturer or ManufacturerModelName is nil then the Toshiba check cannot be made
+            print('Rejecting DICOM instance because one of both of Manufacturer or ManufacturerModelName tag are nil.')
+            -- Delete the DICOM instance and exit the function
+            Delete(instanceId)
+            return true
+        end
         for i = 1, #toshiba_extractor_systems do
             if (instance_tags.Modality == 'CT')
                   and (string.lower(instance_tags.Manufacturer) == string.lower(toshiba_extractor_systems[i][1]))
@@ -220,12 +229,12 @@ function OnStoredInstance(instanceId)
         -- See http://dicom.nema.org/dicom/2013/output/chtml/part04/sect_B.5.html for a list
         -- of standard SOP classes
         print('Rejecting a DICOM instance.'
-              .. ' SOP Class UID: '      .. instance_tags.SOPClassUID
-              .. '; modality: '         .. instance_tags.Modality
-              .. '; make: '             .. instance_tags.Manufacturer
-              .. '; model: '            .. instance_tags.ManufacturerModelName
-              .. '; software version: ' .. instance_tags.SoftwareVersions
-              .. '; station name: '     .. instance_tags.StationName)
+              .. ' SOPClassUID: '            .. instance_tags.SOPClassUID
+              .. '; Modality: '              .. instance_tags.Modality
+              .. '; Manufacturer: '          .. instance_tags.Manufacturer
+              .. '; ManufacturerModelName: ' .. instance_tags.ManufacturerModelName
+              .. '; SoftwareVersions: '      .. instance_tags.SoftwareVersions
+              .. '; StationName: '           .. instance_tags.StationName)
         Delete(instanceId)
         return true
     end
@@ -341,6 +350,14 @@ function OnStableStudy(studyId)
     -------------------------------------------------------------------------------------
     -- Use the CT Toshiba extractor on the study if the manufacturer and model are in the
     -- toshiba_extractor_systems list.
+    if (study_tags.Manufacturer == nil) or (study_tags.ManufacturerModelName == nil) then
+        -- If the Manufacturer or ManufacturerModelName is nil then the Toshiba check cannot be made
+        print('Rejecting DICOM instance because one of both of Manufacturer or ManufacturerModelName tag are nil.')
+        -- Delete the DICOM instance and exit the function
+        Delete(instance)
+        return true
+    end
+
     for i = 1, #toshiba_extractor_systems do
         local first_series
         local temp_files_path
