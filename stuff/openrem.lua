@@ -18,6 +18,13 @@ local dir_sep = '\\'
 
 -- Set this to the path where you want to keep physics-related DICOM images
 local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
+
+-- Set this to the path and name of your zip utility
+local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a'
+
+-- Set this to the path and name of your remove folder command, including switches
+-- for it to be quiet
+local rmdir_cmd = 'rmdir /s/q'
 -------------------------------------------------------------------------------------
 
 
@@ -306,6 +313,12 @@ function OnStableStudy(studyId)
                     Delete(instance)
                 end
             end
+
+            -- Zip the study files to save space and remove the originals after zipping
+            print('Zipping physics imagess: ' .. zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '*.dcm"')
+            os.execute(zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '*.dcm"')
+            print('Removing physics study folder: ' .. rmdir_cmd .. ' "' .. temp_files_path .. '"')
+            os.execute(rmdir_cmd .. ' "' .. temp_files_path .. '"')
 
             -- Exit the function, as a physics study was found and the images moved
             return true
