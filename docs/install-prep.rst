@@ -156,10 +156,10 @@ Alternative - Conquest
   should be consulted when making configuration decisions.
 * Alternatively, Ubuntu 16.04 users can use the following instructions:
 
-..  toctree::
-    :maxdepth: 1
+  ..  toctree::
+      :maxdepth: 1
 
-    conquestUbuntu
+      conquestUbuntu
 
 Unlike with the database, it is possible to change DICOM Store service at a later point.
 
@@ -208,6 +208,25 @@ and provide the full path to script in the `Scripts` folder. If you call the
 script (such as `openrem_rdsr.py`) without prefixing it with `python`, the
 system wide Python will be used instead. This doesn't apply to Linux, where
 once activated, the scripts can be called without a `python` prefix from anywhere.
+
+Quickstart Ubuntu install
+=========================
+
+If you want to get everything installed quickly, you could do the following on a Ubuntu server::
+
+    dose@ubuntu1604:~$ sudo apt update
+    dose@ubuntu1604:~$ sudo apt install python python-pip rabbitmq-server postgresql libpq-dev orthanc dcmtk default-jre
+    dose@ubuntu1604:~$ pip install virtualenv
+    dose@ubuntu1604:~$ virtualenv veopenrem
+    dose@ubuntu1604:~$ . veopenrem/bin/activate
+    (veopenrem) dose@ubuntu1604:~$ pip install numpy psycopg2
+
+You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
+e.g.::
+
+    (veopenrem) dose@ubuntu1604:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
+
+You are now ready for :doc:`install`.
 
 .. _virtualenv: https://virtualenv.pypa.io/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
