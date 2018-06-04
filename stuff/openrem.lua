@@ -316,7 +316,8 @@ function OnStableStudy(studyId)
                 -- Retrieve the IDs of all the series in this study
                 local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
 
-                for i, current_series in pairs(series) do
+                -- using _ as a placeholder as I'm not interested in the key value
+                for _, current_series in pairs(series) do
 
                     if first_series == true then
                         -- Create a string containing the folder path.
@@ -333,7 +334,8 @@ function OnStableStudy(studyId)
                     local instances = ParseJson(RestApiGet('/series/' .. current_series)) ['Instances']
 
                     -- Loop through each instance in the current_series
-                    for j, instance in pairs(instances) do
+                    -- using _ as a placeholder as I'm not interested in the key value
+                    for _, instance in pairs(instances) do
                         -- Retrieve the DICOM file from Orthanc
                         local dicom = RestApiGet('/instances/' .. instance .. '/file')
 
@@ -388,7 +390,8 @@ function OnStableStudy(studyId)
                 -- Retrieve the IDs of all the series in this study
                 local series = ParseJson(RestApiGet('/studies/' .. studyId)) ['Series']
 
-                for i, current_series in pairs(series) do
+                -- using _ as a placeholder as I'm not interested in the key value
+                for _, current_series in pairs(series) do
 
                     if first_series == true then
                         -- Create a string containing the folder path. This needs to be a single folder so that the Toshiba CT extractor
@@ -407,7 +410,8 @@ function OnStableStudy(studyId)
                     local instances = ParseJson(RestApiGet('/series/' .. current_series)) ['Instances']
 
                     -- Loop through each instance
-                    for j, instance in pairs(instances) do
+                    -- using _ as a placeholder as I'm not interested in the key value
+                    for _, instance in pairs(instances) do
                         -- Retrieve the DICOM file from Orthanc
                         local dicom = RestApiGet('/instances/' .. instance .. '/file')
 
