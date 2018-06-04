@@ -14,6 +14,9 @@ Edit the top two sections
 
 ..  sourcecode:: lua
 
+    -------------------------------------------------------------------------------------
+    -- OpenREM python environment and other settings
+
     -- Set this to the path and name of the python executable used by OpenREM
     local python_executable = 'D:\\Server_Apps\\python27\\python.exe'
 
@@ -29,14 +32,18 @@ Edit the top two sections
     -- Set this to '\\'' on Windows, or '/' on Linux
     local dir_sep = '\\'
 
+    -- Set this to true if you want Orthanc to keep physics test studies, and have it
+    -- put them in the physics_to_keep_folder. Set it to false to disable this feature
+    local use_physics_filtering = true
+
     -- Set this to the path where you want to keep physics-related DICOM images
     local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
 
-    -- Set this to the path and name of your zip utility
+    -- Set this to the path and name of your zip utility (used with physics-related images)
     local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a'
 
     -- Set this to the path and name of your remove folder command, including switches
-    -- for it to be quiet
+    -- for it to be quiet (used with physics-related images)
     local rmdir_cmd = 'rmdir /s/q'
     -------------------------------------------------------------------------------------
 
@@ -55,6 +62,10 @@ Edit the top two sections
     local station_names_to_ignore = {'CR85 Main', 'CR75 Main'}
     local software_versions_to_ignore = {'VixWin Platinum v3.3'}
     local device_serial_numbers_to_ignore = {'SCB1312016'}
+
+    -- Set this to true if you want to use the OpenREM Toshiba CT extractor. Set it to
+    -- false to disable this feature.
+    local use_toshiba_ct_extractor = true
 
     -- A list of CT make and model pairs that are known to have worked with the Toshiba CT extractor
     local toshiba_extractor_systems = {
@@ -112,17 +123,21 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
     # Windows example:
     local temp_path = 'C:\\Temp\\orthanc\\'
 
-**physics_to_keep_folder** *Optional* Set this to the path where you want to keep physics-related DICOM images::
+* Using Orthanc to collect Physics QA images:
 
-    local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
+  **use_physics_filtering** set this to ``false`` if you don't want to use this facility. If this is false, the other
+  physics image related values don't matter. If it is ``true``, the:
 
+  **physics_to_keep_folder** *Optional* Set this to the path where you want to keep physics-related DICOM images::
 
-**physics_to_keep** A list to check against patient name and ID to see if the images should be kept.
-Orthanc will put anything that matches this in the ``physics_to_keep_folder``::
+      local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
 
-    local physics_to_keep = {'physics'}
-    # If you don't want to use this facility, set
-    local physics_to_keep = {}
+  **physics_to_keep** A list to check against patient name and ID to see if the images should be kept.
+  Orthanc will put anything that matches this in the ``physics_to_keep_folder``::
+
+      local physics_to_keep = {'physics'}
+      # If you don't want to use this facility, set
+      local physics_to_keep = {}
 
 * Lists of things to ignore. Orthanc will ignore anything matching the content of
   these comma separated lists: they will not be imported into OpenREM::
@@ -133,17 +148,22 @@ Orthanc will put anything that matches this in the ``physics_to_keep_folder``::
     local software_versions_to_ignore = {'VixWin Platinum v3.3'}
     local device_serial_numbers_to_ignore = {'SCB1312016'}
 
-**toshiba_extractor_systems** A list of CT make and model pairs that are known to have worked with the Toshiba CT
-extractor. These will only be considered if an RDSR is not found with the study, otherwise that will be used in
-preference. The format is ``{{'manufacturer', 'model'}, {'manufacturer two'}, {'model two'}}`` etc. They will be
-matched against the names presented in the DICOM headers. See :ref:`install_toshiba_resources`::
+* Attempting to get dose data from CT studies with no RDSR using the OpenREMToshiba CT extractor
 
-    local toshiba_extractor_systems = {
-            {'Toshiba', 'Aquilion'},
-            {'GE Medical Systems', 'Discovery STE'},
-    }
-    # If you haven't installed the additional resources, set
-    local toshiba_extractor_systems = {}
+  **use_toshiba_ct_extractor** set this to ``false`` if you haven't installed the additional
+  :ref:`install_toshiba_resources` or do not wish to use this function. Otherwise:
+
+  **toshiba_extractor_systems** A list of CT make and model pairs that are known to have worked with the Toshiba CT
+  extractor. These will only be considered if an RDSR is not found with the study, otherwise that will be used in
+  preference. The format is ``{{'manufacturer', 'model'}, {'manufacturer two'}, {'model two'}}`` etc. They will be
+  matched against the names presented in the DICOM headers::
+
+      local toshiba_extractor_systems = {
+              {'Toshiba', 'Aquilion'},
+              {'GE Medical Systems', 'Discovery STE'},
+      }
+      # If you haven't installed the additional resources, set
+      local toshiba_extractor_systems = {}
 
 
 Configure Orthanc to make use of the openrem.lua file
