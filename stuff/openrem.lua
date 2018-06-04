@@ -216,6 +216,16 @@ function OnStoredInstance(instanceId)
     -- don't know how to deal with this DICOM file - delete the instance from Orthanc and
     -- exit the function.
     if (use_toshiba_extractor == 0) and (import_script == '') then
+        -- Log the SOP Class UID, modality, make, model, software version and station name
+        -- See http://dicom.nema.org/dicom/2013/output/chtml/part04/sect_B.5.html for a list
+        -- of standard SOP classes
+        print('Rejecting a DICOM instance.'
+              .. ' SOP Class UID: '      .. instance_tags.SOPClassUID
+              .. '; modality: '         .. instance_tags.Modality
+              .. '; make: '             .. instance_tags.Manufacturer
+              .. '; model: '            .. instance_tags.ManufacturerModelName
+              .. '; software version: ' .. instance_tags.SoftwareVersions
+              .. '; station name: '     .. instance_tags.StationName)
         Delete(instanceId)
         return true
     end
