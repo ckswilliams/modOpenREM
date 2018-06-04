@@ -14,8 +14,6 @@ Edit the top two sections
 
 ..  sourcecode:: lua
 
-    -- OpenREM python environment and other settings
-
     -- Set this to the path and name of the python executable used by OpenREM
     local python_executable = 'D:\\Server_Apps\\python27\\python.exe'
 
@@ -33,6 +31,13 @@ Edit the top two sections
 
     -- Set this to the path where you want to keep physics-related DICOM images
     local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
+
+    -- Set this to the path and name of your zip utility
+    local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a'
+
+    -- Set this to the path and name of your remove folder command, including switches
+    -- for it to be quiet
+    local rmdir_cmd = 'rmdir /s/q'
     -------------------------------------------------------------------------------------
 
 
@@ -71,9 +76,10 @@ Edit the top two sections
     }
     -------------------------------------------------------------------------------------
 
-**OpenREM python environment and other settings**
+Guide to customising Orthanc configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Set this to the path and name of the python executable used by OpenREM::
+**python_executable** Set this to the path and name of the python executable used by OpenREM::
 
     # Linux, no virtualenv example:
     local python_executable = '/usr/bin/python'
@@ -84,7 +90,7 @@ Edit the top two sections
     # Windows, using virtualenv example:
     local python_executable = 'C:\\path\\to\\virtualenv\\Scripts\\python.exe'
 
-* Set this to the path of the python scripts folder used by OpenREM::
+**python_scripts_path** Set this to the path of the python scripts folder used by OpenREM::
 
     # Linux, no virtualenv example:
     local python_scripts_path = '/usr/local/bin/'
@@ -95,52 +101,44 @@ Edit the top two sections
     # Windows, using virtualenv example:
     local python_scripts_path = 'C:\\path\\to\\virtualenv\\Scripts\\'
 
-* Set this to the path where you want Orthanc to temporarily store DICOM files. Note: the folder must exist::
+**temp_path** Set this to the path where you want Orthanc to temporarily store DICOM files.
+Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu Linux the user is ``orthanc``::
 
     # Linux example:
     local temp_path = '/tmp/orthanc/'
+    # To create the directory:
+    mkdir /tmp/orthanc
+    sudo chown orthanc /tmp/orthanc/
     # Windows example:
     local temp_path = 'E:\\conquest\\dicom\\'
 
-* *Optional* Set this to the path where you want to keep physics-related DICOM images::
+**physics_to_keep_folder** *Optional* Set this to the path where you want to keep physics-related DICOM images::
 
     local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
 
 
-**User-defined lists that determine how Orthanc deals with certain studies**
-
-* A list to check against patient name and ID to see if the images should be kept.
+**physics_to_keep** A list to check against patient name and ID to see if the images should be kept.
   Orthanc will put anything that matches this in the ``physics_to_keep_folder``::
 
     local physics_to_keep = {'physics'}
 
 * Lists of things to ignore. Orthanc will ignore anything matching the content of
-  these lists: they will not be imported into OpenREM::
+  these comma separated lists: they will not be imported into OpenREM::
 
-    local manufacturers_to_ignore = {'Agfa', 'Agfa-Gevaert', 'Agfa-Gevaert AG', 'Faxitron X-Ray LLC', 'Gendex-KaVo'}
-    local model_names_to_ignore = {'CR 85', 'CR 75', 'CR 35', 'CR 25', 'ADC_5146', 'CR975'}
+    local manufacturers_to_ignore = {'Faxitron X-Ray LLC', 'Gendex-KaVo'}
+    local model_names_to_ignore = {'CR 85', 'CR 75'}
     local station_names_to_ignore = {'CR85 Main', 'CR75 Main'}
     local software_versions_to_ignore = {'VixWin Platinum v3.3'}
     local device_serial_numbers_to_ignore = {'SCB1312016'}
 
-* A list of CT make and model pairs that are known to have worked with the Toshiba CT extractor::
+**toshiba_extractor_systems** A list of CT make and model pairs that are known to have worked with the Toshiba CT
+extractor. These will only be considered if an RDSR is not found with the study, otherwise that will be used in
+preference. The format is ``{{'manufacturer', 'model'}, {'manufacturer two'}, {'model two'}}`` etc. They will be
+matched against the names presented in the DICOM headers::
 
     local toshiba_extractor_systems = {
             {'GE Medical Systems', 'Discovery 710'},
             {'GE Medical Systems', 'Discovery ste'},
-            {'GE Medical Systems', 'Brightspeed'},
-            {'GE Medical Systems', 'Lightspeed Plus'},
-            {'GE Medical Systems', 'Lightspeed16'},
-            {'GE Medical Systems', 'Lightspeed Pro 32'},
-            {'GE Medical Systems', 'Lightspeed VCT'},
-            {'Siemens', 'Biograph64'},
-            {'Siemens', 'Somatom Definition'},
-            {'Siemens', 'Somatom Definition Edge'},
-            {'Siemens', 'Somatom Definition Flash'},
-            {'Siemens', 'Somatom Force'},
-            {'Toshiba', 'Aquilion'},
-            {'Toshiba', 'Aquilion Prime'},
-            {'Toshiba', 'Aquilion One'}
     }
 
 
