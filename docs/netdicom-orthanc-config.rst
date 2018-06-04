@@ -136,7 +136,7 @@ Orthanc will put anything that matches this in the ``physics_to_keep_folder``::
 **toshiba_extractor_systems** A list of CT make and model pairs that are known to have worked with the Toshiba CT
 extractor. These will only be considered if an RDSR is not found with the study, otherwise that will be used in
 preference. The format is ``{{'manufacturer', 'model'}, {'manufacturer two'}, {'model two'}}`` etc. They will be
-matched against the names presented in the DICOM headers. See :ref:`install_toshiba_resources`_::
+matched against the names presented in the DICOM headers. See :ref:`install_toshiba_resources`::
 
     local toshiba_extractor_systems = {
             {'GE Medical Systems', 'Discovery 710'},
