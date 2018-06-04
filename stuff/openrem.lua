@@ -16,6 +16,10 @@ local mkdir_cmd = 'mkdir'
 -- Set this to '\\'' on Windows, or '/' on Linux
 local dir_sep = '\\'
 
+-- Set this to true if you want Orthanc to keep physics test studies, and have it
+-- put them in the physics_to_keep_folder. Set it to false to disable this feature
+local use_physics_filtering = true
+
 -- Set this to the path where you want to keep physics-related DICOM images
 local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
 
@@ -42,6 +46,10 @@ local model_names_to_ignore = {'CR 85', 'CR 75', 'CR 35', 'CR 25', 'ADC_5146', '
 local station_names_to_ignore = {'CR85 Main', 'CR75 Main'}
 local software_versions_to_ignore = {'VixWin Platinum v3.3'}
 local device_serial_numbers_to_ignore = {'SCB1312016'}
+
+-- Set this to true if you want to use the OpenREM Toshiba CT extractor. Set it to
+-- false to disable this feature.
+local use_toshiba_ct_extractor = true
 
 -- A list of CT make and model pairs that are known to have worked with the Toshiba CT extractor
 local toshiba_extractor_systems = {
@@ -93,7 +101,7 @@ function OnStoredInstance(instanceId)
     -------------------------------------------------------------------------------------
     -- See if the images are physics tests - if so, keep them and exit this function
     --print('Is it a physics test?')
-    if physics_to_keep[1] ~= nil then
+    if use_physics_filtering == true then
         if instance_tags.PatientName ~= nil then
             for i = 1, #physics_to_keep do
                 if string.match(string.lower(instance_tags.PatientName), string.lower(physics_to_keep[i])) then
@@ -199,9 +207,9 @@ function OnStoredInstance(instanceId)
     -------------------------------------------------------------------------------------
     -- Work out if the Toshiba CT extractor should be used - must be CT and a match with
     -- a make/model pair in toshiba_extractor_systems
-    local use_toshiba_extractor = 0
+    local toshiba_extractor_match = false
 
-    if toshiba_extractor_systems[1][1] ~= nil then
+    if use_toshiba_ct_extractor == true then
         if import_script == '' then
             if (instance_tags.Manufacturer == nil) or (instance_tags.ManufacturerModelName == nil) then
                 -- If the Manufacturer or ManufacturerModelName is nil then the Toshiba check cannot be made
@@ -216,7 +224,7 @@ function OnStoredInstance(instanceId)
                       and (string.lower(instance_tags.ManufacturerModelName) == string.lower(toshiba_extractor_systems[i][2])) then
                     -- Might be useful Toshiba import, leave it in the database until the study has finished importing
                     --print('I am going to use the Toshiba CT extractor on this study')
-                    use_toshiba_extractor = 1
+                    toshiba_extractor_match = true
                     return true
                 end
             end
@@ -229,7 +237,7 @@ function OnStoredInstance(instanceId)
     -- If we're not using the Toshiba CT extractor and import_script is empty then we
     -- don't know how to deal with this DICOM file - delete the instance from Orthanc and
     -- exit the function.
-    if (use_toshiba_extractor == 0) and (import_script == '') then
+    if (toshiba_extractor_match == false) and (import_script == '') then
         -- Log the SOP Class UID, modality, make, model, software version and station name
         -- See http://dicom.nema.org/dicom/2013/output/chtml/part04/sect_B.5.html for a list
         -- of standard SOP classes
@@ -277,7 +285,7 @@ function OnStableStudy(studyId)
     -------------------------------------------------------------------------------------
     -- See if any of the physics strings are in patient name or ID. If they are then
     -- copy the image to the physics_to_keep_folder and then remove it from Orthanc
-    if physics_to_keep[1] ~= nil then
+    if use_physics_filtering == true then
         local patient_name
         local patient_id
         local patient_folder = 'blank'
@@ -302,7 +310,7 @@ function OnStableStudy(studyId)
             if string.match(string.lower(patient_name), string.lower(physics_to_keep[i])) or string.match(string.lower(patient_id), string.lower(physics_to_keep[i])) then
                 -- It is a physics patient - save them to the physics folder
                 --print('It is physics')
-                local first_series = 1
+                local first_series = true
                 local temp_files_path = ''
 
                 -- Retrieve the IDs of all the series in this study
@@ -310,7 +318,7 @@ function OnStableStudy(studyId)
 
                 for i, current_series in pairs(series) do
 
-                    if first_series == 1 then
+                    if first_series == true then
                         -- Create a string containing the folder path.
                         temp_files_path = ToAscii(physics_to_keep_folder .. study_tags.StudyDate .. dir_sep .. patient_folder)
                         -- print('temp_files_path is: ' .. temp_files_path)
@@ -319,7 +327,7 @@ function OnStableStudy(studyId)
                         os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
                         -- print('Just tried to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
 
-                        first_series = 0
+                        first_series = false
                     end
 
                     local instances = ParseJson(RestApiGet('/series/' .. current_series)) ['Instances']
@@ -358,7 +366,7 @@ function OnStableStudy(studyId)
     -------------------------------------------------------------------------------------
     -- Use the CT Toshiba extractor on the study if the manufacturer and model are in the
     -- toshiba_extractor_systems list.
-    if toshiba_extractor_systems[1][1] ~= nil then
+    if use_toshiba_ct_extractor == true then
         if (study_tags.Manufacturer == nil) or (study_tags.ManufacturerModelName == nil) then
             -- If the Manufacturer or ManufacturerModelName is nil then the Toshiba check cannot be made
             print('Rejecting DICOM study because one of both of Manufacturer or ManufacturerModelName tag are nil: ' .. studyId)
@@ -374,7 +382,7 @@ function OnStableStudy(studyId)
                   and (string.lower(study_tags.Manufacturer) == string.lower(toshiba_extractor_systems[i][1]))
                   and (string.lower(study_tags.ManufacturerModelName) == string.lower(toshiba_extractor_systems[i][2])) then
 
-                first_series = 1
+                first_series = true
                 temp_files_path = ''
 
                 -- Retrieve the IDs of all the series in this study
@@ -382,7 +390,7 @@ function OnStableStudy(studyId)
 
                 for i, current_series in pairs(series) do
 
-                    if first_series == 1 then
+                    if first_series == true then
                         -- Create a string containing the folder path. This needs to be a single folder so that the Toshiba CT extractor
                         -- is able to remove it once the data has been imported into OpenREM.
                         temp_files_path = ToAscii(temp_path .. study_tags.StudyDate .. '_' .. study_tags.PatientID .. '_' .. studyId)
@@ -392,7 +400,7 @@ function OnStableStudy(studyId)
                         os.execute(mkdir_cmd .. ' "' .. temp_files_path .. '"')
                         -- print('Just tried to create folder: ' .. mkdir_cmd .. ' "' .. temp_files_path .. '"')
 
-                        first_series = 0
+                        first_series = false
                     end
 
                     -- Obtain a table of instances in the series
