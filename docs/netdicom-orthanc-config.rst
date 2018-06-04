@@ -110,7 +110,7 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
     mkdir /tmp/orthanc
     sudo chown orthanc /tmp/orthanc/
     # Windows example:
-    local temp_path = 'E:\\conquest\\dicom\\'
+    local temp_path = 'C:\\Temp\\orthanc\\'
 
 **physics_to_keep_folder** *Optional* Set this to the path where you want to keep physics-related DICOM images::
 
@@ -118,9 +118,11 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
 
 
 **physics_to_keep** A list to check against patient name and ID to see if the images should be kept.
-  Orthanc will put anything that matches this in the ``physics_to_keep_folder``::
+Orthanc will put anything that matches this in the ``physics_to_keep_folder``::
 
     local physics_to_keep = {'physics'}
+    # If you don't want to use this facility, set
+    local physics_to_keep = {}
 
 * Lists of things to ignore. Orthanc will ignore anything matching the content of
   these comma separated lists: they will not be imported into OpenREM::
@@ -134,12 +136,14 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
 **toshiba_extractor_systems** A list of CT make and model pairs that are known to have worked with the Toshiba CT
 extractor. These will only be considered if an RDSR is not found with the study, otherwise that will be used in
 preference. The format is ``{{'manufacturer', 'model'}, {'manufacturer two'}, {'model two'}}`` etc. They will be
-matched against the names presented in the DICOM headers::
+matched against the names presented in the DICOM headers. See :ref:`install_toshiba_resources`_::
 
     local toshiba_extractor_systems = {
             {'GE Medical Systems', 'Discovery 710'},
             {'GE Medical Systems', 'Discovery ste'},
     }
+    # If you haven't installed the additional resources, set
+    local toshiba_extractor_systems = {}
 
 
 Configure Orthanc to make use of the openrem.lua file

@@ -155,6 +155,8 @@ and provide details of how to use it in the :doc:`netdicom` section.
 
 Unlike with the database, it is possible to change DICOM Store service at a later point.
 
+.. _install_toshiba_resources:
+
 Resources for creating RDSR for older Toshiba CT scanners
 =========================================================
 
