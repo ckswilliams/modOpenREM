@@ -136,8 +136,6 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
   Orthanc will put anything that matches this in the ``physics_to_keep_folder``::
 
       local physics_to_keep = {'physics'}
-      # If you don't want to use this facility, set
-      local physics_to_keep = {}
 
 * Lists of things to ignore. Orthanc will ignore anything matching the content of
   these comma separated lists: they will not be imported into OpenREM::
@@ -162,9 +160,6 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
               {'Toshiba', 'Aquilion'},
               {'GE Medical Systems', 'Discovery STE'},
       }
-      # If you haven't installed the additional resources, set
-      local toshiba_extractor_systems = {}
-
 
 Configure Orthanc to make use of the openrem.lua file
 -----------------------------------------------------
@@ -199,10 +194,14 @@ Windows (note the double back-slash):
 Check permissions
 -----------------
 
-**Stub**
+**Linux**
 
 * Linux: orthanc user needs to be able to write to the OpenREM logs
 * Linux: orthanc user needs to be able to write to the temp directory we specified
+
+**Windows**
+
+* Orthanc will be running as a local admin user, so should be able to function without any special consideration
 
 Restart Orthanc
 ---------------
