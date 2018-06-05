@@ -60,6 +60,7 @@ local toshiba_extractor_systems = {
         {'GE Medical Systems', 'Lightspeed16'},
         {'GE Medical Systems', 'Lightspeed Pro 32'},
         {'GE Medical Systems', 'Lightspeed VCT'},
+        {'GE Medical Systems', 'Revolution EVO'},
         {'Siemens', 'Biograph64'},
         {'Siemens', 'Somatom Definition'},
         {'Siemens', 'Somatom Definition Edge'},
@@ -186,16 +187,22 @@ function OnStoredInstance(instanceId)
     -------------------------------------------------------------------------------------
     -- Work out if file can be used by the RDSR, MG, DX or ctphilips extractors
     local import_script = ''
-    if instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67' then
-        import_script = 'openrem_rdsr.py'
-    elseif instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22' then
-        -- Enhanced SR used by GE CT Scanners
-        import_script = 'openrem_rdsr.py'
-    elseif instance_tags.Modality == 'MG' then
-        import_script = 'openrem_mg.py'
-    elseif (instance_tags.Modality == 'CR') or (instance_tags.Modality == 'DX') then
-        import_script = 'openrem_dx.py'
-    elseif instance_tags.Manufacturer ~= nil then
+    if instance_tags.SOPClassUID ~= nil then
+        if instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67' then
+            import_script = 'openrem_rdsr.py'
+        elseif instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22' then
+            -- Enhanced SR used by GE CT Scanners
+            import_script = 'openrem_rdsr.py'
+        end
+    end
+    if (instance_tags.Modality ~= nil) and (import_script == '') then
+        if instance_tags.Modality == 'MG' then
+            import_script = 'openrem_mg.py'
+        elseif (instance_tags.Modality == 'CR') or (instance_tags.Modality == 'DX') then
+            import_script = 'openrem_dx.py'
+        end
+    end
+    if (instance_tags.SOPClassUID ~= nil) and (instance_tags.Manufacturer ~= nil) and (import_script == '') then
         if (instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7') and string.match(string.lower(instance_tags.Manufacturer), 'philips') then
             -- Secondary Capture object that might be Philips CT Dose Info image
             import_script = 'openrem_ctphilips.py'
@@ -241,13 +248,14 @@ function OnStoredInstance(instanceId)
         -- Log the SOP Class UID, modality, make, model, software version and station name
         -- See http://dicom.nema.org/dicom/2013/output/chtml/part04/sect_B.5.html for a list
         -- of standard SOP classes
-        print('Rejecting a DICOM instance.'
-              .. ' SOPClassUID: '            .. instance_tags.SOPClassUID
-              .. '; Modality: '              .. instance_tags.Modality
-              .. '; Manufacturer: '          .. instance_tags.Manufacturer
-              .. '; ManufacturerModelName: ' .. instance_tags.ManufacturerModelName
-              .. '; SoftwareVersions: '      .. instance_tags.SoftwareVersions
-              .. '; StationName: '           .. instance_tags.StationName)
+        local reject_msg = 'Rejecting a DICOM instance'
+        if instance_tags.SOPClassUID           ~= nil then reject_msg = reject_msg .. ': SOPClassUID: '           .. instance_tags.SOPClassUID           end
+        if instance_tags.Modality              ~= nil then reject_msg = reject_msg .. '; Modality: '              .. instance_tags.Modality              end
+        if instance_tags.Manufacturer          ~= nil then reject_msg = reject_msg .. '; Manufacturer: '          .. instance_tags.Manufacturer          end
+        if instance_tags.ManufacturerModelName ~= nil then reject_msg = reject_msg .. '; ManufacturerModelName: ' .. instance_tags.ManufacturerModelName end
+        if instance_tags.SoftwareVersions      ~= nil then reject_msg = reject_msg .. '; SoftwareVersions: '      .. instance_tags.SoftwareVersions      end
+        if instance_tags.StationName           ~= nil then reject_msg = reject_msg .. '; StationName: '           .. instance_tags.StationName           end
+        print(reject_msg)
         Delete(instanceId)
         return true
     end
