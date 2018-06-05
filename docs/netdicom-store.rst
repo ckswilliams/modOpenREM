@@ -1,5 +1,5 @@
-Conquest Store
-==============
+Conquest Store configuration
+============================
 
 The instructions for installing Conquest were included in the :ref:`installdicomstore` docs.
 
