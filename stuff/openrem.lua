@@ -187,16 +187,22 @@ function OnStoredInstance(instanceId)
     -------------------------------------------------------------------------------------
     -- Work out if file can be used by the RDSR, MG, DX or ctphilips extractors
     local import_script = ''
-    if instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67' then
-        import_script = 'openrem_rdsr.py'
-    elseif instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22' then
-        -- Enhanced SR used by GE CT Scanners
-        import_script = 'openrem_rdsr.py'
-    elseif instance_tags.Modality == 'MG' then
-        import_script = 'openrem_mg.py'
-    elseif (instance_tags.Modality == 'CR') or (instance_tags.Modality == 'DX') then
-        import_script = 'openrem_dx.py'
-    elseif instance_tags.Manufacturer ~= nil then
+    if instance_tags.SOPClassUID ~= nil then
+        if instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67' then
+            import_script = 'openrem_rdsr.py'
+        elseif instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22' then
+            -- Enhanced SR used by GE CT Scanners
+            import_script = 'openrem_rdsr.py'
+        end
+    end
+    if (instance_tags.Modality ~= nil) and (import_script == '') then
+        if instance_tags.Modality == 'MG' then
+            import_script = 'openrem_mg.py'
+        elseif (instance_tags.Modality == 'CR') or (instance_tags.Modality == 'DX') then
+            import_script = 'openrem_dx.py'
+        end
+    end
+    if (instance_tags.Manufacturer ~= nil) and (import_script == '') then
         if (instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7') and string.match(string.lower(instance_tags.Manufacturer), 'philips') then
             -- Secondary Capture object that might be Philips CT Dose Info image
             import_script = 'openrem_ctphilips.py'
