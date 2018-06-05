@@ -209,8 +209,8 @@ script (such as `openrem_rdsr.py`) without prefixing it with `python`, the
 system wide Python will be used instead. This doesn't apply to Linux, where
 once activated, the scripts can be called without a `python` prefix from anywhere.
 
-Quickstart Ubuntu install
-=========================
+Quickstart Ubuntu install using virtualenv
+==========================================
 
 If you want to get everything installed quickly, you could do the following on a Ubuntu server::
 
@@ -226,7 +226,14 @@ e.g.::
 
     (veopenrem) dose@ubuntu1604:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
 
-You are now ready for :doc:`install`.
+
+We can now install OpenREM and a customised version of pynetdicom::
+
+    (veopenrem) dose@ubuntu1604:~$ pip install openrem==0.8.0b6
+    (veopenrem) dose@ubuntu1604:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+
+
+You can now go straight to the :ref:`localsettingsconfig`.
 
 .. _virtualenv: https://virtualenv.pypa.io/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
