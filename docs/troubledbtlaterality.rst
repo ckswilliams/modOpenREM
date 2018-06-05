@@ -173,9 +173,9 @@ In a shell/command window, activate your virtualenv if you are using one, and ch
 
 * Ubuntu linux: ``cd /usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``cd /usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``cd lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``cd virtualenvfolder/lib/python2.7/site-packages/openrem/``
 * Windows: ``cd C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``cd Lib\site-packages\openrem\``
+* Windows virtualenv: ``cd virtualenvfolder\Lib\site-packages\openrem\``
 
 Then:
 
