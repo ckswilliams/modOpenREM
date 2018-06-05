@@ -140,7 +140,7 @@ Celery periodic tasks: beat
 
     Celery beat is only required if you are using the :ref:`nativestore`. Please read the warnings there before deciding
     if you need to run Celery beat. At the current time, using a third party DICOM store service is recommended for
-    most users. See the :doc:`netdicom` documentation for more details
+    most users. See the :ref:`configure_third_party_DICOM` documentation for more details
 
 Celery beat is a scheduler. If it is running, then every 60 seconds a task is run to check if any of the DICOM
 Store SCP nodes are set to ``keep_alive``, and if they are, it tries to verify they are running with a DICOM echo.
@@ -220,7 +220,7 @@ Configure the settings
 * Go to ``Config -> DICOM object delete settings`` and configure appropriately (see :doc:`i_deletesettings`)
 * Go to ``Config -> Patient ID settings`` and configure appropriately (see :doc:`patientid`)
 * If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to
-  ``Config -> Dicom network configuration``. For more information go to :doc:`netdicom` (not yet up to date)
+  ``Config -> Dicom network configuration``. For more information go to :doc:`import`.
 * With data in the system, you will want to go to ``Config -> View and edit display names`` and customise
   the display names. An established system will have several entries for each device, from each time the software
   version, station name or other elements changes. See :doc:`i_displaynames` for more information
