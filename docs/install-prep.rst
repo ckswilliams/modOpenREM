@@ -200,8 +200,8 @@ Virtualenv sets up an isolated python environment and is relatively easy to use.
 If you do use virtualenv, all the paths referred to in the documentation will
 be changed to:
 
-* Linux: ``lib/python2.7/site-packages/openrem/``
-* Windows: ``Lib\site-packages\openrem``
+* Linux: ``vitualenvfolder/lib/python2.7/site-packages/openrem/``
+* Windows: ``virtualenvfolder\Lib\site-packages\openrem``
 
 In Windows, even when the virtualenv is activated you will need to call `python`
 and provide the full path to script in the `Scripts` folder. If you call the
