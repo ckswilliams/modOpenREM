@@ -202,7 +202,7 @@ function OnStoredInstance(instanceId)
             import_script = 'openrem_dx.py'
         end
     end
-    if (instance_tags.Manufacturer ~= nil) and (import_script == '') then
+    if (instance_tags.SOPClassUID ~= nil) and (instance_tags.Manufacturer ~= nil) and (import_script == '') then
         if (instance_tags.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7') and string.match(string.lower(instance_tags.Manufacturer), 'philips') then
             -- Secondary Capture object that might be Philips CT Dose Info image
             import_script = 'openrem_ctphilips.py'
