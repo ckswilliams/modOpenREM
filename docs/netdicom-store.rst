@@ -26,8 +26,6 @@ dicom.ini configuration
     conquestImportConfig
 
 
-* Add Linux examples
-
 ..  toctree::
     :maxdepth: 2
 
