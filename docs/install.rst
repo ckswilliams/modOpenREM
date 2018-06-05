@@ -14,7 +14,7 @@ Install OpenREM 0.8.0b6
 Install pynetdicom (edited version)
 ===================================
 
-Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See :doc:`netdicom` for details.
+Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See :ref:`directfrommodalities` for details.
 
 .. sourcecode:: bash
 
@@ -347,19 +347,6 @@ Start all the services!
 
 You are now ready to start the services to allow you to use OpenREM - go to :doc:`startservices` to see how!
 
-
-Further instructions
-====================
-
-
-
-DICOM Store and query-retrieve
-------------------------------
-
-The best (and only practical way in a production environment) to get DICOM data into OpenREM is to have a DICOM store
-node (Store Service Class Provider/SCP) and possibly a query-retrieve service class user too.
-
-To find out more about this, refer to the :doc:`netdicom` docs.
 
 
 .. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
