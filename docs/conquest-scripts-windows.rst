@@ -1,7 +1,7 @@
 Creating batch scripts on windows
 *********************************
 
-Create a and save a bash script for each of RDSR, mammo, DX and Philips CT dose images, as required. They should have
+Create and save a bash script for each of RDSR, mammo, DX and Philips CT dose images, as required. They should have
 content something like the following.
 
 These scripts assume there is no virtualenv in use. If you are using one, simply refer to the python executable and
