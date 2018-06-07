@@ -38,7 +38,8 @@ extensions = [
     'sphinx.ext.graphviz',
     'sphinxcontrib.programoutput',
     'sphinxcontrib.autoprogram',
-    'sphinxarg.ext'
+    'sphinxarg.ext',
+    'sphinx.ext.extlinks'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
