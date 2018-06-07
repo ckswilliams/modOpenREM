@@ -7,16 +7,7 @@ Create Lua file
 Open the following link in a new tab and copy and paste the content into a text editor. Save this as a new file called
 ``openrem_orthanc_config.lua``. This can be saved anywhere, provided that Orthanc is able to access it:
 
-* https://bitbucket.org/openrem/openrem/raw/issue635OrthancExperiment/stuff/openrem_orthanc_config.lua
-* https://bitbucket.org/openrem/openrem/raw/\ |release|\ /stuff/openrem_orthanc_config.lua
-* https://bitbucket.org/openrem/openrem/raw/|release|/stuff/openrem_orthanc_config.lua
-* :orthanc_config:`\ |release|\ `
-* :orthanc_config:`|release|`
-* :orthanc_config:`issue635OrthancExperiment`
-
 * |openrem_orthanc_conf_link|
-
-Making sure the release substitution works: |release|
 
 
 Edit the top two sections

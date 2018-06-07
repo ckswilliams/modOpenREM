@@ -39,7 +39,6 @@ extensions = [
     'sphinxcontrib.programoutput',
     'sphinxcontrib.autoprogram',
     'sphinxarg.ext',
-    'sphinx.ext.extlinks'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -273,10 +272,8 @@ texinfo_documents = [
 
 autodoc_member_order = 'bysource'
 
-extlinks = {'orthanc_config': ('https://bitbucket.org/openrem/openrem/raw/%s/stuff/openrem_orthanc_config.lua', '')}
-
 rst_prolog = """
     .. |openrem_orthanc_conf_link| raw:: html
 
      <a href="https://bitbucket.org/openrem/openrem/raw/%s/stuff/openrem_orthanc_config.lua">openrem_orthanc_config.lua on bitbucket</a>
-""" % (version)
+""" % (release)
