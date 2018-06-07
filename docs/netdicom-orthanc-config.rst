@@ -14,6 +14,9 @@ Open the following link in a new tab and copy and paste the content into a text 
 * :orthanc_config:`|release|`
 * :orthanc_config:`issue635OrthancExperiment`
 
+* |openrem_orthanc_conf_link|
+
+Making sure the release substitution works: |release|
 
 
 Edit the top two sections
