@@ -4,10 +4,12 @@ Orthanc Store configuration
 Create Lua file
 ---------------
 
-Open the following link in a new tab, create a file called ``openrem.lua`` *somewhere*, and copy and paste the
-content into the file:
+Open the following link in a new tab and copy and paste the content into a text editor. Save this as a new file called
+``openrem_orthanc_config.lua``. This can be saved anywhere, provided that Orthanc is able to access it:
 
-* https://bitbucket.org/openrem/openrem/raw/issue635OrthancExperiment/stuff/openrem.lua
+* https://bitbucket.org/openrem/openrem/raw/issue635OrthancExperiment/stuff/openrem_orthanc_config.lua
+* https://bitbucket.org/openrem/openrem/raw/\ |release|\ /stuff/openrem_orthanc_config.lua
+* https://bitbucket.org/openrem/openrem/raw/|release|/stuff/openrem_orthanc_config.lua
 
 Edit the top two sections
 -------------------------
@@ -161,7 +163,7 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
               {'GE Medical Systems', 'Discovery STE'},
       }
 
-Configure Orthanc to make use of the openrem.lua file
+Configure Orthanc to make use of the openrem_orthanc_config.lua file
 -----------------------------------------------------
 
 Edit ``orthanc.json`` which can be found in:
@@ -178,7 +180,7 @@ Linux:
     // List of paths to the custom Lua scripts that are to be loaded
     // into this instance of Orthanc
     "LuaScripts" : [
-    "/path/to/openrem.lua"
+    "/path/to/openrem_orthanc_config.lua"
     ],
 
 Windows (note the double back-slash):
@@ -188,7 +190,7 @@ Windows (note the double back-slash):
     // List of paths to the custom Lua scripts that are to be loaded
     // into this instance of Orthanc
     "LuaScripts" : [
-    "C:\\path\\to\\openrem.lua"
+    "C:\\path\\to\\openrem_orthanc_config.lua"
     ],
 
 Check permissions
