@@ -276,4 +276,4 @@ rst_prolog = """
     .. |openrem_orthanc_conf_link| raw:: html
 
      <a href="https://bitbucket.org/openrem/openrem/raw/%s/stuff/openrem_orthanc_config.lua">openrem_orthanc_config.lua on bitbucket</a>
-""" % (__docs_version__)
+""" % (__repo_branch__)
