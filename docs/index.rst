@@ -26,7 +26,6 @@ Contents:
     startservices
     configuration
     import
-    netdicom
     i_navigate
     charts
     skindosemap

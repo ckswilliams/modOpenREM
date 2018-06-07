@@ -14,7 +14,7 @@ Install OpenREM 0.8.0b6
 Install pynetdicom (edited version)
 ===================================
 
-Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See :doc:`netdicom` for details.
+Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See :ref:`directfrommodalities` for details.
 
 .. sourcecode:: bash
 
@@ -40,9 +40,9 @@ Locate install location
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\``
 
 
 There are two files that need renaming:
@@ -278,8 +278,10 @@ In a shell/command window, move into the openrem folder:
 
 * Ubuntu linux: ``cd /usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``cd /usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``cd virtualenvfolder/lib/python2.7/site-packages/openrem/``
 * Windows: ``cd C:\Python27\Lib\site-packages\openrem\``
-* Virtualenv: ``cd lib/python2.7/site-packages/openrem/``
+* Windows virtualenv: ``cd virtualenvfolder\Lib\site-packages\openrem\``
+
 
 Create the database::
 
@@ -345,19 +347,6 @@ Start all the services!
 
 You are now ready to start the services to allow you to use OpenREM - go to :doc:`startservices` to see how!
 
-
-Further instructions
-====================
-
-
-
-DICOM Store and query-retrieve
-------------------------------
-
-The best (and only practical way in a production environment) to get DICOM data into OpenREM is to have a DICOM store
-node (Store Service Class Provider/SCP) and possibly a query-retrieve service class user too.
-
-To find out more about this, refer to the :doc:`netdicom` docs.
 
 
 .. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en

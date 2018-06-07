@@ -76,9 +76,8 @@ For native DICOM store nodes, you need to open the ``Advanced - test/development
   to start the store node whenever it finds it not to be running.
 
 
-***********************************************************
 Third-party DICOM store node for scripted import to OpenREM
-***********************************************************
+===========================================================
 
 If you are using Conquest or another third-party Store SCP to collect DICOM data, simply fill in the basic details as
 above without configuring the settings in the ``Advanced`` section. This will enable you to request remote hosts send

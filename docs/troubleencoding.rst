@@ -24,9 +24,9 @@ Find and edit the pydicom file ``charset.py``. It should be at one of the follow
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/dicom/charset.py``
 * Other linux: ``/usr/lib/python2.7/site-packages/dicom/charset.py``
-* Linux virtualenv: ``lib/python2.7/site-packages/dicom/charset.py``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/dicom/charset.py``
 * Windows: ``C:\Python27\Lib\site-packages\dicom\charset.py``
-* Windows virtualenv: ``Lib\site-packages\dicom\charset.py``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\dicom\charset.py``
 
 Replace the dictionary  ``python_encoding`` that is declared at the start with the following dictionary:
 
