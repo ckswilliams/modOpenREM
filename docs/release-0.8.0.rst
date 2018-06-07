@@ -69,13 +69,13 @@ Upgrade
 
 * Back up your database
 
-    * For PostgreSQL you can refer to :ref:`backup-psql-db`
+    * For PostgreSQL on linux you can refer to :ref:`backup-psql-db`
+    * For PostgreSQL on Windows you can refer to :ref:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
 * Stop any Celery workers
 
-* Consider temporarily disabling your DICOM StoreSCP if it is Conquest, or redirecting the data in Conquest to be
-  processed later
+* Consider temporarily disabling your DICOM StoreSCP, or redirecting the data to be processed later
 
 * If you are using a virtualenv, activate it
 
