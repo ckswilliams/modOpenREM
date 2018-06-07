@@ -15,7 +15,6 @@ Open the following link in a new tab and copy and paste the content into a text 
 * :orthanc_config:`issue635OrthancExperiment`
 
 
-extlinks = {'orthanc_config': (https://bitbucket.org/openrem/openrem/raw/%s/stuff/openrem_orthanc_config.lua', '')}
 
 Edit the top two sections
 -------------------------

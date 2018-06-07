@@ -272,3 +272,6 @@ texinfo_documents = [
 
 
 autodoc_member_order = 'bysource'
+
+extlinks = {'orthanc_config': ('https://bitbucket.org/openrem/openrem/raw/%s/stuff/openrem_orthanc_config.lua', '')}
+
