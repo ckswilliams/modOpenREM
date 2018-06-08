@@ -52,6 +52,7 @@ setup(
     url='http://openrem.org/',
     author='Ed McDonagh',
     author_email='ed@openrem.org',
+    long_description_content_type="text/x-rst",
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
