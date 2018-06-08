@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.8.0b6 (2018-05-16)
---------------------
+0.8.0 (2018-06-xx)
+------------------
 * `#635`_  Documentation: added Orthanc as preferred third party DICOM Store service
 * `#634`_  Documentation: updated docs for import and query-retrieve duplicates porcessing
 * `#633`_  Charts: fixed issue where charts failed if bar chart series name was null

@@ -229,7 +229,7 @@ e.g.::
 
 We can now install OpenREM and a customised version of pynetdicom::
 
-    (veopenrem) dose@ubuntu1604:~$ pip install openrem==0.8.0b6
+    (veopenrem) dose@ubuntu1604:~$ pip install openrem
     (veopenrem) dose@ubuntu1604:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 
