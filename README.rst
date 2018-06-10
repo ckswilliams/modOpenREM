@@ -1,7 +1,6 @@
 #######
 OpenREM
 #######
-====================
 
 .. image:: https://img.shields.io/pypi/v/openrem.svg?
     :target: https://badge.fury.io/py/openrem
@@ -22,10 +21,11 @@ Coveralls:
 Codacy:
 
 .. image:: https://api.codacy.com/project/badge/Grade/2117af7281134e42ace3efe5fc4a5255
-    :target: https://www.codacy.com/app/OpenREM/openrem?utm_source=openrem@bitbucket.org&amp;utm_medium=referral&amp;utm_content=openrem/openrem&amp;utm_campaign=Badge_Grade
+    :target: https://www.codacy.com/app/OpenREM/openrem
 
 .. image:: https://api.codacy.com/project/badge/Coverage/2117af7281134e42ace3efe5fc4a5255
-    :target: https://www.codacy.com/app/OpenREM/openrem?utm_source=openrem@bitbucket.org&amp;utm_medium=referral&amp;utm_content=openrem/openrem&amp;utm_campaign=Badge_Coverage
+    :target: https://www.codacy.com/app/OpenREM/openrem
+
 
 OpenREM is a Django app to extract, store and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
@@ -43,7 +43,7 @@ Contribution of code, ideas, bug reports documentation is all welcome.
 Please feel free to fork the repository and send me pull requests. See
 `the website <http://openrem.org/getinvolved>`_ for more information.
 
-There is a developer demo site, which at times has a working demo of recent code, but might not, and 
+There is a developer demo site, which at times has a working demo of recent code, but might not, and
 might be broken. It can be found at http://dev.openrem.org; username `demo` password `demo`
 
 OpenREM currently ships with charts that use the HighCharts libraries. This is free to use in a non-commercial setting.

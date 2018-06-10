@@ -20,3 +20,5 @@ cp ../bbOpenREM/stuff/0002_0_7_fresh_install_add_median.py.inactive openrem/rema
 Build:
 	python setup.py sdist bdist_wheel
 
+Test upload:
+    twine upload --repository-url https://test.pypi.org/legacy/ dist/*
