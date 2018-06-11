@@ -1,5 +1,5 @@
-An example Conquest dicom.ini file
-**********************************
+Example Windows Conquest dicom.ini file
+***************************************
 
 Below is an example ``dicom.ini`` file, including comments describing the function of some sections. The file calls
 various lua scripts - see the Conquest import configuration document for an example - :doc:`conquestImportConfig`.

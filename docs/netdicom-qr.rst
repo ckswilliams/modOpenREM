@@ -3,7 +3,11 @@ DICOM Query Retrieve Service
 ############################
 
 
-To query retrieve dose related objects from a remote server, you need to review the :doc:`netdicom-nodes` first.
+To query retrieve dose related objects from a remote server, you need to review the :doc:`netdicom-store` documents
+first to make sure you have created a DICOM Store node which will import objects to OpenREM.
+
+You will also need to set up the remote server to allow you to query-retrieve using it - the remote server will need
+to be configured with details of the store node that you have configured.
 
 **************************************
 Query-retrieve using the web interface
@@ -228,6 +232,29 @@ If **SR only studies** were requested:
 
 * Each series response is checked at 'image' level to see which type of SR it is. If is not RDSR or ESR, the study
   response is deleted.
+
+Duplicates processing
+=====================
+
+For each remaining study in the query response, the Study Instance UID is checked against the studies already in
+the OpenREM database.
+
+If there is a match and the series level modality is **SR** (from a CT, or RF etc):
+
+* The image level response will have the SOP Instance UID - this is checked against the SOP Instance UIDs recorded
+  with the matching study. If a match is found, the 'image' level response is deleted.
+
+If there is a match and the series level modality is **MG**, **DX** or **CR**:
+
+* An image level query is made which will populate the image level responses with SOP Instance UIDs
+* Each image level response is then processed and the SOP Instance UID is checked against the SOP Instance UIDs
+  recorded with the matching study. If a match is found, the 'image' level response is deleted.
+
+Once each series level response is processed:
+
+* If the series no longer has any image  level responses the series level response is deleted.
+* If the study no longer has any series level responses the study level response is deleted.
+
 
 .. _qrtroubleshooting:
 

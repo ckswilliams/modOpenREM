@@ -26,9 +26,9 @@ Create a new file in your Python OpenREM folder (the folder ``manage.py`` is in)
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/fix_dbt_laterality.py``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/fix_dbt_laterality.py``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/fix_dbt_laterality.py``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/openrem/fix_dbt_laterality.py``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\fix_dbt_laterality.py``
-* Windows virtualenv: ``Lib\site-packages\openrem\fix_dbt_laterality.py``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\fix_dbt_laterality.py``
 
 Copy and paste into the new file the code from below. You will need to edit the ``DISPLAY_NAME`` to match the display
 name you have configured for the Hologic DBT system that needs to be modified. If you are not sure what this is, go to
@@ -173,9 +173,9 @@ In a shell/command window, activate your virtualenv if you are using one, and ch
 
 * Ubuntu linux: ``cd /usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``cd /usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``cd lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``cd virtualenvfolder/lib/python2.7/site-packages/openrem/``
 * Windows: ``cd C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``cd Lib\site-packages\openrem\``
+* Windows virtualenv: ``cd virtualenvfolder\Lib\site-packages\openrem\``
 
 Then:
 

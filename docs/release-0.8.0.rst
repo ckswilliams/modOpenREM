@@ -12,47 +12,17 @@ Headline changes
 * Imports: Better distinction and control over defining RDSR studies as RF or DX
 * Imports: Code and instructions to generate and import RDSR from older Toshiba CT scanners
 * Imports: DICOM Query-Retrieve functionality has been overhauled
+* Imports: Duplicate checking improved to allow cumulative and continued study RDSRs to import properly
+* Imports: indicators that a study is not a patient can now be configured in the web interface
 * Imports, display and export: Better handling of non-ASCII characters
 * Interface: More detailed, consistent and faster rendering of the data in the web interface
 * Interface: Maps of fluoroscopy radiation exposure incident on a phantom (Siemens RDSRs only)
 * Interface: More and better charts, including scatter plots for mammography
+* Interface: Display names dialogue has been extended to allow administration of all studies from each source
 * Exports: Much faster, and more consistent
+* Documentation: Extensive user documentation improvements
 
-Changes since release 0.8.0b1
-=============================
 
-* Lots of documentation updates
-* Imports: changes to how 'dual' RF/DX modalities are handled, improvements to handling MultiValue filters, bug fixes
-* Interface: bug fix for bi-plane fluoroscopy systems DAP and RP Dose display
-* Exports: added target exposure index and deviation index to DX exports, bug fixes
-
-Changes since release 0.8.0b2
-=============================
-
-* A few documentation updates
-* Imports: fix for query retrieve of RDSRs in studies
-
-Changes since release 0.8.0b3
-=============================
-
-* Extensive documentation updates, particularly on the code side, as well as fixing install order
-* Changed the name of the Toshiba import function and script
-
-Changes since release 0.8.0b4
-=============================
-
-* Changed duplicate RDSR processing method to work with CT and projection, duplicate, continued and cumulative using
-  UIDs
-* Changed Celery results backend to rpc
-* Minor documentation and interface updates
-
-Changes since release 0.8.0b5
-=============================
-
-* Implemented duplicate processing for RDSR, MG and DX using UIDs in a better way
-* Improved duplicate processing for DX and MG generally
-* Modified query-retrieve to work with SOPInstanceUIDs for duplicates processing
-* Added tests and rewrote existing ones
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
@@ -69,13 +39,13 @@ Upgrade
 
 * Back up your database
 
-    * For PostgreSQL you can refer to :ref:`backup-psql-db`
+    * For PostgreSQL on linux you can refer to :ref:`backup-psql-db`
+    * For PostgreSQL on Windows you can refer to :ref:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
 * Stop any Celery workers
 
-* Consider temporarily disabling your DICOM StoreSCP if it is Conquest, or redirecting the data in Conquest to be
-  processed later
+* Consider temporarily disabling your DICOM StoreSCP, or redirecting the data to be processed later
 
 * If you are using a virtualenv, activate it
 
@@ -83,7 +53,7 @@ Upgrade
 
 .. sourcecode:: bash
 
-    pip install openrem==0.8.0b6
+    pip install openrem==0.8.0
 
 ..  _upgradefrom074:
 
@@ -94,9 +64,9 @@ Locate and edit your local_settings file
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openremproject/local_settings.py``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\openremproject\local_settings.py``
-* Windows virtualenv: ``Lib\site-packages\openrem\openremproject\local_settings.py``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\openremproject\local_settings.py``
 
 Date format
 ^^^^^^^^^^^
@@ -174,9 +144,9 @@ In a shell/command window, move into the openrem folder:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\``
 
 .. sourcecode:: bash
 

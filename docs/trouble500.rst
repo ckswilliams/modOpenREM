@@ -7,9 +7,9 @@ Locate and edit your local_settings file
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openremproject/local_settings.py``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\openremproject\local_settings.py``
-* Windows virtualenv: ``Lib\site-packages\openrem\openremproject\local_settings.py``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\openremproject\local_settings.py``
 
 * Change the line::
 

@@ -35,9 +35,9 @@ Next, find the location of your pydicom install -- it should be at one of the fo
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/dicom/``
 * Other linux: ``/usr/lib/python2.7/site-packages/dicom/``
-* Linux virtualenv: ``lib/python2.7/site-packages/dicom/``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/dicom/``
 * Windows: ``C:\Python27\Lib\site-packages\dicom\``
-* Windows virtualenv: ``Lib\site-packages\dicom\``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\dicom\``
 
 Replace the existing ``_dicom_dict.py`` file with the one you have downloaded.
 

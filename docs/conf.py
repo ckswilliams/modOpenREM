@@ -38,7 +38,7 @@ extensions = [
     'sphinx.ext.graphviz',
     'sphinxcontrib.programoutput',
     'sphinxcontrib.autoprogram',
-    'sphinxarg.ext'
+    'sphinxarg.ext',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -55,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OpenREM'
-copyright = u'2013-2016, The Royal Marsden NHS Foundation Trust'
+copyright = u'2013-2018, The Royal Marsden NHS Foundation Trust'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -271,3 +271,9 @@ texinfo_documents = [
 
 
 autodoc_member_order = 'bysource'
+
+rst_prolog = """
+    .. |openrem_orthanc_conf_link| raw:: html
+
+     <a href="https://bitbucket.org/openrem/openrem/raw/%s/stuff/openrem_orthanc_config.lua">openrem_orthanc_config.lua on bitbucket</a>
+""" % (__repo_branch__)

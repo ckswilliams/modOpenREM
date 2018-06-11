@@ -56,4 +56,4 @@ you can review the current settings:
 
     Deletion policies can be reviewed on the DICOM network configuration page
 
-More information about the DICOM network configuration can be found on the :doc:`netdicom` page.
+More information about the DICOM network configuration can be found on the :ref:`directfrommodalities` page.

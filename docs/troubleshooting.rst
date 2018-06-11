@@ -61,8 +61,9 @@ In a shell/command window, move into the openrem folder:
 
 * Ubuntu linux: ``cd /usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``cd /usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``cd virtualenvfolder/lib/python2.7/site-packages/openrem/``
 * Windows: ``cd C:\Python27\Lib\site-packages\openrem\``
-* Virtualenv: ``cd lib/python2.7/site-packages/openrem/``
+* Windows virtualenv: ``cd virtualenvfolder\Lib\site-packages\openrem\``
 
 Run the django python shell:
 
