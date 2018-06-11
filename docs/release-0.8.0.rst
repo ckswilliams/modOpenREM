@@ -12,47 +12,16 @@ Headline changes
 * Imports: Better distinction and control over defining RDSR studies as RF or DX
 * Imports: Code and instructions to generate and import RDSR from older Toshiba CT scanners
 * Imports: DICOM Query-Retrieve functionality has been overhauled
+* Imports: Duplicate checking improved to allow cumulative and continued study RDSRs to import properly
 * Imports, display and export: Better handling of non-ASCII characters
 * Interface: More detailed, consistent and faster rendering of the data in the web interface
 * Interface: Maps of fluoroscopy radiation exposure incident on a phantom (Siemens RDSRs only)
 * Interface: More and better charts, including scatter plots for mammography
+* Interface: Display names dialogue has been extended to allow administration of all studies from each source
 * Exports: Much faster, and more consistent
+* Documentation: Extensive user documentation improvements
 
-Changes since release 0.8.0b1
-=============================
 
-* Lots of documentation updates
-* Imports: changes to how 'dual' RF/DX modalities are handled, improvements to handling MultiValue filters, bug fixes
-* Interface: bug fix for bi-plane fluoroscopy systems DAP and RP Dose display
-* Exports: added target exposure index and deviation index to DX exports, bug fixes
-
-Changes since release 0.8.0b2
-=============================
-
-* A few documentation updates
-* Imports: fix for query retrieve of RDSRs in studies
-
-Changes since release 0.8.0b3
-=============================
-
-* Extensive documentation updates, particularly on the code side, as well as fixing install order
-* Changed the name of the Toshiba import function and script
-
-Changes since release 0.8.0b4
-=============================
-
-* Changed duplicate RDSR processing method to work with CT and projection, duplicate, continued and cumulative using
-  UIDs
-* Changed Celery results backend to rpc
-* Minor documentation and interface updates
-
-Changes since release 0.8.0b5
-=============================
-
-* Implemented duplicate processing for RDSR, MG and DX using UIDs in a better way
-* Improved duplicate processing for DX and MG generally
-* Modified query-retrieve to work with SOPInstanceUIDs for duplicates processing
-* Added tests and rewrote existing ones
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
