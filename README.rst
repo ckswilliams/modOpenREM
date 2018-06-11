@@ -31,7 +31,7 @@ OpenREM is a Django app to extract, store, display and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
 
 This is release 0.8.0, which features extensive improvements to code quality, interface speed and functionality,
-documentation, imports and is tested to a much greater extent than ever before. This release is also the first to
+documentation, imports and exports. It is tested to a much greater extent than ever before and is the first release to
 feature `openSkin dose maps <http://docs.openrem.org/en/0.8.0/skindosemap.html>`_ for specific fluoroscopy systems.
 
 Please review the `release notes <http://docs.openrem.org/en/0.8.0/release-0.8.0.html>`_ for more details.
