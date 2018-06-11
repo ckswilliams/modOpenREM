@@ -13,6 +13,7 @@ Headline changes
 * Imports: Code and instructions to generate and import RDSR from older Toshiba CT scanners
 * Imports: DICOM Query-Retrieve functionality has been overhauled
 * Imports: Duplicate checking improved to allow cumulative and continued study RDSRs to import properly
+* Imports: indicators that a study is not a patient can now be configured in the web interface
 * Imports, display and export: Better handling of non-ASCII characters
 * Interface: More detailed, consistent and faster rendering of the data in the web interface
 * Interface: Maps of fluoroscopy radiation exposure incident on a phantom (Siemens RDSRs only)
