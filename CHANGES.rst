@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.8.0 (2018-06-xx)
+0.8.0 (2018-06-11)
 ------------------
 * `#635`_  Documentation: added Orthanc as preferred third party DICOM Store service
 * `#634`_  Documentation: updated docs for import and query-retrieve duplicates porcessing
