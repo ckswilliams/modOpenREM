@@ -569,6 +569,8 @@ def _query_for_each_modality(all_mods, query, d, assoc):
              responses have been filtered based on requested modality
     """
 
+    from openremproject.settings import USE_MODALITY_IN_STUDY_RQ
+
     # Assume that ModalitiesInStudy is a Matching Key Attribute
     # If not, 1 query is sufficient to retrieve all relevant studies
     modality_matching = True
@@ -584,12 +586,14 @@ def _query_for_each_modality(all_mods, query, d, assoc):
                     query.save()
                     logger.info(u'Currently querying for {0} studies...'.format(mod))
                     d.ModalitiesInStudy = mod
+                    if USE_MODALITY_IN_STUDY_RQ:
+                        d.Modality = ''
                     query_id = uuid.uuid4()
                     _query_study(assoc, d, query, query_id)
                     study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
                     logger.debug(u"Queried for {0}, now have {1} study level responses".format(mod, study_rsp.count()))
                     for rsp in study_rsp:  # First check if modalities in study has been populated
-                        if rsp.get_modalities_in_study():
+                        if rsp.get_modalities_in_study() and rsp.get_modalities_in_study()[0] != u'':
                             modalities_returned = True
                             # Then check for inappropriate responses
                             if mod not in rsp.get_modalities_in_study():
