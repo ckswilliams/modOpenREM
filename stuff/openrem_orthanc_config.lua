@@ -52,24 +52,11 @@ local device_serial_numbers_to_ignore = {'SCB1312016'}
 -- false to disable this feature.
 local use_toshiba_ct_extractor = true
 
--- A list of CT make and model pairs that are known to have worked with the Toshiba CT extractor
+-- A list of CT make and model pairs that are known to have worked with the Toshiba CT extractor.
+-- You can add to this list, but you will need to verify that the dose data created matches what you expect.
 local toshiba_extractor_systems = {
-        {'GE Medical Systems', 'Discovery 710'},
-        {'GE Medical Systems', 'Discovery ste'},
-        {'GE Medical Systems', 'Brightspeed'},
-        {'GE Medical Systems', 'Lightspeed Plus'},
-        {'GE Medical Systems', 'Lightspeed16'},
-        {'GE Medical Systems', 'Lightspeed Pro 32'},
-        {'GE Medical Systems', 'Lightspeed VCT'},
-        {'GE Medical Systems', 'Revolution EVO'},
-        {'Siemens', 'Biograph64'},
-        {'Siemens', 'Somatom Definition'},
-        {'Siemens', 'Somatom Definition Edge'},
-        {'Siemens', 'Somatom Definition Flash'},
-        {'Siemens', 'Somatom Force'},
         {'Toshiba', 'Aquilion'},
-        {'Toshiba', 'Aquilion Prime'},
-        {'Toshiba', 'Aquilion One'}
+        {'GE Medical Systems', 'Discovery STE'},
 }
 -------------------------------------------------------------------------------------
 
