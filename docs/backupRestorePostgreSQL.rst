@@ -6,7 +6,8 @@ Backing up a PostgreSQL database (Windows)
 These instructions are based on PostgreSQL 9.1 and OpenREM 0.5.0 running on Windows Server 2008. The database restore has been tested on Ubuntu 12.04 LTS.
 
 
-As a one-off, create a PostgreSQL user called ``backup`` with a password of ``backup``. This is easiest to do using the ``pgAdminIII`` tool: you'll need to create a new login role. In the role privileges ensure that ``Can initiate streaming replication and backups`` is checked.
+Create a PostgreSQL user called ``backup`` with a password of ``backup``. This is easiest to do using the ``pgAdminIII`` tool: you'll need to create a new login role.
+In the role privileges ensure that at least ``Can login``, ``Superuser`` and ``Can initiate streaming replication and backups`` are checked.
 
 The ``pgAdminIII`` tool is available by default on Windows, but needs to be explicitly installed if using Ubuntu with the following command:
 
@@ -20,9 +21,13 @@ To backup the contents of ``openrempostgresql`` to a file called ``backup.sql`` 
 
 ..  code-block:: posh
 
-    pg_dump -i -U backup -F c -b -v -f backup.sql openrempostgresql
+    pg_dump -U backup -F c -b -v -f backup.sql openrempostgresql
 
-Note that the ``pg_dump`` command needs to be in your path for this to work exactly as written. The ``-U backup`` indicates that the ``backup`` user is to carry out the task. The ``-F c`` option archives in a suitable format for input into the ``pg_restore`` command. Further information on ``pg_dump`` and backing up a PostgreSQL database can be found here: http://www.postgresql.org/docs/9.3/static/app-pgdump.html and here: http://www.postgresql.org/docs/9.3/static/backup-dump.html
+You will need to add your ``C:\path\to\postgres\bin`` folder to the ``path`` environment variable for this to work. Make sure to use the actual path to your PostgreSQL ``bin``
+folder rather than the example text provided here. See http://www.computerhope.com/issues/ch000549.htm for instructions on editing the path environment variable.
+
+
+The ``-U backup`` indicates that the ``backup`` user is to carry out the task. The ``-F c`` option archives in a suitable format for input into the ``pg_restore`` command. Further information on ``pg_dump`` and backing up a PostgreSQL database can be found here: http://www.postgresql.org/docs/9.3/static/app-pgdump.html and here: http://www.postgresql.org/docs/9.3/static/backup-dump.html
 
 Restoring a PostgreSQL database (Windows)
 =========================================
