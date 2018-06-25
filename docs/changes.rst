@@ -2,6 +2,10 @@
 OpenREM version history
 =======================
 
+0.8.1
+-----
+* `#639`_  Charts: fixed problem where a blank category name may not be displayed correctly
+
 0.8.0 (2018-06-11)
 ------------------
 * `#635`_  Documentation: added Orthanc as preferred third party DICOM Store service
