@@ -19,5 +19,5 @@ To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM 
 * Remote hostname: Alternatively, if your network has a DNS server that can resolve the hostnames, you can enter the
   hostname instead. If the hostname is entered, it will be used in preference to the IP address, so only enter it if
   you know it will be resolved.
-* Use Modality in Study Query. Some PACS systems (like Impax 6.6) need modality at study level for correct filtering.
+* Use Modality in Study Query: Some PACS systems (like Impax 6.6) need modality at study level for correct filtering.
   if this option is checked, the modality tag is inserted in the study level request.
