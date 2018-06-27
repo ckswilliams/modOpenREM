@@ -73,13 +73,6 @@ USE_TZ = False
 XLSX_DATE = 'dd/mm/yyyy'
 XLSX_TIME = 'hh:mm:ss'
 
-# Boolean to determine if OpenREM should use Modality tag in study find request while retrieving data from PACS
-# It is known that Impax 6.6 should have Modality to correctly match for ModalitiesInStudy. It returns an empty value
-# in ModalitiesInStudy using Modality, but otherwise matching is incorrect: too few studies returned
-# (seems to be a bug)
-# Use local_settings.py to override
-USE_MODALITY_IN_STUDY_RQ = False
-
 #
 # MEDIA_ROOT filepath has been moved to local_settings.py
 # Line below will be overwritten there. Included here for docs issue
