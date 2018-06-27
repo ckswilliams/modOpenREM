@@ -5,6 +5,9 @@ from __future__ import absolute_import
 # library.  If you don't have this then `from celery.schedules import`
 # becomes `proj.celery.schedules` in Python 2.x since it allows
 # for relative imports by default.
+from celery.schedules import crontab
+import os
+
 
 # Debug is now set to false - you can turn it back on in local_settings if you need to
 DEBUG = False
@@ -12,33 +15,34 @@ TEMPLATE_DEBUG = False
 
 # Celery settings
 BROKER_URL = 'amqp://guest:guest@localhost//'
-BROKER_TRANSPORT_OPTIONS = {'confirm_publish': True}
-#CELERY_RESULT_BACKEND = 'amqp'
+CELERY_RESULT_BACKEND = 'rpc://'
 
-
-#: Only add pickle to this list if your broker is secured
-#: from unwanted access (see userguide/security.html)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
 CELERY_DEFAULT_QUEUE = 'default'
+
+CELERY_ACKS_LATE = True
 CELERYD_PREFETCH_MULTIPLIER = 1
 
-from celery.schedules import crontab
+
 CELERYBEAT_SCHEDULE = {
     'trigger-dicom-keep-alive': {
         'task': 'remapp.netdicom.keepalive.keep_alive',
         'schedule': crontab(minute='*/1'),
-        'options': {'expires': 10},   # expire if not run ten seconds after being scheduled
+        'options': {'expires': 10},  # expire if not run ten seconds after being scheduled
     },
 }
 
-import os
-ROOT_PROJECT = os.path.join(os.path.split(__file__)[0],"..")
+
+ROOT_PROJECT = os.path.join(os.path.split(__file__)[0], "..")
 
 # **********************************************************************
 #
 # Database settings have been moved to local_settings.py
+# Line below will be overwritten there. Included here for docs issue
+DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': 'openrem.db', 'USER': '', 'PASSWORD': '', 'HOST': '', 'PORT': '', }}
 #
 # **********************************************************************
 
@@ -65,12 +69,14 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = False
 
-# Default date format for exporting to Excel xlsx spreadsheets - use Excel codes, override it in local_settings.py
+# Default date and time format for exporting to Excel xlsx spreadsheets - use Excel codes, override it in local_settings.py
 XLSX_DATE = 'dd/mm/yyyy'
+XLSX_TIME = 'hh:mm:ss'
 
 #
 # MEDIA_ROOT filepath has been moved to local_settings.py
-#
+# Line below will be overwritten there. Included here for docs issue
+MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -91,8 +97,9 @@ STATICFILES_DIRS = (
 )
 
 #
-# SECRET_KEY moved to local_settings.py
+# SECRET_KEY must be changed in local_settings.py
 #
+SECRET_KEY = 'youmustchangethiskeyinlocal_settings'
 
 # URL of the login page
 LOGIN_URL = '/login/'
@@ -139,7 +146,6 @@ ROOT_URLCONF = 'openremproject.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'openremproject.wsgi.application'
 
-
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -172,8 +178,8 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt' : "%d/%b/%Y %H:%M:%S"
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
@@ -208,6 +214,12 @@ LOGGING = {
             'filename': 'openrem_storescp.log',
             'formatter': 'verbose'
         },
+        'extractor_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'openrem_extractor.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django.request': {
@@ -229,8 +241,23 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'remapp.extractors.ct_toshiba': {
+            'handlers': ['extractor_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     }
 }
+
+# Dummy locations of various tools for DICOM RDSR creation from CT images
+DCMTK_PATH = ''
+DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
+DCMMKDIR = os.path.join(DCMTK_PATH, 'dcmmkdir.exe')
+JAVA_EXE = ''
+JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
+PIXELMED_JAR = ''
+PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
+
 
 try:
     LOCAL_SETTINGS

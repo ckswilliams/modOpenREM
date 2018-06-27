@@ -2,42 +2,29 @@
 Troubleshooting
 ***************
 
-Server 500 errors
-=================
+..  toctree::
+    :maxdepth: 1
 
-**Turn on debug mode**
+    trouble500
+    troubleencoding
+    trouble_dictionary
+    troubledbtlaterality
 
-Locate and edit your local_settings file
+If you have a modality where every study has one event (usually CT), review
 
-* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openremproject/local_settings.py``
-* Other linux: ``/usr/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\openremproject\local_settings.py``
-* Windows virtualenv: ``Lib\site-packages\openrem\openremproject\local_settings.py``
+.. toctree::
+    :maxdepth: 1
 
-* Change the line::
+    import_multirdsr
 
-    # DEBUG = True
+If planar X-ray studies are appearing in fluoroscopy or vice-versa, review
 
-* to::
+* :doc:`i_displaynames`
 
-    DEBUG = True
+For DICOM networking:
 
-This will render a debug report in the browser - usually revealing the problem.
-
-Once the problem is fixed, change ``DEBUG`` to ``False``, or comment it again using a ``#``. If you leave debug mode
-in place, the system is likely to run out of memory.
-
-
-Query-retrieve issues
-=====================
-
-Refer to the :ref:`qrtroubleshooting` documentation
-
-OpenREM DICOM storage nodes
-===========================
-
-Refer to the :ref:`storetroubleshooting` documentation
+* :ref:`qrtroubleshooting` for query retrieve
+* :ref:`storetroubleshooting` for DICOM store
 
 Log files
 =========
@@ -52,7 +39,7 @@ The ``openrem.log`` has general logging information, the other two are specific 
 query-retrieve functions if you are making use of them.
 
 You can increase the verbosity of the log files by changing the log 'level' to ``DEBUG``, or you can decrease the
-verbosity to ``WARNING``, 'ERROR', or 'CRITICAL'. The default is ``INFO``.
+verbosity to ``WARNING``, ``ERROR``, or ``CRITICAL``. The default is ``INFO``.
 
 Starting again!
 ===============
@@ -74,8 +61,9 @@ In a shell/command window, move into the openrem folder:
 
 * Ubuntu linux: ``cd /usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``cd /usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``cd virtualenvfolder/lib/python2.7/site-packages/openrem/``
 * Windows: ``cd C:\Python27\Lib\site-packages\openrem\``
-* Virtualenv: ``cd lib/python2.7/site-packages/openrem/``
+* Windows virtualenv: ``cd virtualenvfolder\Lib\site-packages\openrem\``
 
 Run the django python shell:
 

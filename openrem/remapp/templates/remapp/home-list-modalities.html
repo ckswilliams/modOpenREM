@@ -1,0 +1,27 @@
+{% load humanize %}
+<table class="table table-bordered table-hover row-clickable">
+  <tr>
+    <th>Scanner</th>
+    <th>Number of studies</th>
+    <th>Latest study</th>
+  </tr>
+  {% for display_name,details in data.items %}
+    <tr>
+      <td style="width:33%">
+        <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
+          {{ details.displayname }}
+        </a>
+      </td>
+      <td style="width:33%">
+        <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
+          {{ details.total }}
+        </a>
+      </td>
+      <td style="width:33%">
+        <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
+          {{ details.latest|naturaltime }}
+        </a>
+      </td>
+    </tr>
+  {% endfor %}
+</table>

@@ -1,5 +1,5 @@
-Diagram showing the OpenREM system components
-=============================================
+Diagram of system components
+============================
 
 .. graphviz::
 
@@ -18,9 +18,9 @@ Diagram showing the OpenREM system components
          node [style=filled color=white];
 
          // Define the nodes for the data storage, display and retrieval
-         webserver [label="Apache\nweb server&sup1;" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box"];
+         webserver [label="Web server&sup1;" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box"];
          python_django [label="OpenREM\nDjango app" fontname="Helvetica" tooltip="Python web framework" shape="box"];
-         database [label="PostgreSQL\ndatabase&sup3;" fontname="Helvetica" tooltip="Relational database management system" shape="parallelogram"];
+         database [label="Database&sup3;" fontname="Helvetica" tooltip="Relational database management system" shape="parallelogram"];
          rabbitmq [label="RabbitMQ\nmessage broker" fontname="Helvetica" tooltip="Message broker" shape="box"];
          celery [label="Celery\ntask queue" fontname="Helvetica" tooltip="Asynchronous task queue" shape="hexagon"];
          skin_dose_map_data [label="Skin dose map\ndata calculation,\nstorage, retrieval" fontname="Helvetica" tooltip="Calculate, store and retrieve skin dose map data" shape="parallelogram"];
@@ -82,12 +82,13 @@ Diagram showing the OpenREM system components
 Alternatives
 ------------
 
-1: Webservers
-^^^^^^^^^^^^^
-Apache with mod_wsgi is the recommended method of deploying OpenREM/Django. You can use other web servers, for example
-nginx. You can read more about `Apache and mod_wsgi on the Django website
-<https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/modwsgi/>`_ and also about other methods on the subsequent
-pages on the same site.
+1: Web servers
+^^^^^^^^^^^^^^
+The recommended web server for Windows is Microsoft IIS - see :doc:`iis_on_windows` for details. This
+has replaced the recommendation to use Apache due to difficulties in obtaining the
+required binary files, as described in the :ref:`webservers` section of the installation document.
+
+The recommended web server for Linux is Gunicorn with NGINX - see :doc:`nginx_on_linux` for details.
 
 Alternatively, a built-in web server is included that will suffice for testing purposes and getting started.
 

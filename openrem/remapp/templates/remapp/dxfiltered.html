@@ -88,7 +88,15 @@
                     {{ chartOptionsForm }}
                 </table>
                 <input class="btn btn-default" name="submit" type="submit" id="examFilterFormSubmit" />
-
+            </div>
+            <div class="panel-heading">
+                <h3 class="panel-title">Table options</h3>
+            </div>
+            <div class="panel-body">
+                <table>
+                    {{ itemsPerPageForm }}
+                </table>
+                <input class="btn btn-default" name="submit" type="submit" />
             </div>
         </div>
     </form>
@@ -99,7 +107,7 @@
 {% endblock %}
 
 {% block col1 %}
-    {% autopaginate filter.qs 50 as filter_list %}
+    {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
     {% paginate %}
 
     <table class="table table-bordered table-hover row-clickable small">
@@ -116,7 +124,8 @@
             <th>
                 <table>
                     <tr><td class="nowrap">Study description</td></tr>
-                    <tr><td class="nowrap">Requested procedure</td></tr>
+                    <tr><td class="nowrap">Procedure</td></tr>
+                    <tr><td class="nowrap">Requested Procedure</td></tr>
                     <tr><td class="nowrap">Accession number</td></tr>
                 </table>
             </th>
@@ -127,18 +136,22 @@
             {% endif %}
         </row>
         {% for exam in filter_list %}
+          {% with equipment=exam.generalequipmentmoduleattr_set.get %}
+          {% with projection_set=exam.projectionxrayradiationdose_set.get %}
+          {% with accum_set=projection_set.accumxraydose_set.get %}
+          {% with accum_integrated=accum_set.accumintegratedprojradiogdose_set.get %}
             <tr>
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
-                        {{ exam.generalequipmentmoduleattr_set.get.institution_name }}
+                        {{ equipment.institution_name }}
                     </a>
                 </td>
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
                         <table onclick="window.location='/openrem/dx/{{ exam.id }}/';">
-                            <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
-                            <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
-                            <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
+                            <tr><td class="nowrap">{{ equipment.manufacturer }}</td></tr>
+                            <tr><td class="nowrap">{{ equipment.manufacturer_model_name }}</td></tr>
+                            <tr><td class="nowrap">{{ equipment.unique_equipment_name.display_name }}</td></tr>
                         </table>
                     </a>
                 </td>
@@ -150,8 +163,9 @@
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
                         <table onclick="window.location='/openrem/dx/{{ exam.id }}/';">
-                            <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
-                            <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
+                          <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
+                          <tr><td class="nowrap">{{ exam.procedure_code_meaning }}</td></tr>
+                          <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
                         {% if not exam.accession_hashed %}
                             <tr><td class="nowrap">{{ exam.accession_number }}</td></tr>
                         {% endif %}
@@ -160,16 +174,16 @@
                 </td>
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
-                      {% if exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.total_number_of_radiographic_frames %}
-                        {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.total_number_of_radiographic_frames }}
+                      {% if accum_integrated.total_number_of_radiographic_frames %}
+                        {{ accum_integrated.total_number_of_radiographic_frames }}
                       {% else %}
-                        {{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.all.count }}
+                        {{ projection_set.irradeventxraydata_set.all.count }}
                       {% endif %}
                     </a>
                 </td>
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
-                        {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}
+                        {{ accum_integrated.convert_gym2_to_cgycm2 | floatformat:1 }}
                     </a>
                 </td>
                 {% if admin.admingroup %}
@@ -178,6 +192,7 @@
                     </td>
                 {% endif %}
             </tr>
+          {% endwith %}{% endwith %}{% endwith %}{% endwith %}
         {% endfor %}
     </table>
 
@@ -187,32 +202,32 @@
 {% block plotdata %}
     {% if request.user.userprofile.plotCharts %}
 
-        <script src="{{ STATIC_URL }}js/chartFullScreen.js"></script>
-        <script src="{{ STATIC_URL }}js/chartSetExportSize.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/chartFullScreen.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/chartSetExportSize.js"></script>
         <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
-        <script src="{{ STATIC_URL }}js/chartUpdateData.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/chartUpdateData.js"></script>
 
         <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
         <!-- Include JavaScript to enable highcharts plots -->
-        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
-        <script src="{{ STATIC_URL }}js/boost.js"></script>
-        <script src="{{ STATIC_URL }}js/exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
-        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
-        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
-        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
-        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
-        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
-        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
-        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/highcharts.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/boost.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/offline-exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/drilldown.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/chartSortingRoutines.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/chartHistogramNormalise.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/chartAverageAndHistogram.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/chartAverageOverTime.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/chartFrequency.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/chartWorkload.js"></script>
         <script>
             var chartSorting = '{{ request.user.userprofile.plotDXInitialSortingChoice }}';
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
 
             var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
-                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
+                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result, hide_series_btn_stub;
         </script>
         <!-- End of include JavaScript for the plots -->
 
@@ -225,11 +240,11 @@
         <!-- End of JavaScript to enable bootstrap tooltips -->
 
         <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
-        <script src="{{ STATIC_URL }}js/sorting.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/sorting.js"></script>
         <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
 
         <!-- JavaScript chart AJAX code. -->
-        <script src="{{ STATIC_URL }}js/dxChartAjax.js"></script>
+        <script src="{{ STATIC_URL }}js/charts/dxChartAjax.js"></script>
         <!-- End of JavaScript chart AJAX code. -->
 
         <script>var plotDXAcquisitionMeanDAPOverTimePeriod = '{{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}';</script>
@@ -277,13 +292,13 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#container', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DAP">&uarr;DAP</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#container', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#container', 'avgValue', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DAP">&uarr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#container', 'totalCounts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#container', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#container', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#container', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#container', 'avgValue', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#container', 'totalCounts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#container', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                                     </tr>
                                 </table>
@@ -291,6 +306,9 @@
                             <a onclick="$('#container').highcharts().viewData(false, false, true); enterFullScreen('collapseOne','container'); $('#toggle_acq_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#container').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_data_btn">Toggle data table</a>
                             <a onclick="$('#container').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('container', 'hide', 'acq_dap_series_')" class="btn btn-default btn-sm" role="button" id="acq_dap_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('container', 'show', 'acq_dap_series_')" class="btn btn-default btn-sm" role="button" id="acq_dap_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('container')" class="btn btn-default btn-sm" role="button" id="acq_dap_series_toggle">Toggle all series</a>
                             <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#container'); $('#container').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -299,6 +317,8 @@
             <!-- End of HTML to include div for acquisition plot -->
 
             <script>
+                $('#acq_dap_series_show').hide();
+
                 var plotDXAcquisitionMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('container');
@@ -318,6 +338,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFilters;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -330,7 +351,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -401,13 +422,13 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'avgValue', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'totalCounts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'avgValue', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'totalCounts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                                     </tr>
                                 </table>
@@ -415,6 +436,9 @@
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().viewData(false, false, true); enterFullScreen('collapsePlotDXRequestMeanDAPAccordion','plotDXRequestMeanDAPContainer'); $('#toggle_req_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_req_data_btn">Toggle data table</a>
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('plotDXRequestMeanDAPContainer', 'hide', 'req_dap_series_')" class="btn btn-default btn-sm" role="button" id="req_dap_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('plotDXRequestMeanDAPContainer', 'show', 'req_dap_series_')" class="btn btn-default btn-sm" role="button" id="req_dap_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('plotDXRequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button" id="req_dap_series_toggle">Toggle all series</a>
                             <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXRequestMeanDAPContainer'); $('#plotDXRequestMeanDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -423,6 +447,8 @@
             <!-- End of HTML to include div for requested procedure name plot -->
 
             <script>
+                $('#req_dap_series_show').hide();
+
                 var plotDXRequestMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotDXRequestMeanDAPContainer');
@@ -442,6 +468,7 @@
                 field_cat_name = 'requested_procedure';
                 tooltip_filters = tooltipFiltersRequest;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'req_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -454,7 +481,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -526,13 +553,13 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'avgValue', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'totalCounts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'avgValue', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'totalCounts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                                     </tr>
                                 </table>
@@ -540,6 +567,9 @@
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().viewData(false, false, true); enterFullScreen('collapsePlotDXStudyMeanDAPAccordion','plotDXStudyMeanDAPContainer'); $('#toggle_study_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_data_btn">Toggle data table</a>
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('plotDXStudyMeanDAPContainer', 'hide', 'study_dap_series_')" class="btn btn-default btn-sm" role="button" id="study_dap_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('plotDXStudyMeanDAPContainer', 'show', 'study_dap_series_')" class="btn btn-default btn-sm" role="button" id="study_dap_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('plotDXStudyMeanDAPContainer')" class="btn btn-default btn-sm" role="button" id="study_dap_series_toggle">Toggle all series</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXStudyMeanDAPContainer'); $('#plotDXStudyMeanDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -548,6 +578,8 @@
             <!-- End of HTML to include div for study name plot -->
 
             <script>
+                $('#study_dap_series_show').hide();
+
                 var plotDXStudyMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotDXStudyMeanDAPContainer');
@@ -567,6 +599,7 @@
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudy;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'study_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -579,7 +612,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -648,13 +681,13 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending kVp">&uarr;kVp</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'avgValue', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending kVp">&uarr;kVp</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'totalCounts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending kVp">&darr;kVp</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'avgValue', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending kVp">&darr;kVp</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'totalCounts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                                     </tr>
                                 </table>
@@ -662,6 +695,9 @@
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeankVpChart', 'chartAcquisitionMeankVp'); $('#toggle_acq_kvp_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_kvp_data_btn">Toggle data table</a>
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('chartAcquisitionMeankVp', 'hide', 'acq_kvp_series_')" class="btn btn-default btn-sm" role="button" id="acq_kvp_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('chartAcquisitionMeankVp', 'show', 'acq_kvp_series_')" class="btn btn-default btn-sm" role="button" id="acq_kvp_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('chartAcquisitionMeankVp')" class="btn btn-default btn-sm" role="button" id="acq_kvp_series_toggle">Toggle all series</a>
                             <div class="kvp-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeankVp'); $('#chartAcquisitionMeankVp').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -670,6 +706,8 @@
             <!-- End of HTML to include div container for mean kVp per acquisition chart -->
 
             <script>
+                $('#acq_kvp_series_show').hide();
+
                 var plotDXAcquisitionMeankVp = true;
                 $(window).resize(function() {
                     chartSetExportSize('chartAcquisitionMeankVp');
@@ -689,6 +727,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFilterskVp;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_kvp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -701,7 +740,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -737,13 +776,13 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending mAs">&uarr;mAs</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'avgValue', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending mAs">&uarr;mAs</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'totalCounts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending mAs">&darr;mAs</a></td>
-                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'avgValue', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending mAs">&darr;mAs</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'totalCounts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
                                         <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                                     </tr>
                                 </table>
@@ -751,6 +790,9 @@
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeanmAsChart', 'chartAcquisitionMeanmAs'); $('#toggle_acq_mas_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_mas_data_btn">Toggle data table</a>
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('chartAcquisitionMeanmAs', 'hide', 'acq_mas_series_')" class="btn btn-default btn-sm" role="button" id="acq_mas_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('chartAcquisitionMeanmAs', 'show', 'acq_mas_series_')" class="btn btn-default btn-sm" role="button" id="acq_mas_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('chartAcquisitionMeanmAs')" class="btn btn-default btn-sm" role="button" id="acq_mas_series_toggle">Toggle all series</a>
                             <div class="mas-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeanmAs'); $('#chartAcquisitionMeanmAs').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -759,6 +801,8 @@
             <!-- End of HTML to include div container for mean mAs per acquisition chart -->
 
             <script>
+                $('#acq_mas_series_show').hide();
+
                 var plotDXAcquisitionMeanmAs = true;
                 $(window).resize(function() {
                     chartSetExportSize('chartAcquisitionMeanmAs');
@@ -778,6 +822,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersmAs;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_mas_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -790,7 +835,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -848,6 +893,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#AcquisitionMeankVpOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeankVpOverTime', 'AcquisitionMeankVpOverTimeDIV'); $('#toggle_acq_kvp_ot_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#AcquisitionMeankVpOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_kvp_ot_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeankVpOverTimeDIV', 'hide', 'acq_kvp_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_kvp_over_time_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeankVpOverTimeDIV', 'show', 'acq_kvp_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_kvp_over_time_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('AcquisitionMeankVpOverTimeDIV')" class="btn btn-default btn-sm" role="button" id="acq_kvp_over_time_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -855,6 +903,8 @@
             <!-- End of HTML to include div container for mean acquisition protocol kVp over time -->
 
             <script>
+                $('#acq_kvp_over_time_series_show').hide();
+
                 var plotDXAcquisitionMeankVpOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeankVpOverTimeDIV');
@@ -889,6 +939,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#AcquisitionMeanmAsOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeanmAsOverTime', 'AcquisitionMeanmAsOverTimeDIV'); $('#toggle_acq_mas_ot_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#AcquisitionMeanmAsOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_mas_ot_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeanmAsOverTimeDIV', 'hide', 'acq_mas_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_mas_over_time_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeanmAsOverTimeDIV', 'show', 'acq_mas_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_mas_over_time_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('AcquisitionMeanmAsOverTimeDIV')" class="btn btn-default btn-sm" role="button" id="acq_mas_over_time_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -896,6 +949,8 @@
             <!-- End of HTML to include div container for mean acquisition protocol mAs over time -->
 
             <script>
+                $('#acq_mas_over_time_series_show').hide();
+
                 var plotDXAcquisitionMeanmAsOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeanmAsOverTimeDIV');
@@ -930,6 +985,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#AcquisitionMeanDAPOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeanDAPOverTime', 'AcquisitionMeanDAPOverTimeDIV'); $('#toggle_acq_dap_ot_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#AcquisitionMeanDAPOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_dap_ot_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeanDAPOverTimeDIV', 'hide', 'acq_dap_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_dap_over_time_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeanDAPOverTimeDIV', 'show', 'acq_dap_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_dap_over_time_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('AcquisitionMeanDAPOverTimeDIV')" class="btn btn-default btn-sm" role="button" id="acq_dap_over_time_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -937,6 +995,8 @@
             <!-- End of HTML to include div container for mean acquisition protocol DAP per week -->
 
             <script>
+                $('#acq_dap_over_time_series_show').hide();
+
                 var plotDXAcquisitionMeanDAPOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeanDAPOverTimeDIV');

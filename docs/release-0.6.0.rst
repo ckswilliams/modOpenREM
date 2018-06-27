@@ -1,6 +1,6 @@
-####################
-Release Notes v0.6.0
-####################
+###################################
+OpenREM Release Notes version 0.6.0
+###################################
 
 ****************
 Headline changes
@@ -138,7 +138,7 @@ DICOM Store Service Class Provider
 
 OpenREM can now act as the DICOM Store service, allowing direct sending of DICOM objects from modalities to OpenREM
 without needing to use Conquest or any other DICOM Store SCP. This feature is a preview as it hasn't been extensively
-tested, but it is expected to work. For more information, please see :doc:`netdicom`.
+tested, but it is expected to work. For more information, please see :ref:`directfrommodalities`.
 
 
 Exports for openSkin

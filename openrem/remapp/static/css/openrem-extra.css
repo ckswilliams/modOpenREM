@@ -347,3 +347,10 @@ table.sortable thead th {
     font-weight: bold;
     cursor: default;
 }
+
+a.vert-offset:before {
+    display: block;
+    content: "";
+    height: 52px;
+    margin: -52px 0 0;
+}

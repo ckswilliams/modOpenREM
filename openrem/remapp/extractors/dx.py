@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -39,7 +39,7 @@ import sys
 import django
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('remapp.extractors.dx')  # Explicitly named so that it is still handled when using __main__
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -68,13 +68,14 @@ def _xrayfilters(filttype, material, thickmax, thickmin, source):
                 filter_types[filttype]["code"], filter_types[filttype]["meaning"]
             )
     if material:
+        logger.debug("In _xrayfilters, attempting to match material {0}".format(material.strip().lower()))
         if material.strip().lower() == 'molybdenum':
             filters.xray_filter_material = get_or_create_cid('C-150F9', 'Molybdenum or Molybdenum compound')
         if material.strip().lower() == 'rhodium':
             filters.xray_filter_material = get_or_create_cid('C-167F9', 'Rhodium or Rhodium compound')
         if material.strip().lower() == 'silver':
             filters.xray_filter_material = get_or_create_cid('C-137F9', 'Silver or Silver compound')
-        if material.strip().lower() == 'aluminum':
+        if material.strip().lower() in ['aluminum', 'aluminium']:  # Illegal spelling of Aluminium found in Philips DiDi
             filters.xray_filter_material = get_or_create_cid('C-120F9', 'Aluminum or Aluminum compound')
         if material.strip().lower() == 'copper':
             filters.xray_filter_material = get_or_create_cid('C-127F9', 'Copper or Copper compound')
@@ -138,33 +139,10 @@ def _xray_filters_prep(dataset, source):
     if ',' in xray_filter_material and not isinstance(xray_filter_material, MultiValue):
         xray_filter_material = xray_filter_material.split(',')
 
-    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
-        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187052, thick2)
-            xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-        else:
-            xray_filter_thickness_minimum = None
+    xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
 
-    try:
-        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187054, thick2)
-            xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-        else:
-            xray_filter_thickness_maximum = None
-
-    if type(xray_filter_material) is list:
+    if isinstance(xray_filter_material, list):
         _xray_filters_multiple(
             xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source)
     else:
@@ -368,17 +346,16 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
     if not event_date: event_date = get_value_kw('StudyDate', dataset)
     event.date_time_started = make_date_time('{0}{1}'.format(event_date, event_time))
     event.irradiation_event_type = get_or_create_cid('113611', 'Stationary Acquisition')
-    event.acquisition_protocol = get_value_kw('ProtocolName', dataset, char_set=ch)
+    event.acquisition_protocol = get_value_kw('ProtocolName', dataset)
     if not event.acquisition_protocol:
-        manufacturer = get_value_kw('Manufacturer', dataset, char_set=ch)
-        software_versions = get_value_kw('SoftwareVersions', dataset, char_set=ch)
+        manufacturer = get_value_kw('Manufacturer', dataset)
+        software_versions = get_value_kw('SoftwareVersions', dataset)
         if manufacturer == 'TOSHIBA_MEC' and software_versions == 'TM_TFD_1.0':
-            event.acquisition_protocol = get_value_kw('ImageComments', dataset, char_set=ch)
-    if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw(
-        'SeriesDescription', dataset, char_set=ch)
+            event.acquisition_protocol = get_value_kw('ImageComments', dataset)
+    if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw('SeriesDescription', dataset)
     if not event.acquisition_protocol: event.acquisition_protocol = get_seq_code_meaning(
-        'PerformedProtocolCodeSequence', dataset, char_set=ch)
-    series_description = get_value_kw('SeriesDescription', dataset, char_set=ch)
+        'PerformedProtocolCodeSequence', dataset)
+    series_description = get_value_kw('SeriesDescription', dataset)
     if series_description:
         event.comment = series_description
     event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence', dataset),
@@ -411,11 +388,11 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
         event.target_region = event.anatomical_structure
     event.entrance_exposure_at_rp = get_value_kw('EntranceDoseInmGy', dataset)
     # reference point definition?
-    pc_fibroglandular = get_value_kw('CommentsOnRadiationDose', dataset, char_set=ch)
+    pc_fibroglandular = get_value_kw('CommentsOnRadiationDose', dataset)
     if pc_fibroglandular:
         if '%' in pc_fibroglandular:
             event.percent_fibroglandular_tissue = pc_fibroglandular.replace('%', '').strip()
-    exposure_control = get_value_kw('ExposureControlModeDescription', dataset, char_set=ch)
+    exposure_control = get_value_kw('ExposureControlModeDescription', dataset)
 
     if event.comment and exposure_control:
         event.comment = event.comment + ', ' + exposure_control
@@ -473,15 +450,15 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.hash_id import hash_id
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
-    equip.manufacturer = get_value_kw("Manufacturer", dataset, char_set=ch)
-    equip.institution_name = get_value_kw("InstitutionName", dataset, char_set=ch)
-    equip.institution_address = get_value_kw("InstitutionAddress", dataset, char_set=ch)
-    equip.station_name = get_value_kw("StationName", dataset, char_set=ch)
-    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName", dataset, char_set=ch)
-    equip.manufacturer_model_name = get_value_kw("ManufacturerModelName", dataset, char_set=ch)
-    equip.device_serial_number = get_value_kw("DeviceSerialNumber", dataset, char_set=ch)
-    equip.software_versions = get_value_kw("SoftwareVersions", dataset, char_set=ch)
-    equip.gantry_id = get_value_kw("GantryID", dataset, char_set=ch)
+    equip.manufacturer = get_value_kw("Manufacturer", dataset)
+    equip.institution_name = get_value_kw("InstitutionName", dataset)
+    equip.institution_address = get_value_kw("InstitutionAddress", dataset)
+    equip.station_name = get_value_kw("StationName", dataset)
+    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName", dataset)
+    equip.manufacturer_model_name = get_value_kw("ManufacturerModelName", dataset)
+    equip.device_serial_number = get_value_kw("DeviceSerialNumber", dataset)
+    equip.software_versions = get_value_kw("SoftwareVersions", dataset)
+    equip.gantry_id = get_value_kw("GantryID", dataset)
     equip.spatial_resolution = get_value_kw("SpatialResolution", dataset)
     equip.date_of_last_calibration = get_date("DateOfLastCalibration", dataset)
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration", dataset)
@@ -567,13 +544,13 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
 
     patient_id_settings = PatientIDSettings.objects.get()
     if patient_id_settings.name_stored:
-        name = get_value_kw("PatientName", dataset, char_set=ch)
+        name = get_value_kw("PatientName", dataset)
         if name and patient_id_settings.name_hashed:
             name = hash_id(name)
             pat.name_hashed = True
         pat.patient_name = name
     if patient_id_settings.id_stored:
-        patid = get_value_kw("PatientID", dataset, char_set=ch)
+        patid = get_value_kw("PatientID", dataset)
         if patid and patient_id_settings.id_hashed:
             patid = hash_id(patid)
             pat.id_hashed = True
@@ -586,7 +563,8 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
 def _generalstudymoduleattributes(dataset, g):
     from datetime import datetime
     from remapp.models import PatientIDSettings
-    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value, get_value_num
+    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value, get_value_num, \
+        list_to_string
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.hash_id import hash_id
 
@@ -594,30 +572,30 @@ def _generalstudymoduleattributes(dataset, g):
     g.study_date = get_date('StudyDate', dataset)
     g.study_time = get_time('StudyTime', dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900, 1, 1)), datetime.time(g.study_time))
-    g.referring_physician_name = get_value_kw('ReferringPhysicianName', dataset, char_set=ch)
-    g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification', dataset, char_set=ch)
-    g.study_id = get_value_kw('StudyID', dataset, char_set=ch)
-    accession_number = get_value_kw('AccessionNumber', dataset, char_set=ch)
+    g.referring_physician_name = list_to_string(get_value_kw('ReferringPhysicianName', dataset))
+    g.referring_physician_identification = list_to_string(get_value_kw('ReferringPhysicianIdentification', dataset))
+    g.study_id = get_value_kw('StudyID', dataset)
+    accession_number = get_value_kw('AccessionNumber', dataset)
     patient_id_settings = PatientIDSettings.objects.get()
     if accession_number and patient_id_settings.accession_hashed:
         accession_number = hash_id(accession_number)
         g.accession_hashed = True
     g.accession_number = accession_number
-    g.study_description = get_value_kw('StudyDescription', dataset, char_set=ch)
-    if not g.study_description: g.study_description = get_value_kw('SeriesDescription', dataset, char_set=ch)
-    if not g.study_description: g.study_description = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
+    g.study_description = get_value_kw('StudyDescription', dataset)
+    if not g.study_description: g.study_description = get_value_kw('SeriesDescription', dataset)
+    if not g.study_description: g.study_description = get_seq_code_meaning('ProcedureCodeSequence', dataset)
     g.modality_type = get_value_kw('Modality', dataset)
-    g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset, char_set=ch)
-    g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy', dataset, char_set=ch)
-    g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset, char_set=ch)
-    g.operator_name = get_value_kw('OperatorsName', dataset, char_set=ch)
+    g.physician_of_record = list_to_string(get_value_kw('PhysicianOfRecord', dataset))
+    g.name_of_physician_reading_study = list_to_string(get_value_kw('NameOfPhysicianReadingStudy', dataset))
+    g.performing_physician_name = list_to_string(get_value_kw('PerformingPhysicianName', dataset))
+    g.operator_name = list_to_string(get_value_kw('OperatorsName', dataset))
     # Being used to summarise protocol for study:
-    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
-    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('ProtocolName', dataset, char_set=ch)
-    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('StudyDescription', dataset, char_set=ch)
-    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription', dataset, char_set=ch)
+    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset)
+    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('ProtocolName', dataset)
+    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('StudyDescription', dataset)
+    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription', dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
-    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset, char_set=ch)
+    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset)
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'RequestAttributesSequence', dataset)
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
@@ -625,20 +603,19 @@ def _generalstudymoduleattributes(dataset, g):
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'PerformedProtocolCodeSequence', dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
-        'RequestAttributesSequence', dataset, char_set=ch)
+        'RequestAttributesSequence', dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
-        'ProcedureCodeSequence', dataset, char_set=ch)
-    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(
-        0x00321060, dataset, char_set=ch)
+        'ProcedureCodeSequence', dataset)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(0x00321060, dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
-        'PerformedProtocolCodeSequence', dataset, char_set=ch)
+        'PerformedProtocolCodeSequence', dataset)
     if not g.requested_procedure_code_meaning:
-        manufacturer = get_value_kw("Manufacturer", dataset, char_set=ch)
-        model = get_value_kw("ManufacturerModelName", dataset, char_set=ch)
+        manufacturer = get_value_kw("Manufacturer", dataset)
+        model = get_value_kw("ManufacturerModelName", dataset)
         if manufacturer and model and 'canon' in manufacturer.lower() and 'cxdi' in model.lower():
-            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset, char_set=ch)
+            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset)
         if manufacturer and model and 'carestream health' in manufacturer.lower() and 'drx-revolution' in model.lower():
-            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset, char_set=ch)
+            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset)
     g.save()
 
     _generalequipmentmoduleattributes(dataset, g, ch)
@@ -659,89 +636,48 @@ def _test_if_dx(dataset):
     return 1
 
 
-def _create_event(dataset):
-    """
-    If study exists, create new event
-    :param dataset: DICOM object
-    :return: Nothing
-    """
-    from remapp.models import GeneralStudyModuleAttr
-    from remapp.tools import check_uid
-    from remapp.tools.get_values import get_value_kw
-    from remapp.tools.dcmdatetime import make_date_time
-
-    study_uid = get_value_kw('StudyInstanceUID', dataset)
-    event_uid = get_value_kw('SOPInstanceUID', dataset)
-    inst_in_db = check_uid.check_uid(event_uid, 'Event')
-    if inst_in_db:
-        return 0
-    same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
-    if same_study_uid.count() != 1:
-        print "Duplicate study UIDs in database! Could be a problem."
-        for dup in same_study_uid:
-            if dup.modality_type:
-                same_study_uid = dup
-                continue
-    # further check required to ensure 'for processing' and 'for presentation'
-    # versions of the same irradiation event don't get imported twice
-    event_time = get_value_kw('AcquisitionTime', dataset)
-    if not event_time:
-        event_time = get_value_kw('ContentTime', dataset)
-    event_date = get_value_kw('AcquisitionDate', dataset)
-    if not event_date:
-        event_date = get_value_kw('ContentDate', dataset)
-    event_date_time = make_date_time('{0}{1}'.format(event_date, event_time))
-    try:
-        for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-            if event_date_time == events.date_time_started:
-                return 0
-    except Exception as e:
-        logger.warning("DX study UID %s, event UID %s failed at check for identical event. Error %s",
-                       study_uid, event_uid, e)
-    # study exists, but event doesn't
-    ch = get_value_kw('SpecificCharacterSet', dataset)
-    _irradiationeventxraydata(dataset, same_study_uid.get().projectionxrayradiationdose_set.get(), ch)
-    # update the accumulated tables
-    return 0
-
-
 def _dx2db(dataset):
-    import os, sys
+    import sys
     import openrem_settings
     from time import sleep
     from random import random
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-    from django.db import models
 
     openrem_settings.add_project_to_path()
+    from remapp.extractors.extract_common import get_study_check_dup
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
-    from remapp.tools.dcmdatetime import make_date_time
 
     study_uid = get_value_kw('StudyInstanceUID', dataset)
     if not study_uid:
         sys.exit('No UID returned')
     study_in_db = check_uid.check_uid(study_uid)
+    ch = get_value_kw('SpecificCharacterSet', dataset)
 
-    if study_in_db == 1:
+    if study_in_db:
         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-        _create_event(dataset)
+        this_study = get_study_check_dup(dataset, modality='DX')
+        if this_study:
+            _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
 
     if not study_in_db:
         # study doesn't exist, start from scratch
         g = GeneralStudyModuleAttr.objects.create()
         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
         g.save()
-        # check again
+        logger.debug("Started importing DX with Study Instance UID of {0}".format(g.study_instance_uid))
+        event_uid = get_value_kw('SOPInstanceUID', dataset)
+        check_uid.record_sop_instance_uid(g, event_uid)
+        # check study again
         study_in_db = check_uid.check_uid(study_uid)
         if study_in_db == 1:
             _generalstudymoduleattributes(dataset, g)
         elif not study_in_db:
-            sys.exit("Something went wrong, GeneralStudyModuleAttr wasn't created")
+            sys.exit(u"Something went wrong, GeneralStudyModuleAttr wasn't created")
         elif study_in_db > 1:
-            sleep(random())
+            sleep(random())  # nosec - not being used for cryptography
             # Check if other instance(s) has deleted the study yet
             study_in_db = check_uid.check_uid(study_uid)
             if study_in_db == 1:
@@ -751,41 +687,75 @@ def _dx2db(dataset):
                 study_in_db = check_uid.check_uid(study_uid)
                 if not study_in_db:
                     # both must have been deleted simultaneously!
-                    sleep(random())
+                    sleep(random())  # nosec - not being used for cryptography
                     # Check if other instance has created the study again yet
                     study_in_db = check_uid.check_uid(study_uid)
                     if study_in_db == 1:
                         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                        _create_event(dataset)
+                        this_study = get_study_check_dup(dataset, modality='DX')
+                        if this_study:
+                            _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
                     while not study_in_db:
                         g = GeneralStudyModuleAttr.objects.create()
                         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
                         g.save()
+                        check_uid.record_sop_instance_uid(g, event_uid)
                         # check again
                         study_in_db = check_uid.check_uid(study_uid)
                         if study_in_db == 1:
                             _generalstudymoduleattributes(dataset, g)
                         elif study_in_db > 1:
                             g.delete()
-                            sleep(random())
+                            sleep(random())  # nosec - not being used for cryptography
                             study_in_db = check_uid.check_uid(study_uid)
                             if study_in_db == 1:
                                 sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                                _create_event(dataset)
+                                this_study = get_study_check_dup(dataset, modality='DX')
+                                if this_study:
+                                    _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(),
+                                                              ch)
                 elif study_in_db == 1:
                     sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
-                    _create_event(dataset)
+                    this_study = get_study_check_dup(dataset, modality='DX')
+                    if this_study:
+                        _irradiationeventxraydata(dataset, this_study.projectionxrayradiationdose_set.get(), ch)
 
 
-@shared_task
+def _fix_kodak_filters(dataset):
+    """
+    Replace floats with commas in with multivalue floats: as found in older Carestream/Kodak units such as the DR7500
+    :param dataset: DICOM dataset
+    :return: Repaired DICOM dataset
+    """
+    from remapp.tools.get_values import get_value_kw
+
+    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187052, thick2)
+
+    try:
+        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187054, thick2)
+
+
+@shared_task(name="remapp.extractors.dx.dx")
 def dx(dig_file):
     """Extract radiation dose structured report related data from DX radiographic images
 
     :param filename: relative or absolute path to DICOM DX radiographic image file.
     :type filename: str.
-
-    Tested with:
-        Nothing yet
 
     """
 
@@ -798,11 +768,19 @@ def dx(dig_file):
     except ObjectDoesNotExist:
         del_dx_im = False
 
+    logger.debug(u"About to read DX")
     dataset = dicom.read_file(dig_file)
+    try:
+        dataset.decode()
+    except ValueError as e:
+        if "Invalid tag (0018, 7052): invalid literal for float" in e.message:
+            _fix_kodak_filters(dataset)
+            dataset.decode()
     isdx = _test_if_dx(dataset)
     if not isdx:
-        return '{0} is not a DICOM DX radiographic image'.format(dig_file)
+        return u'{0} is not a DICOM DX radiographic image'.format(dig_file)
 
+    logger.debug(u"About to launch _dx2db")
     _dx2db(dataset)
 
     if del_dx_im:
@@ -815,6 +793,6 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
-        sys.exit('Error: Supply exactly one argument - the DICOM DX radiographic image file')
+        sys.exit(u'Error: Supply exactly one argument - the DICOM DX radiographic image file')
 
     sys.exit(dx(sys.argv[1]))

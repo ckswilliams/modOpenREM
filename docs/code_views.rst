@@ -1,6 +1,4 @@
 Views
 =====
 
-.. automodule:: remapp.views
-    :members:
-    :undoc-members:
+*Will be documented in future release*

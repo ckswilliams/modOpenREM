@@ -13,7 +13,7 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
+#    Foundation trust in connection with this Program in any press or
 #    other public announcement without the prior written consent of 
 #    The Royal Marsden NHS Foundation Trust.
 #
@@ -39,7 +39,7 @@ from django import forms
 from remapp.models import GeneralStudyModuleAttr
 from django.utils.safestring import mark_safe
 
-TEST_CHOICES = (('', 'Yes (default)'), (2, 'No (caution)'),)
+TEST_CHOICES = ((u'', u'Yes (default)'), (2, u'No (caution)'),)
 
 def custom_name_filter(queryset, value):
     if not value:
@@ -121,21 +121,24 @@ class RFSummaryListFilter(django_filters.FilterSet):
     """Filter for fluoroscopy studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-    study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
-    patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
-    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Manufacturer', name='generalequipmentmoduleattr__manufacturer')
-    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
-    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
-    performing_physician_name = django_filters.CharFilter(lookup_type='icontains', label='Physician')
-    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
-    display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
-    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe('Min study DAP (cGy.cm<sup>2</sup>)'))
-    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe('Max study DAP (cGy.cm<sup>2</sup>)'))
-    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
+    date_after = django_filters.DateFilter(lookup_type='gte', label=u'Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label=u'Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    study_description = django_filters.CharFilter(lookup_type='icontains', label=u'Study description')
+    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
+    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+    patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
+    patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
+    institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
+    manufacturer = django_filters.CharFilter(lookup_type='icontains', label=u'Manufacturer', name='generalequipmentmoduleattr__manufacturer')
+    model_name = django_filters.CharFilter(lookup_type='icontains', label=u'Model', name='generalequipmentmoduleattr__manufacturer_model_name')
+    station_name = django_filters.CharFilter(lookup_type='icontains', label=u'Station name', name='generalequipmentmoduleattr__station_name')
+    performing_physician_name = django_filters.CharFilter(lookup_type='icontains', label=u'Physician')
+    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label=u'Accession number')
+    display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe(u'Min study DAP (cGy.cm<sup>2</sup>)'))
+    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe(u'Max study DAP (cGy.cm<sup>2</sup>)'))
+    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -162,30 +165,31 @@ class RFSummaryListFilter(django_filters.FilterSet):
 class RFFilterPlusPid(RFSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(RFFilterPlusPid, self).__init__(*args, **kwargs)
-        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
-        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
+        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label=u'Patient name')
+        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label=u'Patient ID')
 
 
 class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-    study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
-    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label='Acquisition protocol', name='ctradiationdose__ctirradiationeventdata__acquisition_protocol')
-    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label='Requested procedure', name='requested_procedure_code_meaning')
-    patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
-    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make', name='generalequipmentmoduleattr__manufacturer')
-    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
-    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
-    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
-    study_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
-    study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
-    display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
-    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
+    date_after = django_filters.DateFilter(lookup_type='gte', label=u'Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label=u'Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    study_description = django_filters.CharFilter(lookup_type='icontains', label=u'Study description')
+    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
+    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+    patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
+    patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
+    institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
+    manufacturer = django_filters.CharFilter(lookup_type='icontains', label=u'Make', name='generalequipmentmoduleattr__manufacturer')
+    model_name = django_filters.CharFilter(lookup_type='icontains', label=u'Model', name='generalequipmentmoduleattr__manufacturer_model_name')
+    station_name = django_filters.CharFilter(lookup_type='icontains', label=u'Station name', name='generalequipmentmoduleattr__station_name')
+    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label=u'Accession number')
+    study_dlp_min = django_filters.NumberFilter(lookup_type='gte', label=u'Min study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
+    study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label=u'Max study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
+    display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -212,8 +216,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
 class CTFilterPlusPid(CTSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(CTFilterPlusPid, self).__init__(*args, **kwargs)
-        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
-        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
+        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label=u'Patient name')
+        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label=u'Patient ID')
 
 
 def ct_acq_filter(filters, pid=False):
@@ -284,18 +288,21 @@ class MGSummaryListFilter(django_filters.FilterSet):
     """Filter for mammography studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label='Procedure')
-    patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
-    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Manufacturer', name='generalequipmentmoduleattr__manufacturer')
-    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
-    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
-    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
-    display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
-    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
+    date_after = django_filters.DateFilter(lookup_type='gte', label=u'Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label=u'Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    study_description = django_filters.CharFilter(lookup_type='icontains', label=u'Study description')
+    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
+    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+    patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
+    patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
+    institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
+    manufacturer = django_filters.CharFilter(lookup_type='icontains', label=u'Manufacturer', name='generalequipmentmoduleattr__manufacturer')
+    model_name = django_filters.CharFilter(lookup_type='icontains', label=u'Model', name='generalequipmentmoduleattr__manufacturer_model_name')
+    station_name = django_filters.CharFilter(lookup_type='icontains', label=u'Station name', name='generalequipmentmoduleattr__station_name')
+    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label=u'Accession number')
+    display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -323,40 +330,43 @@ class MGSummaryListFilter(django_filters.FilterSet):
 class MGFilterPlusPid(MGSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(MGFilterPlusPid, self).__init__(*args, **kwargs)
-        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
-        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
+        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label=u'Patient name')
+        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label=u'Patient ID')
 
 
 class DXSummaryListFilter(django_filters.FilterSet):
     """Filter for DX studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-    study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
-    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label='Acquisition protocol', name='projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
-    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label='Requested procedure', name='requested_procedure_code_meaning')
-    patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
-    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make', name='generalequipmentmoduleattr__manufacturer')
-    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
-    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
-    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
-    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe('Min study DAP (cGy.cm<sup>2</sup>)'))
-    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe('Max study DAP (cGy.cm<sup>2</sup>)'))
+    date_after = django_filters.DateFilter(lookup_type='gte', label=u'Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label=u'Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    study_description = django_filters.CharFilter(lookup_type='icontains', label=u'Study description')
+    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
+    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+    patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
+    patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
+    institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
+    manufacturer = django_filters.CharFilter(lookup_type='icontains', label=u'Make', name='generalequipmentmoduleattr__manufacturer')
+    model_name = django_filters.CharFilter(lookup_type='icontains', label=u'Model', name='generalequipmentmoduleattr__manufacturer_model_name')
+    station_name = django_filters.CharFilter(lookup_type='icontains', label=u'Station name', name='generalequipmentmoduleattr__station_name')
+    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label=u'Accession number')
+    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe(u'Min study DAP (cGy.cm<sup>2</sup>)'))
+    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe(u'Max study DAP (cGy.cm<sup>2</sup>)'))
     # acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
     # acquisition_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
-    display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
-    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
+    display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
         fields = [
             'date_after', 
             'date_before', 
-            'institution_name', 
+            'institution_name',
             'study_description',
+            'procedure_code_meaning',
+            'requested_procedure',
             'acquisition_protocol',
             'patient_age_min',
             'patient_age_max',
@@ -390,8 +400,8 @@ class DXSummaryListFilter(django_filters.FilterSet):
 class DXFilterPlusPid(DXSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(DXFilterPlusPid, self).__init__(*args, **kwargs)
-        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
-        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
+        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label=u'Patient name')
+        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label=u'Patient ID')
 
 
 def dx_acq_filter(filters, pid=False):

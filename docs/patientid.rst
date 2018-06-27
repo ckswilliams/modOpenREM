@@ -23,10 +23,17 @@ Configure what is stored
 ************************
 
 .. figure:: img/ConfigMenu.png
-    :align: center
+    :figwidth: 30 %
+    :align: right
     :alt: Configuration menu
 
-On the Config menu, select ``Patient ID settings``. The initial settings are as follows:
+On the Config menu, select ``Patient ID``:
+
+.. raw:: html
+
+    <div class="clearfix"></div>
+
+The initial settings are as follows:
 
 .. figure:: img/ModifyPtIDStorage.png
     :align: center

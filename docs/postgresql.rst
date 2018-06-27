@@ -24,13 +24,13 @@ If you are using a virtualenv, make sure you are in it and it is active (``sourc
 Change the security configuration
 =================================
 
-The default security settings are too restrictive to allow access to the database. Assumes version ``9.4``, change as
+The default security settings are too restrictive to allow access to the database. Assumes version ``9.5``, change as
 appropriate.
 
 
 .. sourcecode:: console
 
-    sudo nano /etc/postgresql/9.4/main/pg_hba.conf
+    sudo nano /etc/postgresql/9.5/main/pg_hba.conf
 
 Scroll down to the bottom of the file and edit the following line from ``peer`` to ``md5``:
 
@@ -41,6 +41,11 @@ Scroll down to the bottom of the file and edit the following line from ``peer`` 
 Don't worry about any lines that start with a ``#`` as they are ignored. If you can't access the database when
 everything else is configured, you might need to revisit this file and see if there are other lines with a method of
 ``peer`` that need to be ``md5``
+
+.. note::
+
+    If you need to have different settings for different databases on your server, you can use the database name instead
+    of the first ``all``, and/or the the database user name instead of the second ``all``.
 
 Restart PostgreSQL so the new settings take effect:
 
@@ -54,20 +59,20 @@ Optional: Specify the location for the database files
 You might like to do this if you want to put the database on an encrypted location instead of ``/var/lib/postgresql``.
 
 For this example, I'm going to assume all the OpenREM programs and data are in the folder ``/var/openrem/`` and
-PostgreSQL is at version ``9.4`` (change both as appropriate)
+PostgreSQL is at version ``9.5`` (change both as appropriate)
 
 .. sourcecode:: console
 
     sudo service postgresql stop
     mkdir /var/openrem/database
-    sudo cp -aRv /var/lib/postgresql/9.4/main /var/openrem/database/
-    sudo nano /etc/postgresql/9.4/main/postgresql.conf
+    sudo cp -aRv /var/lib/postgresql/9.5/main /var/openrem/database/
+    sudo nano /etc/postgresql/9.5/main/postgresql.conf
 
 Change the line
 
 .. sourcecode:: console
 
-    data_directory = '/var/lib/postgresql/9.4/main'
+    data_directory = '/var/lib/postgresql/9.5/main'
 
 to
 
@@ -108,9 +113,9 @@ Move to the OpenREM install directory:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\``
 
 
 Edit the settings file, eg
@@ -159,32 +164,37 @@ Automated backup with a bash script
 
 This script could be called by a cron task, or by a backup system such as backuppc prior to running the system backup.
 
+.. _restore-psql-linux:
+
 ********************
 Restore the database
 ********************
 
-If the restore is taking place on a different system, ensure that PostgreSQL is installed and the same user has been
-added as was used to create the initial database (see :ref:`create-psql-db`)
+If the restore is taking place on a different system,
 
-Create a fresh database and restore from the backup
-===================================================
+* ensure that PostgreSQL is installed and the same user has been added as was used to create the initial database
+  (see :ref:`create-psql-db`).
+* Ensure that the new system has the same version of OpenREM installed as the system the database was backed up from.
+* Ensure the ``openrem/remapp/migrations/`` folder has no files in except __init__.py
+
+Create a fresh database and restore from the backup:
 
 .. sourcecode:: console
 
     sudo -u postgres createdb -T template0 new_openremdb_name
     sudo -u postgres psql new_openremdb_name < /path/to/db/backups/openrem.bak
 
+Reconfigure ``local_settings.py`` with the new database details and introduce OpenREM to the restored database:
 
-**********************************************
-Alternative instructions and further reference
-**********************************************
+.. sourcecode:: console
 
-Previous versions had instructions that used different backup options and the ``pg_restore`` command. To review these,
-please refer to the 0.6.2 documentation at
-`docs.openrem.org/en/0.6.2/  <http://docs.openrem.org/en/0.6.2/backupRestorePostgreSQL.html>`_
+    python manage.py migrate --fake-initial
+    python manage.py makemigrations remapp
+    python manage.py migrate remapp --fake
 
-Further details can be found on the
-`PostgreSQL website <http://www.postgresql.org/docs/9.4/static/backup-dump.html#BACKUP-DUMP-RESTORE>`_
+If you are creating a second system in order to test upgrading, you can do this now followed by the usual ``python
+manage.py makemigrations remapp`` then ``python manage.py migrate remapp`` as per the upgrade instructions.
+
 
 **************************
 Useful PostgreSQL commands

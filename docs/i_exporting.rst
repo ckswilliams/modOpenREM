@@ -6,17 +6,16 @@ Exporting to csv and xlsx sheets
 
 If you are logged in as a user in the ``exportgroup`` or the ``admingroup``,
 the export links will be available near the top of the modality filter pages
-in the OpenREM interface. The following exports are currently available (version 0.5.0)
+in the OpenREM interface.
 
-* CT basic, single sheet csv
-* CT advanced, XLSX muliple-sheets
-* Fluoroscopy basic, single sheet csv
-* Mammography, single sheet csv
-* `Mammography NHSBSP`_, single sheet csv designed to satisfy NHSPSB reporting
-* Radiographic, single sheet csv
-* Radiographic, XLSX multiple sheets
+For each modality you can export to a single-sheet csv file or a multi-sheet xlsx file. In addition, there is an export
+tailored to the :ref:`NHSBSP_dose_audit` requirements.
 
-For CT and radiographic, the XLSX export has multiple sheets. The first sheet contains a
+If you are logged in as a user in the ``pidgroup`` you will also have a choice of exporting with patient name and/or
+patient ID information included in the export (if any is recorded in the database). See :doc:`patientid` for more
+details.
+
+The xlsx export has multiple sheets. The first sheet contains a
 summary of all the study descriptions, requested procedures and series
 protocol names contained in the export:
 
@@ -44,6 +43,43 @@ is listed one per line. If a single study
 has more than one series with the same protocol name, then the same study
 will appear on more than one line.
 
+Fluoroscopy exports
+-------------------
+
+Fluoroscopy csv exports only report study level information — this includes summary dose information for fluoroscopy
+exposures and acquisition exposures, but not information about individual exposures.
+
+Fluoroscopy xlsx exports contain the following sheets:
+
+- Summary sheet
+- All data sheet with groups of exposures
+- One sheet per acquisition protocol with one row per exposure including all the details of that exposure.
+
+Exposures are considered similar and put in the same group if they are, relative to the first exposure of a group:
+
+- same plane (for bi-plane systems)
+- same protocol
+- same field size (mag, not collimation)
+- same pulse rate
+- same filter material and thickness
+- within 5° in both directions (primary and secondary)
+- of the same 'event type' (Fluoroscopy, Stationary Acquisition, Stepping Acquisition, Rotational Acquisition)
+
+The minimum, maximum and mean of all the remaining factors are presented for each group along with the common factors.
+Where a factor is not available in the source RDSR, that factor is not considered.
+
+The grouping process for the all data sheet takes a lot of time compared to the other exports. However, we hope that
+this is a useful way of comprehending the study. Other modalities have all the series for any one study detailed in full
+on one long row — this is not possible when one study might have 400 exposures!
+
+The majority of systems report kV, mA and pulse width information as a mean value per exposure. Some systems report
+this information on a per pulse basis instead. In this circumstance, in the web interface you will see the list of
+pulses, but in the export the mean value (after excluding any zero values) is calculated first and this value is then
+used.
+
+Exports page
+------------
+
 Clicking the link for an export redirects you to the Exports page, which
 you can also get to using the link at the top right of the navigation bar:
 
@@ -53,14 +89,11 @@ you can also get to using the link at the top right of the navigation bar:
     :height: 471px
     :alt: Exports list
 
-Whilst an export is being processed, it will be listed in the first table
-at the top. The current status is displayed to indicate export progress.
-If an export gets stuck for whatever reason, you may be able to abort the
-process by clicking the 'Abort' button. However this does not always cause
-an active export to terminate - you may find it completes anyway!
+Whilst an export is being processed, it will be listed in the first table at the top. The current status is displayed to
+indicate export progress, and is updated every two seconds. You can stop an export early by using the abort button;  you
+will not be able to download anything in this instance.
 
-Completed exports are then listed in the second table, with a link to
-download the csv or xlsx file.
+Once a study is complete a new table of recently completed exams is created and you will be able to download the file.
 
 When the export is no longer needed, it can be deleted from the server
 by ticking the delete checkbox and clicking the delete button at the bottom:
@@ -71,20 +104,12 @@ by ticking the delete checkbox and clicking the delete button at the bottom:
     :height: 268px
     :alt: Deleting exports
 
-.. warning::
-
-    Large exports have been killed by the operating system due to running 
-    out of memory - a 6500 CT exam xlsx export was killed after 3400 
-    studies for example. This issue is being tracked as `#116`_ and will
-    hopefully be addressed in the next release. It is possible that if debug 
-    mode is turned off then memory will be managed better, but I also need
-    to modify the xlsx export to make use of the memory optimisation mode in 
-    xlsxwriter.
-
 Specific modality export information
 ====================================
 
-Mammography NHSBSP
+..  _NHSBSP_dose_audit:
+
+NHSBSP dose audits
 ------------------
 
 This export is specific to the UK NHS Breast Screening Programme and generates the source data in the format required
@@ -120,7 +145,23 @@ then you should further prepare the data as follows:
 Where patients have had both 2D and tomographic exposures in the same study, NCCPM will be able to match them up as they
 will have the same patient number in both surveys.
 
+Opening csv exports in Excel
+============================
 
+If the export contains non-ASCII characters, then Microsoft Excel is unlikely to display them correctly by default. This
+issue does not occur with Libre Office which defaults to UTF-8 -- behaviour with other applications will vary.
+
+To correctly render characters in csv files with Excel, you will need to follow the following procedure:
+
+#. Open Excel.
+#. On the ``Data`` tab of the ribbon interface, select ``From Text`` in the ``Get External Data`` section.
+#. Select your exported csv file and click ``Import``
+#. Ensure that Data Type ``Fixed width`` is selected.
+#. Change the ``File origin`` from ``Windows (ANSI)`` to ``65001 : Unicode (UTF-8)`` -- the easiest way to find it is to
+   scroll right to the bottom of the list, then move up one.
+#. Click ``Next >``
+#. Change the delimiter to just ``Comma``
+#. Either click ``Finish`` or ``Next >`` if you want to further customise the import.
 
 ..  _`#116`: https://bitbucket.org/openrem/openrem/issue/116/
 ..  _ACR MQCM 1999 Equivalent code.: http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4014.html

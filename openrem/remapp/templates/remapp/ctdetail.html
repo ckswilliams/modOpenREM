@@ -3,10 +3,12 @@
 {% block navct%}<li class="active">{% endblock %}
 
 
-{% block mainblock %}		
+{% block mainblock %}
 <h1>Detail list of events</h1>
-
-<ul>
+{% with patientstudy=generalstudymoduleattr.patientstudymoduleattr_set.get %}
+{% with equipment=generalstudymoduleattr.generalequipmentmoduleattr_set.get %}
+{% with accum_dose=generalstudymoduleattr.ctradiationdose_set.get.ctaccumulateddosedata_set.get %}
+  <ul>
     <li>
         Accession number:
         {% if not generalstudymoduleattr.accession_hashed %}
@@ -18,35 +20,44 @@
     <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
     <li>Study time: {{ generalstudymoduleattr.study_time|date:"H:i" }}</li>
     <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
+    <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
     <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
-    <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }} years</li>
-    <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:2 }} m, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
-    <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
+    <li>Patient age: {{ patientstudy.patient_age_decimal|floatformat:1 }} years</li>
+    <li>Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m, {{ patientstudy.patient_weight|floatformat:1 }} kg</li>
+    <li>Hospital: {{ equipment.institution_name }}</li>
     <li>
-        Scanner: 
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
+        Scanner:
+        {{ equipment.manufacturer }} |
+        {{ equipment.manufacturer_model_name }} |
+        {{ equipment.station_name }}
     </li>
+    <li>Display name: {{ equipment.unique_equipment_name.display_name }}</li>
     <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
     <li>Comment: {{ generalstudymoduleattr.ctradiationdose_set.get.comment }} </li>
+    <li>Performing physician(s): {{ generalstudymoduleattr.performing_physician_name }}</li>
+    <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
     <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
-    <li>
-        Total number of events:
-        {{ generalstudymoduleattr.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}
-    </li>
-    <li>
-        Total DLP:
-        {{ generalstudymoduleattr.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}
-        mGy.cm
-    </li>
-</ul>
+  </ul>
+<div class="row">
+  <div class="col-md-3">
+    <table class="table table-condensed table-bordered small">
+      <tr>
+        <th>Total number of events</th>
+        <td>{{ accum_dose.total_number_of_irradiation_events }}</td>
+      </tr>
+      <tr>
+        <th>Total DLP </th>
+        <td>{{ accum_dose.ct_dose_length_product_total|floatformat:2 }} mGy&middot;cm</td>
+      </tr>
+    </table>
+  </div>
+</div>
 
 <table class="table table-striped table-bordered small">
     <th>Acquisition protocol</th>
     <th>Type</th>
     <th>CTDI<sub>vol</sub> (mGy)</th>
-    <th>DLP (mGy.cm)</th>
+    <th>DLP (mGy&middot;cm)</th>
     <th>Scanning length (mm)</th>
     <th>kVp</th>
     <th>mA</th>
@@ -57,7 +68,14 @@
     <th>Slice thickness (mm)</th>
     <th>Collimation (mm)</th>
     <th>X-ray modulation type</th>
-    {% for event in generalstudymoduleattr.ctradiationdose_set.get.ctirradiationeventdata_set.all %}
+    {% for event in events_all %}
+      {% with source=event.ctxraysourceparameters_set.all %}
+      {% with dose_check=event.ctdosecheckdetails_set.get %}
+      {% with dose_check_person_alert=dose_check.tid1020_alert.get %}
+      {% with dose_check_person_notification=dose_check.tid1020_notification.get %}
+      {% with source_zero=source.0 %}
+      {% with num_sources=event.number_of_xray_sources %}
+
       <tr>
         <td rowspan="2">{{ event.acquisition_protocol }}</td>
         <td rowspan="2">{{ event.ct_acquisition_type }}</td>
@@ -71,16 +89,16 @@
         </td>
         <td rowspan="2">{{ event.dlp|floatformat:2 }}</td>
         <td rowspan="2">{{ event.scanninglength_set.get.scanning_length|floatformat:0 }}</td>
-        {% if event.number_of_xray_sources != 2 %}
-          <td rowspan="2">{{ event.ctxraysourceparameters_set.get.kvp|floatformat:0 }}</td>
-          <td rowspan="2">{{ event.ctxraysourceparameters_set.get.xray_tube_current|floatformat:0 }}</td>
-          <td rowspan="2">{{ event.ctxraysourceparameters_set.get.maximum_xray_tube_current|floatformat:0 }}</td>
-          <td rowspan="2">{{ event.ctxraysourceparameters_set.get.exposure_time_per_rotation|floatformat:3 }}</td>
+        {% if num_sources != 2 %}
+          <td rowspan="2">{{ source_zero.kvp|floatformat:0 }}</td>
+          <td rowspan="2">{{ source_zero.xray_tube_current|floatformat:0 }}</td>
+          <td rowspan="2">{{ source_zero.maximum_xray_tube_current|floatformat:0 }}</td>
+          <td rowspan="2">{{ source_zero.exposure_time_per_rotation|floatformat:3 }}</td>
         {% else %}
-          <td>{{ event.ctxraysourceparameters_set.all.0.kvp|floatformat:0 }}</td>
-          <td>{{ event.ctxraysourceparameters_set.all.0.xray_tube_current|floatformat:0 }}</td>
-          <td>{{ event.ctxraysourceparameters_set.all.0.maximum_xray_tube_current|floatformat:0 }}</td>
-          <td>{{ event.ctxraysourceparameters_set.all.0.exposure_time_per_rotation|floatformat:3 }}</td>
+          <td>{{ source_zero.kvp|floatformat:0 }}</td>
+          <td>{{ source_zero.xray_tube_current|floatformat:0 }}</td>
+          <td>{{ source_zero.maximum_xray_tube_current|floatformat:0 }}</td>
+          <td>{{ source_zero.exposure_time_per_rotation|floatformat:3 }}</td>
         {% endif %}
         <td rowspan="2">{{ event.pitch_factor|floatformat:3 }}</td>
         <td rowspan="2">{{ event.exposure_time|floatformat:3 }}</td>
@@ -88,22 +106,81 @@
         <td rowspan="2">{{ event.nominal_total_collimation_width|floatformat:2 }}</td>
         <td rowspan="2">{{ event.xray_modulation_type }}</td>
       </tr>
-      {% if event.number_of_xray_sources == 2 %}
+      {% if num_sources == 2 %}
+        {% with source_one=source.1 %}
         <tr>
-          <td>{{ event.ctxraysourceparameters_set.all.1.kvp|floatformat:0 }}</td>
-          <td>{{ event.ctxraysourceparameters_set.all.1.xray_tube_current|floatformat:0 }}</td>
-          <td>{{ event.ctxraysourceparameters_set.all.1.maximum_xray_tube_current|floatformat:0 }}</td>
-          <td>{{ event.ctxraysourceparameters_set.all.1.exposure_time_per_rotation|floatformat:3 }}</td>
+          <td>{{ source_one.kvp|floatformat:0 }}</td>
+          <td>{{ source_one.xray_tube_current|floatformat:0 }}</td>
+          <td>{{ source_one.maximum_xray_tube_current|floatformat:0 }}</td>
+          <td>{{ source_one.exposure_time_per_rotation|floatformat:3 }}</td>
         </tr>
+        {% endwith %}
       {% else %}
         <tr></tr>
       {% endif %}
 
-        {% if event.comment != "" %}
+
         <tr>
-            <td colspan="14"><strong>Comment</strong> {{ event.comment }}</td>
+            <td colspan="14">
+              <strong>Comment</strong> {{ event.comment }}<br>
+              {% if dose_check.dlp_alert_value_configured or dose_check.ctdivol_alert_value_configured %}
+                <strong>Dose Check Alerts</strong>
+                {% if dose_check.dlp_alert_value_configured %}
+                  DLP alert is configured at {{ dose_check.dlp_alert_value|floatformat:2 }} mGy&middot;cm with
+                  {% if dose_check.accumulated_dlp_forward_estimate %}
+                    an accumulated forward estimate of
+                    {{ dose_check.accumulated_dlp_forward_estimate|floatformat:2 }} mGy&middot;cm.
+                  {% else %}
+                    no accumulated forward estimate recorded.
+                  {% endif %}
+                {% endif %}
+                {% if dose_check.ctdivol_alert_value_configured %}
+                  CTDIvol alert is configured at {{ dose_check.ctdivol_alert_value|floatformat:2 }} mGy with
+                  {% if dose_check.accumulated_ctdivol_forward_estimate %}
+                    an accumulated forward estimate of
+                    {{ dose_check.accumulated_ctdivol_forward_estimate|floatformat:2 }} mGy.
+                  {% else %}
+                    no accumulated forward estimate recorded.
+                  {% endif %}
+                {% endif %}
+                {% if dose_check.alert_reason_for_proceeding %}
+                  Reason for proceeding: {{ dose_check.alert_reason_for_proceeding }}
+                {% endif %}
+                {% if dose_check_person_alert.person_name %}
+                  Person authorizing irradiation: {{ dose_check_person_alert.person_name }}
+                {% endif %}
+                <br>
+              {% endif %}
+              {% if dose_check.dlp_notification_value_configured or dose_check.ctdivol_notification_value_configured %}
+                <strong>Dose Check Notifications</strong>
+                {% if dose_check.dlp_notification_value_configured %}
+                  DLP notification is configured at {{ dose_check.dlp_notification_value|floatformat:2 }} mGy&middot;cm with
+                  {% if dose_check.dlp_forward_estimate %}
+                    an accumulated forward estimate of
+                    {{ dose_check.dlp_forward_estimate|floatformat:2 }} mGy&middot;cm.
+                  {% else %}
+                    no accumulated forward estimate recorded.
+                  {% endif %}
+                {% endif %}
+                {% if dose_check.ctdivol_notification_value_configured %}
+                  CTDIvol notification is configured at {{ dose_check.ctdivol_notification_value|floatformat:2 }} mGy with
+                  {% if dose_check.ctdivol_forward_estimate %}
+                    a forward estimate of
+                    {{ dose_check.ctdivol_forward_estimate|floatformat:2 }} mGy.
+                  {% else %}
+                    no forward estimate recorded.
+                  {% endif %}
+                {% endif %}
+                {% if dose_check.notification_reason_for_proceeding %}
+                  Reason for proceeding: {{dose_check.notification_reason_for_proceeding }}
+                {% endif %}
+                {% if dose_check_person_notification.person_name %}
+                  Person authorizing irradiation: {{ dose_check_person_notification.person_name }}
+                {% endif %}
+              {% endif %}
+            </td>
         </tr>
-        {% endif %}
+      {% endwith %}{% endwith %}{% endwith %}{% endwith %}{% endwith %}{% endwith %}
     {% endfor %}
 </table>
 
@@ -119,5 +196,5 @@
     {% endif %}
 </p>
 {% endif %}
-
-{% endblock %}	
+{% endwith %}{% endwith %}{% endwith %}
+{% endblock %}

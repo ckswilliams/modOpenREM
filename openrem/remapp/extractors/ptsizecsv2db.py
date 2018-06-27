@@ -14,7 +14,7 @@
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
 #    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -27,7 +27,7 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
-
+from celery import shared_task
 
 
 def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *args, **kwargs): # C.7.2.2
@@ -103,7 +103,6 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
 
     db.reset_queries()
 
-from celery import shared_task
 
 @shared_task
 def websizeimport(csv_pk = None, *args, **kwargs):
@@ -139,7 +138,7 @@ def websizeimport(csv_pk = None, *args, **kwargs):
             try:
                 csvrecord.logfile.save(logfile,headerrow)
             except OSError as e:
-                csvrecord.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+                csvrecord.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
                 csvrecord.status = 'ERROR'
                 csvrecord.save()
                 return
@@ -175,9 +174,8 @@ def websizeimport(csv_pk = None, *args, **kwargs):
                 csvrecord.processtime = (datetime.datetime.now() - datestamp).total_seconds()
                 csvrecord.status = 'COMPLETE'
                 csvrecord.save()
-       
 
-    
+
 def csv2db(*args, **kwargs):
     """ Import patient height and weight data from csv RIS exports. Can be called from ``openrem_ptsizecsv.py`` script
         
@@ -203,7 +201,6 @@ def csv2db(*args, **kwargs):
     import django
     import openrem_settings
 
-    
     # Required and optional arguments
     parser = argparse.ArgumentParser(description="Import height and weight data into an OpenREM database. If either is missing just add a blank column with appropriate title.")
     parser.add_argument("-u", "--si-uid", action="store_true", help="Use Study Instance UID instead of Accession Number")

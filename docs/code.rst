@@ -1,5 +1,5 @@
-Documentation for the OpenREM code
-**********************************
+Developers
+**********
 
 Contents:
 

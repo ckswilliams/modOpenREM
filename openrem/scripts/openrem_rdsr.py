@@ -1,4 +1,5 @@
 #!/usr/local/bin/python
+# This Python file uses the following encoding: utf-8
 # scripts/openrem_rdsr
 
 """Script to launch the rdsr to import information from DICOM Radiation SR objects 
@@ -13,10 +14,10 @@
 
 import sys
 from glob import glob
-from openrem.remapp.extractors import rdsr
+from openrem.remapp.extractors.rdsr import rdsr
 
 if len(sys.argv) < 2:
-    sys.exit('Error: Supply at least one argument - the radiation dose structured report')
+    sys.exit(u'Error: Supply at least one argument - the radiation dose structured report')
 
 for arg in sys.argv[1:]:
     for filename in glob(arg):

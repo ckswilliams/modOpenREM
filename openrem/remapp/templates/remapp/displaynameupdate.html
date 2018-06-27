@@ -5,7 +5,7 @@
 {% block navhelp %}
         <li>
             <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_displaynames.html#changing-x-ray-system-display-names" target="_blank" data-toggle="tooltip" title="Display name documentation - opens in a new tab">
-                Changing display names
+                Changing display names and / or modality type
             </a>
         </li>
 {% endblock %}
@@ -17,12 +17,13 @@
   {% endif %}
   <table class="table table-bordered table-hover row-clickable">
     <row>
-      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+      <th>Display name</th><th>User defined modality</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
 
     {% for eachname in name_list %}
       <tr>
         <td><a style="text-decoration: none">{{ eachname.display_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachname.user_defined_modality }}</a></td>
         <td><a style="text-decoration: none">{{ eachname.institution_name }}</a></td>
         <td><a style="text-decoration: none">{{ eachname.institutional_department_name }}</a></td>
         <td><a style="text-decoration: none">{{ eachname.manufacturer }}</a></td>
@@ -37,8 +38,24 @@
   </table>
 
   {% if admin.admingroup %}
-      Enter new display name to be used for all of the above systems:
-      <input name="new_display_name" type="text" value="" /><br>
+  	  <table>
+  	  <tr>
+  	  	<td>Enter new display name to be used for all of the above systems:</td>
+  	  	<td><input name="new_display_name" type="text" value="" /></td>
+  	  </tr>
+  	  <tr>
+      	<td>Enter a user defined modality type for all of the above systems:</td>
+      	<td>
+          <select name="new_user_defined_modality">
+        	  <option value="">[Leave unchanged]</option>
+      		  <option value="DX">DX (planar x-ray)</option>
+      		  <option value="RF">RF (fluoroscopy)</option>
+            <option value="dual">Dual (planar x-ray and fluoroscopy)</option>
+      	  </select>
+        </td>
+      </tr>
+      </table>
+      <br>
       <input id="pks" name="pks" type="hidden" value="" />
 
       <script>

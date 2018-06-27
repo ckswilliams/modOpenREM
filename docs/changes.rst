@@ -2,48 +2,171 @@
 OpenREM version history
 =======================
 
-0.8.0 (?)
----------
-
+0.8.0 (2018-06-11)
+------------------
+* `#635`_  Documentation: added Orthanc as preferred third party DICOM Store service
+* `#634`_  Documentation: updated docs for import and query-retrieve duplicates processing
+* `#633`_  Charts: fixed issue where charts failed if bar chart series name was null
+* `#632`_  DICOM: move requests for queries that don't exist now fail gracefully
+* `#631`_  Skin dose maps: bug fixed that prevented message from displaying on screen when skin dose map cannot be calculated
+* `#630`_  Documentation: improved installation instructions
+* `#628`_  Imports: fixed code for importing when there are duplicate DX or MG studies in the database
+* `#626`_  DICOM: isolated the generate modalities in study function and added testing
+* `#625`_  Imports: now using event level UIDs to process continued, cumulative and duplicate RDSRs
+* `#624`_  Charts: removed filter link on number of events histogram as it was not functioning correctly
+* `#623`_  Imports: changed name of Toshiba image based extractor routine
+* `#621`_  Documentation: reversed install order of openrem and pynetdicom due to new pydicom release
+* `#619`_  Documentation: added workaround for outdated dictionary issues
+* `#618`_  DICOM: fixed image level query that prevented RDSRs from being found
+* `#617`_  Imports: fixed issue with multi study exams crashing the Toshiba extractor
+* `#616`_  Documentation: added information for pip download -d
+* `#615`_  Exports: added Target Exposure Index and Deviation Index to radiographic exports
+* `#614`_  Exports: handle error when study is deleted during sheet creation for exports
+* `#613`_  Imports: fixed dual modality type imports after 'dual' designation from ref `#580`_
+* `#612`_  Imports: prevented crash when RDSR was imported with AcquisitionProtocol sequence with no TextValue
+* `#610`_  DICOM: query-retrieve changed to work for duplicate RDSRs, ref `#114`_
+* `#609`_  Interface: fixed the feature that toggles the selection when clicking anywhere on a display name table row
+* `#608`_  Interface: fixed the broken sorting of display name table
+* `#603`_  Interface: fixed JavaScript error if there are any None values in fluoro detail irradiation type table
+* `#602`_  Skin dose maps: fixed error when there are multiple kVp values for a single irradiation event
+* `#599`_  Installation: postgres instructions now include note about differing security choices
+* `#597`_  Skin dose maps: documented that using a production webserver the default timeout value must be increased
+* `#596`_  Documentation: added docs for using Gunicorn and NGINX on linux
+* `#594`_  Display: corrected display of dual-plane DAP and RP dose in RF filtered view
+* `#593`_  Imports: properly handles MultiValue filter material tags and permits aluminium spelling
+* `#592`_  Documentation: added docs for using IIS on Windows
+* `#589`_  Exports: now handles zero studies and studies deleted during exports sensibly
+* `#587`_  Documentation: added instructions for Linux users to rotate logs
+* `#586`_  Documentation: updated exports and detailed how pulse level data is exported
+* `#585`_  Documentation: added information about multiple cumulative RDSRs
+* `#584`_  Import, Interface, Export: RDSR with pulse level data now function
+* `#583`_  Documentation: added information about dual mode modalities and deleting all from an X-ray unit
+* `#582`_  Celery: updated results backend as amqp deprecated and slow
+* `#581`_  Import scripts: interpreter line now always first, functions imported specifically
+* `#580`_  Imports and Interface: one modality creating both DX and RF can now be handled appropriately
+* `#579`_  Imports: dummy values for Toshiba CT import function now in settings.py, log file config in docs
+* `#578`_  Exports: fixed NHSBSP export that was excluding RDSR imported Hologic studies
+* `#575`_  Exports: export page now updates using AJAX and has a select all button
+* `#573`_  Exports: corrected and clarified exposure time and duration units, added number of pulses
+* `#572`_  Interface: homepage now populates as AJAX to increase responsiveness
+* `#570`_  Charts: simplified chart function code
+* `#569`_  Charts: fixed frequency issue with mean averages selected
+* `#568`_  Imports: missing DICOM date-time no longer causes an error
+* `#567`_  Celery: fixed dual-namespace imports of tasks
+* `#566`_  Interface: correctly show "assumed patient mass" in case of set value of zero
+* `#565`_  Interface: correctly handle dose area product with zero value
+* `#564`_  Skin dose maps: text information on skin dose maps now embedded when saving the 2d or 3d map as a graphic
+* `#562`_  Skin dose maps: error message on calculation failure now more explicit
+* `#561`_  Imports: patient orientation modifier now correctly extracted from RDSR
+* `#560`_  Exports: added study level comments
+* `#559`_  Interface: date pickers inconsistent start day fixed
+* `#558`_  Skin dose maps: set defaults instead of crashing if kV, dose, table or tube/detector position are missing
+* `#557`_  Skin dose maps: improved construction of patient orientation code
+* `#556`_  Exports: DX exports where TotalNumberOfRadiographicFrames is not populated now export
+* `#552`_  Documentation: documented extractor for older Toshiba CT scanners
+* `#551`_  Documentation: added procedure for opening csv files in Excel with non-ASCII characters
+* `#550`_  Documentation: added a note to describe exposure time and duration for fluoroscopy studies
+* `#549`_  Documentation: added procedure for fixing laterality on Hologic studies, ref `#411`_
+* `#547`_  Interface: improved handling of available time information for fluoro studies
+* `#546`_  Query Retrieve: added flag and functionality to query for Toshiba images
+* `#544`_  Interface: added procedure, requested procedure to summary listings and details and filtering
+* `#543`_  Interface: added drop-down box to choose how many studies are displayed on filtered pages
+* `#542`_  Interface: added display name to all detailed html pages
+* `#541`_  Documentation: updated for celery on Windows
+* `#540`_  Documentation: updated for current skinDose functionality
+* `#539`_  Documentation: updated chart document to include series toggle buttons
+* `#537`_  Charts: hide series function added
+* `#536`_  Code quality: reduced javascript duplication and collected file groups into subfolders
+* `#535`_  Interface: fixed problem where category names that included a plus symbol caused filtering and chart issues
+* `#534`_  Interface: chart drilldown reported as not working - was actually due to a user's database migrations
+* `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
+* `#532`_  DICOM: documented how to work-around missing encoding charsets due to old pydicom
+* `#529`_  Charts: added CT charts of number of irradiation events per study description and requested procedure
+* `#528`_  Query Retrieve: reduced number of simultaneous associations to one, reused for everything
+* `#526`_  Code quality: addressed some of the code quality/style issues raised by `Codacy`_
+* `#525`_  Importing: improved mammo import by checking compression force before converting to float
+* `#524`_  Importing: improved mammo import by checking anode exists before converting to DICOM terms
+* `#523`_  Importing: changed mammo import to use del_no_match instead of del_mg_im if not mammo
+* `#522`_  Documentation: made it clearer on offline-install docs that version numbers will change
+* `#521`_  Testing: added tests for dual source CT imports
+* `#520`_  Imports: removed XML styling from Philips legacy CT comment creation
+* `#519`_  Skin dose maps: fixed black on black text issue
+* `#518`_  Importing: fixed imports where CT Target Region isn't specified
+* `#517`_  Interface: operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
+* `#516`_  Imports: MultiValue person names are now stored as a decoded string, not a list
+* `#511`_  Testing: develop and other branches can now be deployed to dev.openrem.org and testing.openrem.org automatically
+* `#510`_  Imports: 'not-patient-indicators' can now be configured in the interface
+* `#509`_  Skin dose maps: now recalculated on view if recorded height or weight has changed since last calculation
+* `#508`_  Testing: DX sample files are now tested
+* `#507`_  Interface: Mammo now filterable by study description, procedure, requested procedure and acquisition protocol
+* `#506`_  Documentation: updated query-retrieve docs
+* `#505`_  Charts: n is now displayed on charts
+* `#504`_  Charts: Fixed issue with null values
+* `#503`_  Internationalisation: more robust decoding and use of unicode throughout
 * `#502`_  Testing: tests now work with SQLite3 and PostgreSQL databases
 * `#501`_  Imports: Changed field type for CodeValue  from 16 chars to text, allows for illegal long values
 * `#500`_  Imports: Philips SC Dose Info with missing time stamps now import
 * `#499`_  Imports: Now aborts gracefully with error log if no template in RDSR
+* `#498`_  Exports: Missing units added to header fields
 * `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
-* `#494`_  Charts: Charts now ignore non-zero data when calculating mean, median and number of events
+* `#494`_  Charts: Charts now ignore blank and zero-value data when calculating mean, median and number of events
+* `#493`_  Charts: Added user option to made chart categories all lower case
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
+* `#491`_  Imports, Interface and Exports: CT Dose Check alerts and notifications are now extracted, displayed and exported
+* `#490`_  Exports: Response object included for messages - removed as now asynchronous
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
+* `#488`_  Exports: All exports now include study time
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
 * `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
 * `#485`_  Imports: CT RDSR now imports 'target region' correctly
+* `#484`_  Exports and Interface: Exports and interface page views are now more efficient and (much) faster
+* `#482`_  Imports: DX extractor now extracts acquisition protocol, requested procedure name and study name for Fuji Go mobile; extracts acquisition protocol for Toshiba Radrex equipment; extracts requested procedure name from Carestream DRX-Revolution mobiles
+* `#480`_  Imports: Code and instructions to create and import an RDSR from Toshiba CT dose summary images and studies
+* `#476`_  Imports: Mixed latin-1 and UTF8 characters now imported, but need to be handled better if possible
 * `#475`_  Query Retrieve: Made -sr a stand-alone option - it has a very niche use-case!
-* `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` qill now be respected
+* `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` will now be respected
 * `#473`_  Query Retrieve: Added tests
 * `#472`_  Query Retrieve: Overhauled the query retrieve routines
+* `#471`_  Internationalisation: added configuration and docs to set the timezone
 * `#470`_  Query Retrieve: Optimised CT filtering
 * `#468`_  Query Retrieve: Station names can now be used for filtering if returned
+* `#467`_  Testing: Added tests for mammography RDSR imports
 * `#466`_  Query Retrieve: RDSR now retrieved in preference to images for MG and DX/CR
+* `#465`_  Added newer SSDE and water equivalent diameter fields to database
+* `#464`_  Imports: DX RDSR now imported properly
 * `#463`_  Imports: Properly checks that Enhanced SR are GE dose reports before importing
 * `#460`_  Interface: Display names table now sortable
 * `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
 * `#454`_  Exports: Mean filter thickness now reported in exports
 * `#453`_  Imports: DX with min filter thickness greater than max have values switched on import
+* `#452`_  Exports: Added CTDIw phantom size to CT exports
+* `#451`_  Skin dose maps: fixed issue with filters being referenced before being defined
 * `#450`_  Imports: DX imports with filter thickness of 0.00 are now recorded as such
 * `#449`_  Exports: Fixed a bug that prevented fluoro exports if protocol names had non-ASCII characters
 * `#448`_  Documentation: Added a diagram showing the relationship between the OpenREM system components
 * `#447`_  Imports: Modified rdsr and ctdetail template to import and display data from Pixelmed generated Toshiba RDSR
+* `#446`_  Import: Extract additional Philips private information for Allura Xper systems, create workaround for missing end angles for rotational acquisitions
+* `#445`_  Interface: Added function for user to determine between DX and fluoro for ambiguous modalities
+* `#444`_  Imports: DX systems that submit RDSRs that look like fluoro can now be reclassified using `#445`_
 * `#443`_  Exports: Accession number and ID are now exported to XLSX as text. Thanks to `@LuukO`_
 * `#442`_  Exports: Fixed RF exports with multiple filters, added tests. Thanks to `@LuukO`_
 * `#441`_  Charts: Fixed a bug that broke chart links containing non-ASCII characters
 * `#440`_  Charts: Fixed a bug in sorting.js so that undefined strings are handled correctly
 * `#439`_  Charts: Added controls for plotting a series per system and calculation histogram data to each filtered view
 * `#438`_  Skin dose maps: skin dose maps successfully calculated from existing studies; indication of assumed or extracted data shown
+* `#434`_  Internationalisation: added passing char_set throughout the extractor functions (since largely made redundant again!)
 * `#432`_  Imports: RDSR import function now looks in comment field for `patient_table_relationship` data
 * `#431`_  Imports: fixed DX imports with MultiValue filter values (Cu+Al) again!
-* `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
-* `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
-* `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
+* `#430`_  Exports: fixed DX exports with multiple filters again, added tests
+* `#429`_  Charts: added new mammo scatter plots. Thanks to `@rijkhorst`_
+* `#427`_  Testing: added a large number of tests that are automatically run on commit to bitbucket
+* `#414`_  Reduced use of JavaScript global variables and improved JavaScript objects
+* `#411`_  Imports: fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
+* `#323`_  Documentation: code autodocumentation largely now working again
+* `#318`_  Database management: Display names view can be used to review and delete all studies from one source
+* `#114`_  Imports: Subsequent RDSRs of the same study will now replace existing study in database
+* `#61`_  Skin dose maps: These have been re-enabled, and currently work for Siemens systems
 
 0.7.4 (2016-10-17)
 ------------------
@@ -1318,3 +1441,4 @@ Reopened issue
 ..  _`NHSBSP specific mammography csv export`: https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
 ..  _@rijkhorst: https://bitbucket.org/rijkhorst/
 ..  _@LuukO: https://bitbucket.org/LuukO/
+..  _Codacy: https://www.codacy.com/app/OpenREM/openrem

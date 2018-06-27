@@ -36,8 +36,8 @@ Now install the dependencies:
 
 .. sourcecode:: console
 
-    pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
     pip install -e openremrepo/
+    pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 In the future it might be necessary to install numpy too for testing.
 
@@ -77,3 +77,9 @@ If you wish to make use of the debug toolbar on machines other than the one the 
 INTERNAL_IPS address list to include your client machine.
 
 Now when ``DEBUG = True`` the toolbar should appear.
+
+Creating test versions of production systems
+============================================
+
+If you wish to create a duplicate install to test upgrades etc, refer to :ref:`restore-psql-linux` and the preceding
+text regarding making backups.

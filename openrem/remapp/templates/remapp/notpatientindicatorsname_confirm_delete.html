@@ -1,0 +1,52 @@
+{% extends "remapp/base.html" %}
+
+{% block navhelp %}
+        <li>
+{#            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_not_patient_indicator.html" target="_blank" data-toggle="tooltip" title="Not-patient indicators documentation - opens in a new tab">#}
+            <a href="http://docs.openrem.org/en/issue510notpatientindb/i_not_patient_indicator.html" target="_blank" data-toggle="tooltip" title="Not-patient indicators documentation - opens in a new tab">
+                Not-patient indicator documentation
+            </a>
+        </li>
+{% endblock %}
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block mainblock %}
+
+      <div class="row col-md-offset-2">
+        <h1>Not-patient indicators - name patterns</h1>
+      </div>
+
+    {% if admin.admingroup %}
+      <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+          <div class="panel panel-info">
+          <div class="panel-heading">
+              <h3 class="panel-title">Are you sure you want to remove this name matching pattern?</h3>
+          </div>
+          <div class="panel-body">
+            <table>
+              <tr>
+                <td><code>{{ object.not_patient_name }}</code></td>
+              </tr>
+            </table>
+            <p></p>
+            <form action="" method="post">
+              {% csrf_token %}
+              <input type="submit" value="Delete!"/>&nbsp;
+              <input type="button" value="No, changed my mind..." onclick="window.history.go(-1);" />
+            </form>
+
+        </div>
+      </div>
+      </div>
+    </div>
+    {% else %}
+      <div class="row col-md-offset-2">
+        <p>Only users in the Admin group can delete the patterns.</p>
+      </div>
+    {% endif %}
+
+
+
+{% endblock %}	

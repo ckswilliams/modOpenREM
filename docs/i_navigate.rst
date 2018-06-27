@@ -32,9 +32,9 @@ boxes on the right hand side to show just the studies where the modality
 model name includes the term 'soma':
 
 .. image:: img/CTFilter.png
-    :width: 730px
+    :width: 1440px
     :align: center
-    :height: 499px
+    :height: 1508px
     :alt: Filtering CT studies
 
 The search fields can all be used on their own or together, and they are
@@ -45,6 +45,19 @@ available, but it does exist as `issue 17 <https://bitbucket.org/openrem/openrem
 for a future release.
 
 The last box below the filtering search boxes is the ordering preference.
+
+Setting the number of studies displayed per page
+================================================
+
+The number of studies displayed per page can be controlled by changing the
+value selected in the ``Items per page`` drop down box, located beneath the
+chart options:
+
+.. image:: img/CTStudiesPerPage.png
+    :width: 1438px
+    :align: center
+    :height: 997px
+    :alt: Filtering CT studies
 
 Viewing study details
 =====================
@@ -71,3 +84,26 @@ simply the presence of one of the key words. Therefore a patient named
 'Phyliss' would trigger this, but only 'Phy' would be reproduced in this field.
 Other fields will also help to confirm whether a study is for a real patient
 such as the lack of an Accession Number and an unusual patient age.
+
+A note on time data for fluoroscopy studies
+-------------------------------------------
+
+On the page showing a specific fluoroscopy study there is a table that shows the
+details of each irradiation event in the study. This table includes a column
+labelled as::
+
+    Duration (ms)
+    Exposure time (ms)
+
+The ``Duration`` value is the amount of time that the exposure switch or pedal was
+pressed (technically, this should be the time from the loading of the first x-ray
+pulse to the time of the trailing edge of the final pulse for that irradiation
+event). The ``Exposure time`` value is different: this is the total time that the
+x-ray beam was actually switched on for during the irradiation event. So for
+pulsed fluoroscopy the ``Exposure time`` will be (much) shorter than the
+``Duration``.
+
+Near the top of each fluoroscopy study in the detail view is a table summarising the
+DAP, dose at reference point and duration for each irradiation type used in the study.
+Totals are also shown. The ``Total duration`` values in this table show the amount
+of time that the exposure switch or pedal was pressed.

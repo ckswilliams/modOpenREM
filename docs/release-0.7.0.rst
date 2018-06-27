@@ -1,6 +1,6 @@
-########################
-Upgrade to OpenREM 0.7.1
-########################
+###################################
+OpenREM Release Notes version 0.7.1
+###################################
 
 ****************
 Headline changes
@@ -79,10 +79,7 @@ Extremely minor change to the documenation links
 Upgrading an OpenREM server with no internet access
 ***************************************************
 
-..  toctree::
-    :maxdepth: 1
-
-    upgrade-offline
+Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
 ..  _upgradefrom060:
 
@@ -107,9 +104,9 @@ In a shell/command window, move into the openrem folder:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\``
 
 Delete all numbered migration files in openrem's ``remapp/migrations`` folder, **leaving the 0002 files ending in .inactive**
 
