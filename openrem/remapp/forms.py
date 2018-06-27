@@ -390,7 +390,7 @@ class DicomQRForm(forms.ModelForm):
         self.helper.field_class = 'col-lg-2'
         self.helper.layout = Layout(
             Div(
-                'name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname'
+                'name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname', 'use_modality_tag'
             ),
             FormActions(
                 Submit('submit', 'Submit')
@@ -408,7 +408,7 @@ class DicomQRForm(forms.ModelForm):
 
     class Meta:
         model = DicomRemoteQR
-        fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname']
+        fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname', 'use_modality_tag']
 
 
 class DicomStoreForm(forms.ModelForm):

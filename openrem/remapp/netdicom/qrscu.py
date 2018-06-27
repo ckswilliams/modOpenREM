@@ -39,6 +39,7 @@ def _generate_modalities_in_study(study_rsp):
     logger.debug(u"modalities_returned = False, so building from series info")
     series_rsp = study_rsp.dicomqrrspseries_set.all()
     study_rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
+    study_rsp.save()
 
 
 def _remove_duplicates(query, study_rsp, assoc, query_id):
@@ -569,8 +570,6 @@ def _query_for_each_modality(all_mods, query, d, assoc):
              responses have been filtered based on requested modality
     """
 
-    from openremproject.settings import USE_MODALITY_IN_STUDY_RQ
-
     # Assume that ModalitiesInStudy is a Matching Key Attribute
     # If not, 1 query is sufficient to retrieve all relevant studies
     modality_matching = True
@@ -586,7 +585,8 @@ def _query_for_each_modality(all_mods, query, d, assoc):
                     query.save()
                     logger.info(u'Currently querying for {0} studies...'.format(mod))
                     d.ModalitiesInStudy = mod
-                    if USE_MODALITY_IN_STUDY_RQ:
+                    if query.qr_scp_fk.use_modality_tag:
+                        logger.debug(u'Using modality tag in study query.')
                         d.Modality = ''
                     query_id = uuid.uuid4()
                     _query_study(assoc, d, query, query_id)
@@ -842,6 +842,16 @@ def qrscu(
 
     logger.debug(u"Query {0} complete. Move is {1}. Query took {2}".format(
         query.query_id, move, time_took))
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(u"Query result contains the following studies / series:")
+        studies = query.dicomqrrspstudy_set.all()
+        for study in studies:
+            for series in study.dicomqrrspseries_set.all():
+                logger.debug(
+                    u"    Study: {0} ({1}) modalities: {2}, Series: {3}, modality: {4} containing {5} objects.".format(
+                        study.study_description, study.study_instance_uid, study.get_modalities_in_study(),
+                        series.series_instance_uid, series.modality, series.number_of_series_related_instances))
 
     if move:
         movescu.delay(str(query.query_id))
