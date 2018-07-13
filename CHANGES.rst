@@ -2,6 +2,10 @@
 OpenREM version history
 =======================
 
+0.8.1
+------------------
+* `#606`_  Interface: Made it possible for the user to change his/her password
+
 0.8.0 (2018-06-11)
 ------------------
 * `#635`_  Documentation: added Orthanc as preferred third party DICOM Store service
