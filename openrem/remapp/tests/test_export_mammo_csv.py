@@ -30,7 +30,7 @@ class ExportMammoCSV(TestCase):
     def test_all_values(self):
         import pandas as pd
 
-        filter_set = ""
+        filter_set = {}
         pid = False
         name = False
         patient_id = False
