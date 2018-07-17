@@ -210,7 +210,6 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
             exit()
 
     # Resetting the ordering key to avoid duplicates
-
     if isinstance(filterdict, dict):
         if u'o' in filterdict and filterdict[u'o'] == '-projectionxrayradiationdose__accumxraydose__' \
                                                       'accummammographyxraydose__accumulated_average_glandular_dose':

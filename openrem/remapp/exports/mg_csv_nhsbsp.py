@@ -70,15 +70,15 @@ def mg_csv_nhsbsp(filterdict, user=None):
         exit()
 
     # Resetting the ordering key to avoid duplicates
-    fixed_ordering_dict = filterdict
-    if fixed_ordering_dict[u'o'] == '-projectionxrayradiationdose__accumxraydose__accummammographyxraydose__' \
-                                    'accumulated_average_glandular_dose':
-        logger.info("Replacing AGD ordering with study date to avoid duplication")
-        fixed_ordering_dict[u'o'] = '-study_date'
+    if isinstance(filterdict, dict):
+        if u'o' in filterdict and filterdict[u'o'] == '-projectionxrayradiationdose__accumxraydose__' \
+                                                      'accummammographyxraydose__accumulated_average_glandular_dose':
+            logger.info("Replacing AGD ordering with study date to avoid duplication")
+            filterdict['o'] = '-study_date'
 
     # Get the data!
     studies_qs = MGSummaryListFilter(
-        fixed_ordering_dict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact=u'MG'))
+        filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact=u'MG'))
     s = studies_qs.qs
 
     tsk.progress = u'Required study filter complete.'
