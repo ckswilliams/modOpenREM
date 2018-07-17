@@ -3,10 +3,12 @@
 
 import hashlib
 import os
+from collections import Counter
 from django.contrib.auth.models import User, Group
 from django.test import TestCase, RequestFactory
-from remapp.extractors import mam
+from remapp.extractors import mam, rdsr
 from remapp.exports.mg_export import exportMG2excel
+from remapp.exports.mg_csv_nhsbsp import mg_csv_nhsbsp
 from remapp.models import PatientIDSettings, Exports
 
 class ExportMammoCSV(TestCase):
@@ -69,3 +71,40 @@ class ExportMammoCSV(TestCase):
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
         task.delete()  # not necessary, by hey, why not?
+
+class ExportMammoCSVNHSBSP(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create_user(
+            username='jacob', email='jacob@…', password='top_secret')
+        eg = Group(name="exportgroup")
+        eg.save()
+        eg.user_set.add(self.user)
+        eg.save()
+
+        PatientIDSettings.objects.create()
+
+        dicom_file = os.path.join("test_files", "MG-RDSR-Hologic_mix.dcm")
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path = os.path.join(root_tests, dicom_file)
+
+        rdsr(dicom_path)
+
+    def test_nhsbsp(self):
+        import pandas as pd
+
+        filter_set = {u'o': '-projectionxrayradiationdose__accumxraydose__accummammographyxraydose__accumulated_'
+                            'average_glandular_dose'}
+
+        mg_csv_nhsbsp(filter_set, user=self.user)
+
+        task = Exports.objects.all()[0]
+        csvdf = pd.read_csv(task.filename.path)
+
+        # Test there are only seven data rows (and fifteen columns), ie no duplication from AGD ordering
+        self.assertEqual(csvdf.shape, (7, 15))
+
+        # Test all three filters are in the results in the right quantities
+        self.assertEqual(Counter(csvdf.Filter.tolist()), Counter(['Al', 'Al', 'Al', 'Al', 'Ag', 'Rh', 'Rh']))
+
+

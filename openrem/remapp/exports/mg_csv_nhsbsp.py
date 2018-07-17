@@ -47,6 +47,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
     """
 
     import datetime
+    import uuid
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter
@@ -55,6 +56,8 @@ def mg_csv_nhsbsp(filterdict, user=None):
     tsk = Exports.objects.create()
 
     tsk.task_id = mg_csv_nhsbsp.request.id
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = u"MG"
     tsk.export_type = u"NHSBSP CSV export"
     datestamp = datetime.datetime.now()
