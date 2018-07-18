@@ -47,6 +47,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
     """
 
     import datetime
+    import uuid
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter
@@ -55,6 +56,8 @@ def mg_csv_nhsbsp(filterdict, user=None):
     tsk = Exports.objects.create()
 
     tsk.task_id = mg_csv_nhsbsp.request.id
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = u"MG"
     tsk.export_type = u"NHSBSP CSV export"
     datestamp = datetime.datetime.now()
@@ -69,9 +72,16 @@ def mg_csv_nhsbsp(filterdict, user=None):
     if not tmpfile:
         exit()
 
+    # Resetting the ordering key to avoid duplicates
+    if isinstance(filterdict, dict):
+        if u'o' in filterdict and filterdict[u'o'] == '-projectionxrayradiationdose__accumxraydose__' \
+                                                      'accummammographyxraydose__accumulated_average_glandular_dose':
+            logger.info("Replacing AGD ordering with study date to avoid duplication")
+            filterdict['o'] = '-study_date'
+
     # Get the data!
-    studies_qs = MGSummaryListFilter(filterdict,
-                                         queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact=u'MG'))
+    studies_qs = MGSummaryListFilter(
+        filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact=u'MG'))
     s = studies_qs.qs
 
     tsk.progress = u'Required study filter complete.'
@@ -102,6 +112,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
     for i, study in enumerate(s):
         tsk.progress = u"{0} of {1}".format(i + 1, tsk.num_records)
         tsk.save()
+        unique_views = set()
 
         try:
             exposures = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
@@ -177,8 +188,6 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 elif u"SILV" in filter_mat.upper():
                     filter_mat = u'Ag'
 
-            unique_views = set()
-            for exp in exposures:
                 if exp.nccpm_view:
                     if exp.nccpm_view not in unique_views:
                         unique_views.add(exp.nccpm_view)
@@ -188,10 +197,11 @@ def mg_csv_nhsbsp(filterdict, user=None):
                                 exp.nccpm_view += str(x+2)
                                 unique_views.add(exp.nccpm_view)
                                 break
-            for exp in exposures:
-                if not exp.nccpm_view:
+                else:
                     logger.debug("Exposure excluded due to no generated nncp_view")
                     continue  # Avoid exporting exposures with no view code
+
+                automan_short = None
                 try:
                     automan = exp.irradeventxraysourcedata_set.get().exposure_control_mode
                     if u"AUTO" in automan.upper():
@@ -200,7 +210,6 @@ def mg_csv_nhsbsp(filterdict, user=None):
                         automan_short = u"MANUAL"
                 except AttributeError:
                     automan = None
-                    automan_short = None
 
                 writer.writerow([
                     u'1',
