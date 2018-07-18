@@ -30,6 +30,7 @@
 
 from django.conf.urls import patterns, include, url
 from django_filters.views import FilterView
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
 from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
@@ -109,6 +110,17 @@ urlpatterns = patterns('remapp.views',
                        url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/$', NotPatientIDUpdate.as_view(), name='notpatientid_update'),
                        url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/delete/$', NotPatientIDDelete.as_view(), name='notpatientid_delete'),
                        url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient', name='admin_questions_hide_not_patient'),
+
+                       # url(r'^password/$', 'change_password', name='change_password'),
+                       url(
+                           '^change_password/$',
+                           auth_views.password_change,
+                           {'template_name': 'registration/changepassword.html'}
+                       ),
+                       url(
+                           '^change_password/done/$', auth_views.password_change_done,
+                          {'template_name': 'registration/changepassworddone.html'},
+                           name='password_change_done'),
                        )
 
 urlpatterns += patterns('remapp.exports.exportviews',

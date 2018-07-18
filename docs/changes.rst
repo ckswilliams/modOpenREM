@@ -2,9 +2,10 @@
 OpenREM version history
 =======================
 
-0.8.1
------
+0.8.1 (2018-07-xx)
+------------------
 * `#639`_  Charts: fixed problem where a blank category name may not be displayed correctly
+* `#606`_  Interface: Made it possible for the user to change his/her password
 
 0.8.0 (2018-06-11)
 ------------------
