@@ -209,11 +209,20 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
         if not tmpfile:
             exit()
 
+    # Resetting the ordering key to avoid duplicates
+    if isinstance(filterdict, dict):
+        if u'o' in filterdict and filterdict[u'o'] == '-projectionxrayradiationdose__accumxraydose__' \
+                                                      'accummammographyxraydose__accumulated_average_glandular_dose':
+            logger.info("Replacing AGD ordering with study date to avoid duplication")
+            filterdict['o'] = '-study_date'
+
     # Get the data!
     if pid:
-        df_filtered_qs = MGFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
+        df_filtered_qs = MGFilterPlusPid(
+            filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
     else:
-        df_filtered_qs = MGSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
+        df_filtered_qs = MGSummaryListFilter(
+            filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
     studies = df_filtered_qs.qs
 
     tsk.progress = u'Required study filter complete.'
