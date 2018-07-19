@@ -23,7 +23,7 @@ Upgrading an existing installation
 ..  toctree::
     :maxdepth: 2
 
-    release-0.8.0
+    release-0.8.1
     upgrade-offline
 
 .. _databaselinks:
