@@ -10,6 +10,7 @@ Headline changes
 * Exports: fixed bug where sorting by AGD would cause duplicate entries for bilateral studies
 * Charts: fixed problem where a blank category name may not be displayed correctly
 * Interface: added feature to allow users to change their own password
+* Imports: reduced list of scanners that work with the legacy Toshiba CT extractor
 
 If upgrading from 0.7.4, see also :doc:`release-0.8.0`
 
