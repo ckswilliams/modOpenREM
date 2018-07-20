@@ -129,6 +129,9 @@ configuration above using the command ``which dcmconv``. This will be something 
 for ``DCMMKDIR`` and ``JAVA_EXE``, which might be ``/usr/bin/java``. The pixelmed.jar file should be downloaded from
 the link above, and you will need to provide the path to where you have saved it.
 
+The list of CT scanners that the extractor works with has been reduced. You can add to this list, but you will need to
+verify that any systems you configure to use this extractor produce data in OpenREM that you expect.
+
 
 Migrate the database
 ====================
