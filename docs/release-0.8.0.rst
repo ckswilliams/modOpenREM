@@ -55,8 +55,6 @@ Upgrade
 
     pip install openrem==0.8.0
 
-..  _upgradefrom074:
-
 Update the configuration
 ========================
 
