@@ -10,6 +10,7 @@ Headline changes
 * Exports: fixed bug where sorting by AGD would cause duplicate entries for bilateral studies
 * Charts: fixed problem where a blank category name may not be displayed correctly
 * Interface: added feature to allow users to change their own password
+* Imports: reduced list of scanners that work with the legacy Toshiba CT extractor
 
 If upgrading from 0.7.4, see also :doc:`release-0.8.0`
 
@@ -128,6 +129,9 @@ configuration above using the command ``which dcmconv``. This will be something 
 ``DCMTK_PATH`` would be ``'/usr/bin`` and the ``DCMCONV`` would be ``os.path.join(DCMTK_PATH, 'dcmconv')``. Similarly
 for ``DCMMKDIR`` and ``JAVA_EXE``, which might be ``/usr/bin/java``. The pixelmed.jar file should be downloaded from
 the link above, and you will need to provide the path to where you have saved it.
+
+The list of CT scanners that the extractor works with has been reduced. You can add to this list, but you will need to
+verify that any systems you configure to use this extractor produce data in OpenREM that you expect.
 
 
 Migrate the database
