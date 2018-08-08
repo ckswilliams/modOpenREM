@@ -21,3 +21,9 @@ To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM 
   you know it will be resolved.
 * Use Modality in Study Query: Some PACS systems (like Impax 6.6) need modality at study level for correct filtering.
   if this option is checked, the modality tag is inserted in the study level request.
+
+  .. warning::
+
+    Modality is not a valid tag in a study level request (Modalities In Study is available instead). However, some PACS
+    systems require it for proper function, others will ignore it, and some will return zero results if the tag is
+    present.
