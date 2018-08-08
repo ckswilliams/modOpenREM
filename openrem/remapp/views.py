@@ -861,6 +861,7 @@ def rf_detail_view_skin_map(request, pk=None):
         with gzip.open(skin_map_path, 'rb') as f:
             return_structure = pickle.load(f)
 
+    return_structure['primary_key'] = pk
     return JsonResponse(return_structure, safe=False)
 
 

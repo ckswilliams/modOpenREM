@@ -3,6 +3,24 @@
 /*eslint security/detect-object-injection: "off" */
 /*eslint object-shorthand: "off" */
 
+/**
+ * Function to replace missing category names with the word "Blank"
+ * @param names -  an array of category names
+ */
+function replaceBlankNames(names) {
+    var listOfBlankIndicators = ["", null];
+    var i, j;
+    for (i = 0; i < listOfBlankIndicators.length; i++) {
+        for (j = 0; j < names.length; j++) {
+            if (names[j] === listOfBlankIndicators[i]) {
+                names[j] = "Blank";
+            }
+        }
+    }
+    return names;
+}
+
+
 function sortChartDataToDefault(sortingField, sortingDirection, chartDiv) {
     switch(sortingField) {
         case "freq":
@@ -73,8 +91,8 @@ function updateOverTimeChart(nameList, overTimeData, seriesColours, urlStart, ch
     var dateAxis, currentValue, tempDate, dateAfter, dateBefore, temp, i, j;
     var chart = $("#"+chartDiv).highcharts();
 
-    var index = nameList.indexOf(null || "");
-    if (index !== -1) {nameList[index] = "Blank";}
+    // Replace all items in nameList that match an item in blankIndicators with "Blank"
+    nameList = replaceBlankNames(nameList);
 
     dateAxis = [];
     for (i = 0; i < overTimeData[0].length; i++) {
@@ -127,8 +145,8 @@ function updateFrequencyChart(nameList, systemList, summaryData, urlStart, chart
     var dataCounts = 0;
     var i, j;
 
-    var index = nameList.indexOf(null || "");
-    if (index !== -1) {nameList[index] = "Blank";}
+    // Replace all items in nameList that match an item in blankIndicators with "Blank"
+    nameList = replaceBlankNames(nameList);
 
     for (i = 0; i < nameList.length; i++) {
         dataCounts = 0;
@@ -170,8 +188,8 @@ function updateAverageChart(nameList, systemList, summaryData, histogramData, av
     var calcHistograms = typeof histogramData !== "undefined";
     var i, j, k;
 
-    var index = nameList.indexOf(null || "");
-    if (index !== -1) {nameList[index] = "Blank";}
+    // Replace all items in nameList that match an item in blankIndicators with "Blank"
+    nameList = replaceBlankNames(nameList);
 
     // Calculate counts per name and average value per name. These are used to sort the chart series by.
     if(calcHistograms) {

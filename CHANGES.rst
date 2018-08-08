@@ -2,9 +2,14 @@
 OpenREM version history
 =======================
 
-0.8.1
+0.8.1 (2018-07-xx)
 ------------------
+* `#641`_  Exports: mammography exports from filtered pages sorted by AGD no longer result in duplicate studies
+* `#640`_  Exports: error in filter listing for NHSBSP csv exports corrected
+* `#639`_  Charts: fixed problem where a blank category name may not be displayed correctly
+* `#638`_  Skin dose maps: added a link to download data for stand-alone openSkin even when map displayed
 * `#627`_  DICOM Networking: Implemented workaround for query "bug" in Impax 6.6
+* `#606`_  Interface: Made it possible for the user to change his/her password
 
 0.8.0 (2018-06-11)
 ------------------

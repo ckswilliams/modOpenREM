@@ -68,23 +68,11 @@ Edit the top two sections
     -- false to disable this feature.
     local use_toshiba_ct_extractor = true
 
-    -- A list of CT make and model pairs that are known to have worked with the Toshiba CT extractor
+    -- A list of CT make and model pairs that are known to have worked with the Toshiba CT extractor.
+    -- You can add to this list, but you will need to verify that the dose data created matches what you expect.
     local toshiba_extractor_systems = {
-            {'GE Medical Systems', 'Discovery 710'},
-            {'GE Medical Systems', 'Discovery ste'},
-            {'GE Medical Systems', 'Brightspeed'},
-            {'GE Medical Systems', 'Lightspeed Plus'},
-            {'GE Medical Systems', 'Lightspeed16'},
-            {'GE Medical Systems', 'Lightspeed Pro 32'},
-            {'GE Medical Systems', 'Lightspeed VCT'},
-            {'Siemens', 'Biograph64'},
-            {'Siemens', 'Somatom Definition'},
-            {'Siemens', 'Somatom Definition Edge'},
-            {'Siemens', 'Somatom Definition Flash'},
-            {'Siemens', 'Somatom Force'},
             {'Toshiba', 'Aquilion'},
-            {'Toshiba', 'Aquilion Prime'},
-            {'Toshiba', 'Aquilion One'}
+            {'GE Medical Systems', 'Discovery STE'},
     }
     -------------------------------------------------------------------------------------
 
@@ -152,10 +140,11 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
   **use_toshiba_ct_extractor** set this to ``false`` if you haven't installed the additional
   :ref:`install_toshiba_resources` or do not wish to use this function. Otherwise:
 
-  **toshiba_extractor_systems** A list of CT make and model pairs that are known to have worked with the Toshiba CT
-  extractor. These will only be considered if an RDSR is not found with the study, otherwise that will be used in
-  preference. The format is ``{{'manufacturer', 'model'}, {'manufacturer two'}, {'model two'}}`` etc. They will be
-  matched against the names presented in the DICOM headers::
+  **toshiba_extractor_systems** A list of CT make and model pairs that you want to use with the Toshiba CT
+  extractor. You can add to this list, but you will need to verify that the dose data created matches what
+  you expect. These will only be considered if an RDSR is not found with the study, otherwise that will be
+  used in preference. The format is ``{{'manufacturer', 'model'}, {'manufacturer two'}, {'model two'}}``
+  etc. They will be matched against the names presented in the DICOM headers::
 
       local toshiba_extractor_systems = {
               {'Toshiba', 'Aquilion'},
