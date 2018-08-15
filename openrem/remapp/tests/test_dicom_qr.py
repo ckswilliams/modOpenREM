@@ -396,11 +396,11 @@ class QRPhilipsCT(TestCase):
 
         _generate_modalities_in_study(rst1)
 
+        # reload study, else _generate_modalities_in_study appears to work without save. See #627
+        rst2 = query.dicomqrrspstudy_set.all()[0]
+
         # Modalities in study should now be available again
-        self.assertEqual(Counter(rst1.get_modalities_in_study()), Counter([u'CT', u'SC', u'SR']))
-
-
-
+        self.assertEqual(Counter(rst2.get_modalities_in_study()), Counter([u'CT', u'SC', u'SR']))
 
 
 class ResponseFiltering(TestCase):
