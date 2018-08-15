@@ -514,8 +514,8 @@ Reopened issue
 
 ..  note::
 
-    * `#64`_ includes **changes to the database schema and needs a user response** - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
-    * `#65`_ includes changes to the settings file which **require settings information to be copied** and files moved/renamed - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
+    * `#64`_ includes **changes to the database schema and needs a user response** - see `version 0.4.0 release notes <https://docs.openrem.org/page/release-0.4.0.html>`_
+    * `#65`_ includes changes to the settings file which **require settings information to be copied** and files moved/renamed - see `version 0.4.0 release notes <https://docs.openrem.org/page/release-0.4.0.html>`_
 
 
 * `#80`_   Added docs for installing Apache with auto-start on Windows Server 2012. Contributed by JA Cole
@@ -542,7 +542,7 @@ Reopened issue
 
 0.3.9 (2014-03-08)
 ------------------
-..  note:: `#51`_ includes changes to the database schema -- make sure South is in use before upgrading. See http://docs.openrem.org/page/upgrade.html
+..  note:: `#51`_ includes changes to the database schema -- make sure South is in use before upgrading. See https://docs.openrem.org/page/upgrade.html
 
 * `#59`_   CSS stylesheet referenced particular fonts that are not in the distribution -- references removed
 * `#58`_   Export to xlsx more robust - limitation of 31 characters for sheet names now enforced

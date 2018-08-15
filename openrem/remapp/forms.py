@@ -432,7 +432,7 @@ class DicomStoreForm(forms.ModelForm):
                         HTML("""
                         <p>
                           DICOM store node built in to OpenREM is not yet ready for production. See
-                            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/netdicom-nodes.html"
+                            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/netdicom-nodes.html"
                                 target="_blank" data-toggle="tooltip"
                                 title="DICOM store documentation - opens in a new tab">
                                 DICOM store documentation (Advanced)
