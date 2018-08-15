@@ -19,7 +19,7 @@ If you are using a virtualenv, make sure you are in it and it is active (``sourc
 
 .. sourcecode:: console
 
-    pip install psycopg2
+    pip install psycopg2-binary
 
 Change the security configuration
 =================================
