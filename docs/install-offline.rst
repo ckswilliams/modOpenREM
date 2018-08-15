@@ -57,7 +57,7 @@ testing purposes only, you could skip this step and use SQLite3 which comes with
 * Note: this version is modified in comparison to the version in PyPI, and will malfunction if you use the official
   version
 
-**A webserver** such as Apache, although this can be left till later - you can get started with the built-in web
+**A webserver** although this can be left till later - you can get started with the built-in web
 server
 
 Download python packages from PyPI
