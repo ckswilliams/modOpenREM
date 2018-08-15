@@ -8,6 +8,7 @@ OpenREM version history
 * `#640`_  Exports: error in filter listing for NHSBSP csv exports corrected
 * `#639`_  Charts: fixed problem where a blank category name may not be displayed correctly
 * `#638`_  Skin dose maps: added a link to download data for stand-alone openSkin even when map displayed
+* `#627`_  DICOM Networking: Implemented workaround for query "bug" in Impax 6.6
 * `#606`_  Interface: Made it possible for the user to change his/her password
 
 0.8.0 (2018-06-11)
