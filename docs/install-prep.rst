@@ -2,8 +2,37 @@
 Pre-installation preparations
 *****************************
 
-Install Python 2.7.x and pip
-============================
+Quick start: Ubuntu install using virtualenv
+============================================
+
+If you want to get everything installed quickly, you could do the following on a Ubuntu server::
+
+    dose@ubuntu1604:~$ sudo apt update
+    dose@ubuntu1604:~$ sudo apt install python python-pip rabbitmq-server postgresql orthanc dcmtk default-jre
+    dose@ubuntu1604:~$ pip install virtualenv
+    dose@ubuntu1604:~$ virtualenv veopenrem
+
+Activate the virtualenv and install the python packages::
+
+    dose@ubuntu1604:~$ . veopenrem/bin/activate
+    (veopenrem) dose@ubuntu1604:~$ pip install numpy psycopg2-binary
+
+You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
+e.g.::
+
+    (veopenrem) dose@ubuntu1604:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
+
+
+We can now install OpenREM and the customised version of pynetdicom::
+
+    (veopenrem) dose@ubuntu1604:~$ pip install openrem
+    (veopenrem) dose@ubuntu1604:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+
+
+You can now go straight to the :ref:`localsettingsconfig`.
+
+Full instructions: Install Python 2.7.x and pip
+===============================================
 
 * Windows – instructions and downloads are available at `python.org <https://www.python.org/downloads>`_
 * Linux – likely to be installed already except on newer distributions
@@ -215,31 +244,6 @@ script (such as `openrem_rdsr.py`) without prefixing it with `python`, the
 system wide Python will be used instead. This doesn't apply to Linux, where
 once activated, the scripts can be called without a `python` prefix from anywhere.
 
-Quickstart Ubuntu install using virtualenv
-==========================================
-
-If you want to get everything installed quickly, you could do the following on a Ubuntu server::
-
-    dose@ubuntu1604:~$ sudo apt update
-    dose@ubuntu1604:~$ sudo apt install python python-pip rabbitmq-server postgresql orthanc dcmtk default-jre
-    dose@ubuntu1604:~$ pip install virtualenv
-    dose@ubuntu1604:~$ virtualenv veopenrem
-    dose@ubuntu1604:~$ . veopenrem/bin/activate
-    (veopenrem) dose@ubuntu1604:~$ pip install numpy psycopg2-binary
-
-You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
-e.g.::
-
-    (veopenrem) dose@ubuntu1604:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
-
-
-We can now install OpenREM and a customised version of pynetdicom::
-
-    (veopenrem) dose@ubuntu1604:~$ pip install openrem
-    (veopenrem) dose@ubuntu1604:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
-
-
-You can now go straight to the :ref:`localsettingsconfig`.
 
 .. _virtualenv: https://virtualenv.pypa.io/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
