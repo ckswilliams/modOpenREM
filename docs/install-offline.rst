@@ -91,13 +91,9 @@ In a console, navigate to the directory that your ``openremfiles`` directory is 
 
 .. sourcecode:: console
 
-    pip install openremfiles\numpy‑1.14.0+mkl‑cp27-cp27m‑win32.whl  # update the version number
-    # or if you have the 64 bit version
-    pip install openremfiles\numpy‑1.14.0+mkl‑cp27-cp27m‑win_amd64.whl  # update the version number
-
     pip install --no-index --find-links=openremfiles openrem  # where openremfiles is the directory you created
 
-    pip install openremfiles\edmcdonagh-pynetdicom-2da8a57b53b3.tar.gz
+    pip install openremfiles\default.tar.gz  # this is the custom version of pynetdicom
 
 Install PostgreSQL
 ------------------
