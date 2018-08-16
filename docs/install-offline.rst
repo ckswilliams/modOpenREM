@@ -52,7 +52,7 @@ download them all:
 
     mkdir openremfiles
     pip download -d openremfiles openrem
-    pip download -d openremfiles numpy psycopg2-binary
+    pip download -d openremfiles psycopg2-binary
     pip download -d openremfiles https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 .. note::
