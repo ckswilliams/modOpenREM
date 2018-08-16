@@ -89,7 +89,7 @@ Installation of the python packages
 
 In a console, navigate to the directory that your ``openremfiles`` directory is in, and
 
-.. sourcecode:: console
+.. sourcecode:: python
 
     pip install --no-index --find-links=openremfiles openrem  # where openremfiles is the directory you created
 
