@@ -65,6 +65,15 @@ download them all:
       the official version
 
 
+Delete newer version of pydicom
+-------------------------------
+
+We need to use an old version of pydicom for now - the current version will not work with OpenREM (a future version
+will work with the current pydicom and pynetdicom3 when it is released). The correct version of pydicom was downloaded
+with openrem. The later version will have been downloaded with the custom pynetdicom, so we need to delete that one::
+
+    del openremfiles\pydicom-1*
+
 Copy everything to the Windows machine
 --------------------------------------
 
