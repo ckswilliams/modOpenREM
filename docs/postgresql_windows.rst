@@ -10,7 +10,7 @@ Get PostgreSQL and the python connector
 + Download the installer from http://www.enterprisedb.com/products-services-training/pgdownload#windows
 + Install the Python PostgreSQL connector (activate the virtualenv first if using)::
 
-  pip install psycopg2-binary
+    pip install psycopg2-binary
 
 .. _windowspsqlinstall:
 
