@@ -67,8 +67,6 @@ download them all:
 Copy everything to the Windows machine
 --------------------------------------
 
-* Add the ``pynetdicom`` file, the ``psycopg2`` file and the ``numpy`` file to the directory with the other python
-  packages
 * Copy this directory plus all the binaries to the Windows server that you are using
 
 
