@@ -129,25 +129,9 @@ Install NumPy
 
 Numpy is required for charts.
 
-For linux - activate virtualenv first::
+For Linux and Windows - activate virtualenv first::
 
     pip install numpy
-
-For Windows:
-
-Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
-
-* Find the right version - look for **numpy-X+mkl-cp27-cp27m-win32.whl** for 32-bit Windows or
-* **numpy-X+mkl-cp27-cp27m-win_amd64.whl** for 64-bit Windows.
-* At the time of writing, ``X`` was ``1.14.0`` - choose the latest version
-* Install using pip:
-
-.. sourcecode:: console
-
-    pip install C:\path\to\numpy‑1.14.0+mkl‑cp27-cp27m‑win32.whl  # update the version number
-    # or
-    pip install C:\path\to\numpy‑1.14.0+mkl‑cp27‑cp27m‑win_amd64.whl  # update the version number
-    # changing the path and filename to the numpy appropriately
 
 
 .. _installpreppostgres:
