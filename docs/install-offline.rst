@@ -39,25 +39,7 @@ testing purposes only, you could skip this step and use SQLite3 which comes with
 
 * Download by clicking on the icon for ``Win x86-32`` or ``Win x86-64``
 
-**PostgreSQL Python connector** from http://www.lfd.uci.edu/~gohlke/pythonlibs/#psycopg
-
-* Find the right version - look for ``psycopg2-X-cp27-cp27m-win32.whl`` for 32-bit Windows or
-* ``psycopg2-X-cp27-cp27m-win_amd64.whl`` for 64-it Windows.
-* At the time of writing, ``X`` was ``2.7.3.2`` - choose the latest ``cp27`` version
-
-**NumPy** from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
-
-* Find the right version - look for ``numpy-X+mkl-cp27-cp27m-win32.whl`` for 32-bit Windows or
-* ``numpy-X+mkl-cp27-cp27m-win_amd64.whl`` for 64-bit Windows.
-* At the time of writing, ``X`` was ``1.14.0`` - choose the latest ``cp27`` version
-
-**Pynetdicom** from https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
-
-* The downloaded file will be named something like ``edmcdonagh-pynetdicom-2da8a57b53b3.tar.gz``
-* Note: this version is modified in comparison to the version in PyPI, and will malfunction if you use the official
-  version
-
-**A webserver** such as Apache, although this can be left till later - you can get started with the built-in web
+**A webserver** although this can be left till later - you can get started with the built-in web
 server
 
 Download python packages from PyPI
@@ -69,19 +51,22 @@ download them all:
 .. sourcecode:: console
 
     mkdir openremfiles
-    pip install -d openremfiles openrem
+    pip download -d openremfiles openrem
+    pip download -d openremfiles psycopg2-binary
+    pip download --no-deps -d openremfiles https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 .. note::
 
-    If ``pip install`` complains that ``-d`` is not a valid option, then use the following command instead:
+    Older versions of pip may need to use the following command instead:
 
-    ``pip download -d openremfiles openrem``
+    ``pip install -d openremfiles openrem``
+
+    * Note: this  of ``pynetdicom`` is modified in comparison to the version in PyPI, and will malfunction if you use
+      the official version
 
 Copy everything to the Windows machine
 --------------------------------------
 
-* Add the ``pynetdicom`` file, the ``psycopg2`` file and the ``numpy`` file to the directory with the other python
-  packages
 * Copy this directory plus all the binaries to the Windows server that you are using
 
 
@@ -102,15 +87,11 @@ Installation of the python packages
 
 In a console, navigate to the directory that your ``openremfiles`` directory is in, and
 
-.. sourcecode:: console
-
-    pip install openremfiles\numpy‑1.14.0+mkl‑cp27-cp27m‑win32.whl  # update the version number
-    # or if you have the 64 bit version
-    pip install openremfiles\numpy‑1.14.0+mkl‑cp27-cp27m‑win_amd64.whl  # update the version number
+.. sourcecode:: python
 
     pip install --no-index --find-links=openremfiles openrem  # where openremfiles is the directory you created
 
-    pip install openremfiles\edmcdonagh-pynetdicom-2da8a57b53b3.tar.gz
+    pip install openremfiles\default.tar.gz  # this is the custom version of pynetdicom
 
 Install PostgreSQL
 ------------------

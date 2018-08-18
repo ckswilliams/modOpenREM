@@ -13,24 +13,24 @@ Install PostgreSQL and the python connector
     
 .. sourcecode:: console
 
-    sudo apt-get install postgresql libpq-dev
+    sudo apt-get install postgresql
 
 If you are using a virtualenv, make sure you are in it and it is active (``source bin/activate``)
 
 .. sourcecode:: console
 
-    pip install psycopg2
+    pip install psycopg2-binary
 
 Change the security configuration
 =================================
 
-The default security settings are too restrictive to allow access to the database. Assumes version ``9.5``, change as
+The default security settings are too restrictive to allow access to the database. Assumes version ``10``, change as
 appropriate.
 
 
 .. sourcecode:: console
 
-    sudo nano /etc/postgresql/9.5/main/pg_hba.conf
+    sudo nano /etc/postgresql/10/main/pg_hba.conf
 
 Scroll down to the bottom of the file and edit the following line from ``peer`` to ``md5``:
 
@@ -56,35 +56,7 @@ Restart PostgreSQL so the new settings take effect:
 Optional: Specify the location for the database files
 -----------------------------------------------------
 
-You might like to do this if you want to put the database on an encrypted location instead of ``/var/lib/postgresql``.
-
-For this example, I'm going to assume all the OpenREM programs and data are in the folder ``/var/openrem/`` and
-PostgreSQL is at version ``9.5`` (change both as appropriate)
-
-.. sourcecode:: console
-
-    sudo service postgresql stop
-    mkdir /var/openrem/database
-    sudo cp -aRv /var/lib/postgresql/9.5/main /var/openrem/database/
-    sudo nano /etc/postgresql/9.5/main/postgresql.conf
-
-Change the line
-
-.. sourcecode:: console
-
-    data_directory = '/var/lib/postgresql/9.5/main'
-
-to
-
-.. sourcecode:: console
-
-    data_directory = '/var/openrem/database/main'
-
-then restart PostgreSQL:
-
-.. sourcecode:: console
-
-    sudo service postgresql start
+:ref:`move_pg_files`
 
 Create a user for the OpenREM database
 ======================================
@@ -213,3 +185,40 @@ Useful PostgreSQL commands
 
     -- Exit the console
     \q
+
+
+.. _move_pg_files:
+
+*************************************************
+Advanced: specify location for the database files
+*************************************************
+
+You might like to do this if you want to put the database on an encrypted location instead of ``/var/lib/postgresql``.
+
+For this example, I'm going to assume all the OpenREM programs and data are in the folder ``/var/openrem/`` and
+PostgreSQL is at version ``10`` (change both as appropriate)
+
+.. sourcecode:: console
+
+    sudo service postgresql stop
+    mkdir /var/openrem/database
+    sudo cp -aRv /var/lib/postgresql/10/main /var/openrem/database/
+    sudo nano /etc/postgresql/10/main/postgresql.conf
+
+Change the line
+
+.. sourcecode:: console
+
+    data_directory = '/var/lib/postgresql/10/main'
+
+to
+
+.. sourcecode:: console
+
+    data_directory = '/var/openrem/database/main'
+
+then restart PostgreSQL:
+
+.. sourcecode:: console
+
+    sudo service postgresql start

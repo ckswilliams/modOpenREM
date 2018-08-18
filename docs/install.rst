@@ -9,7 +9,7 @@ Install OpenREM
 
     pip install openrem
 
-*Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
+*Will need* ``sudo`` *or equivalent if installing on linux without using a virtualenv*
 
 Install pynetdicom (edited version)
 ===================================

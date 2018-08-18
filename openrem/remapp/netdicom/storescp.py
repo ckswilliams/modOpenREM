@@ -23,9 +23,9 @@ try:
     from distutils.version import StrictVersion
 
     if StrictVersion(netdicom.__version__.__version__) <= StrictVersion('0.8.1'):
-        sys.exit(u'Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
+        sys.exit(u'Pynedicom > 0.8.1 needs to be installed, see https://docs.openrem.org/en/latest/install.html')
 except ImportError:
-    sys.exit(u'Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
+    sys.exit(u'Pynedicom > 0.8.1 needs to be installed, see https://docs.openrem.org/en/latest/install.html')
 from netdicom.SOPclass import StorageSOPClass, VerificationSOPClass
 from dicom.dataset import Dataset, FileDataset
 from django.views.decorators.csrf import csrf_exempt

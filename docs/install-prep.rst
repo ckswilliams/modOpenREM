@@ -2,11 +2,48 @@
 Pre-installation preparations
 *****************************
 
-Install Python 2.7.x and pip
-============================
+Quick start: Ubuntu install using virtualenv
+============================================
 
-* Linux – likely to be installed already
+If you want to get everything installed quickly, you could do the following on a Ubuntu server::
+
+    dose@ubuntu1604:~$ sudo apt update
+    dose@ubuntu1604:~$ sudo apt install python python-pip rabbitmq-server postgresql orthanc dcmtk default-jre
+    dose@ubuntu1604:~$ pip install virtualenv
+    dose@ubuntu1604:~$ virtualenv veopenrem
+
+Activate the virtualenv and install the python packages::
+
+    dose@ubuntu1604:~$ . veopenrem/bin/activate
+    (veopenrem) dose@ubuntu1604:~$ pip install numpy psycopg2-binary
+
+You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
+e.g.::
+
+    (veopenrem) dose@ubuntu1604:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
+
+
+We can now install OpenREM and the customised version of pynetdicom::
+
+    (veopenrem) dose@ubuntu1604:~$ pip install openrem
+    (veopenrem) dose@ubuntu1604:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+
+
+You can now go straight to the :ref:`localsettingsconfig`.
+
+Full instructions: Install Python 2.7.x and pip
+===============================================
+
 * Windows – instructions and downloads are available at `python.org <https://www.python.org/downloads>`_
+* Linux – likely to be installed already except on newer distributions
+
+  Check by typing ``python -V`` - if the response is ``Python 2.7.x`` (x can be any number) then move on to installing
+  pip.
+
+  If the response is that the command can't be found, you will need to install Python. On Ubuntu, Python 2.7 is python
+  and Python 3.x is Python3::
+
+      sudo apt-get install python
 
 Add Python and the scripts folder to the path
 ---------------------------------------------
@@ -26,11 +63,11 @@ If Python is already installed, you can add Python to Path yourself:
 
         ;C:\Python27\;C:\Python27\Scripts\
 
-Setuptools and pip
-------------------
+Python package installer pip
+----------------------------
 
-Install setuptools and pip – for details go to
-http://www.pip-installer.org/en/latest/installing.html. The quick version
+Install pip – for details go to
+https://pip.pypa.io/en/latest/installing/. The quick version
 is as follows:
 
 Linux
@@ -92,27 +129,9 @@ Install NumPy
 
 Numpy is required for charts.
 
-For linux::
+For Linux and Windows - activate virtualenv first::
 
-    sudo apt-get install python-numpy
-    # If using a virtualenv, you might need to also do:
     pip install numpy
-
-For Windows:
-
-Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
-
-* Find the right version - look for **numpy-X+mkl-cp27-cp27m-win32.whl** for 32-bit Windows or
-* **numpy-X+mkl-cp27-cp27m-win_amd64.whl** for 64-bit Windows.
-* At the time of writing, ``X`` was ``1.14.0`` - choose the latest version
-* Install using pip:
-
-.. sourcecode:: console
-
-    pip install C:\path\to\numpy‑1.14.0+mkl‑cp27-cp27m‑win32.whl  # update the version number
-    # or
-    pip install C:\path\to\numpy‑1.14.0+mkl‑cp27‑cp27m‑win_amd64.whl  # update the version number
-    # changing the path and filename to the numpy appropriately
 
 
 .. _installpreppostgres:
@@ -209,31 +228,6 @@ script (such as `openrem_rdsr.py`) without prefixing it with `python`, the
 system wide Python will be used instead. This doesn't apply to Linux, where
 once activated, the scripts can be called without a `python` prefix from anywhere.
 
-Quickstart Ubuntu install using virtualenv
-==========================================
-
-If you want to get everything installed quickly, you could do the following on a Ubuntu server::
-
-    dose@ubuntu1604:~$ sudo apt update
-    dose@ubuntu1604:~$ sudo apt install python python-pip rabbitmq-server postgresql libpq-dev orthanc dcmtk default-jre
-    dose@ubuntu1604:~$ pip install virtualenv
-    dose@ubuntu1604:~$ virtualenv veopenrem
-    dose@ubuntu1604:~$ . veopenrem/bin/activate
-    (veopenrem) dose@ubuntu1604:~$ pip install numpy psycopg2
-
-You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
-e.g.::
-
-    (veopenrem) dose@ubuntu1604:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
-
-
-We can now install OpenREM and a customised version of pynetdicom::
-
-    (veopenrem) dose@ubuntu1604:~$ pip install openrem
-    (veopenrem) dose@ubuntu1604:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
-
-
-You can now go straight to the :ref:`localsettingsconfig`.
 
 .. _virtualenv: https://virtualenv.pypa.io/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
