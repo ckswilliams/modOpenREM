@@ -2,8 +2,10 @@
 OpenREM version history
 =======================
 
-0.8.1 (2018-07-xx)
+0.8.1 (2018-08-xx)
 ------------------
+* `#643`_  Installation: updated docs to make use of pip binaries for Postgres connector and numpy, Windows and Linux
+* `#642`_  Skin dose maps: added catch for error when there are no events in the study
 * `#641`_  Exports: mammography exports from filtered pages sorted by AGD no longer result in duplicate studies
 * `#640`_  Exports: error in filter listing for NHSBSP csv exports corrected
 * `#639`_  Charts: fixed problem where a blank category name may not be displayed correctly
@@ -515,8 +517,8 @@ Reopened issue
 
 ..  note::
 
-    * `#64`_ includes **changes to the database schema and needs a user response** - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
-    * `#65`_ includes changes to the settings file which **require settings information to be copied** and files moved/renamed - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
+    * `#64`_ includes **changes to the database schema and needs a user response** - see `version 0.4.0 release notes <https://docs.openrem.org/page/release-0.4.0.html>`_
+    * `#65`_ includes changes to the settings file which **require settings information to be copied** and files moved/renamed - see `version 0.4.0 release notes <https://docs.openrem.org/page/release-0.4.0.html>`_
 
 
 * `#80`_   Added docs for installing Apache with auto-start on Windows Server 2012. Contributed by JA Cole
@@ -543,7 +545,7 @@ Reopened issue
 
 0.3.9 (2014-03-08)
 ------------------
-..  note:: `#51`_ includes changes to the database schema -- make sure South is in use before upgrading. See http://docs.openrem.org/page/upgrade.html
+..  note:: `#51`_ includes changes to the database schema -- make sure South is in use before upgrading. See https://docs.openrem.org/page/upgrade.html
 
 * `#59`_   CSS stylesheet referenced particular fonts that are not in the distribution -- references removed
 * `#58`_   Export to xlsx more robust - limitation of 31 characters for sheet names now enforced

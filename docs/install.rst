@@ -2,14 +2,14 @@
 Installing OpenREM
 ******************
 
-Install OpenREM
-===============
+Install OpenREM v0.8.1b1
+========================
 
 .. sourcecode:: bash
 
-    pip install openrem
+    pip install openrem==0.8.1b1
 
-*Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
+*Will need* ``sudo`` *or equivalent if installing on linux without using a virtualenv*
 
 Install pynetdicom (edited version)
 ===================================

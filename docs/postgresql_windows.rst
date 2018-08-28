@@ -8,11 +8,9 @@ Get PostgreSQL and the python connector
 =======================================
     
 + Download the installer from http://www.enterprisedb.com/products-services-training/pgdownload#windows
-+ Download the Python PostgreSQL connector from http://www.lfd.uci.edu/~gohlke/pythonlibs/#psycopg
++ Install the Python PostgreSQL connector (activate the virtualenv first if using)::
 
-  * Find the right version - look for ``psycopg2-X-cp27-cp27m-win32.whl`` for 32-bit Windows or
-  * ``psycopg2-X-cp27-cp27m-win_amd64.whl`` for 64-it Windows.
-  * At the time of writing, ``X`` was ``2.7.3.2`` - choose the latest ``cp27`` version
+    pip install psycopg2-binary
 
 .. _windowspsqlinstall:
 
@@ -38,16 +36,6 @@ Open pgAdmin
 + Right click on databases and choose "New database"
 + Name the database (openremdb is fine) and assign the the owner to the user you just created
 
-
-Install psycopg2
-================
-
-.. sourcecode:: console
-
-    pip install psycopg2-2.7.3.2-cp27-cp27m-win32.whl  # update the version number
-    # or if you have the 64-bit version
-    pip install psycopg2-2.7.3.2-cp27-cp27m-win_amd64.whl  # update the version number
-    # adjusting the version number appropriately
 
 **If this is your initial install**, you are now ready to install OpenREM, so go to the :doc:`install` docs.
 

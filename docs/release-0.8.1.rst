@@ -1,27 +1,18 @@
-###################################
-OpenREM Release Notes version 0.8.0
-###################################
+########################
+Upgrade to OpenREM 0.8.1
+########################
 
 ****************
 Headline changes
 ****************
 
-* This release has extensive automated testing for large parts of the codebase (for the first time)
-* Code quality is much improved, reduced duplication, better documentation, many bugs fixed
-* Imports: RDSR from a wider range of systems now import properly
-* Imports: Better distinction and control over defining RDSR studies as RF or DX
-* Imports: Code and instructions to generate and import RDSR from older Toshiba CT scanners
-* Imports: DICOM Query-Retrieve functionality has been overhauled
-* Imports: Duplicate checking improved to allow cumulative and continued study RDSRs to import properly
-* Imports: indicators that a study is not a patient can now be configured in the web interface
-* Imports, display and export: Better handling of non-ASCII characters
-* Interface: More detailed, consistent and faster rendering of the data in the web interface
-* Interface: Maps of fluoroscopy radiation exposure incident on a phantom (Siemens RDSRs only)
-* Interface: More and better charts, including scatter plots for mammography
-* Interface: Display names dialogue has been extended to allow administration of all studies from each source
-* Exports: Much faster, and more consistent
-* Documentation: Extensive user documentation improvements
+* Exports: fixed bug in mammography NHSBSP exports that incorrectly reported the filter material in some circumstances
+* Exports: fixed bug where sorting by AGD would cause duplicate entries for bilateral studies
+* Charts: fixed problem where a blank category name may not be displayed correctly
+* Interface: added feature to allow users to change their own password
+* Imports: reduced list of scanners that work with the legacy Toshiba CT extractor
 
+If upgrading from 0.7.4, see also :doc:`release-0.8.0`
 
 
 ***************************************************
@@ -30,9 +21,10 @@ Upgrading an OpenREM server with no internet access
 
 Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
-****************************************************
-Upgrading from version 0.7.4 or previous 0.8.0 betas
-****************************************************
+
+*************************************
+Upgrading from version 0.7.4 or 0.8.0
+*************************************
 
 Upgrade
 =======
@@ -53,10 +45,13 @@ Upgrade
 
 .. sourcecode:: bash
 
-    pip install openrem==0.8.0
+    pip install openrem==0.8.1b1
+
+..  _upgradefrom074:
 
 Update the configuration
 ========================
+*no changes should be required if upgrading from 0.8.0*
 
 Locate and edit your local_settings file
 
@@ -106,6 +101,7 @@ configuration' section from  ``local_settings.py.example`` if you haven't made m
 
 Adding legacy Toshiba CT functionality
 ======================================
+*No change required if upgrading from 0.8.0*
 
 If you need to import data from older Toshiba CT scanners into OpenREM then the following tools need to be available
 on the same server as OpenREM:
@@ -134,11 +130,15 @@ configuration above using the command ``which dcmconv``. This will be something 
 for ``DCMMKDIR`` and ``JAVA_EXE``, which might be ``/usr/bin/java``. The pixelmed.jar file should be downloaded from
 the link above, and you will need to provide the path to where you have saved it.
 
+The list of CT scanners that the extractor works with has been reduced. You can add to this list, but you will need to
+verify that any systems you configure to use this extractor produce data in OpenREM that you expect.
+
 
 Migrate the database
 ====================
+*No changes are expected if you are upgrading from 0.8.0, but it is good practice to run through this anyway*
 
-In a shell/command window, move into the openrem folder:
+In a shell/command window, move into the ``openrem`` folder:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
