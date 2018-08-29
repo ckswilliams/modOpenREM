@@ -5,6 +5,7 @@ OpenREM version history
 0.8.1 (2018-08-xx)
 ------------------
 * `#645`_  Imports: prevent import failure when text is used in filter thickness field in DX image
+* `#644`_  Exports: fixed error in exporting non-ASCII CT protocol acquisition names
 * `#643`_  Installation: updated docs to make use of pip binaries for Postgres connector and numpy, Windows and Linux
 * `#642`_  Skin dose maps: added catch for error when there are no events in the study
 * `#641`_  Exports: mammography exports from filtered pages sorted by AGD no longer result in duplicate studies
