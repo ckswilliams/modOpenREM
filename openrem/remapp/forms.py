@@ -386,11 +386,32 @@ class DicomQRForm(forms.ModelForm):
         super(DicomQRForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-lg-4'
-        self.helper.field_class = 'col-lg-2'
+        self.helper.label_class = 'col-md-8'
+        self.helper.field_class = 'col-md-4'
         self.helper.layout = Layout(
             Div(
                 'name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname'
+            ),
+            Accordion(
+                AccordionGroup(
+                    'Non-standard configuration options',
+                    Div(
+                        HTML("""
+                        <p>
+                          Some PACS systems (like Impax 6.6) need modality at study level for correct filtering. 
+                          Others will return no results if modality is included at study level. See
+                            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/netdicom-qr-config.html"
+                                target="_blank" data-toggle="tooltip"
+                                title="DICOM query-retrieve node config documentation - opens in a new tab">
+                                DICOM query-retrieve node config documentation
+                            </a>
+                        </p>
+                        """)
+                    ),
+                    PrependedText('use_modality_tag', ''),  # Trick to force label to join the other labels,
+                                                            # otherwise sits to right
+                    active=False
+                )
             ),
             FormActions(
                 Submit('submit', 'Submit')
@@ -408,7 +429,7 @@ class DicomQRForm(forms.ModelForm):
 
     class Meta:
         model = DicomRemoteQR
-        fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname']
+        fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname', 'use_modality_tag']
 
 
 class DicomStoreForm(forms.ModelForm):

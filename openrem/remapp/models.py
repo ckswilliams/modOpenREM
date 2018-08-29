@@ -152,6 +152,7 @@ class DicomRemoteQR(models.Model):
     hostname = models.CharField(max_length=32, blank=True, null=True, verbose_name="Or remote hostname")
     callingaet = models.CharField(max_length=16, blank=True, null=True,
                                   verbose_name="AE Title of this OpenREM server - 16 or fewer letters and numbers, no spaces")
+    use_modality_tag = models.BooleanField(default=False, verbose_name="Use modality tag in study query")
     enabled = models.BooleanField(default=False)
 
     def get_absolute_url(self):

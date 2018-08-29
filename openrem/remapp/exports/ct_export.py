@@ -327,9 +327,14 @@ def _ct_get_series_data(s):
     except AttributeError:
         phantom = None
 
+    try:
+        ct_acquisition_type = s.ct_acquisition_type.code_meaning
+    except AttributeError:
+        ct_acquisition_type = ""
+
     seriesdata = [
-        str(s.acquisition_protocol),
-        str(s.ct_acquisition_type),
+        s.acquisition_protocol,
+        ct_acquisition_type,
         s.exposure_time,
         s.scanninglength_set.get().scanning_length,
         s.nominal_single_collimation_width,
@@ -424,6 +429,6 @@ def _ct_get_series_data(s):
     seriesdata += [
         s.xray_modulation_type,
         dose_check_string,
-        str(s.comment),
+        s.comment,
         ]
     return seriesdata

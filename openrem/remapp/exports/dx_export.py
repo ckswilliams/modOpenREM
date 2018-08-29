@@ -125,9 +125,14 @@ def _dx_get_series_data(s):
         distance_source_to_isocenter = None
         table_height_position = None
 
+    try:
+        anatomical_structure = s.anatomical_structure.code_meaning
+    except AttributeError:
+        anatomical_structure = ""
+
     series_data = [
         s.acquisition_protocol,
-        str(s.anatomical_structure),
+        anatomical_structure,
     ]
     try:
         series_data += [s.image_view.code_meaning, ]

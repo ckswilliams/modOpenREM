@@ -95,7 +95,7 @@ class ImportCTRDSR(TestCase):
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.order_by('id')[0].nominal_total_collimation_width, Decimal(3.6))
         self.assertEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.order_by('id')[0].acquisition_protocol, 'Topogram')
+            ctirradiationeventdata_set.order_by('id')[0].acquisition_protocol, u'test\xc3\xa6\xc3\xb8\xc3\xa5')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.order_by('id')[0].number_of_xray_sources, Decimal(1))
         self.assertEqual(study.ctradiationdose_set.get().
