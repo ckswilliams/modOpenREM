@@ -98,6 +98,8 @@ def make_skin_map(study_pk=None):
                             u"Assuming head first.".format(study_pk, ptr_meaning))
         except AttributeError:
             logger.info(u"Study PK {0}: Patient table relationship not found. Assuming head first.".format(study_pk))
+        except IndexError:
+            logger.info(u"Study PK {0}: No irradiation event x-ray data found. Assuming head first.".format(study_pk))
         try:
             orientation_modifier_meaning = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[
                 0].patient_orientation_modifier_cid.code_meaning.lower()
@@ -110,6 +112,8 @@ def make_skin_map(study_pk=None):
                             u"Assuming supine.".format(study_pk, orientation_modifier_meaning))
         except AttributeError:
             logger.info(u"Study PK {0}: Orientation modifier not found. Assuming supine.".format(study_pk))
+        except IndexError:
+            logger.info(u"Study PK {0}: No irradiation event x-ray data found. Assuming supine.".format(study_pk))
         if ptr and orientation_modifier:
             pat_pos_source = u"extracted"
             patPos = ptr + u"F" + orientation_modifier
