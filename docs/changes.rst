@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.1 (2018-07-xx)
 ------------------
+* `#644`_  Exports: fixed error in exporting non-ASCII CT protocol acquisition names
 * `#641`_  Exports: mammography exports from filtered pages sorted by AGD no longer result in duplicate studies
 * `#640`_  Exports: error in filter listing for NHSBSP csv exports corrected
 * `#639`_  Charts: fixed problem where a blank category name may not be displayed correctly

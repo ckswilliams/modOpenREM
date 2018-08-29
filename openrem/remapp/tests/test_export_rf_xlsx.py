@@ -127,11 +127,17 @@ class ExportRFxlsx(TransactionTestCase):  # Not TestCase as raises TransactionMa
         eurocolumbus_headers = eurocolumbus_sheet.row(0)
         kvp_col = [i for i, x in enumerate(eurocolumbus_headers) if x.value == u'kVp'][0]
         ma_col = [i for i, x in enumerate(eurocolumbus_headers) if x.value == u'mA'][0]
-        pulse_width_col =[i for i, x in enumerate(eurocolumbus_headers) if x.value == u'Pulse width (ms)'][0]
+        pulse_width_col = [i for i, x in enumerate(eurocolumbus_headers) if x.value == u'Pulse width (ms)'][0]
+        exposure_time_col = [i for i, x in enumerate(eurocolumbus_headers) if x.value == u'Time'][0]
+        target_row = 0
+        for row_num in range(eurocolumbus_sheet.nrows):
+            if eurocolumbus_sheet.cell_value(row_num, exposure_time_col) == "2018-01-10 12:35:29":
+                target_row = row_num
+                break
 
-        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(1, kvp_col), 56.6666666666667)
-        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(1, ma_col), 50.0)
-        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(1, pulse_width_col), 8.0)
+        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(target_row, kvp_col), 56.6666666666667)
+        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(target_row, ma_col), 50.0)
+        self.assertAlmostEqual(eurocolumbus_sheet.cell_value(target_row, pulse_width_col), 8.0)
 
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
