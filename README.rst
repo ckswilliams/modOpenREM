@@ -30,21 +30,20 @@ Codacy:
 OpenREM is a Django app to extract, store, display and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
 
-This is release 0.8.0, which features extensive improvements to code quality, interface speed and functionality,
-documentation, imports and exports. It is tested to a much greater extent than ever before and is the first release to
-feature `openSkin dose maps <https://docs.openrem.org/en/0.8.0/skindosemap.html>`_ for specific fluoroscopy systems.
+This is release 0.8.1b1, which contains mainly bug fixes for the 0.8.0 release, plus added a feature to allow users to
+change their own passwords.
 
-Please review the `release notes <https://docs.openrem.org/en/0.8.0/release-0.8.0.html>`_ for more details.
+Please review the `release notes <https://docs.openrem.org/en/0.8.1b1/release-0.8.1.html>`_ for more details.
 
 Full documentation can be found on Read the Docs: https://docs.openrem.org/, and a demo site can be seen at
 http://demo.openrem.org; username `demo` password `demo`
 
-For upgrades, please review the `version release notes <https://docs.openrem.org/en/0.8.0/release-0.8.0.html>`_. For
-fresh installs, please review the `install docs <https://docs.openrem.org/en/0.8.0/installation.html>`_.
+For upgrades, please review the `version release notes <https://docs.openrem.org/en/0.8.1b1/release-0.8.1.html>`_. For
+fresh installs, please review the `install docs <https://docs.openrem.org/en/0.8.1b1/installation.html>`_.
 
 Contribution of code, ideas, bug reports documentation is all welcome.
 Please feel free to fork the repository and send me pull requests. See
-`the website <http://openrem.org/getinvolved>`_ for more information.
+`the website <https://openrem.org/getinvolved>`_ for more information.
 
 There is a developer demo site, which at times has a working demo of recent code, but might not, and
 might be broken. It can be found at http://dev.openrem.org; username `demo` password `demo`

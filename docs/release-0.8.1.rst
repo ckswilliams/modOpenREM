@@ -37,7 +37,7 @@ Upgrade
 
 * Stop any Celery workers
 
-* Consider temporarily disabling your DICOM StoreSCP, or redirecting the data to be processed later
+* Consider temporarily disabling your DICOM Store SCP, or redirecting the data to be processed later
 
 * If you are using a virtualenv, activate it
 

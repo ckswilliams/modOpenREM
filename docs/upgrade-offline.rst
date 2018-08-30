@@ -10,7 +10,7 @@ installing on - same operating system and matching 32-bit or 64-bit.
 On a computer with internet access
 ==================================
 
-In a console, navigate to a suitable place and create a directory to collect all the packages in, then use pip to
+In a console, navigate to a suitable place and create a new directory to collect all the packages in, then use pip to
 download them all:
 
 .. sourcecode:: console
