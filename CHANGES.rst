@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.1 (2018-07-xx)
 ------------------
+* `#646`_  Modified Celery import to avoid name clash in some circumstances
 * `#644`_  Exports: fixed error in exporting non-ASCII CT protocol acquisition names
 * `#642`_  Skin dose maps: added catch for error when there are no events in the study
 * `#641`_  Exports: mammography exports from filtered pages sorted by AGD no longer result in duplicate studies
