@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.1 (2018-08-xx)
 ------------------
+* `#646`_  Modified Celery import to avoid name clash in some circumstances
 * `#645`_  Imports: prevent import failure when text is used in filter thickness field in DX image
 * `#644`_  Exports: fixed error in exporting non-ASCII CT protocol acquisition names
 * `#643`_  Installation: updated docs to make use of pip binaries for Postgres connector and numpy, Windows and Linux
