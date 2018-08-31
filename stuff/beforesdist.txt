@@ -23,5 +23,19 @@ Build:
 Test upload:
     twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
+    Go to https://test.pypi.org/project/OpenREM/ to review
+
 Real upload:
     twine upload dist/*
+
+    Go to https://pypi.org/project/OpenREM/ to review
+
+    Merge release branch into master
+    Tag commit with release number , ie "0.8.1b1"
+    Push master to bitbucket
+    Merge master into develop and upload to bitbucket
+    Delete release branch
+
+    Go to https://readthedocs.org/projects/openrem/versions/ and find the new tag and set it to public and active
+
+    Tell everyone
