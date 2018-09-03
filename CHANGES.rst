@@ -2,8 +2,9 @@
 OpenREM version history
 =======================
 
-0.8.1b1 (2018-08-31)
+0.8.1b2 (2018-09-xx)
 --------------------
+* `#653`_  Docs: clarified notes to get link to Orthanc lua file correct on release
 * `#646`_  Modified Celery import to avoid name clash in some circumstances
 * `#645`_  Imports: prevent import failure when text is used in filter thickness field in DX image
 * `#644`_  Exports: fixed error in exporting non-ASCII CT protocol acquisition names
