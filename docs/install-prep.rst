@@ -5,28 +5,42 @@ Pre-installation preparations
 Quick start: Ubuntu install using virtualenv
 ============================================
 
-If you want to get everything installed quickly, you could do the following on a Ubuntu server::
+If you want to get everything installed quickly, you could do the following on a Ubuntu server:
 
-    dose@ubuntu1604:~$ sudo apt update
-    dose@ubuntu1604:~$ sudo apt install python python-pip rabbitmq-server postgresql orthanc dcmtk default-jre
-    dose@ubuntu1604:~$ pip install virtualenv
-    dose@ubuntu1604:~$ virtualenv veopenrem
+First edit ``/etc/hosts`` to add the local server name - else ``rabitmq-server`` will not start when installed::
+
+    dose@ubuntu1804:~$ sudo nano /etc/hosts
+
+Modify the content to ensure the following two lines are present - **substitute the correct server hostname on the
+second line**::
+
+    127.0.0.1 localhost
+    127.0.1.1 ubuntu1804
+
+``Ctrl-o Ctrl-x`` to write out and exit
+
+Then::
+
+    dose@ubuntu1804:~$ sudo apt update
+    dose@ubuntu1804:~$ sudo apt install python python-pip rabbitmq-server postgresql orthanc dcmtk default-jre
+    dose@ubuntu1804:~$ pip install virtualenv
+    dose@ubuntu1804:~$ virtualenv veopenrem
 
 Activate the virtualenv and install the python packages::
 
-    dose@ubuntu1604:~$ . veopenrem/bin/activate
-    (veopenrem) dose@ubuntu1604:~$ pip install numpy psycopg2-binary
+    dose@ubuntu1804:~$ . veopenrem/bin/activate
+    (veopenrem) dose@ubuntu1804:~$ pip install numpy psycopg2-binary
 
 You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
 e.g.::
 
-    (veopenrem) dose@ubuntu1604:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
+    (veopenrem) dose@ubuntu1804:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
 
 
 We can now install OpenREM and the customised version of pynetdicom::
 
-    (veopenrem) dose@ubuntu1604:~$ pip install openrem==0.8.1b1
-    (veopenrem) dose@ubuntu1604:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+    (veopenrem) dose@ubuntu1804:~$ pip install openrem==0.8.1b1
+    (veopenrem) dose@ubuntu1804:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 
 You can now go straight to the :ref:`localsettingsconfig`.
