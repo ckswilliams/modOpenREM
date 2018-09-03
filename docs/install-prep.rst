@@ -24,8 +24,7 @@ Then::
     dose@ubuntu1804:~$ sudo apt update
     dose@ubuntu1804:~$ sudo apt install python python-pip virtualenv rabbitmq-server postgresql orthanc dcmtk default-jre
 
-Now create a virtualenv (Python local environment) in a folder ``veopenrem`` in the folder you are currently working
-in::
+Now create a virtualenv (Python local environment) in the folder you are currently working in::
 
     dose@ubuntu1804:~$ virtualenv veopenrem
 
