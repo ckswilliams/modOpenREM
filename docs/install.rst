@@ -242,7 +242,7 @@ http://www.i18nguy.com/unicode/language-identifiers.html
 Toshiba CT RDSR creation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you need to import data from older Toshiba CT scanners that do not create RDSRs into OpenREM then the following
+If you need to import data from older Toshiba CT scanners that do not create RDSRs then the following
 tools need to be available on the same server as OpenREM:
 
     * The `Offis DICOM toolkit`_
