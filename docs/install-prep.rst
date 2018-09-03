@@ -7,7 +7,7 @@ Quick start: Ubuntu install using virtualenv
 
 If you want to get everything installed quickly, you could do the following on a Ubuntu server:
 
-First edit ``/etc/hosts`` to add the local server name - else ``rabitmq-server`` will not start when installed::
+First edit ``/etc/hosts`` to add the local server name – else ``rabbitmq-server`` will not start when installed::
 
     dose@ubuntu1804:~$ sudo nano /etc/hosts
 
@@ -29,7 +29,7 @@ in::
 
     dose@ubuntu1804:~$ virtualenv veopenrem
 
-Activate the virtualenv and install the python packages (note the ``.`` - you can also use the word ``source``)::
+Activate the virtualenv and install the python packages (note the ``.`` – you can also use the word ``source``)::
 
     dose@ubuntu1804:~$ . veopenrem/bin/activate
     (veopenrem) dose@ubuntu1804:~$ pip install numpy psycopg2-binary
