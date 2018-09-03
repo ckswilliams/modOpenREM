@@ -22,11 +22,14 @@ second line**::
 Then::
 
     dose@ubuntu1804:~$ sudo apt update
-    dose@ubuntu1804:~$ sudo apt install python python-pip rabbitmq-server postgresql orthanc dcmtk default-jre
-    dose@ubuntu1804:~$ pip install virtualenv
+    dose@ubuntu1804:~$ sudo apt install python python-pip virtualenv rabbitmq-server postgresql orthanc dcmtk default-jre
+
+Now create a virtualenv (Python local environment) in a folder ``veopenrem`` in the folder you are currently working
+in::
+
     dose@ubuntu1804:~$ virtualenv veopenrem
 
-Activate the virtualenv and install the python packages::
+Activate the virtualenv and install the python packages (note the ``.`` - you can also use the word ``source``)::
 
     dose@ubuntu1804:~$ . veopenrem/bin/activate
     (veopenrem) dose@ubuntu1804:~$ pip install numpy psycopg2-binary
