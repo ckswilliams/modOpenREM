@@ -5,6 +5,7 @@ OpenREM version history
 0.8.1b2 (2018-09-xx)
 --------------------
 * `#652`_  Documentation: added docs showing Celery daemonisation in Linux
+* `#647`_  Documentation: updated link to pixelmed
 * `#646`_  Modified Celery import to avoid name clash in some circumstances
 * `#645`_  Imports: prevent import failure when text is used in filter thickness field in DX image
 * `#644`_  Exports: fixed error in exporting non-ASCII CT protocol acquisition names
