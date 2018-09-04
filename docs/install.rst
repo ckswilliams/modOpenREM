@@ -242,8 +242,8 @@ http://www.i18nguy.com/unicode/language-identifiers.html
 Toshiba CT RDSR creation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you need to import data from older Toshiba CT scanners into OpenREM then the following tools need to be available
-on the same server as OpenREM:
+If you need to import data from older Toshiba CT scanners that do not create RDSRs then the following
+tools need to be available on the same server as OpenREM:
 
     * The `Offis DICOM toolkit`_
     * `Java`_
@@ -268,6 +268,11 @@ configuration above using the command ``which dcmconv``. This will be something 
 ``DCMTK_PATH`` would be ``'/usr/bin`` and the ``DCMCONV`` would be ``os.path.join(DCMTK_PATH, 'dcmconv')``. Similarly
 for ``DCMMKDIR`` and ``JAVA_EXE``, which might be ``/usr/bin/java``. The pixelmed.jar file should be downloaded from
 the link above, and you will need to provide the path to where you have saved it.
+
+.. note::
+
+    If you do not intend to use the RDSR creation feature (all your CT scanners create RDSRs already, or your older
+    scanners are Philips), then these paths do not need to be changed for your install.
 
 .. _database_creation:
 

@@ -40,11 +40,14 @@ Edit the top two sections
     -- Set this to the path where you want to keep physics-related DICOM images
     local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
 
-    -- Set this to the path and name of your zip utility (used with physics-related images)
+    -- Set this to the path and name of your zip utility, and include any switches that
+    -- are needed to create an archive (used with physics-related images)
+    -- You can install and use the 'zip' command on Linux without any switches
     local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a'
 
     -- Set this to the path and name of your remove folder command, including switches
     -- for it to be quiet (used with physics-related images)
+    -- You can use the command 'rm -r' if you are using Linux
     local rmdir_cmd = 'rmdir /s/q'
     -------------------------------------------------------------------------------------
 
