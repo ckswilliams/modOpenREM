@@ -36,7 +36,7 @@ Activate the virtualenv and install the python packages (note the ``.`` – you 
 You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
 e.g.::
 
-    (veopenrem) dose@ubuntu1804:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
+    (veopenrem) dose@ubuntu1804:~$ wget http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar
 
 
 We can now install OpenREM and the customised version of pynetdicom::
