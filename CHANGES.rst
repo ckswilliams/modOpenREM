@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.1b2 (2018-09-xx)
 --------------------
+* `#654`_  Documentation: supplemented the Orthanc Lua file config option docs
 * `#652`_  Documentation: added docs showing Celery daemonisation in Linux
 * `#647`_  Documentation: updated link to pixelmed
 * `#646`_  Modified Celery import to avoid name clash in some circumstances
