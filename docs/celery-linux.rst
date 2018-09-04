@@ -10,9 +10,9 @@ are taken from the Celery docs but customised for OpenREM.
 
 In this example, the following folders have been created:
 
-:file:`/var/dose/celery/`
-:file:`/var/dose/log/`
-:file:`/var/dose/veopenrem/`
+* :file:`/var/dose/celery/`
+* :file:`/var/dose/log/`
+* :file:`/var/dose/veopenrem/`
 
 OpenREM is installed in a virtualenv in ``/var/dose/veopenrem/``.
 
@@ -20,7 +20,7 @@ Adjust all the paths as appropriate.
 
 First, create a Celery configuration file:
 
-:file:`/var/dose/celery/celery.conf`:
+``nano /var/dose/celery/celery.conf``:
 
 .. code-block:: bash
 
@@ -49,7 +49,7 @@ First, create a Celery configuration file:
 
 Now create the systemd service file:
 
-:file:`/etc/systemd/system/celery-openrem-server.service`:
+``sudo nano /etc/systemd/system/celery-openrem-server.service``:
 
 .. code-block:: bash
 
@@ -76,7 +76,7 @@ Now create the systemd service file:
     [Install]
     WantedBy=multi-user.target
 
-Now register, set to start on boot and start the service:
+Now register, set to start on boot, and start the service:
 
 .. code-block:: console
 
