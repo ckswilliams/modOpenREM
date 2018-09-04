@@ -210,7 +210,7 @@ on the same server as OpenREM:
 
     * The `Offis DICOM toolkit`_
     * `Java`_
-    * pixelmed.jar from the `PixelMed Java DICOM Toolkit`_
+    * `pixelmed.jar`_ from the PixelMed Java DICOM Toolkit
 
 For more information see :ref:`toshiba_legacy_imports`. The locations of these executables needs to be configured in the
 ``local_settings.py`` - see :ref:`toshiba_configuration`.
@@ -250,4 +250,4 @@ once activated, the scripts can be called without a `python` prefix from anywher
 .. _consider virtualenv: `Virtualenv and virtualenvwrapper`_
 .. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
 .. _`Java`: http://java.com/en/download/
-.. _`PixelMed Java DICOM Toolkit`: http://www.pixelmed.com/dicomtoolkit.html
+.. _`pixelmed.jar`: http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar
