@@ -14,7 +14,7 @@ Pre-install prep
 ----------------
 First edit ``/etc/hosts`` to add the local server name – else ``rabbitmq-server`` will not start when installed::
 
-    dose@ubuntu1804:~$ sudo nano /etc/hosts
+    sudo nano /etc/hosts
 
 Modify the content to ensure the following two lines are present - **substitute the correct server hostname on the
 second line**::
@@ -47,30 +47,33 @@ be added to the ``openrem`` group, and the 'sticky' group setting below will ena
     mkdir log
     mkdir media
     mkdir -p orthanc/dicom
+    mkdir pixelmed
     mkdir static
     mkdir veopenrem
     sudo chown -R $USER:openrem /var/dose/*
     sudo chmod -R g+s /var/dose/*
 
 
-
-
-Install apt packages
---------------------
+Install apt packages and direct downloads
+-----------------------------------------
 
 .. code-block:: console
 
     sudo apt update
     sudo apt install python python-pip virtualenv rabbitmq-server postgresql orthanc dcmtk default-jre
 
-Now create a virtualenv (Python local environment) in the folder we created:
+    cd /var/dose/pixelmed
+    wget http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar
+
+
+Install Python packages
+-----------------------
+
+Create a virtualenv (Python local environment) in the folder we created:
 
 .. code-block:: console
 
     virtualenv /var/dose/veopenrem
-
-Install Python packages
------------------------
 
 Activate the virtualenv and install the python packages (note the ``.`` – you can also use the word ``source``):
 
@@ -78,23 +81,35 @@ Activate the virtualenv and install the python packages (note the ``.`` – you 
 
     . /var/dose/veopenrem/bin/activate
     pip install numpy psycopg2-binary
+    pip install openrem
+    pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 
+Setup PostgreSQL database
+-------------------------
+
+*Need to establish if it really is necessary to change security configuration - I am thinking it might not be*
+
+Create a postgres user, and create the database. You will be asked to enter a new password (twice). This will be needed
+when configuring OpenREM:
+
+.. code-block:: console
+
+    sudo -u postgres createuser -P openremuser
+    sudo -u postgres createdb -T template1 -O openremuser -E 'UTF8' openremdb
+
+If you are migrating from another server, you could at this point create a template0 database to restore into. See
+:ref:`restore-psql-linux` for details.
 
 
+Configure OpenREM
+-----------------
 
-*From pre-install quick-start docs*
+First navigate to the Python openrem folder and copy the example local_settings and wsgi files:
 
-You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
-e.g.::
+.. code-block:: console
 
-    (veopenrem) dose@ubuntu1804:~$ wget http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar
+    cd /var/dose/veopenrem/lib/python2.7/site-packages/openrem/
+    cp openremproject/local_settings.py{.example,}
+    cp openremproject/wsgi.py{.example,}
 
-
-We can now install OpenREM and the customised version of pynetdicom::
-
-    (veopenrem) dose@ubuntu1804:~$ pip install openrem==0.8.1b1
-    (veopenrem) dose@ubuntu1804:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
-
-
-You can now go straight to the :ref:`localsettingsconfig`.
