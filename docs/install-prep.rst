@@ -2,53 +2,14 @@
 Pre-installation preparations
 *****************************
 
-Quick start: Ubuntu install using virtualenv
-============================================
+..  toctree::
+    :maxdepth: 1
 
-If you want to get everything installed quickly, you could do the following on a Ubuntu server:
-
-First edit ``/etc/hosts`` to add the local server name – else ``rabbitmq-server`` will not start when installed::
-
-    dose@ubuntu1804:~$ sudo nano /etc/hosts
-
-Modify the content to ensure the following two lines are present - **substitute the correct server hostname on the
-second line**::
-
-    127.0.0.1 localhost
-    127.0.1.1 ubuntu1804
-
-``Ctrl-o Ctrl-x`` to write out and exit
-
-Then::
-
-    dose@ubuntu1804:~$ sudo apt update
-    dose@ubuntu1804:~$ sudo apt install python python-pip virtualenv rabbitmq-server postgresql orthanc dcmtk default-jre
-
-Now create a virtualenv (Python local environment) in the folder you are currently working in::
-
-    dose@ubuntu1804:~$ virtualenv veopenrem
-
-Activate the virtualenv and install the python packages (note the ``.`` – you can also use the word ``source``)::
-
-    dose@ubuntu1804:~$ . veopenrem/bin/activate
-    (veopenrem) dose@ubuntu1804:~$ pip install numpy psycopg2-binary
-
-You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
-e.g.::
-
-    (veopenrem) dose@ubuntu1804:~$ wget http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar
+    quick_start_linux
 
 
-We can now install OpenREM and the customised version of pynetdicom::
-
-    (veopenrem) dose@ubuntu1804:~$ pip install openrem==0.8.1b1
-    (veopenrem) dose@ubuntu1804:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
-
-
-You can now go straight to the :ref:`localsettingsconfig`.
-
-Full instructions: Install Python 2.7.x and pip
-===============================================
+Install Python 2.7.x and pip
+============================
 
 * Windows – instructions and downloads are available at `python.org <https://www.python.org/downloads>`_
 * Linux – likely to be installed already except on newer distributions
