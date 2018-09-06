@@ -109,7 +109,7 @@ do this:
 
     sudo mkdir /var/openrem/static
     sudo chown $USER:www-data /var/openrem/static
-    sudo chmod 755 /var/openrem/static
+    sudo chmod 775 /var/openrem/static
 
 Now edit your ``openremproject/local_settings.py`` config file to put the same path in the ``STATIC_ROOT``:
 
@@ -229,8 +229,8 @@ For the gunicorn command, you will need to provide the full path to gunicorn, wh
     [Install]
     WantedBy=multi-user.target
 
-Make sure you have customised the ``User``, the  ``WorkingDirectory`` path, the path to gunicorn, and the name of the
-socket file.
+Make sure you have customised the ``WorkingDirectory`` path, the path to gunicorn, and the name of the
+socket file. The ``User`` would normally be ``www-data``.
 
 .. warning::
 
@@ -238,7 +238,6 @@ socket file.
     the location the logs are configured to be written (usually in ``MEDIA_ROOT``), the systemd gunicorn service is
     likely to fail when started.
 
-    If you have installed everything in your user folder, you are likely to need to set ``User`` to your own username.
 
 Now enable the new configuration:
 
