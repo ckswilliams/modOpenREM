@@ -170,10 +170,11 @@ Configure the filename to determine where the logs are written. In linux, you mi
 .. sourcecode:: python
 
     import os
-    logfilename = os.path.join(MEDIA_ROOT, "openrem.log")
-    qrfilename = os.path.join(MEDIA_ROOT, "openrem_qr.log")
-    storefilename = os.path.join(MEDIA_ROOT, "openrem_store.log")
-    extractorfilename = os.path.join(MEDIA_ROOT, "openrem_extractor.log")
+    LOG_ROOT = MEDIA_ROOT
+    logfilename = os.path.join(LOG_ROOT, "openrem.log")
+    qrfilename = os.path.join(LOG_ROOT, "openrem_qr.log")
+    storefilename = os.path.join(LOG_ROOT, "openrem_store.log")
+    extractorfilename = os.path.join(LOG_ROOT, "openrem_extractor.log")
 
     LOGGING['handlers']['file']['filename'] = logfilename          # General logs
     LOGGING['handlers']['qr_file']['filename'] = qrfilename        # Query Retrieve SCU logs
