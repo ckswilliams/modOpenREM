@@ -56,11 +56,13 @@ be added to the ``openrem`` group, and the 'sticky' group setting below will ena
 
 Install apt packages and direct downloads
 -----------------------------------------
+The ``\`` just allows the ``sudo apt install`` command to spread to two lines - feel free to put it all on one line.
 
 .. code-block:: console
 
     sudo apt update
-    sudo apt install python python-pip virtualenv rabbitmq-server postgresql nginx orthanc dcmtk default-jre
+    sudo apt install python python-pip virtualenv rabbitmq-server \
+    postgresql nginx orthanc dcmtk default-jre
 
     cd /var/dose/pixelmed
     wget http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar
