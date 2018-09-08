@@ -60,7 +60,7 @@ Install apt packages and direct downloads
 .. code-block:: console
 
     sudo apt update
-    sudo apt install python python-pip virtualenv rabbitmq-server postgresql orthanc dcmtk default-jre
+    sudo apt install python python-pip virtualenv rabbitmq-server postgresql nginx orthanc dcmtk default-jre
 
     cd /var/dose/pixelmed
     wget http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar
@@ -80,7 +80,7 @@ Activate the virtualenv and install the python packages (note the ``.`` – you 
 .. code-block:: console
 
     . /var/dose/veopenrem/bin/activate
-    pip install numpy psycopg2-binary
+    pip install numpy psycopg2-binary gunicorn
     pip install openrem
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
@@ -120,13 +120,108 @@ Edit the new local_settings file (``nano openremproject/local_settings.py``):
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'openremdb',                                 # Or path to database file if using sqlite3.
-            'USER': 'openremuser',                          # Not used with sqlite3.
-            'PASSWORD': 'mysecretpassword',                          # Not used with sqlite3.
-            'HOST': '',                              # Set to empty string for localhost. Not used with sqlite3.
-            'PORT': '',                              # Set to empty string for default. Not used with sqlite3.
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'openremdb',
+            'USER': 'openremuser',
+            'PASSWORD': 'mysecretpassword',     # This needs changing, hopefully!
+            'HOST': '',
+            'PORT': '',
         }
     }
+
+    MEDIA_ROOT = '/var/dose/media/'
+
+    STATIC_ROOT = '/var/dose/static/'
+
+    # Change secret key
+
+    # Leave the hash in place for now, but remove it and the space so DEBUG starts at the start of the line as soon as
+    # something doesn't work. Put it back when you get it working again.
+    # DEBUG = True
+
+    ALLOWED_HOSTS = [
+        # Add the names and IP address of your host, for example:
+        'openrem-server',
+        'openrem-server.ad.abc.nhs.uk',
+        '10.123.213.22',
+    ]
+
+    LOG_ROOT = "/var/dose/log"
+    logfilename = os.path.join(LOG_ROOT, "openrem.log")
+    qrfilename = os.path.join(LOG_ROOT, "openrem_qr.log")
+    storefilename = os.path.join(LOG_ROOT, "openrem_store.log")
+    extractorfilename = os.path.join(LOG_ROOT, "openrem_extractor.log")
+
+    # Removed comment hashes to enable log file rotation:
+    LOGGING['handlers']['file']['class'] = 'logging.handlers.RotatingFileHandler'
+    LOGGING['handlers']['file']['maxBytes'] = 10 * 1024 * 1024  # 10*1024*1024 = 10 MB
+    LOGGING['handlers']['file']['backupCount'] = 5  # number of log files to keep before deleting the oldest one
+    LOGGING['handlers']['qr_file']['class'] = 'logging.handlers.RotatingFileHandler'
+    LOGGING['handlers']['qr_file']['maxBytes'] = 10 * 1024 * 1024  # 10*1024*1024 = 10 MB
+    LOGGING['handlers']['qr_file']['backupCount'] = 5  # number of log files to keep before deleting the oldest one
+    LOGGING['handlers']['store_file']['class'] = 'logging.handlers.RotatingFileHandler'
+    LOGGING['handlers']['store_file']['maxBytes'] = 10 * 1024 * 1024  # 10*1024*1024 = 10 MB
+    LOGGING['handlers']['store_file']['backupCount'] = 5  # number of log files to keep before deleting the oldest one
+    LOGGING['handlers']['extractor_file']['class'] = 'logging.handlers.RotatingFileHandler'
+    LOGGING['handlers']['extractor_file']['maxBytes'] = 10 * 1024 * 1024  # 10*1024*1024 = 10 MB
+    LOGGING['handlers']['extractor_file']['backupCount'] = 5  # number of log files to keep before deleting the oldest one
+
+    DCMTK_PATH = '/usr/bin'
+    DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv')
+    DCMMKDIR = os.path.join(DCMTK_PATH, 'dcmmkdir')
+    JAVA_EXE = '/usr/bin/java'
+    JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
+    PIXELMED_JAR = '/var/dose/pixelmed/pixelmed.jar'
+    PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
+
+Now create the database = assuming you are still in ``/var/dose/veopenrem/lib/python2.7/site-packages/openrem/``:
+
+.. code-block:: console
+
+    python manage.py makemigrations remapp
+    python manage.py migrate
+    python manage.py createsuperuser
+    mv remapp/migrations/0002_0_7_fresh_install_add_median.py{.inactive,}
+    python manage.py migrate
+
+Configure NGINX and gunicorn
+----------------------------
+
+Start NGINX:
+
+.. code-block:: console
+
+    sudo systemctl start nginx
+
+Create the OpenREM site config file ``sudo nano /etc/nginx/sites-available/openrem-server``:
+
+.. code-block:: nginx
+
+    server {
+        listen 80;
+        server_name openrem-server;
+
+        location /static {
+            alias /var/dose/static;
+        }
+
+        location / {
+            proxy_pass http://unix:/tmp/openrem-server.socket;
+            proxy_set_header Host $host;
+            proxy_read_timeout 300s;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
