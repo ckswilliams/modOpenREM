@@ -1,5 +1,5 @@
-Quick start: Ubuntu install
-===========================
+One page complete Ubuntu install
+================================
 
 A one page install based on Ubuntu 18.04 using:
 
@@ -10,8 +10,9 @@ A one page install based on Ubuntu 18.04 using:
 * Daemonisation: systemd scripts for Celery and Gunicorn
 * All OpenREM files in ``/var/dose/`` with group owner of ``openrem``
 
-Pre-install prep
-----------------
+Initial prep
+^^^^^^^^^^^^
+
 First edit ``/etc/hosts`` to add the local server name – else ``rabbitmq-server`` will not start when installed::
 
     sudo nano /etc/hosts
@@ -96,6 +97,16 @@ Install Python packages
     pip install openrem
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
+Addd orthanc and www-data users to openrem group
+------------------------------------------------
+
+.. code-block:: console
+
+    sudo adduser orthanc openrem
+    sudo adduser www-data openrem
+
+Database and OpenREM config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Setup PostgreSQL database
 -------------------------
@@ -199,6 +210,10 @@ the virtualenv is active (prompt will look like
     mv remapp/migrations/0002_0_7_fresh_install_add_median.py{.inactive,}
     python manage.py migrate
 
+
+Webserver
+^^^^^^^^^
+
 Configure NGINX and Gunicorn
 ----------------------------
 
@@ -288,7 +303,177 @@ You can check that NGINX and Gunicorn are running with the following two command
     sudo systemctl status nginx.service
 
 
+Celery
+^^^^^^
+
+First, create a Celery configuration file:
+
+``nano /var/dose/celery/celery.conf``:
+
+.. code-block:: bash
+
+    # Name of nodes to start
+    CELERYD_NODES="default"
+
+    # Absolute or relative path to the 'celery' command:
+    CELERY_BIN="/var/dose/veopenrem/bin/celery"
+
+    # App instance to use
+    CELERY_APP="openremproject"
+
+    # How to call manage.py
+    CELERYD_MULTI="multi"
+
+    # Extra command-line arguments to the worker
+    # Adjust the concurrency as appropriate
+    CELERYD_OPTS="-O=fair --concurrency=4 --queues=default"
+
+    # - %n will be replaced with the first part of the nodename.
+    # - %I will be replaced with the current child process index
+    #   and is important when using the prefork pool to avoid race conditions.
+    CELERYD_PID_FILE="/var/dose/celery/%n.pid"
+    CELERYD_LOG_FILE="/var/dose/log/%n%I.log"
+    CELERYD_LOG_LEVEL="INFO"
+
+Now create the systemd service file:
+
+``sudo nano /etc/systemd/system/celery-openrem.service``:
+
+.. code-block:: bash
+
+    [Unit]
+    Description=Celery Service
+    After=network.target
+
+    [Service]
+    Type=forking
+    Restart=on-failure
+    User=www-data
+    Group=www-data
+    EnvironmentFile=/var/dose/celery/celery.conf
+    WorkingDirectory=/var/dose/veopenrem/lib/python2.7/site-packages/openrem
+    ExecStart=/bin/sh -c '${CELERY_BIN} multi start ${CELERYD_NODES} \
+      -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
+      --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
+    ExecStop=/bin/sh -c '${CELERY_BIN} multi stopwait ${CELERYD_NODES} \
+      --pidfile=${CELERYD_PID_FILE}'
+    ExecReload=/bin/sh -c '${CELERY_BIN} multi restart ${CELERYD_NODES} \
+      -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
+      --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
+
+    [Install]
+    WantedBy=multi-user.target
+
+Now register, set to start on boot, and start the service:
+
+.. code-block:: console
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable celery-openrem.service
+    sudo systemctl start celery-openrem.service
 
 
+DICOM Store SCP
+^^^^^^^^^^^^^^^
+
+Open the following link in a new tab and copy the content (select all then Ctrl-c): |openrem_orthanc_conf_link|
+
+Create the lua file to control how we process the incoming DICOM objects and paste the content in (Shift-Ctrl-v if
+working directly in the Ubuntu terminal, something else if you are using PuTTY etc):
+
+``nano /var/dose/orthanc/openrem_orthanc_config.lua``
+
+Then edit the top section as follows - keeping Physics test images has not been configured, feel free to do so! There
+are other settings too that you might like to change in the second section (not displayed here):
+
+.. code-block:: lua
+
+    -------------------------------------------------------------------------------------
+    -- OpenREM python environment and other settings
+
+    -- Set this to the path and name of the python executable used by OpenREM
+    local python_executable = '/var/dose/veopenrem/bin/python'
+
+    -- Set this to the path of the python scripts folder used by OpenREM
+    local python_scripts_path = '/var/dose/veopenrem/bin/'
+
+    -- Set this to the path where you want Orthanc to temporarily store DICOM files
+    local temp_path = '/var/dose/orthanc/dicom/'
+
+    -- Set this to 'mkdir' on Windows, or 'mkdir -p' on Linux
+    local mkdir_cmd = 'mkdir -p'
+
+    -- Set this to '\\'' on Windows, or '/' on Linux
+    local dir_sep = '/'
+
+    -- Set this to true if you want Orthanc to keep physics test studies, and have it
+    -- put them in the physics_to_keep_folder. Set it to false to disable this feature
+    local use_physics_filtering = false
+
+    -- Set this to the path where you want to keep physics-related DICOM images
+    local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
+
+    -- Set this to the path and name of your zip utility, and include any switches that
+    -- are needed to create an archive (used with physics-related images)
+    local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a'
+
+    -- Set this to the path and name of your remove folder command, including switches
+    -- for it to be quiet (used with physics-related images)
+    local rmdir_cmd = 'rmdir /s/q'
+    -------------------------------------------------------------------------------------
+
+Add the Lua script to the Orthanc config:
+
+``sudo nano /etc/orthanc/orthanc.json``
+
+.. code-block:: json
+
+    // List of paths to the custom Lua scripts that are to be loaded
+    // into this instance of Orthanc
+    "LuaScripts" : [
+    "/var/dose/orthanc/openrem_orthanc_config.lua"
+    ],
+
+Optionally, you may also like to enable the HTTP server interface for Orthanc (although if the Lua script is removing
+all the objects as soon as they are processed, you won'yt see much!):
+
+.. code-block:: json
+
+    // Whether remote hosts can connect to the HTTP server
+    "RemoteAccessAllowed" : true,
+
+    // Whether or not the password protection is enabled
+    "AuthenticationEnabled" : false,
+
+Allow Orthanc to use DICOM port
+-------------------------------
+
+By default, Orthanc uses port 4242. If you wish to use a lower port, specifically the DICOM port of 104, you will need
+to give the Orthan binary special permission to do so:
+
+.. code-block:: console
+
+    sudo setcap CAP_NET_BIND_SERVICE=+eip /usr/sbin/Orthanc
+
+Then edit the Orthanc configuration again:
+
+``sudo nano /etc/orthanc/orthanc.json``
+
+.. code-block:: json
+
+    // The DICOM Application Entity Title
+    "DicomAet" : "OPENREM",
+
+    // The DICOM port
+    "DicomPort" : 104,
+
+Finish off
+----------
+
+Restart Orthanc:
+
+.. code-block:: console
+
+    sudo systemctl restart orthanc.service
 
 
