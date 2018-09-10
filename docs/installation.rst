@@ -67,3 +67,15 @@ Our recommendations for Windows and Linux are:
 
     iis_on_windows
     nginx_on_linux
+
+Quick start: One page complete install
+======================================
+
+..  toctree::
+    :maxdepth: 1
+
+    quick_start_linux
+
+
+
+

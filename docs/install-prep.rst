@@ -2,12 +2,6 @@
 Pre-installation preparations
 *****************************
 
-..  toctree::
-    :maxdepth: 1
-
-    quick_start_linux
-
-
 Install Python 2.7.x and pip
 ============================
 
