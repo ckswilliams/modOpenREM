@@ -61,6 +61,7 @@ Edit local_settings.py
     on the View tab you may wish to set the Word wrap to 'No wrap'
 
 ..  Important::
+
     In local_settings.py, always use forward slashes and not backslashes, even for paths on
     Windows systems.
 
