@@ -90,6 +90,8 @@ Activate the virtualenv (note the ``.`` – you can also use the word ``source``
 Install Python packages
 -----------------------
 
+.. code-block:: console
+
     pip install numpy psycopg2-binary gunicorn
     pip install openrem
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
@@ -200,12 +202,6 @@ the virtualenv is active (prompt will look like
 Configure NGINX and Gunicorn
 ----------------------------
 
-Start NGINX:
-
-.. code-block:: console
-
-    sudo systemctl start nginx
-
 Create the OpenREM site config file ``sudo nano /etc/nginx/sites-available/openrem-server``:
 
 .. code-block:: nginx
@@ -277,7 +273,7 @@ Start the Gunicorn service, and restart the NGINX service:
 .. code-block:: console
 
     sudo systemctl start gunicorn-openrem.service
-    sudo systemctl reload nginx.service
+    sudo systemctl restart nginx.service
 
 Test the webserver
 ------------------
