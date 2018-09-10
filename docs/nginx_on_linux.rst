@@ -210,7 +210,7 @@ For the gunicorn command, you will need to provide the full path to gunicorn, wh
 .. sourcecode:: bash
 
     # Customise the name of the file as you please - it must end in .service
-     sudo nano /etc/systemd/system/gunicorn-openrem-server.service
+     sudo nano /etc/systemd/system/gunicorn-openrem.service
 
 .. sourcecode:: systemd
 
@@ -246,15 +246,15 @@ Now enable the new configuration:
     # Load to config
     sudo systemctl daemon-reload
     # Enable start on boot - change the name as per how you created it
-    sudo systemctl enable gunicorn-openrem-server.service
+    sudo systemctl enable gunicorn-openrem.service
     # Now start the service
-    sudo systemctl start gunicorn-openrem-server.service
+    sudo systemctl start gunicorn-openrem.service
 
 You might like to see if it worked...
 
 .. sourcecode:: bash
 
-    sudo systemctl status gunicorn-openrem-server.service
+    sudo systemctl status gunicorn-openrem.service
 
 Look for ``Active: active (running)``
 
@@ -311,7 +311,7 @@ Now reload the nginx configuration and reload Gunicorn:
 .. sourcecode:: bash
 
     sudo systemctl reload nginx
-    sudo systemctl restart gunicorn-openrem-server.service
+    sudo systemctl restart gunicorn-openrem.service
 
 And check the web interface again. If it doesn't work due to the ``ALLOWED_HOSTS`` setting, you will get a 'Bad request
 400' error.
@@ -324,7 +324,7 @@ Gunicorn and nginx configurations need to be modified:
 
 .. sourcecode:: bash
 
-     sudo nano /etc/systemd/system/gunicorn-openrem-server.service
+     sudo nano /etc/systemd/system/gunicorn-openrem.service
 
 Add the ``--timeout`` setting to the end of the ``ExecStart`` command, time is in seconds (300 = 5 minutes,
 1200 = 20 minutes)
@@ -375,7 +375,7 @@ Reload everything:
 .. sourcecode:: bash
 
     sudo systemctl daemon-reload
-    sudo systemctl restart gunicorn-openrem-server.service
+    sudo systemctl restart gunicorn-openrem.service
     sudo systemctl reload nginx
 
 .. Note::
@@ -383,7 +383,7 @@ Reload everything:
     If you have jumped straight to here to get the final config, then make sure you substitute all the following values
     to suit your install:
 
-    * ``gunicorn-openrem-server.service`` - name not important (except the ``.service``, but you need to use it in the
+    * ``gunicorn-openrem.service`` - name not important (except the ``.service``, but you need to use it in the
       reload commands etc
     * ``User=www-data`` as appropriate. This should either be your user or ``www-data``. You will need to ensure folder
       permissions correspond
@@ -442,11 +442,11 @@ Nginx
 Systemd and Gunicorn
 ^^^^^^^^^^^^^^^^^^^^
 
-* Review the logs with ``sudo journalctl -u gunicorn-openrem-server`` (change as appropriate for the the name you have
+* Review the logs with ``sudo journalctl -u gunicorn-openrem`` (change as appropriate for the the name you have
   used)
-* Check the systemd configuration with ``systemd-analyze verify /etc/systemd/system/gunicorn-openrem-server.service`` -
+* Check the systemd configuration with ``systemd-analyze verify /etc/systemd/system/gunicorn-openrem.service`` -
   again changing the name as appropriate.
 * If you make changes, you need to use ``sudo systemctl daemon-reload`` before the changes will take effect.
-* Restart: ``sudo systemctl restart gunicorn-openrem-server.service``
+* Restart: ``sudo systemctl restart gunicorn-openrem.service``
 
 
