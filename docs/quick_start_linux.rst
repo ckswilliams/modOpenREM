@@ -476,4 +476,14 @@ Restart Orthanc:
 
     sudo systemctl restart orthanc.service
 
+Log locations
+^^^^^^^^^^^^^
+
+* OpenREM: ``/var/dose/log/``
+* Celery: ``/var/dose/log/default.log``
+* Celery systemd: ``sudo journalctl -u gunicorn-openrem``
+* NGINX: ``/var/log/nginx/``
+* Orthanc: ``/var/log/orthanc/Orthanc.log``
+* Gunicorn systemd: ```sudo journalctl -u gunicorn-openrem``
+
 
