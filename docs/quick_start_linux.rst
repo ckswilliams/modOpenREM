@@ -67,9 +67,8 @@ The ``\`` just allows the ``sudo apt install`` command to spread to two lines - 
     cd /var/dose/pixelmed
     wget http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar
 
-
-Install Python packages
------------------------
+Create the virtualenv
+---------------------
 
 Create a virtualenv (Python local environment) in the folder we created:
 
@@ -77,11 +76,20 @@ Create a virtualenv (Python local environment) in the folder we created:
 
     virtualenv /var/dose/veopenrem
 
-Activate the virtualenv and install the python packages (note the ``.`` – you can also use the word ``source``):
+.. _activatevirtualenv:
+
+Activate the virtualenv
+-----------------------
+
+Activate the virtualenv (note the ``.`` – you can also use the word ``source``):
 
 .. code-block:: console
 
     . /var/dose/veopenrem/bin/activate
+
+Install Python packages
+-----------------------
+
     pip install numpy psycopg2-binary gunicorn
     pip install openrem
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
@@ -176,7 +184,10 @@ Edit the new local_settings file (``nano openremproject/local_settings.py``):
     PIXELMED_JAR = '/var/dose/pixelmed/pixelmed.jar'
     PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
 
-Now create the database = assuming you are still in ``/var/dose/veopenrem/lib/python2.7/site-packages/openrem/``:
+Now create the database. Make sure you are still in the openrem python folder and
+the virtualenv is active (prompt will look like
+``(veopenrem)username@hostname:/var/dose/veopenrem/lib/python2.7/site-packages/openrem/$``). Otherwise see
+:ref:`activatevirtualenv` and navigate back to that folder:
 
 .. code-block:: console
 
@@ -186,7 +197,7 @@ Now create the database = assuming you are still in ``/var/dose/veopenrem/lib/py
     mv remapp/migrations/0002_0_7_fresh_install_add_median.py{.inactive,}
     python manage.py migrate
 
-Configure NGINX and gunicorn
+Configure NGINX and Gunicorn
 ----------------------------
 
 Start NGINX:
@@ -214,13 +225,71 @@ Create the OpenREM site config file ``sudo nano /etc/nginx/sites-available/openr
         }
     }
 
+Remove the default config and make ours active:
 
+.. code-block:: console
 
+    sudo rm /etc/nginx/sites-enabled/default
+    sudo ln -s /etc/nginx/sites-available/openrem-server /etc/nginx/sites-enabled/openrem-server
 
+Add the static files to the static folder for NGINX to serve. Again, you need to ensure the virtualenv is active in your
+console and you are in the ``site-packages/openrem/`` folder:
 
+.. code-block:: console
 
+    python manage.py collectstatic
 
+Create the Gunicorn systemd service file:
 
+``sudo nano /etc/systemd/system/gunicorn-openrem.service``
+
+.. code-block:: systemd
+
+    [Unit]
+    Description=Gunicorn server for OpenREM
+
+    [Service]
+    Restart=on-failure
+    User=www-data
+    WorkingDirectory=/var/dose/veopenrem/lib/python2.7/site-packages/openrem
+
+    ExecStart=/var/dose/veopenrem/bin/gunicorn \
+        --bind unix:/tmp/openrem-server.socket \
+        openremproject.wsgi:application --timeout 300 --workers 4
+
+    [Install]
+    WantedBy=multi-user.target
+
+Load the new systemd configurations:
+
+.. code-block:: console
+
+    sudo systemctl daemon-reload
+
+Set the new Gunicorn service to start on boot:
+
+.. code-block:: console
+
+    sudo systemctl enable gunicorn-openrem.service
+
+Start the Gunicorn service, and restart the NGINX service:
+
+.. code-block:: console
+
+    sudo systemctl start gunicorn-openrem.service
+    sudo systemctl reload nginx.service
+
+Test the webserver
+------------------
+
+You should now be able to browse to the OpenREM server from another PC.
+
+You can check that NGINX and Gunicorn are running with the following two commands:
+
+.. code-block:: console
+
+    sudo systemctl status gunicorn-openrem.service
+    sudo systemctl status nginx.service
 
 
 
