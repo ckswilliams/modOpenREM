@@ -49,7 +49,7 @@ First, create a Celery configuration file:
 
 Now create the systemd service file:
 
-``sudo nano /etc/systemd/system/celery-openrem-server.service``:
+``sudo nano /etc/systemd/system/celery-openrem.service``:
 
 .. code-block:: bash
 
@@ -81,5 +81,5 @@ Now register, set to start on boot, and start the service:
 .. code-block:: console
 
     sudo systemctl daemon-reload
-    sudo systemctl enable celery-openrem-server.service
-    sudo systemctl start celery-openrem-server.service
+    sudo systemctl enable celery-openrem.service
+    sudo systemctl start celery-openrem.service
