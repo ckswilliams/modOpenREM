@@ -160,8 +160,8 @@ Edit the new local_settings file (``nano openremproject/local_settings.py``):
 
     # Change secret key
 
-    # DEBUG mode: leave the hash in place for now, but remove it and the space so DEBUG
-    # is at the start of the line as soon as something doesn't work. Put it back
+    # DEBUG mode: leave the hash in place for now, but remove it and the space (so DEBUG
+    # is at the start of the line) as soon as something doesn't work. Put it back
     # when you get it working again.
     # DEBUG = True
 
