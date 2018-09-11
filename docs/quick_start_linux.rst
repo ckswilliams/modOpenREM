@@ -99,6 +99,11 @@ Install Python packages
     pip install openrem
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
+.. note::
+
+    There will be error messages when you install pynetdicom from this source. As long as the final line is
+    ``Successfully installed pynetdicom-0.8.2b2`` then everything is ok!
+
 Addd orthanc and www-data users to openrem group
 ------------------------------------------------
 
