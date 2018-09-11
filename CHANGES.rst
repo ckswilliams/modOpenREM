@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.8.1b2 (2018-09-xx)
+0.8.1b2 (2018-09-11)
 --------------------
 * `#656`_  Install: pegged django-debug-toolbar to 1.9.1 until Django is upgraded
 * `#654`_  Documentation: supplemented the Orthanc Lua file config option docs
