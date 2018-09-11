@@ -2,37 +2,8 @@
 Pre-installation preparations
 *****************************
 
-Quick start: Ubuntu install using virtualenv
-============================================
-
-If you want to get everything installed quickly, you could do the following on a Ubuntu server::
-
-    dose@ubuntu1604:~$ sudo apt update
-    dose@ubuntu1604:~$ sudo apt install python python-pip rabbitmq-server postgresql orthanc dcmtk default-jre
-    dose@ubuntu1604:~$ pip install virtualenv
-    dose@ubuntu1604:~$ virtualenv veopenrem
-
-Activate the virtualenv and install the python packages::
-
-    dose@ubuntu1604:~$ . veopenrem/bin/activate
-    (veopenrem) dose@ubuntu1604:~$ pip install numpy psycopg2-binary
-
-You will then need to setup the :doc:`postgresql` and download the latest version of the pixelmed.jar application
-e.g.::
-
-    (veopenrem) dose@ubuntu1604:~$ wget http://www.dclunie.com/pixelmed/software/20180419_current/pixelmed.jar
-
-
-We can now install OpenREM and the customised version of pynetdicom::
-
-    (veopenrem) dose@ubuntu1604:~$ pip install openrem==0.8.1b1
-    (veopenrem) dose@ubuntu1604:~$ pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
-
-
-You can now go straight to the :ref:`localsettingsconfig`.
-
-Full instructions: Install Python 2.7.x and pip
-===============================================
+Install Python 2.7.x and pip
+============================
 
 * Windows – instructions and downloads are available at `python.org <https://www.python.org/downloads>`_
 * Linux – likely to be installed already except on newer distributions
@@ -194,7 +165,7 @@ on the same server as OpenREM:
 
     * The `Offis DICOM toolkit`_
     * `Java`_
-    * pixelmed.jar from the `PixelMed Java DICOM Toolkit`_
+    * `pixelmed.jar`_ from the PixelMed Java DICOM Toolkit
 
 For more information see :ref:`toshiba_legacy_imports`. The locations of these executables needs to be configured in the
 ``local_settings.py`` - see :ref:`toshiba_configuration`.
@@ -234,4 +205,4 @@ once activated, the scripts can be called without a `python` prefix from anywher
 .. _consider virtualenv: `Virtualenv and virtualenvwrapper`_
 .. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
 .. _`Java`: http://java.com/en/download/
-.. _`PixelMed Java DICOM Toolkit`: http://www.pixelmed.com/dicomtoolkit.html
+.. _`pixelmed.jar`: http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar

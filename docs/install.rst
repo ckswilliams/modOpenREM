@@ -2,12 +2,12 @@
 Installing OpenREM
 ******************
 
-Install OpenREM v0.8.1b1
+Install OpenREM v0.8.1b2
 ========================
 
 .. sourcecode:: bash
 
-    pip install openrem==0.8.1b1
+    pip install openrem==0.8.1b2
 
 *Will need* ``sudo`` *or equivalent if installing on linux without using a virtualenv*
 
@@ -61,6 +61,7 @@ Edit local_settings.py
     on the View tab you may wish to set the Word wrap to 'No wrap'
 
 ..  Important::
+
     In local_settings.py, always use forward slashes and not backslashes, even for paths on
     Windows systems.
 
@@ -170,10 +171,11 @@ Configure the filename to determine where the logs are written. In linux, you mi
 .. sourcecode:: python
 
     import os
-    logfilename = os.path.join(MEDIA_ROOT, "openrem.log")
-    qrfilename = os.path.join(MEDIA_ROOT, "openrem_qr.log")
-    storefilename = os.path.join(MEDIA_ROOT, "openrem_store.log")
-    extractorfilename = os.path.join(MEDIA_ROOT, "openrem_extractor.log")
+    LOG_ROOT = MEDIA_ROOT
+    logfilename = os.path.join(LOG_ROOT, "openrem.log")
+    qrfilename = os.path.join(LOG_ROOT, "openrem_qr.log")
+    storefilename = os.path.join(LOG_ROOT, "openrem_store.log")
+    extractorfilename = os.path.join(LOG_ROOT, "openrem_extractor.log")
 
     LOGGING['handlers']['file']['filename'] = logfilename          # General logs
     LOGGING['handlers']['qr_file']['filename'] = qrfilename        # Query Retrieve SCU logs
@@ -242,8 +244,8 @@ http://www.i18nguy.com/unicode/language-identifiers.html
 Toshiba CT RDSR creation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you need to import data from older Toshiba CT scanners into OpenREM then the following tools need to be available
-on the same server as OpenREM:
+If you need to import data from older Toshiba CT scanners that do not create RDSRs then the following
+tools need to be available on the same server as OpenREM:
 
     * The `Offis DICOM toolkit`_
     * `Java`_
@@ -268,6 +270,11 @@ configuration above using the command ``which dcmconv``. This will be something 
 ``DCMTK_PATH`` would be ``'/usr/bin`` and the ``DCMCONV`` would be ``os.path.join(DCMTK_PATH, 'dcmconv')``. Similarly
 for ``DCMMKDIR`` and ``JAVA_EXE``, which might be ``/usr/bin/java``. The pixelmed.jar file should be downloaded from
 the link above, and you will need to provide the path to where you have saved it.
+
+.. note::
+
+    If you do not intend to use the RDSR creation feature (all your CT scanners create RDSRs already, or your older
+    scanners are Philips), then these paths do not need to be changed for your install.
 
 .. _database_creation:
 
