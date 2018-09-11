@@ -6,6 +6,7 @@ OpenREM version history
 --------------------
 * `#654`_  Documentation: supplemented the Orthanc Lua file config option docs
 * `#652`_  Documentation: added docs showing Celery daemonisation in Linux
+* `#651`_  Documentation: added one-page full setup Ubuntu 18.04 install instructions
 * `#650`_  Documentation: modified quick install virtualenv docs
 * `#649`_  Documentation: instructions for updating hosts file for Ubuntu and RabbitMQ
 * `#648`_  Documentation: clarified Toshiba options when not required
