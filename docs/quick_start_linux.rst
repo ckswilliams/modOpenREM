@@ -13,7 +13,7 @@ A one page install based on Ubuntu 18.04 using:
 Initial prep
 ^^^^^^^^^^^^
 
-First edit ``/etc/hosts`` to add the local server name â€“ else ``rabbitmq-server`` will not start when installed::
+First edit ``/etc/hosts`` to add the local server name – else ``rabbitmq-server`` will not start when installed::
 
     sudo nano /etc/hosts
 
@@ -84,7 +84,7 @@ Create a virtualenv (Python local environment) in the folder we created:
 Activate the virtualenv
 -----------------------
 
-Activate the virtualenv (note the ``.`` â€“ you can also use the word ``source``):
+Activate the virtualenv (note the ``.`` – you can also use the word ``source``):
 
 .. code-block:: console
 
@@ -492,6 +492,6 @@ Log locations
 * Celery systemd: ``sudo journalctl -u gunicorn-openrem``
 * NGINX: ``/var/log/nginx/``
 * Orthanc: ``/var/log/orthanc/Orthanc.log``
-* Gunicorn systemd: ```sudo journalctl -u gunicorn-openrem``
+* Gunicorn systemd: ``sudo journalctl -u gunicorn-openrem``
 
 
