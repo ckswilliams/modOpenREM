@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.1b2 (2018-09-xx)
 --------------------
+* `#656`_  Install: pegged django-debug-toolbar to 1.9.1 until Django is upgraded
 * `#654`_  Documentation: supplemented the Orthanc Lua file config option docs
 * `#652`_  Documentation: added docs showing Celery daemonisation in Linux
 * `#651`_  Documentation: added one-page full setup Ubuntu 18.04 install instructions
