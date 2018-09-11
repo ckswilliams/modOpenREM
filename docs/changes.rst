@@ -4,7 +4,15 @@ OpenREM version history
 
 0.8.1b2 (2018-09-xx)
 --------------------
+* `#656`_  Install: pegged django-debug-toolbar to 1.9.1 until Django is upgraded
+* `#654`_  Documentation: supplemented the Orthanc Lua file config option docs
 * `#653`_  Docs: clarified notes to get link to Orthanc lua file correct on release
+* `#652`_  Documentation: added docs showing Celery daemonisation in Linux
+* `#651`_  Documentation: added one-page full setup Ubuntu 18.04 install instructions
+* `#650`_  Documentation: modified quick install virtualenv docs
+* `#649`_  Documentation: instructions for updating hosts file for Ubuntu and RabbitMQ
+* `#648`_  Documentation: clarified Toshiba options when not required
+* `#647`_  Documentation: updated link to pixelmed
 * `#646`_  Modified Celery import to avoid name clash in some circumstances
 * `#645`_  Imports: prevent import failure when text is used in filter thickness field in DX image
 * `#644`_  Exports: fixed error in exporting non-ASCII CT protocol acquisition names
