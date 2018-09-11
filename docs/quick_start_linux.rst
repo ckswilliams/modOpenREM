@@ -33,7 +33,9 @@ running as) :
     sudo groupadd openrem
     sudo adduser $USER openrem
 
-At a later stage, to add a second administrator just add them to the ``openrem`` group in the same way.
+.. note::
+
+    At a later stage, to add a second administrator just add them to the ``openrem`` group in the same way.
 
 Create the folders we need, and set the permissions. In due course, the ``orthanc`` user and the ``www-data`` user will
 be added to the ``openrem`` group, and the 'sticky' group setting below will enable both users to write to the logs etc:
@@ -158,8 +160,9 @@ Edit the new local_settings file (``nano openremproject/local_settings.py``):
 
     # Change secret key
 
-    # Leave the hash in place for now, but remove it and the space so DEBUG starts at the start of the line as soon as
-    # something doesn't work. Put it back when you get it working again.
+    # DEBUG mode: leave the hash in place for now, but remove it and the space so DEBUG
+    # is at the start of the line as soon as something doesn't work. Put it back
+    # when you get it working again.
     # DEBUG = True
 
     ALLOWED_HOSTS = [
@@ -254,7 +257,7 @@ Create the Gunicorn systemd service file:
 
 ``sudo nano /etc/systemd/system/gunicorn-openrem.service``
 
-.. code-block:: systemd
+.. code-block:: bash
 
     [Unit]
     Description=Gunicorn server for OpenREM
@@ -426,7 +429,7 @@ Add the Lua script to the Orthanc config:
 
 ``sudo nano /etc/orthanc/orthanc.json``
 
-.. code-block:: json
+.. code-block:: json-object
 
     // List of paths to the custom Lua scripts that are to be loaded
     // into this instance of Orthanc
@@ -437,7 +440,7 @@ Add the Lua script to the Orthanc config:
 Optionally, you may also like to enable the HTTP server interface for Orthanc (although if the Lua script is removing
 all the objects as soon as they are processed, you won'yt see much!):
 
-.. code-block:: json
+.. code-block:: json-object
 
     // Whether remote hosts can connect to the HTTP server
     "RemoteAccessAllowed" : true,
@@ -459,7 +462,7 @@ Then edit the Orthanc configuration again:
 
 ``sudo nano /etc/orthanc/orthanc.json``
 
-.. code-block:: json
+.. code-block:: json-object
 
     // The DICOM Application Entity Title
     "DicomAet" : "OPENREM",
