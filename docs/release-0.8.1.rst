@@ -50,7 +50,7 @@ Upgrade
 
 .. sourcecode:: bash
 
-    pip install openrem==0.8.1b2
+    pip install openrem==0.8.1
 
 ..  _upgradefrom074:
 
