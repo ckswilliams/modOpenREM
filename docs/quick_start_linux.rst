@@ -13,7 +13,7 @@ A one page install based on Ubuntu 18.04 using:
 Initial prep
 ^^^^^^^^^^^^
 
-First edit ``/etc/hosts`` to add the local server name – else ``rabbitmq-server`` will not start when installed::
+First edit ``/etc/hosts`` to add the local server name ï¿½ else ``rabbitmq-server`` will not start when installed::
 
     sudo nano /etc/hosts
 
@@ -84,7 +84,7 @@ Create a virtualenv (Python local environment) in the folder we created:
 Activate the virtualenv
 -----------------------
 
-Activate the virtualenv (note the ``.`` – you can also use the word ``source``):
+Activate the virtualenv (note the ``.`` ï¿½ you can also use the word ``source``):
 
 .. code-block:: console
 
@@ -96,7 +96,7 @@ Install Python packages
 .. code-block:: console
 
     pip install numpy psycopg2-binary gunicorn
-    pip install openrem==0.8.1b2
+    pip install openrem
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 .. note::
