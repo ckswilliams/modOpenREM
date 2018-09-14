@@ -356,6 +356,8 @@ class UserProfile(models.Model):
 
     plotCaseInsensitiveCategories = models.BooleanField(default=False)
 
+    summaryWorkloadDaysA = models.IntegerField(blank=True, null=True, default=7, verbose_name="Number of days over which to sum studies A")
+    summaryWorkloadDaysB = models.IntegerField(blank=True, null=True, default=28, verbose_name="Number of days over which to sum studies B")
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

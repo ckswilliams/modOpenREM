@@ -1537,6 +1537,13 @@ def openrem_home(request):
         'total': allstudies.count(),
     }
 
+    if request.user.is_authenticated():
+        homedata['day_delta_a'] = user_profile.summaryWorkloadDaysA
+        homedata['day_delta_b'] = user_profile.summaryWorkloadDaysB
+    else:
+        homedata['day_delta_a'] = 7
+        homedata['day_delta_b'] = 28
+
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)
 
     for group in request.user.groups.all():
@@ -1589,6 +1596,7 @@ def update_latest_studies(request):
     """
     from django.db.models import Q
     from datetime import datetime
+    from datetime import timedelta
     from collections import OrderedDict
 
     if request.is_ajax():
@@ -1602,6 +1610,17 @@ def update_latest_studies(request):
         display_names = studies.values_list(
             'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
         modalitydata = {}
+
+        if request.user.is_authenticated():
+            day_delta_a = request.user.userprofile.summaryWorkloadDaysA
+            day_delta_b = request.user.userprofile.summaryWorkloadDaysB
+        else:
+            day_delta_a = 7
+            day_delta_b = 28
+
+        today = datetime.now()
+        date_a = (datetime.now() - timedelta(days=day_delta_a))
+        date_b = (datetime.now() - timedelta(days=day_delta_b))
 
         for display_name in display_names:
             latestdate = studies.filter(
@@ -1621,6 +1640,12 @@ def update_latest_studies(request):
                 'total': studies.filter(
                     generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
                 ).count(),
+                'studies_in_past_days_a': studies.filter(
+                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]).filter(
+                    study_date__range=[date_a, today]).count(),
+                'studies_in_past_days_b': studies.filter(
+                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]).filter(
+                    study_date__range=[date_b, today]).count(),
                 'latest': latestdatetime,
                 'displayname': displayname
             }
@@ -1628,6 +1653,9 @@ def update_latest_studies(request):
 
         template = 'remapp/home-list-modalities.html'
         data = ordereddata
+        data['day_delta_a'] = day_delta_a
+        data['day_delta_b'] = day_delta_b
+
         return render(request, template, {'data': data, 'modality': modality.lower()})
 
 

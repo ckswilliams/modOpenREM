@@ -1,27 +1,47 @@
 {% load humanize %}
-<table class="table table-bordered table-hover row-clickable">
+<table class="table table-bordered table-hover row-clickable sortable" id="summary_table_{{ modality }}">
   <tr>
     <th>Scanner</th>
     <th>Number of studies</th>
     <th>Latest study</th>
+    <th>Number of studies in last {{ data.day_delta_a }} days</th>
+    <th>Number of studies in last {{ data.day_delta_b }} days</th>
   </tr>
   {% for display_name,details in data.items %}
     <tr>
-      <td style="width:33%">
+      <td style="width:20%">
         <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
           {{ details.displayname }}
         </a>
       </td>
-      <td style="width:33%">
+      <td style="width:20%">
         <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
           {{ details.total }}
         </a>
       </td>
-      <td style="width:33%">
+      <td style="width:20%">
         <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
           {{ details.latest|naturaltime }}
+        </a>
+      </td>
+      <td style="width:20%">
+        <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
+          {{ details.studies_in_past_days_a }}
+        </a>
+      </td>
+      <td style="width:20%">
+        <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
+          {{ details.studies_in_past_days_b }}
         </a>
       </td>
     </tr>
   {% endfor %}
 </table>
+
+    <script>
+        $(document).ready(
+            function () {
+                var summary_table_{{ modality }} = document.getElementById("summary_table_{{ modality }}");
+                sorttable.makeSortable(summary_table_{{ modality }});
+            });
+    </script>
