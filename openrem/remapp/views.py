@@ -1538,11 +1538,15 @@ def openrem_home(request):
     }
 
     if request.user.is_authenticated():
-        homedata['day_delta_a'] = user_profile.summaryWorkloadDaysA
-        homedata['day_delta_b'] = user_profile.summaryWorkloadDaysB
+        home_config = {
+            'day_delta_a': user_profile.summaryWorkloadDaysA,
+            'day_delta_b': user_profile.summaryWorkloadDaysB
+        }
     else:
-        homedata['day_delta_a'] = 7
-        homedata['day_delta_b'] = 28
+        home_config = {
+            'day_delta_a': 7,
+            'day_delta_b': 28
+        }
 
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)
 
@@ -1562,7 +1566,7 @@ def openrem_home(request):
     return render(request, "remapp/home.html",
                   {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
                    'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true,
-                   'modalities': modalities})
+                   'modalities': modalities, 'home_config': home_config})
 
 
 @csrf_exempt
@@ -1653,10 +1657,13 @@ def update_latest_studies(request):
 
         template = 'remapp/home-list-modalities.html'
         data = ordereddata
-        data['day_delta_a'] = day_delta_a
-        data['day_delta_b'] = day_delta_b
 
-        return render(request, template, {'data': data, 'modality': modality.lower()})
+        home_config = {
+            'day_delta_a': day_delta_a,
+            'day_delta_b': day_delta_b
+        }
+
+        return render(request, template, {'data': data, 'modality': modality.lower(), 'home_config': home_config})
 
 
 @login_required
