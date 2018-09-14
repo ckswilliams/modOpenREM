@@ -21,7 +21,7 @@ Modify the content to ensure the following two lines are present - **substitute 
 second line**::
 
     127.0.0.1 localhost
-    127.0.1.1 ubuntu1804
+    127.0.1.1 openremserver
 
 ``Ctrl-o Ctrl-x`` to write out and exit
 
@@ -450,7 +450,7 @@ Add the Lua script to the Orthanc config:
     ],
 
 Optionally, you may also like to enable the HTTP server interface for Orthanc (although if the Lua script is removing
-all the objects as soon as they are processed, you won'yt see much!):
+all the objects as soon as they are processed, you won't see much!):
 
 .. code-block:: json-object
 
@@ -459,6 +459,9 @@ all the objects as soon as they are processed, you won'yt see much!):
 
     // Whether or not the password protection is enabled
     "AuthenticationEnabled" : false,
+
+To see the Orthanc web interface, go to http://openremserver:8042/ - of course change the server name to that of your
+server!
 
 Allow Orthanc to use DICOM port
 -------------------------------
