@@ -13,7 +13,7 @@ A one page install based on Ubuntu 18.04 using:
 Initial prep
 ^^^^^^^^^^^^
 
-First edit ``/etc/hosts`` to add the local server name – else ``rabbitmq-server`` will not start when installed::
+First edit ``/etc/hosts`` to add the local server name ï¿½ else ``rabbitmq-server`` will not start when installed::
 
     sudo nano /etc/hosts
 
@@ -84,7 +84,7 @@ Create a virtualenv (Python local environment) in the folder we created:
 Activate the virtualenv
 -----------------------
 
-Activate the virtualenv (note the ``.`` – you can also use the word ``source``):
+Activate the virtualenv (note the ``.`` ï¿½ you can also use the word ``source``):
 
 .. code-block:: console
 
@@ -118,8 +118,6 @@ Database and OpenREM config
 Setup PostgreSQL database
 -------------------------
 
-*Need to establish if it really is necessary to change security configuration - I am thinking it might not be*
-
 Create a postgres user, and create the database. You will be asked to enter a new password (twice). This will be needed
 when configuring OpenREM:
 
@@ -131,6 +129,15 @@ when configuring OpenREM:
 If you are migrating from another server, you could at this point create a template0 database to restore into. See
 :ref:`restore-psql-linux` for details.
 
+Update the PostgreSQL client authentication configuration. Add the following line anywhere near the bottom of the file,
+for example in the gap before ``# DO NOT DISABLE`` or anywhere in the table that follows. The number of spaces between
+each word is not important (one or more).
+
+``sudo nano /etc/postgresql/10/main/pg_hba.conf``:
+
+.. code-block:: console
+
+    local   all     openremuser                 md5
 
 Configure OpenREM
 -----------------
