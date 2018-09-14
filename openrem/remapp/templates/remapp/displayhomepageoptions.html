@@ -1,0 +1,35 @@
+{% extends "remapp/base.html" %}
+
+{% block navhelp %}
+        <li>
+            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/i_navigate.html" target="_blank" data-toggle="tooltip" title="Navigation options documentation - opens in a new tab">
+                Navigation options documentation
+            </a>
+        </li>
+{% endblock %}
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block toprow %}
+{% endblock %}
+
+{% block mainblock %}
+
+  <form action="" method="post" class="form-horizontal" role="form">
+    <div class="panel panel-info">
+
+      <div class="panel-heading">
+        <h3 class="panel-title">Home page options</h3>
+      </div>
+      <div class="panel-body">
+        <table>
+          {% csrf_token %}
+          {{ HomepageOptionsForm }}
+        </table>
+        <input class="btn btn-default" name="submit" type="submit" />
+      </div>
+
+    </div>
+  </form>
+
+{% endblock %}

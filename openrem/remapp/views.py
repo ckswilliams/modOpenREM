@@ -2765,6 +2765,58 @@ def chart_options_view(request):
 
 
 @login_required
+def homepage_options_view(request):
+    from remapp.forms import HomepageOptionsForm
+    from openremproject import settings
+
+    if request.method == 'POST':
+        homepage_options_form = HomepageOptionsForm(request.POST)
+        if homepage_options_form.is_valid():
+            try:
+                # See if the user has a userprofile
+                user_profile = request.user.userprofile
+            except:
+                # Create a default userprofile for the user if one doesn't exist
+                create_user_profile(sender=request.user, instance=request.user, created=True)
+                user_profile = request.user.userprofile
+
+            user_profile.summaryWorkloadDaysA = homepage_options_form.cleaned_data['dayDeltaA']
+            user_profile.summaryWorkloadDaysB = homepage_options_form.cleaned_data['dayDeltaB']
+
+            user_profile.save()
+
+        messages.success(request, "Home page options have been updated")
+
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    try:
+        # See if the user has a userprofile
+        user_profile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        user_profile = request.user.userprofile
+
+    homepage_form_data = {'dayDeltaA': user_profile.summaryWorkloadDaysA,
+                          'dayDeltaB': user_profile.summaryWorkloadDaysB}
+
+    homepage_options_form = HomepageOptionsForm(homepage_form_data)
+
+    return_structure = {'admin': admin,
+                        'HomepageOptionsForm': homepage_options_form,
+                        }
+
+    return render_to_response(
+        'remapp/displayhomepageoptions.html',
+        return_structure,
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
 def not_patient_indicators(request):
     """Displays current not-patient indicators
     """

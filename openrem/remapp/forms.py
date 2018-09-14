@@ -233,6 +233,11 @@ class UpdateDisplayNamesForm(forms.Form):
     display_names = forms.CharField()
 
 
+class HomepageOptionsForm(forms.Form):
+    dayDeltaA = forms.IntegerField(label='Primary time period to sum studies (days)', required=False)
+    dayDeltaB = forms.IntegerField(label='Secondary time period to sum studies (days)', required=False)
+
+
 class DicomQueryForm(forms.Form):
     """Form for launching DICOM Query
     """
