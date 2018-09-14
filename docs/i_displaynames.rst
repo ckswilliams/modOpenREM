@@ -49,7 +49,7 @@ Viewing X-ray system display names and user defined modality
 .. figure:: img/UserOptionsMenu.png
    :align: right
    :alt: User options menu
-   :width: 179px
+   :width: 243px
 
    The ``Config`` menu (user)
 
