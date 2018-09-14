@@ -1627,12 +1627,9 @@ def update_latest_studies(request):
         date_b = (datetime.now() - timedelta(days=day_delta_b))
 
         for display_name in display_names:
-            latestdate = studies.filter(
-                generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-            ).latest('study_date').study_date
-            latestuid = studies.filter(
-                generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-            ).filter(study_date__exact=latestdate).latest('study_time')
+            display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0])
+            latestdate = display_name_studies.latest('study_date').study_date
+            latestuid = display_name_studies.filter(study_date__exact=latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
 
             try:
@@ -1641,15 +1638,9 @@ def update_latest_studies(request):
                 displayname = "Error has occurred - import probably unsuccessful"
 
             modalitydata[display_name[0]] = {
-                'total': studies.filter(
-                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-                ).count(),
-                'studies_in_past_days_a': studies.filter(
-                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]).filter(
-                    study_date__range=[date_a, today]).count(),
-                'studies_in_past_days_b': studies.filter(
-                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]).filter(
-                    study_date__range=[date_b, today]).count(),
+                'total': display_name_studies.count(),
+                'studies_in_past_days_a': display_name_studies.filter(study_date__range=[date_a, today]).count(),
+                'studies_in_past_days_b': display_name_studies.filter(study_date__range=[date_b, today]).count(),
                 'latest': latestdatetime,
                 'displayname': displayname
             }
