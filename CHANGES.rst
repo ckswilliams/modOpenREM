@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.1b2 (2018-09-11)
 --------------------
+* `#659`_  Interface: Made the summary tables on the home page sortable by clicking on headers
 * `#656`_  Install: pegged django-debug-toolbar to 1.9.1 until Django is upgraded
 * `#654`_  Documentation: supplemented the Orthanc Lua file config option docs
 * `#653`_  Docs: clarified notes to get link to Orthanc lua file correct on release

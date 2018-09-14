@@ -22,7 +22,10 @@ By selecting the links in the navigation bar at the top, you can view all
 of the CT, fluoroscopy or mammography studies. Alternatively, if you click
 on the station name link (in blue) you can filter to just that source modality.
 
-*New in 0.4.0:* If you are not logged in, clicking any of the links will bring up the log in page.
+The modality tables can be sorted by any of the columns by clicking on the
+column header that you wish to sort by.
+
+If you are not logged in, clicking any of the links will bring up the log in page.
 
 Filtering for specific studies
 ==============================
