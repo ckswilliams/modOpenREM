@@ -17,7 +17,7 @@ First edit ``/etc/hosts`` to add the local server name -- else ``rabbitmq-server
 
     sudo nano /etc/hosts
 
-Modify the content to ensure the following two lines are present - **substitute the correct server hostname on the
+Modify the content to ensure the following two lines are present -- **substitute the correct server hostname on the
 second line**::
 
     127.0.0.1 localhost
@@ -59,7 +59,7 @@ be added to the ``openrem`` group, and the 'sticky' group setting below will ena
 
 Install apt packages and direct downloads
 -----------------------------------------
-The ``\`` just allows the ``sudo apt install`` command to spread to two lines - feel free to put it all on one line.
+The ``\`` just allows the ``sudo apt install`` command to spread to two lines -- feel free to put it all on one line.
 
 .. code-block:: console
 
