@@ -13,7 +13,7 @@ A one page install based on Ubuntu 18.04 using:
 Initial prep
 ^^^^^^^^^^^^
 
-First edit ``/etc/hosts`` to add the local server name � else ``rabbitmq-server`` will not start when installed::
+First edit ``/etc/hosts`` to add the local server name -- else ``rabbitmq-server`` will not start when installed::
 
     sudo nano /etc/hosts
 
@@ -84,7 +84,7 @@ Create a virtualenv (Python local environment) in the folder we created:
 Activate the virtualenv
 -----------------------
 
-Activate the virtualenv (note the ``.`` � you can also use the word ``source``):
+Activate the virtualenv (note the ``.`` -- you can also use the word ``source``):
 
 .. code-block:: console
 
@@ -398,7 +398,7 @@ working directly in the Ubuntu terminal, something else if you are using PuTTY e
 
 ``nano /var/dose/orthanc/openrem_orthanc_config.lua``
 
-Then edit the top section as follows - keeping Physics test images has not been configured, feel free to do so! There
+Then edit the top section as follows -- keeping Physics test images has not been configured, feel free to do so! There
 are other settings too that you might like to change in the second section (not displayed here):
 
 .. code-block:: lua
@@ -460,7 +460,7 @@ all the objects as soon as they are processed, you won't see much!):
     // Whether or not the password protection is enabled
     "AuthenticationEnabled" : false,
 
-To see the Orthanc web interface, go to http://openremserver:8042/ - of course change the server name to that of your
+To see the Orthanc web interface, go to http://openremserver:8042/ -- of course change the server name to that of your
 server!
 
 Allow Orthanc to use DICOM port
