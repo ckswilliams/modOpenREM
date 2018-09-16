@@ -96,7 +96,7 @@ Install Python packages
 .. code-block:: console
 
     pip install numpy psycopg2-binary gunicorn
-    pip install openrem==0.8.1b2
+    pip install openrem
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 .. note::

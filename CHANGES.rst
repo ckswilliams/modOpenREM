@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.8.1b2 (2018-09-11)
---------------------
+0.8.1 (2018-09-16)
+------------------
 * `#663`_  Interface: updated column headings on home page
 * `#660`_  Documentation: Corrected and improved Linux one-page install
 * `#659`_  Interface: Made the summary tables on the home page sortable by clicking on headers
