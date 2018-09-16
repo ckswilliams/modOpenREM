@@ -31,8 +31,7 @@ OpenREM is a Django app to extract, store, display and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
 
 This is release 0.8.1, which contains an important fix for NHSBSP mammography exports, various other fixes, improved
-and new documentation, plus an additional feature to allow
-users to change their own passwords.
+and new documentation, plus an additional feature to allow users to change their own passwords.
 
 Please review the `release notes <https://docs.openrem.org/en/0.8.1/release-0.8.1.html>`_ for more details.
 
