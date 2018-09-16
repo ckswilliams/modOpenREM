@@ -1,8 +1,8 @@
 {% load humanize %}
-<table class="table table-bordered table-hover row-clickable">
+<table class="table table-bordered table-hover row-clickable sortable" id="summary_table_{{ modality }}">
   <tr>
-    <th>Scanner</th>
-    <th>Number of studies</th>
+    <th>System name</th>
+    <th>Total number of studies</th>
     <th>Latest study</th>
   </tr>
   {% for display_name,details in data.items %}
@@ -25,3 +25,11 @@
     </tr>
   {% endfor %}
 </table>
+
+<script>
+  $(document).ready(function () {
+    var summary_table_{{ modality }} = document.getElementById("summary_table_{{ modality }}");
+    sorttable.makeSortable(summary_table_{{ modality }});
+  });
+</script>
+
