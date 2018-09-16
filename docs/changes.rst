@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.8.1 (2018-09-13)
+0.8.1 (2018-09-16)
 ------------------
 * `#663`_  Interface: updated column headings on home page
 * `#660`_  Documentation: Corrected and improved Linux one-page install

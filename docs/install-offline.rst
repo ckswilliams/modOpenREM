@@ -89,7 +89,7 @@ In a console, navigate to the directory that your ``openremfiles`` directory is 
 
 .. sourcecode:: python
 
-    pip install --no-index --find-links=openremfiles openrem==0.8.1  # where openremfiles is the directory you created
+    pip install --no-index --find-links=openremfiles openrem  # where openremfiles is the directory you created
 
     pip install openremfiles\default.tar.gz  # this is the custom version of pynetdicom
 
