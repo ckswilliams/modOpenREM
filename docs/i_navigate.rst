@@ -21,10 +21,9 @@ populated with studies:
    OpenREM homepage screenshot
 
 By selecting the links in the navigation bar at the top, you can view all
-of the CT, fluoroscopy or mammography studies. Alternatively, if you click
-on the station name link (in blue) you can filter to just that source modality.
+of the CT, fluoroscopy, mammography or radiographic studies. Alternatively, click on any row to filter by that system.
 
-*New in 0.4.0:* If you are not logged in, clicking any of the links will bring up the log in page.
+You can click on the title of the tables to re-sort by that column.
 
 Filtering for specific studies
 ==============================
