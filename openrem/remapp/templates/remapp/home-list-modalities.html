@@ -25,22 +25,11 @@
         </a>
       </td>
       <td style="width:12.5%">
-        <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
-          {{ details.studies_in_past_days_a }}
-        </a>
+        <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date" id="{{ details.displayname_pk }}_a"></a>
       </td>
       <td style="width:12.5%">
-        <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
-          {{ details.studies_in_past_days_b }}
-        </a>
+        <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date" id="{{ details.displayname_pk }}_b"></a>
       </td>
     </tr>
   {% endfor %}
 </table>
-
-<script>
-  $(document).ready(function () {
-    var summary_table_{{ modality }} = document.getElementById("summary_table_{{ modality }}");
-    sorttable.makeSortable(summary_table_{{ modality }});
-  });
-</script>

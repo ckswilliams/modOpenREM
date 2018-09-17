@@ -138,6 +138,16 @@
                         type: "POST",
                         success: function (data) {
                             $('#{{ modality }}-table').html(data);
+                            $.ajax(
+                                {
+                                    url: "/openrem/homeworkload/",
+                                    data: {modality: '{{ modality }}'},
+                                    type: "POST",
+                                    success: function (data) {
+                                        $('#{{ modality }}-table').append(data);
+                                    }
+                                }
+                            )
                         }
                     }
                 )
@@ -162,6 +172,9 @@
       </table>
     </div>
   {% endfor %}
+
+
+
 
   {% if not modalities %}
     <h4>No data to display in the system</h4>

@@ -46,6 +46,7 @@ urlpatterns = patterns('remapp.views',
         'openrem_home', name='home'),
                        url(r'^hometotals/$', 'update_modality_totals', name='update_modality_totals'),
                        url(r'^homestudies/$', 'update_latest_studies', name='update_latest_studies'),
+                       url(r'^homeworkload/$', 'update_study_workload', name='update_study_workload'),
 
                        url(r'^rf/$',
         'rf_summary_list_filter', name='rf_summary_list_filter'),

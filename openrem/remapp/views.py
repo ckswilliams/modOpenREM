@@ -1612,7 +1612,76 @@ def update_latest_studies(request):
         else:
             studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
         display_names = studies.values_list(
-            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
+            'generalequipmentmoduleattr__unique_equipment_name__display_name',
+            'generalequipmentmoduleattr__unique_equipment_name__pk').distinct()
+        modalitydata = {}
+
+        if request.user.is_authenticated():
+            day_delta_a = request.user.userprofile.summaryWorkloadDaysA
+            day_delta_b = request.user.userprofile.summaryWorkloadDaysB
+        else:
+            day_delta_a = 7
+            day_delta_b = 28
+
+        #today = datetime.now()
+        #date_a = (datetime.now() - timedelta(days=day_delta_a))
+        #date_b = (datetime.now() - timedelta(days=day_delta_b))
+
+        for display_name, pk in display_names:
+            display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name)
+            latestdate = display_name_studies.latest('study_date').study_date
+            latestuid = display_name_studies.filter(study_date__exact=latestdate).latest('study_time')
+            latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
+
+            try:
+                displayname = (display_name).encode('utf-8')
+            except AttributeError:
+                displayname = "Error has occurred - import probably unsuccessful"
+
+            modalitydata[display_name] = {
+                'total': display_name_studies.count(),
+                #'studies_in_past_days_a': display_name_studies.filter(study_date__range=[date_a, today]).count(),
+                #'studies_in_past_days_b': display_name_studies.filter(study_date__range=[date_b, today]).count(),
+                'latest': latestdatetime,
+                'displayname': displayname,
+                'displayname_pk': modality.lower() + str(pk)
+            }
+        ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
+
+        template = 'remapp/home-list-modalities.html'
+        data = ordereddata
+
+        home_config = {
+            'day_delta_a': day_delta_a,
+            'day_delta_b': day_delta_b
+        }
+
+        return render(request, template, {'data': data, 'modality': modality.lower(), 'home_config': home_config})
+
+
+@csrf_exempt
+def update_study_workload(request):
+    """AJAX function to calculate the number of studies in two user-defined time periods for a particular modality.
+
+    :param request: Request object
+    :return: HTML table of modalities
+    """
+    from django.db.models import Q
+    from datetime import datetime
+    from datetime import timedelta
+    from collections import OrderedDict
+
+    if request.is_ajax():
+        data = request.POST
+        modality = data.get('modality')
+        if modality == 'DX':
+            studies = GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
+        else:
+            studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
+
+        display_name_pks = studies.values_list(
+            'generalequipmentmoduleattr__unique_equipment_name__pk').distinct()
         modalitydata = {}
 
         if request.user.is_authenticated():
@@ -1626,35 +1695,19 @@ def update_latest_studies(request):
         date_a = (datetime.now() - timedelta(days=day_delta_a))
         date_b = (datetime.now() - timedelta(days=day_delta_b))
 
-        for display_name in display_names:
-            display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0])
-            latestdate = display_name_studies.latest('study_date').study_date
-            latestuid = display_name_studies.filter(study_date__exact=latestdate).latest('study_time')
-            latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
+        for pk in display_name_pks:
+            display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk[0])
 
-            try:
-                displayname = (display_name[0]).encode('utf-8')
-            except AttributeError:
-                displayname = "Error has occurred - import probably unsuccessful"
-
-            modalitydata[display_name[0]] = {
-                'total': display_name_studies.count(),
+            modalitydata[pk] = {
                 'studies_in_past_days_a': display_name_studies.filter(study_date__range=[date_a, today]).count(),
                 'studies_in_past_days_b': display_name_studies.filter(study_date__range=[date_b, today]).count(),
-                'latest': latestdatetime,
-                'displayname': displayname
+                'displayname_pk': modality.lower() + str(pk[0])
             }
-        ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
+        data = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['displayname_pk'], reverse=True))
 
-        template = 'remapp/home-list-modalities.html'
-        data = ordereddata
+        template = 'remapp/home-modality-workload.html'
 
-        home_config = {
-            'day_delta_a': day_delta_a,
-            'day_delta_b': day_delta_b
-        }
-
-        return render(request, template, {'data': data, 'modality': modality.lower(), 'home_config': home_config})
+        return render(request, template, {'data': data, 'modality': modality.lower()})
 
 
 @login_required
