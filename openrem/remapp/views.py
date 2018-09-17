@@ -2764,8 +2764,12 @@ def chart_options_view(request):
 
 @login_required
 def homepage_options_view(request):
+    """View to enable user to see and update home page options
+
+    :param request: request object
+    :return: dictionary of home page settings, html template location and request object
+    """
     from remapp.forms import HomepageOptionsForm
-    from openremproject import settings
 
     if request.method == 'POST':
         homepage_options_form = HomepageOptionsForm(request.POST)

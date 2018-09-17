@@ -234,6 +234,9 @@ class UpdateDisplayNamesForm(forms.Form):
 
 
 class HomepageOptionsForm(forms.Form):
+    """Form for displaying and changing the home page options
+    """
+
     dayDeltaA = forms.IntegerField(label='Primary time period to sum studies (days)', required=False)
     dayDeltaB = forms.IntegerField(label='Secondary time period to sum studies (days)', required=False)
 
