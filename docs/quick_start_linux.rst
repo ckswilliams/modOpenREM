@@ -13,15 +13,15 @@ A one page install based on Ubuntu 18.04 using:
 Initial prep
 ^^^^^^^^^^^^
 
-First edit ``/etc/hosts`` to add the local server name – else ``rabbitmq-server`` will not start when installed::
+First edit ``/etc/hosts`` to add the local server name -- else ``rabbitmq-server`` will not start when installed::
 
     sudo nano /etc/hosts
 
-Modify the content to ensure the following two lines are present - **substitute the correct server hostname on the
+Modify the content to ensure the following two lines are present -- **substitute the correct server hostname on the
 second line**::
 
     127.0.0.1 localhost
-    127.0.1.1 ubuntu1804
+    127.0.1.1 openremserver
 
 ``Ctrl-o Ctrl-x`` to write out and exit
 
@@ -59,7 +59,7 @@ be added to the ``openrem`` group, and the 'sticky' group setting below will ena
 
 Install apt packages and direct downloads
 -----------------------------------------
-The ``\`` just allows the ``sudo apt install`` command to spread to two lines - feel free to put it all on one line.
+The ``\`` just allows the ``sudo apt install`` command to spread to two lines -- feel free to put it all on one line.
 
 .. code-block:: console
 
@@ -84,7 +84,7 @@ Create a virtualenv (Python local environment) in the folder we created:
 Activate the virtualenv
 -----------------------
 
-Activate the virtualenv (note the ``.`` – you can also use the word ``source``):
+Activate the virtualenv (note the ``.`` -- you can also use the word ``source``):
 
 .. code-block:: console
 
@@ -96,7 +96,7 @@ Install Python packages
 .. code-block:: console
 
     pip install numpy psycopg2-binary gunicorn
-    pip install openrem==0.8.1b2
+    pip install openrem
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 .. note::
@@ -118,8 +118,6 @@ Database and OpenREM config
 Setup PostgreSQL database
 -------------------------
 
-*Need to establish if it really is necessary to change security configuration - I am thinking it might not be*
-
 Create a postgres user, and create the database. You will be asked to enter a new password (twice). This will be needed
 when configuring OpenREM:
 
@@ -131,6 +129,15 @@ when configuring OpenREM:
 If you are migrating from another server, you could at this point create a template0 database to restore into. See
 :ref:`restore-psql-linux` for details.
 
+Update the PostgreSQL client authentication configuration. Add the following line anywhere near the bottom of the file,
+for example in the gap before ``# DO NOT DISABLE`` or anywhere in the table that follows. The number of spaces between
+each word is not important (one or more).
+
+``sudo nano /etc/postgresql/10/main/pg_hba.conf``:
+
+.. code-block:: console
+
+    local   all     openremuser                 md5
 
 Configure OpenREM
 -----------------
@@ -391,7 +398,7 @@ working directly in the Ubuntu terminal, something else if you are using PuTTY e
 
 ``nano /var/dose/orthanc/openrem_orthanc_config.lua``
 
-Then edit the top section as follows - keeping Physics test images has not been configured, feel free to do so! There
+Then edit the top section as follows -- keeping Physics test images has not been configured, feel free to do so! There
 are other settings too that you might like to change in the second section (not displayed here):
 
 .. code-block:: lua
@@ -443,7 +450,7 @@ Add the Lua script to the Orthanc config:
     ],
 
 Optionally, you may also like to enable the HTTP server interface for Orthanc (although if the Lua script is removing
-all the objects as soon as they are processed, you won'yt see much!):
+all the objects as soon as they are processed, you won't see much!):
 
 .. code-block:: json-object
 
@@ -452,6 +459,9 @@ all the objects as soon as they are processed, you won'yt see much!):
 
     // Whether or not the password protection is enabled
     "AuthenticationEnabled" : false,
+
+To see the Orthanc web interface, go to http://openremserver:8042/ -- of course change the server name to that of your
+server!
 
 Allow Orthanc to use DICOM port
 -------------------------------

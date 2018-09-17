@@ -12,17 +12,21 @@ server then it might be at http://localhost:8000/openrem.
 The home page for OpenREM should look something like this when it is 
 populated with studies:
 
-.. image:: img/Home.png
-    :width: 730px
-    :align: center
-    :height: 630px
-    :alt: OpenREM homepage screenshot
+.. figure:: img/Home.png
+   :figwidth: 100 %
+   :align: center
+   :alt: OpenREM homepage screenshot
+   :target: _images/Home.png
+
+   OpenREM homepage screenshot
 
 By selecting the links in the navigation bar at the top, you can view all
-of the CT, fluoroscopy or mammography studies. Alternatively, if you click
-on the station name link (in blue) you can filter to just that source modality.
+of the CT, fluoroscopy, mammography or radiographic studies. Alternatively, click on any row to filter by that system.
 
-*New in 0.4.0:* If you are not logged in, clicking any of the links will bring up the log in page.
+The modality tables can be sorted by any of the columns by clicking on the
+column header that you wish to sort by.
+
+If you are not logged in, clicking any of the links will bring up the log in page.
 
 Filtering for specific studies
 ==============================
@@ -31,11 +35,13 @@ This image shows the CT studies view, available to any logged in user, filtered 
 boxes on the right hand side to show just the studies where the modality
 model name includes the term 'soma':
 
-.. image:: img/CTFilter.png
-    :width: 1440px
-    :align: center
-    :height: 1508px
-    :alt: Filtering CT studies
+.. figure:: img/CTFilter.png
+   :figwidth: 100 %
+   :align: center
+   :alt: Filtering CT studies
+   :target: _images/CTFilter.png
+
+   Filtering CT studies
 
 The search fields can all be used on their own or together, and they are
 all case insensitive 'contains' searches. The exception is the date field,
@@ -53,11 +59,13 @@ The number of studies displayed per page can be controlled by changing the
 value selected in the ``Items per page`` drop down box, located beneath the
 chart options:
 
-.. image:: img/CTStudiesPerPage.png
-    :width: 1438px
-    :align: center
-    :height: 997px
-    :alt: Filtering CT studies
+.. figure:: img/CTStudiesPerPage.png
+   :figwidth: 100 %
+   :align: center
+   :alt: Setting the number of studies per page
+   :target: _images/CTStudiesPerPage.png
+
+   Setting the number of studies per page
 
 Viewing study details
 =====================
@@ -65,11 +73,13 @@ Viewing study details
 By clicking on the study description link (in blue), you can see more 
 details for an individual study:
 
-.. image:: img/CTDetail.png
-    :width: 730px
-    :align: center
-    :height: 696px
-    :alt: Individual CT study
+.. figure:: img/CTDetail.png
+   :figwidth: 100 %
+   :align: center
+   :alt: Individual CT study
+   :target: _images/CTDetail.png
+
+   Individual CT study
 
 Not all the details stored for any one study are displayed, just those thought
 to be most useful. If there are others you'd like to see, add an issue to the tracker.
