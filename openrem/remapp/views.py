@@ -1598,9 +1598,8 @@ def update_latest_studies(request):
     :param request: Request object
     :return: HTML table of modalities
     """
-    from django.db.models import Q
+    from django.db.models import Q, Min
     from datetime import datetime
-    from datetime import timedelta
     from collections import OrderedDict
 
     if request.is_ajax():
@@ -1613,8 +1612,9 @@ def update_latest_studies(request):
             studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
 
         display_names = studies.values_list(
-            'generalequipmentmoduleattr__unique_equipment_name__display_name',
-            'generalequipmentmoduleattr__unique_equipment_name__pk').distinct()
+            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct().annotate(
+            pk_value=Min('generalequipmentmoduleattr__unique_equipment_name__pk'))
+
         modalitydata = {}
 
         if request.user.is_authenticated():
@@ -1661,7 +1661,7 @@ def update_study_workload(request):
     :param request: Request object
     :return: HTML table of modalities
     """
-    from django.db.models import Q
+    from django.db.models import Q, Min
     from datetime import datetime
     from datetime import timedelta
     from collections import OrderedDict
@@ -1676,8 +1676,9 @@ def update_study_workload(request):
             studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
 
         display_names = studies.values_list(
-            'generalequipmentmoduleattr__unique_equipment_name__display_name',
-            'generalequipmentmoduleattr__unique_equipment_name__pk').distinct()
+            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct().annotate(
+            pk_value=Min('generalequipmentmoduleattr__unique_equipment_name__pk'))
+
         modalitydata = {}
 
         if request.user.is_authenticated():
