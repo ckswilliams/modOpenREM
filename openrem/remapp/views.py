@@ -1611,6 +1611,7 @@ def update_latest_studies(request):
                 Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
         else:
             studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
+
         display_names = studies.values_list(
             'generalequipmentmoduleattr__unique_equipment_name__display_name',
             'generalequipmentmoduleattr__unique_equipment_name__pk').distinct()
@@ -1622,10 +1623,6 @@ def update_latest_studies(request):
         else:
             day_delta_a = 7
             day_delta_b = 28
-
-        #today = datetime.now()
-        #date_a = (datetime.now() - timedelta(days=day_delta_a))
-        #date_b = (datetime.now() - timedelta(days=day_delta_b))
 
         for display_name, pk in display_names:
             display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name)
@@ -1640,8 +1637,6 @@ def update_latest_studies(request):
 
             modalitydata[display_name] = {
                 'total': display_name_studies.count(),
-                #'studies_in_past_days_a': display_name_studies.filter(study_date__range=[date_a, today]).count(),
-                #'studies_in_past_days_b': display_name_studies.filter(study_date__range=[date_b, today]).count(),
                 'latest': latestdatetime,
                 'displayname': displayname,
                 'displayname_pk': modality.lower() + str(pk)
@@ -1680,7 +1675,8 @@ def update_study_workload(request):
         else:
             studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
 
-        display_name_pks = studies.values_list(
+        display_names = studies.values_list(
+            'generalequipmentmoduleattr__unique_equipment_name__display_name',
             'generalequipmentmoduleattr__unique_equipment_name__pk').distinct()
         modalitydata = {}
 
@@ -1695,13 +1691,19 @@ def update_study_workload(request):
         date_a = (datetime.now() - timedelta(days=day_delta_a))
         date_b = (datetime.now() - timedelta(days=day_delta_b))
 
-        for pk in display_name_pks:
-            display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk[0])
+        for display_name, pk in display_names:
+            display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name)
 
-            modalitydata[pk] = {
+            try:
+                displayname = (display_name).encode('utf-8')
+            except AttributeError:
+                displayname = "Error has occurred - import probably unsuccessful"
+
+            modalitydata[display_name] = {
                 'studies_in_past_days_a': display_name_studies.filter(study_date__range=[date_a, today]).count(),
                 'studies_in_past_days_b': display_name_studies.filter(study_date__range=[date_b, today]).count(),
-                'displayname_pk': modality.lower() + str(pk[0])
+                'displayname': displayname,
+                'displayname_pk': modality.lower() + str(pk)
             }
         data = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['displayname_pk'], reverse=True))
 
