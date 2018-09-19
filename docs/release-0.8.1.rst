@@ -141,7 +141,6 @@ verify that any systems you configure to use this extractor produce data in Open
 
 Migrate the database
 ====================
-*No changes are expected if you are upgrading from 0.8.0, but it is good practice to run through this anyway*
 
 In a shell/command window, move into the ``openrem`` folder:
 
