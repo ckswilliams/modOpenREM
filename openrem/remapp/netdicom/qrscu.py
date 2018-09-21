@@ -414,9 +414,15 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False, msg_id=N
         imagesrsp.query_id = query_id
         # Mandatory tags
         imagesrsp.sop_instance_uid = images[1].SOPInstanceUID
-        imagesrsp.sop_class_uid = images[1].SOPClassUID
-        imagesrsp.instance_number = images[1].InstanceNumber
-        if not imagesrsp.instance_number:  # just in case!!
+        try:
+            imagesrsp.sop_class_uid = images[1].SOPClassUID
+        except AttributeError:
+            logger.warning(u"Query_id {0}: Image Response {1}: illegal response, no SOPClassUID")
+            imagesrsp.sop_class_uid = u""
+        try:
+            imagesrsp.instance_number = images[1].InstanceNumber
+        except AttributeError:
+            logger.warning(u"Query_id {0}: Image Response {1}: illegal response, no InstanceNumber")
             imagesrsp.instance_number = None  # integer so can't be ''
         imagesrsp.save()
 
@@ -453,9 +459,14 @@ def _query_series(assoc, d2, studyrsp, query_id):
         seriesrsp.query_id = series_query_id
         # Mandatory tags
         seriesrsp.series_instance_uid = series[1].SeriesInstanceUID
-        seriesrsp.modality = series[1].Modality
-        seriesrsp.series_number = series[1].SeriesNumber
-        if not seriesrsp.series_number:  # despite it being mandatory!
+        try:
+            seriesrsp.modality = series[1].Modality
+        except AttributeError:
+            seriesrsp.modality = u"OT"  # not sure why a series is returned without, assume we don't want it.
+            logger.warning(u"Series Response {0}: Illegal response with no modality at series level")
+        try:
+            seriesrsp.series_number = series[1].SeriesNumber
+        except AttributeError:
             seriesrsp.series_number = None  # integer so can't be ''
         # Optional useful tags
         seriesrsp.series_description = get_value_kw(u'SeriesDescription', series[1])
@@ -816,8 +827,8 @@ def qrscu(
             logger.info(u"mod_set is {0}".format(mod_set))
             delete = True
             for mod_choice, details in all_mods.items():
-                logger.info(u"mod_choice {0}, details {1}".format(mod_choice, details))
                 if details['inc']:
+                    logger.info(u"mod_choice {0}, details {1}".format(mod_choice, details))
                     for mod in details['mods']:
                         logger.info(u"mod is {0}, mod_set is {1}".format(mod, mod_set))
                         if mod in mod_set:
