@@ -417,12 +417,15 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False, msg_id=N
         try:
             imagesrsp.sop_class_uid = images[1].SOPClassUID
         except AttributeError:
-            logger.warning(u"Query_id {0}: Image Response {1}: illegal response, no SOPClassUID")
+            logger.warning(u"Query_id {0}: StudyInstUID {1} Image Response {2}: no SOPClassUID. If "
+                           u"CT, might need to use Toshiba Advanced option (additional config required)".format(
+                            query_id, d3.StudyInstanceUID, imRspNo))
             imagesrsp.sop_class_uid = u""
         try:
             imagesrsp.instance_number = images[1].InstanceNumber
         except AttributeError:
-            logger.warning(u"Query_id {0}: Image Response {1}: illegal response, no InstanceNumber")
+            logger.warning(u"Query_id {0}: Image Response {1}: illegal response, no InstanceNumber".format(
+                query_id, imRspNo))
             imagesrsp.instance_number = None  # integer so can't be ''
         imagesrsp.save()
 
@@ -463,7 +466,7 @@ def _query_series(assoc, d2, studyrsp, query_id):
             seriesrsp.modality = series[1].Modality
         except AttributeError:
             seriesrsp.modality = u"OT"  # not sure why a series is returned without, assume we don't want it.
-            logger.warning(u"Series Response {0}: Illegal response with no modality at series level")
+            logger.warning(u"Series Response {0}: Illegal response with no modality at series level".format(query_id))
         try:
             seriesrsp.series_number = series[1].SeriesNumber
         except AttributeError:
