@@ -525,11 +525,15 @@ def _query_study(assoc, d, query, query_id):
         logger.debug(u"Study Description: {0}; Station Name: {1}".format(rsp.study_description, rsp.station_name))
 
         # Populate modalities_in_study, stored as JSON
-        if isinstance(ss[1].ModalitiesInStudy, str):   # if single modality, then type = string ('XA')
-            rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(u','))
-        else:   # if multiple modalities, type = MultiValue (['XA', 'RF'])
-            rsp.set_modalities_in_study(ss[1].ModalitiesInStudy)
-        logger.debug(u"ModalitiesInStudy: {0}".format(rsp.get_modalities_in_study()))
+        try:
+            if isinstance(ss[1].ModalitiesInStudy, str):   # if single modality, then type = string ('XA')
+                rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(u','))
+            else:   # if multiple modalities, type = MultiValue (['XA', 'RF'])
+                rsp.set_modalities_in_study(ss[1].ModalitiesInStudy)
+            logger.debug(u"ModalitiesInStudy: {0}".format(rsp.get_modalities_in_study()))
+        except AttributeError:
+            rsp.set_modalities_in_study([u''])
+            logger.debug(u"ModalitiesInStudy was not in response")
 
         rsp.modality = None  # Used later
         rsp.save()
@@ -600,6 +604,12 @@ def _query_for_each_modality(all_mods, query, d, assoc):
                                 modality_matching = False
                                 logger.debug(u"Remote node returns but doesn't match against ModalitiesInStudy")
                                 break  # This indicates that there was no modality match, so we have everything already
+                        else:  # modalities in study is empty
+                            modalities_returned = False
+                            # ModalitiesInStudy not supported, therefore assume not matched on key
+                            modality_matching = False
+                            logger.debug(u"Remote node doesn't support ModalitiesInStudy, assume we have everything")
+                            break
     logger.debug(u"modalities_returned: {0}; modality_matching: {1}".format(modalities_returned, modality_matching))
     return modalities_returned, modality_matching
 
