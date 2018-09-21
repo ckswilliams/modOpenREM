@@ -486,6 +486,7 @@ def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
     from remapp.forms import RFChartOptionsForm, itemsPerPageForm
+    from remapp.models import HighDoseMetricAlertSettings
 
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(
@@ -557,6 +558,13 @@ def rf_summary_list_filter(request):
             form_data = {'itemsPerPage': user_profile.itemsPerPage}
             items_per_page_form = itemsPerPageForm(form_data)
 
+    # Import total DAP and total dose at reference point alert levels
+    try:
+        alert_levels = HighDoseMetricAlertSettings.objects.values('alert_total_dap_rf', 'alert_total_rp_dose_rf')[0]
+    except ObjectDoesNotExist:
+        messages.error(request, 'High dose fluoroscopy alert settings not found')
+        #return redirect('/openrem/')
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     # # Calculate skin dose map for all objects in the database
@@ -597,7 +605,7 @@ def rf_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form, 'alertLevels': alert_levels}
 
     return render_to_response(
         'remapp/rffiltered.html',
@@ -2979,6 +2987,38 @@ class DicomDeleteSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
             admin[group.name] = True
         context['admin'] = admin
         return context
+
+
+class RFHighDoseAlertSettings(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView for configuring the fluoroscopy high dose alert settings
+
+    """
+    from remapp.models import HighDoseMetricAlertSettings
+    from remapp.forms import RFHighDoseFluoroAlertsForm
+    from django.core.exceptions import ObjectDoesNotExist
+
+    try:
+        HighDoseMetricAlertSettings.objects.get()
+    except ObjectDoesNotExist:
+        HighDoseMetricAlertSettings.objects.create()
+
+    model = HighDoseMetricAlertSettings
+    form_class = RFHighDoseFluoroAlertsForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+    def form_valid(self, form):
+        if form.has_changed():
+            messages.success(self.request, "Fluoroscopy high dose alert levels have been updated")
+        else:
+            messages.info(self.request, "No changes made")
+        return super(RFHighDoseAlertSettings, self).form_valid(form)
 
 
 class SkinDoseMapCalcSettingsUpdate(UpdateView):  # pylint: disable=unused-variable

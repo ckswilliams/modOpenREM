@@ -184,7 +184,13 @@
                         {% if accum_set.count > 1 %}
                             {{ record.acquisition_plane }}:
                         {% endif %}
-                        {{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }}
+
+                        {% if accum_integrated.convert_gym2_to_cgycm2 >= alertLevels.alert_total_dap_rf %}
+                            <strong style="color: red;">{{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }}</strong>
+                        {% else %}
+                            {{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }}
+                        {% endif %}
+
                         <br>
                       {% endwith %}
                     {% endfor %}
@@ -197,7 +203,13 @@
                         {% if accum_set.count > 1 %}
                             {{ record.acquisition_plane }}:
                         {% endif %}
-                        <script>document.write({{ accum_integrated.dose_rp_total }}.toPrecision(3));</script>
+
+                        {% if accum_integrated.dose_rp_total >= alertLevels.alert_total_rp_dose_rf %}
+                            <strong style="color: red;"><script>document.write({{ accum_integrated.dose_rp_total }}.toPrecision(3));</script></strong>
+                        {% else %}
+                            <script>document.write({{ accum_integrated.dose_rp_total }}.toPrecision(3));</script>
+                        {% endif %}
+
                         <br>
                       {% endwith %}
                     {% endfor %}

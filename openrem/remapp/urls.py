@@ -36,7 +36,7 @@ from django.views.generic import ListView, DetailView
 from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
-from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate
+from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate, RFHighDoseAlertSettings
 from remapp.views import NotPatientNameCreate, NotPatientNameUpdate, NotPatientNameDelete
 from remapp.views import NotPatientIDCreate, NotPatientIDUpdate, NotPatientIDDelete
 
@@ -110,6 +110,7 @@ urlpatterns = patterns('remapp.views',
                        url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/$', NotPatientIDUpdate.as_view(), name='notpatientid_update'),
                        url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/delete/$', NotPatientIDDelete.as_view(), name='notpatientid_delete'),
                        url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient', name='admin_questions_hide_not_patient'),
+                       url(r'^admin/rfalertsettings/(?P<pk>\d+)/$', RFHighDoseAlertSettings.as_view(), name='rf_alert_settings_update'),
 
                        # url(r'^password/$', 'change_password', name='change_password'),
                        url(

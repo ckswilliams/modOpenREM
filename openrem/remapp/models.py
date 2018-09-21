@@ -87,6 +87,14 @@ class SkinDoseMapCalcSettings(SingletonModel):
         return '/admin/skindosemapsettings/1/'
 
 
+class HighDoseMetricAlertSettings(SingletonModel):
+    alert_total_dap_rf = models.IntegerField(blank=True, null=True, default=20000, verbose_name="Alert level for total DAP from fluoroscopy examination (cGy.cm<sup>2</sup>)")
+    alert_total_rp_dose_rf = models.FloatField(blank=True, null=True, default=2.0, verbose_name="Alert level for total dose at reference point from fluoroscopy examination (Gy)")
+
+    def get_absolute_url(self):
+        return '/admin/rfalertsettings/1/'
+
+
 class DicomDeleteSettings(SingletonModel):
     del_no_match = models.BooleanField(default=False,
                     verbose_name="delete objects that don't match any import functions?")

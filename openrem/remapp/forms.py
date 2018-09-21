@@ -6,7 +6,7 @@ from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes,
 import logging
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings, \
-    NotPatientIndicatorsName, NotPatientIndicatorsID
+    NotPatientIndicatorsName, NotPatientIndicatorsID, HighDoseMetricAlertSettings
 
 logger = logging.getLogger()
 
@@ -229,8 +229,32 @@ class GeneralChartOptionsDisplayForm(forms.Form):
     plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
     plotCaseInsensitiveCategories = forms.BooleanField(label='Case-insensitive categories', required=False)
 
+
 class UpdateDisplayNamesForm(forms.Form):
     display_names = forms.CharField()
+
+
+class RFHighDoseFluoroAlertsForm(forms.ModelForm):
+    """Form for displaying and changing fluoroscopy high dose alert settings
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(RFHighDoseFluoroAlertsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.layout = Layout(
+            Div(
+                'alert_total_dap_rf',
+                'alert_total_rp_dose_rf'
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            )
+        )
+
+    class Meta:
+        model = HighDoseMetricAlertSettings
+        fields = ['alert_total_dap_rf', 'alert_total_rp_dose_rf']
 
 
 class DicomQueryForm(forms.Form):
