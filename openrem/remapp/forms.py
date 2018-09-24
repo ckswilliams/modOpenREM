@@ -6,7 +6,7 @@ from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes,
 import logging
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings, \
-    NotPatientIndicatorsName, NotPatientIndicatorsID
+    NotPatientIndicatorsName, NotPatientIndicatorsID, HomePageAdminSettings
 
 logger = logging.getLogger()
 
@@ -228,6 +228,7 @@ class GeneralChartOptionsDisplayForm(forms.Form):
     plotHistograms = forms.BooleanField(label='Calculate histogram data', required=False)
     plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
     plotCaseInsensitiveCategories = forms.BooleanField(label='Case-insensitive categories', required=False)
+
 
 class UpdateDisplayNamesForm(forms.Form):
     display_names = forms.CharField()
@@ -519,6 +520,28 @@ class SkinDoseMapCalcSettingsForm(forms.ModelForm):
     class Meta:
         model = SkinDoseMapCalcSettings
         fields = ['enable_skin_dose_maps', 'calc_on_import']
+
+
+class HomePageAdminSettingsForm(forms.ModelForm):
+    """Form for configuring home page settings
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(HomePageAdminSettingsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.layout = Layout(
+            Div(
+                'enable_workload_stats',
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            )
+        )
+
+    class Meta:
+        model = HomePageAdminSettings
+        fields = ['enable_workload_stats']
 
 
 class NotPatientNameForm(forms.ModelForm):

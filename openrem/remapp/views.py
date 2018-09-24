@@ -1463,9 +1463,14 @@ def mg_detail_view(request, pk=None):
 
 
 def openrem_home(request):
-    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
+    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions, HomePageAdminSettings
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
     from collections import OrderedDict
+
+    try:
+        HomePageAdminSettings.objects.get()
+    except ObjectDoesNotExist:
+        HomePageAdminSettings.objects.create()
 
     test_dicom_store_settings = DicomDeleteSettings.objects.all()
     if not test_dicom_store_settings:
@@ -1537,16 +1542,16 @@ def openrem_home(request):
         'total': allstudies.count(),
     }
 
-    if request.user.is_authenticated():
-        home_config = {
-            'day_delta_a': user_profile.summaryWorkloadDaysA,
-            'day_delta_b': user_profile.summaryWorkloadDaysB
-        }
-    else:
-        home_config = {
-            'day_delta_a': 7,
-            'day_delta_b': 28
-        }
+    # Determine whether to calculate workload settings
+    display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
+    home_config = {'display_workload_stats': display_workload_stats}
+    if display_workload_stats:
+        if request.user.is_authenticated():
+            home_config['day_delta_a'] = user_profile.summaryWorkloadDaysA
+            home_config['day_delta_b'] = user_profile.summaryWorkloadDaysB
+        else:
+            home_config['day_delta_a'] = 7
+            home_config['day_delta_b'] = 28
 
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)
 
@@ -1567,6 +1572,38 @@ def openrem_home(request):
                   {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
                    'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true,
                    'modalities': modalities, 'home_config': home_config})
+
+
+class HomePageAdminSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView for configuring the home page settings
+
+    """
+    from remapp.models import HomePageAdminSettings
+    from remapp.forms import HomePageAdminSettingsForm
+    from django.core.exceptions import ObjectDoesNotExist
+
+    try:
+        HomePageAdminSettings.objects.get()
+    except ObjectDoesNotExist:
+        HomePageAdminSettings.objects.create()
+
+    model = HomePageAdminSettings
+    form_class = HomePageAdminSettingsForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+    def form_valid(self, form):
+        if form.has_changed():
+            messages.success(self.request, "Home page settings have been updated")
+        else:
+            messages.info(self.request, "No changes made")
+        return super(HomePageAdminSettingsUpdate, self).form_valid(form)
 
 
 @csrf_exempt
@@ -1601,6 +1638,7 @@ def update_latest_studies(request):
     from django.db.models import Q, Min
     from datetime import datetime
     from collections import OrderedDict
+    from remapp.models import HomePageAdminSettings
 
     if request.is_ajax():
         data = request.POST
@@ -1646,7 +1684,9 @@ def update_latest_studies(request):
         template = 'remapp/home-list-modalities.html'
         data = ordereddata
 
+        display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
         home_config = {
+            'display_workload_stats': display_workload_stats,
             'day_delta_a': day_delta_a,
             'day_delta_b': day_delta_b
         }

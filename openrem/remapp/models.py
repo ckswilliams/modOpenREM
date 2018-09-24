@@ -87,6 +87,13 @@ class SkinDoseMapCalcSettings(SingletonModel):
         return '/admin/skindosemapsettings/1/'
 
 
+class HomePageAdminSettings(SingletonModel):
+    enable_workload_stats = models.BooleanField(default=False, verbose_name="Enable calculation and display of workload stats on home page?")
+
+    def get_absolute_url(self):
+        return '/admin/homepagesettings/1/'
+
+
 class DicomDeleteSettings(SingletonModel):
     del_no_match = models.BooleanField(default=False,
                     verbose_name="delete objects that don't match any import functions?")

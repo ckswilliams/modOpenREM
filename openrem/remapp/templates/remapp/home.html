@@ -138,6 +138,7 @@
                         type: "POST",
                         success: function (data) {
                             $('#{{ modality }}-table').html(data);
+                            {% if home_config.display_workload_stats %}
                             $.ajax(
                                 {
                                     url: "/openrem/homeworkload/",
@@ -148,6 +149,7 @@
                                     }
                                 }
                             )
+                            {% endif %}
                         }
                     }
                 )
@@ -163,8 +165,10 @@
           <th style="width:25%">System name</th>
           <th style="width:25%">Total number of studies</th>
           <th style="width:25%">Latest study</th>
-          <th style="width:12.5%">Number in last {{ home_config.day_delta_a }} days</th>
-          <th style="width:12.5%">Number in last {{ home_config.day_delta_b }} days</th>
+          {% if home_config.display_workload_stats %}
+            <th style="width:12.5%">Number in last {{ home_config.day_delta_a }} days</th>
+            <th style="width:12.5%">Number in last {{ home_config.day_delta_b }} days</th>
+          {% endif %}
         </tr>
         <tr>
           <td colspan="4">Please wait - querying the database</td>
