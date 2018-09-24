@@ -13,8 +13,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -34,6 +34,6 @@ def add_project_to_path():
     import os, sys
     # Add project to path, assuming openrem app has been installed within project
     basepath = os.path.dirname(__file__)
-    projectpath = os.path.abspath(os.path.join(basepath, "..",".."))
+    projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
     if projectpath not in sys.path:
-        sys.path.insert(1,projectpath)
+        sys.path.insert(1, projectpath)
