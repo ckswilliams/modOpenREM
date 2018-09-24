@@ -1581,6 +1581,7 @@ class HomePageAdminSettingsUpdate(UpdateView):  # pylint: disable=unused-variabl
     from remapp.models import HomePageAdminSettings
     from remapp.forms import HomePageAdminSettingsForm
     from django.core.exceptions import ObjectDoesNotExist
+    #from django.core.urlresolvers import reverse
 
     try:
         HomePageAdminSettings.objects.get()
@@ -2884,6 +2885,7 @@ def homepage_options_view(request):
             user_profile.save()
 
         messages.success(request, "Home page options have been updated")
+        return redirect('/openrem/')
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
