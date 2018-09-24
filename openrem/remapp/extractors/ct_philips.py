@@ -114,7 +114,7 @@ def _ctirradiationeventdata(dataset, ct):  # TID 10013
 
 
 def _ctaccumulateddosedata(dataset, ct, ch):  # TID 10012
-    from remapp.models import CtAccumulatedDoseData, ContextID
+    from remapp.models import CtAccumulatedDoseData
     from remapp.tools.get_values import get_value_kw, get_value_num
     ctacc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     ctacc.total_number_of_irradiation_events = get_value_kw('TotalNumberOfExposures', dataset)
@@ -323,11 +323,10 @@ def _generalstudymoduleattributes(dataset, g, ch):
 
 
 def _philips_ct2db(dataset):
-    import os, sys
+    import os
     import openrem_settings
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-    from django.db import models
 
     openrem_settings.add_project_to_path()
     from remapp.models import GeneralStudyModuleAttr
