@@ -52,7 +52,6 @@ def make_skin_map(study_pk=None):
     import remapp.tools.openskin.calc_exp_map as calc_exp_map
     from remapp.models import GeneralStudyModuleAttr
     from openremproject.settings import MEDIA_ROOT
-    import os
     import cPickle as pickle
     import gzip
     from remapp.version import __skin_map_version__
