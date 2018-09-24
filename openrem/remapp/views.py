@@ -1581,7 +1581,6 @@ class HomePageAdminSettingsUpdate(UpdateView):  # pylint: disable=unused-variabl
     from remapp.models import HomePageAdminSettings
     from remapp.forms import HomePageAdminSettingsForm
     from django.core.exceptions import ObjectDoesNotExist
-    #from django.core.urlresolvers import reverse
 
     try:
         HomePageAdminSettings.objects.get()
