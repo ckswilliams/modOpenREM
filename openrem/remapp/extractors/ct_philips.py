@@ -29,10 +29,11 @@
 
 """
 
+import logging
 import os
 import sys
+
 import django
-import logging
 
 logger = logging.getLogger(__name__)
 
