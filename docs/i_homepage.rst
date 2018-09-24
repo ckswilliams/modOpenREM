@@ -17,14 +17,14 @@ Display of workload information
 The home page can be configured to show the number of studies carried out in
 the past 7 and 28 days for each system. These default values can be changed by
 logging in, clicking on the ``Config`` menu at the right-hand end of the
-navigation bar, and then selecting the ``Home page options`` entry under the
-``User level config`` items shown in the upper section of figure 1. This takes
-the user to a page where the values can be viewed and updated (figure 2).
+navigation bar, and then selecting the ``Home page options`` entry under ``User
+level config`` shown in the upper section of figure 1. This takes the user to a
+page where the two time periods can be viewed and updated (figure 2).
 
 By default the display of workload information is disabled. This setting can be
 changed by an OpenREM administrator via the ``Home page options`` entry under
 the ``System level settings`` config menu (lower portion of figure 1). This
-brings up a simple form where the current settings can viewed and modified.
+brings up a simple form where the current setting can viewed and modified.
 
 .. figure:: img/homePageOptions.png
    :figwidth: 100%
