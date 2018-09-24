@@ -14,8 +14,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -324,7 +324,6 @@ def _generalstudymoduleattributes(dataset, g, ch):
 
 
 def _philips_ct2db(dataset):
-    import os
     import openrem_settings
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
@@ -350,7 +349,7 @@ def _philips_ct2db(dataset):
 @shared_task(name="remapp.extractors.ct_philips.ct_philips")
 def ct_philips(philips_file):
     """Extract radiation dose structured report related data from Philips CT dose report images
-    
+
     :param filename: relative or absolute path to Philips CT dose report DICOM image file.
     :type filename: str.
     
@@ -383,7 +382,6 @@ def ct_philips(philips_file):
 
 
 if __name__ == "__main__":
-    import sys
 
     if len(sys.argv) != 2:
         sys.exit(u'Error: Supply exactly one argument - the Philips dose report image')

@@ -1,7 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
 from django import template
-from datetime import datetime
 
 register = template.Library()
 
@@ -11,7 +10,7 @@ def naturalduration(seconds):
 
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
-    
+
     hplural = ''
     mplural = ''
     splural = ''
