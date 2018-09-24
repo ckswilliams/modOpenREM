@@ -43,7 +43,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
@@ -2884,7 +2884,7 @@ def homepage_options_view(request):
             user_profile.save()
 
         messages.success(request, "Home page options have been updated")
-        return redirect('/openrem/')
+        return HttpResponseRedirect(reverse('home'))
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
