@@ -76,9 +76,9 @@ Changing X-ray system display names and user defined modality
 =============================================================
 
 .. figure:: img/ConfigMenu.png
+   :figwidth: 30%
    :align: right
    :alt: Admin menu
-   :width: 179px
 
    The ``Config`` menu (admin)
 
