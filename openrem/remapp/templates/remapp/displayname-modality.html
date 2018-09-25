@@ -31,7 +31,7 @@
       {% if dual %}
         <td>
           {% if admin.admingroup and eachrow.user_defined_modality == 'dual' %}
-            <a href="/admin/reprocessdual/{{ eachrow.pk }}/">Dual: reprocess</a>
+            <a href="/{{ VIRTUAL_DIRECTORY }}admin/reprocessdual/{{ eachrow.pk }}/">Dual: reprocess</a>
           {% else %}
             <a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a>
           {% endif %}
@@ -70,7 +70,7 @@
             )
         </script>
     {% if admin.admingroup %}
-      <td><a href="/admin/review/{{ eachrow.pk }}/{{ modality }}/">Review</a></td>
+      <td><a href="/{{ VIRTUAL_DIRECTORY }}admin/review/{{ eachrow.pk }}/{{ modality }}/">Review</a></td>
     {% endif %}
     </tr>
   {% endfor %}

@@ -46,8 +46,8 @@
           <tr>
             <td>              <code>{{ id.not_patient_id }}</code>
 {% if admin.admingroup %}
-              <a href="/openrem/admin/notpatientindicators/id/{{ id.id }}/delete/" role="button" class="pull-right"> Delete</a>
-              <a href="/openrem/admin/notpatientindicators/id/{{ id.id }}/" role="button" class="pull-right">Modify&nbsp;</a>
+              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/notpatientindicators/id/{{ id.id }}/delete/" role="button" class="pull-right"> Delete</a>
+              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/notpatientindicators/id/{{ id.id }}/" role="button" class="pull-right">Modify&nbsp;</a>
 {% endif %}
             </td>
           </tr>
@@ -60,7 +60,7 @@
     <div class="panel panel-primary">
       <div class="panel-heading">
 {% if admin.admingroup %}
-        <a class="btn btn-default pull-right btn-sm" href="/admin/notpatientindicators/names/add/" role="button">
+        <a class="btn btn-default pull-right btn-sm" href="/{{ VIRTUAL_DIRECTORY }}admin/notpatientindicators/names/add/" role="button">
           Add name patterns
         </a>
 {% endif %}
@@ -77,8 +77,8 @@
             <td>
               <code>{{ name.not_patient_name }}</code>
 {% if admin.admingroup %}
-              <a href="/openrem/admin/notpatientindicators/names/{{ name.id }}/delete/" role="button" class="pull-right"> Delete</a>
-              <a href="/openrem/admin/notpatientindicators/names/{{ name.id }}/" role="button" class="pull-right">Modify&nbsp;</a>
+              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/notpatientindicators/names/{{ name.id }}/delete/" role="button" class="pull-right"> Delete</a>
+              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/notpatientindicators/names/{{ name.id }}/" role="button" class="pull-right">Modify&nbsp;</a>
 {% endif %}
             </td>
           </tr>
@@ -177,7 +177,7 @@
     <p>
       OpenREM releases before 0.8 had the not-patient identification patterns hard-coded. From release 0.8.0 the
       patterns are (admin) user configurable, but will start with no patterns in place. To add the patterns that would
-      maintain the behaviour of previous releases, <a href="/admin/notpatientindicators/restore074/">click here</a>.
+      maintain the behaviour of previous releases, <a href="/{{ VIRTUAL_DIRECTORY }}admin/notpatientindicators/restore074/">click here</a>.
     </p>
 {% endif %}
   </div>

@@ -9,8 +9,10 @@
     <meta name="copyright" content="2013-2017 The Royal Marsden NHS Foundation Trust">
     <meta name="licence" content="GPLv3">
     <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">
+{% load virtualdirectory %}
+{% get_virtual_directory as VIRTUAL_DIRECTORY %}
 
-    <title>OpenREM Browser</title>
+    <title>OpenREM Browser - {{ VIRTUAL_DIRECTORY }}</title>
 
     <script src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
     <!-- Bootstrap core CSS -->
@@ -45,22 +47,22 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/openrem/">OpenREM</a>
+          <a class="navbar-brand" href="/{{ VIRTUAL_DIRECTORY }}openrem/">OpenREM</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             {% block navbar %}
                 {% if request.user.userprofile.displayCT %}
-                    {% block navct %}<li>{% endblock %}<a href="/openrem/ct/">CT</a></li>
+                    {% block navct %}<li>{% endblock %}<a href="/{{ VIRTUAL_DIRECTORY }}openrem/ct/">CT</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayRF %}
-                    {% block navrf %}<li>{% endblock %}<a href="/openrem/rf/">Fluoroscopy</a></li>
+                    {% block navrf %}<li>{% endblock %}<a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/">Fluoroscopy</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayMG %}
-                    {% block navmg %}<li>{% endblock %}<a href="/openrem/mg/">Mammography</a></li>
+                    {% block navmg %}<li>{% endblock %}<a href="/{{ VIRTUAL_DIRECTORY }}openrem/mg/">Mammography</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayDX %}
-                    {% block navdx %}<li>{% endblock %}<a href="/openrem/dx/">Radiography</a></li>
+                    {% block navdx %}<li>{% endblock %}<a href="/{{ VIRTUAL_DIRECTORY }}openrem/dx/">Radiography</a></li>
                 {% endif %}
             {% endblock %}
           </ul>
@@ -76,13 +78,13 @@
                         </a>
                         <ul class="dropdown-menu">
                             {% if admin.importsizegroup %}
-                            <li><a href="/openrem/admin/sizeupload">Import patient size info</a></li>
+                            <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/sizeupload">Import patient size info</a></li>
                             {% endif %}
                             {% if admin.importsizegroup or admin.admingroup %}
-                            <li><a href="/openrem/admin/sizeimports">Previous patient size imports</a></li>
+                            <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/sizeimports">Previous patient size imports</a></li>
                             {% endif %}
                             {% if admin.importqrgroup %}
-                            <li><a href="/openrem/admin/queryremote">Query remote server</a> </li>
+                            <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/queryremote">Query remote server</a> </li>
                             {% endif %}
                         </ul>
                     </li>
@@ -91,7 +93,7 @@
                     {% block exportnav %}
                         <li>
                     {% endblock %}
-                        <a href="/openrem/export/">Exports</a></li>
+                        <a href="/{{ VIRTUAL_DIRECTORY }}openrem/export/">Exports</a></li>
                 {% endif %}
 
                 {% block confnav %}
@@ -102,56 +104,45 @@
                     </a>
                     <ul class="dropdown-menu">
                       <li class="dropdown-header">User level config</li>
-                      <li><a href="/openrem/chartoptions/">Chart options</a></li>
-                      <li><a href="/openrem/charts_off/">Switch charts off</a></li>
+                      <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/chartoptions/">Chart options</a></li>
+                      <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/charts_off/">Switch charts off</a></li>
                       {% if not admin.admingroup %}
-                        <li><a href="/openrem/viewdisplaynames/">View display names & modality</a></li>
-                        <li><a href="/admin/notpatientindicators/">View not-patient indicators</a> </li>
+                        <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/viewdisplaynames/">View display names & modality</a></li>
+                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/notpatientindicators/">View not-patient indicators</a> </li>
                       {% endif %}
                       {% if admin.admingroup %}
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">System level settings</li>
-                        <li><a href="/admin/auth/user/">Users</a></li>
-                        <li><a href="/openrem/viewdisplaynames/">Display names & modality</a></li>
-                        <li><a href="/openrem/admin/dicomdelsettings/1/">DICOM object deletion</a> </li>
-                        <li><a href="/openrem/admin/dicomsummary">DICOM networking</a></li>
-                        <li><a href="/admin/patientidsettings/1/">Patient ID</a> </li>
-                        <li><a href="/admin/notpatientindicators/">Not-patient indicators</a> </li>
-                        <li><a href="/admin/skindosemapsettings/1/">Skin dose map</a> </li>
+                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/auth/user/">Users</a></li>
+                        <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/viewdisplaynames/">Display names & modality</a></li>
+                        <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/dicomdelsettings/1/">DICOM object deletion</a> </li>
+                        <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/dicomsummary">DICOM networking</a></li>
+                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/patientidsettings/1/">Patient ID</a> </li>
+                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/notpatientindicators/">Not-patient indicators</a> </li>
+                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/skindosemapsettings/1/">Skin dose map</a> </li>
                       {% endif %}
                     </ul>
                 </li>
             {% endif %}
 
 
-            {% block usernav %}
-                <li class="dropdown">
-            {% endblock %}
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
-                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                    {% if user.is_authenticated %}
-                        {{ user.get_full_name }}
-                    {% else %}
-                        User
-                    {% endif %}
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    {% if user.is_authenticated %}
-                        <li><a href="/openrem/change_password/">Change password</a></li>
-                        <li><a href="/logout/">Logout</a></li>
-                    {% else %}
-                        <li><a href="/login/?next={{ request.get_full_path|urlencode }}">Login</a></li>
-                    {% endif %}
-                </ul>
-
+            <p class="navbar-text">
+              <span class="glyphicon glyphicon-user"></span>
+              {% if user.is_authenticated %}
+               {{ user.get_full_name }} -
+               <a href="/{{ VIRTUAL_DIRECTORY }}logout/" class="navbar-link">logout</a>
+              {% else %}
+               Not signed in - 
+              <a href="/{{ VIRTUAL_DIRECTORY }}login/?next={{ request.get_full_path|urlencode }}" class="navbar-link">login</a>
+              {% endif %}
+            </p>
 <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Docs <span class="caret"></span>
     </a>
     <ul class="dropdown-menu">
         <li>
-            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/" target="_blank" data-toggle="tooltip" title="OpenREM documentation - opens in a new tab">
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/" target="_blank" data-toggle="tooltip" title="OpenREM documentation - opens in a new tab">
                 OpenREM Documentation ({{ admin.docsversion }})
             </a>
         </li>
