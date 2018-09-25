@@ -2,10 +2,19 @@
 OpenREM version history
 =======================
 
+0.8.2 (2018-xx-xx)
+------------------
+* `#668`_  Code quality: library import and blank space cleanup
+* `#658`_  Interface: Added display of workload stats in home page modality tables
+
 0.8.1 (2018-09-16)
 ------------------
+* `#663`_  Interface: updated column headings on home page
+* `#660`_  Documentation: Corrected and improved Linux one-page install
+* `#659`_  Interface: Made the summary tables on the home page sortable by clicking on headers
 * `#656`_  Install: pegged django-debug-toolbar to 1.9.1 until Django is upgraded
 * `#654`_  Documentation: supplemented the Orthanc Lua file config option docs
+* `#653`_  Docs: clarified notes to get link to Orthanc lua file correct on release
 * `#652`_  Documentation: added docs showing Celery daemonisation in Linux
 * `#651`_  Documentation: added one-page full setup Ubuntu 18.04 install instructions
 * `#650`_  Documentation: modified quick install virtualenv docs

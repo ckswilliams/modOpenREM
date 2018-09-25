@@ -1,0 +1,13 @@
+<script>
+{% for displayname_pk, details in data.items %}
+    $("#{{ details.displayname_pk }}_a").text({{ details.studies_in_past_days_a }});
+    $("#{{ details.displayname_pk }}_b").text({{ details.studies_in_past_days_b }});
+{% endfor %}
+</script>
+
+<script>
+  $(document).ready(function () {
+    var summary_table_{{ modality }} = document.getElementById("summary_table_{{ modality }}");
+    sorttable.makeSortable(summary_table_{{ modality }});
+  });
+</script>

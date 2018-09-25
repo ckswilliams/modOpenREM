@@ -1,0 +1,27 @@
+{% extends "remapp/base.html" %}
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block navhelp %}
+        <li>
+            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/i_homepage.html" target="_blank" data-toggle="tooltip" title="OpenREM documentation - opens in a new tab">
+                Home page config
+            </a>
+        </li>
+{% endblock %}
+
+{% block mainblock %}
+
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+          <h3>Modify home page settings</h3>
+        {% if admin.admingroup %}
+            {% load crispy_forms_tags %}
+            {% crispy form %}
+        {% else %}
+            <p>Only users in the Admin group can modify these settings.</p>
+        {% endif %}
+      </div>
+    </div>
+
+{% endblock %}	
