@@ -11,7 +11,7 @@
 
 {% block confnav %}<li class="dropdown active">{% endblock %}
 
-{% block mainblock %}		
+{% block mainblock %}
 
 {% block modify_pattern %}
 {% endblock %}
@@ -64,7 +64,7 @@
 {% if admin.admingroup %}
     <p>
       To add the patterns that would maintain the behaviour of previous releases,
-      <a href="/admin/notpatientindicators/restore074/">click here</a>.
+      <a href="/{{ VIRTUAL_DIRECTORY }}admin/notpatientindicators/restore074/">click here</a>.
     </p>
 {% endif %}
 {% if not admin.admingroup %}
@@ -76,4 +76,4 @@
 </div>
 
 
-{% endblock %}	
+{% endblock %}

@@ -26,7 +26,7 @@
       <div class="panel-body">
         <p>
           You will need to allocate users to a group before using this system -
-          <a href="/admin/auth/user/">you can do this here.</a> You will need to know the superuser
+          <a href="/{{ VIRTUAL_DIRECTORY }}admin/auth/user/">you can do this here.</a> You will need to know the superuser
           username and password you used when you installed the database.
         </p>
         <p>
@@ -42,7 +42,7 @@
       </div>
       <div class="panel-body">
         <p>
-          Make sure there is at least one Admin user &mdash; <a href="/admin/auth/user/">you can do this here.</a> You
+          Make sure there is at least one Admin user &mdash; <a href="/{{ VIRTUAL_DIRECTORY }}admin/auth/user/">you can do this here.</a> You
           will need to know the superuser
           username and password you used when you installed the database.
         </p>
@@ -73,13 +73,13 @@
             <td>
               <strong>Admin question:</strong> Identifying non-patient exposures has changed in release 0.8. Would you
               like this install to match the behaviour of release 0.7.4 and earlier?
-              <a href="/admin/adminquestions/hide_not_patient/" role="button" class="btn btn-default pull-right">
+              <a href="/{{ VIRTUAL_DIRECTORY }}admin/adminquestions/hide_not_patient/" role="button" class="btn btn-default pull-right">
                 Hide
               </a>
-              <a href="/admin/notpatientindicators/restore074/" role="button" class="btn btn-default pull-right">
+              <a href="/{{ VIRTUAL_DIRECTORY }}admin/notpatientindicators/restore074/" role="button" class="btn btn-default pull-right">
                 Restore 0.7.4 patterns
               </a>
-              <a href="/openrem/admin/notpatientindicators/" role="button" class="btn btn-default pull-right">
+              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/notpatientindicators/" role="button" class="btn btn-default pull-right">
                 More information
               </a>
             </td>
@@ -98,7 +98,7 @@
           function get_modality_numbers(json) {
               $.ajax(
                   {
-                      url: "/openrem/hometotals/",
+                      url: "/{{ VIRTUAL_DIRECTORY }}openrem/hometotals/",
                       type: "POST",
                       dataType: "json",
                       success: function (json) {
@@ -115,7 +115,7 @@
   <table class="table table-bordered">
     <tr>
       {% for modality, details in modalities.items %}
-        <th style="width:25%"><a href="/openrem/{{ modality|lower }}/">{{ details.name }}</a></th>
+        <th style="width:25%"><a href="/{{ VIRTUAL_DIRECTORY }}openrem/{{ modality|lower }}/">{{ details.name }}</a></th>
       {% endfor %}
     </tr>
     <tr>
@@ -133,7 +133,7 @@
             function get_latest_studies(json) {
                 $.ajax(
                     {
-                        url: "/openrem/homestudies/",
+                        url: "/{{ VIRTUAL_DIRECTORY }}openrem/homestudies/",
                         data: {modality: '{{ modality }}'},
                         type: "POST",
                         success: function (data) {
@@ -167,4 +167,4 @@
       this page.</p>
   {% endif %}
 
-{% endblock %}	
+{% endblock %}
