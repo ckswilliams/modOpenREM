@@ -52,7 +52,7 @@
                 function get_latest_studies(json) {
                     $.ajax(
                         {
-                            url: "/admin/equipmentlastdateandcount",
+                            url: "/{{ VIRTUAL_DIRECTORY }}admin/equipmentlastdateandcount",
                             data: {
                                 modality: '{{ modality }}',
                                 equip_name_pk: '{{ eachrow.pk }}',

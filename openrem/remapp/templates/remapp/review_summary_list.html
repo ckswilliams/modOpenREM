@@ -65,7 +65,7 @@
       function studiesDeleteButton() {
           $.ajax(
               {
-                  url: "/admin/review/studiesdelete",
+                  url: "/{{ VIRTUAL_DIRECTORY }}admin/review/studiesdelete",
                   data: {
                       csrfmiddlewaretoken: '{{ csrf_token }}',
                       equip_name_pk: '{{ equip_name_pk }}',
@@ -81,7 +81,7 @@
       function studiesEquipDeleteButton() {
           $.ajax(
               {
-                  url: "/admin/review/studiesequipdelete",
+                  url: "/{{ VIRTUAL_DIRECTORY }}admin/review/studiesequipdelete",
                   data: {
                       csrfmiddlewaretoken: '{{ csrf_token }}',
                       equip_name_pk: '{{ equip_name_pk }}',
@@ -179,7 +179,7 @@
               function get_review_data(json) {
                   $.ajax(
                       {
-                          url: "/admin/review/study",
+                          url: "/{{ VIRTUAL_DIRECTORY }}admin/review/study",
                           data: {
                               study_pk: '{{ study.pk }}',
                               csrfmiddlewaretoken: '{{ csrf_token }}'

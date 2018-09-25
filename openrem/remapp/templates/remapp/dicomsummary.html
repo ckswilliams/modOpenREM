@@ -35,7 +35,7 @@
               server to start.
           </p>
           <p>
-              <a class="btn btn-primary" href="/openrem/admin/dicomstore/add/" role="button">Add new Store</a>
+              <a class="btn btn-primary" href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/dicomstore/add/" role="button">Add new Store</a>
           </p>
 
 
@@ -101,7 +101,7 @@
 
 
                   <hr>
-                  <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/" role="button">Modify</a>
+                  <a class="btn btn-primary" href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/dicomstore/{{ scp.id }}/" role="button">Modify</a>
                   <span id="store-delete-{{ scp.pk }}"></span>
                   {% if scp.controlled %}
                       <span id="store-start-{{ scp.pk }}" class="pull-right"></span>
@@ -125,8 +125,8 @@
               You can either enter a hostname or an IP address - if you enter both, the hostname will be used.
           </p>
           <p>
-              <a class="btn btn-primary" href="/openrem/admin/dicomqr/add/" role="button">Add new QR Node</a>
-              <a class="btn btn-default pull-right" href="/openrem/admin/queryremote" role="button">Query remote server</a>
+              <a class="btn btn-primary" href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/dicomqr/add/" role="button">Add new QR Node</a>
+              <a class="btn btn-default pull-right" href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/queryremote" role="button">Query remote server</a>
           </p>
 
 
@@ -168,8 +168,8 @@
                       </table>
 
                       <hr>
-                      <a class="btn btn-primary" href="/openrem/admin/dicomqr/{{ qr.id }}/" role="button">Modify</a>
-                      <a class="btn btn-primary" href="/openrem/admin/dicomqr/{{ qr.id }}/delete/" role="button">Delete</a>
+                      <a class="btn btn-primary" href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/dicomqr/{{ qr.id }}/" role="button">Modify</a>
+                      <a class="btn btn-primary" href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/dicomqr/{{ qr.id }}/delete/" role="button">Delete</a>
 
                   </div>
               </div>
@@ -190,7 +190,7 @@
               </p>
               <div class="panel panel-info">
                   <div class="panel-heading">
-                      <a class="btn btn-primary pull-right btn-sm" href="/openrem/admin/dicomdelsettings/1/" role="button">
+                      <a class="btn btn-primary pull-right btn-sm" href="{{ VIRTUAL_DIRECTORY }}/openrem/admin/dicomdelsettings/1/" role="button">
                           Modify DICOM object delete settings
                       </a>
                       <h3 class="panel-title">Settings for all Store SCPs</h3>

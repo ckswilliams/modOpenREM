@@ -41,7 +41,7 @@
   {% paginate %}
 
   {% if admin.admingroup %}
-    <form action="/openrem/updatedisplaynames/" method="get">
+    <form action="/{{ VIRTUAL_DIRECTORY }}openrem/updatedisplaynames/" method="get">
   {% endif %}
 
 {% for modality in modalities %}
@@ -50,7 +50,7 @@
           function get_display_name_list(json) {
               $.ajax(
                   {
-                      url: "/populatedisplaynames",
+                      url: "/{{ VIRTUAL_DIRECTORY }}populatedisplaynames",
                       data: {
                           modality: '{{ modality }}',
                           csrfmiddlewaretoken: '{{ csrf_token }}'

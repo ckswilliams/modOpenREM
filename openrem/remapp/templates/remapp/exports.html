@@ -26,7 +26,7 @@
             function get_current_exports(json) {
                 $.ajax(
                     {
-                        url: "/openrem/export/updateactive",
+                        url: "/{{ VIRTUAL_DIRECTORY }}openrem/export/updateactive",
                         type: "POST",
                         success: function (data) {
                             $('#current').html(data);
@@ -46,7 +46,7 @@
             function get_error_exports(json) {
                 $.ajax(
                     {
-                        url: "/openrem/export/updateerror",
+                        url: "/{{ VIRTUAL_DIRECTORY }}openrem/export/updateerror",
                         type: "POST",
                         success: function (data) {
                             $('#error').html(data);
@@ -67,7 +67,7 @@
             function get_complete_exports(json) {
                 $.ajax(
                     {
-                        url: "/openrem/export/updatecomplete",
+                        url: "/{{ VIRTUAL_DIRECTORY }}openrem/export/updatecomplete",
                         data: {
                             latest_complete_pk: '{{latest_complete_pk}}',
                             in_pid_group: '{{ admin.pidgroup }}'

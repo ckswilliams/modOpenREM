@@ -76,6 +76,7 @@ from django.http import Http404
 def status_update_store(request):
     from remapp.models import DicomStoreSCP
     from remapp.netdicom.tools import echoscu
+    from openremproject.settings import VIRTUAL_DIRECTORY
 
     resp = {}
     data = request.POST
@@ -90,12 +91,12 @@ def status_update_store(request):
         resp['statusindicator'] = u"<h3 class='pull-right panel-title'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Server is alive</h3>"
         resp['delbutton'] = u"<button type='button' class='btn btn-primary' disabled='disabled'>Delete</button>"
         resp['startbutton'] = u""
-        resp['stopbutton'] = u"<a class='btn btn-danger' href='/openrem/admin/dicomstore/{0}/stop/' role='button'>Stop server</a>".format(scp_pk)
+        resp['stopbutton'] = u"<a class='btn btn-danger' href='/{0}openrem/admin/dicomstore/{1}/stop/' role='button'>Stop server</a>".format(VIRTUAL_DIRECTORY, scp_pk)
     elif echo is "AssocFail":
         resp['message'] = u"<div>Last status: {0}</div>".format(store.status)
         resp['statusindicator'] = u"<h3 class='pull-right panel-title status-red'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Association fail - server not running?</h3>"
-        resp['delbutton'] = u"<a class='btn btn-primary' href='/openrem/admin/dicomstore/{0}/delete/' role='button'>Delete</a>".format(scp_pk)
-        resp['startbutton'] = u"<a class='btn btn-success' href='/openrem/admin/dicomstore/{0}/start/' role='button'>Start server</a>".format(scp_pk)
+        resp['delbutton'] = u"<a class='btn btn-primary' href='/{0}openrem/admin/dicomstore/{1}/delete/' role='button'>Delete</a>".format(VIRTUAL_DIRECTORY, scp_pk)
+        resp['startbutton'] = u"<a class='btn btn-success' href='/{0}openrem/admin/dicomstore/{1}/start/' role='button'>Start server</a>".format(VIRTUAL_DIRECTORY, scp_pk)
         resp['stopbutton'] = u""
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
