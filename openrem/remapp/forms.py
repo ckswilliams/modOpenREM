@@ -245,7 +245,8 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
         self.helper.layout = Layout(
             Div(
                 'alert_total_dap_rf',
-                'alert_total_rp_dose_rf'
+                'alert_total_rp_dose_rf',
+                'accum_dose_delta_weeks',
             ),
             FormActions(
                 Submit('submit', 'Submit')
@@ -254,7 +255,7 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
 
     class Meta:
         model = HighDoseMetricAlertSettings
-        fields = ['alert_total_dap_rf', 'alert_total_rp_dose_rf']
+        fields = ['alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks']
 
 
 class HomepageOptionsForm(forms.Form):

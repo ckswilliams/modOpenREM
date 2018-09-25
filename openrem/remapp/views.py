@@ -486,7 +486,10 @@ def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
     from remapp.forms import RFChartOptionsForm, itemsPerPageForm
-    from remapp.models import HighDoseMetricAlertSettings
+    from remapp.models import HighDoseMetricAlertSettings, AccumIntegratedProjRadiogDose
+    from datetime import datetime, timedelta
+    from django.db.models import Sum
+    import json
 
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(
@@ -558,14 +561,59 @@ def rf_summary_list_filter(request):
             form_data = {'itemsPerPage': user_profile.itemsPerPage}
             items_per_page_form = itemsPerPageForm(form_data)
 
-    # Import total DAP and total dose at reference point alert levels
+    # Import total DAP and total dose at reference point alert levels. Create with default values if not found.
     try:
-        alert_levels = HighDoseMetricAlertSettings.objects.values('alert_total_dap_rf', 'alert_total_rp_dose_rf')[0]
+        alert_levels = HighDoseMetricAlertSettings.objects.values('alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks')[0]
     except ObjectDoesNotExist:
-        messages.error(request, 'High dose fluoroscopy alert settings not found')
-        #return redirect('/openrem/')
+        HighDoseMetricAlertSettings.objects.create()
+        alert_levels = HighDoseMetricAlertSettings.objects.values('alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks')[0]
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+
+    # Calculate total dose at RP and DAP over previous delta weeks for every study in f
+    all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
+    week_delta = alert_levels['accum_dose_delta_weeks']
+    for study in f:
+        patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+        if patient_id:
+            study_date = study.study_date
+            oldest_date = (study_date - timedelta(weeks=week_delta))
+
+            try:
+                accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
+            except ObjectDoesNotExist:
+                try:
+                    study.projectionxrayradiationdose_set.get().accumxraydose_set.get()
+                except ObjectDoesNotExist:
+                    study.projectionxrayradiationdose_set.get().accumxraydose_set.create()
+                try:
+                    study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+                except ObjectDoesNotExist:
+                    study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.create()
+                accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
+
+            accum_int_proj_to_update = AccumIntegratedProjRadiogDose.objects.get(pk=accum_int_proj_pk)
+
+            if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks or not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
+                included_studies = all_rf_studies.filter(patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
+                accum_int_proj_to_update.pks_of_studies_in_delta_weeks = json.dumps(list(included_studies.values_list('pk', flat=True)))
+
+            if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks and not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
+                accum_totals = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total'),
+                                                          Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total'))
+                accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__sum']
+                accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total__sum']
+                accum_int_proj_to_update.save()
+            elif not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks:
+                accum_dap_over_delta_weeks = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')).values()[0]
+                accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_dap_over_delta_weeks
+                accum_int_proj_to_update.save()
+            elif not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
+                accum_rp_dose_over_delta_weeks = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total')).values()[0]
+                accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_rp_dose_over_delta_weeks
+                accum_int_proj_to_update.save()
+
 
     # # Calculate skin dose map for all objects in the database
     # import cPickle as pickle
@@ -1710,8 +1758,7 @@ def update_study_workload(request):
     :return: HTML table of modalities
     """
     from django.db.models import Q, Min
-    from datetime import datetime
-    from datetime import timedelta
+    from datetime import datetime, timedelta
     from collections import OrderedDict
 
     if request.is_ajax():
@@ -1737,8 +1784,8 @@ def update_study_workload(request):
             day_delta_b = 28
 
         today = datetime.now()
-        date_a = (datetime.now() - timedelta(days=day_delta_a))
-        date_b = (datetime.now() - timedelta(days=day_delta_b))
+        date_a = (today - timedelta(days=day_delta_a))
+        date_b = (today - timedelta(days=day_delta_b))
 
         for display_name, pk in display_names:
             display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name)

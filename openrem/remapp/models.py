@@ -90,6 +90,7 @@ class SkinDoseMapCalcSettings(SingletonModel):
 class HighDoseMetricAlertSettings(SingletonModel):
     alert_total_dap_rf = models.IntegerField(blank=True, null=True, default=20000, verbose_name="Alert level for total DAP from fluoroscopy examination (cGy.cm<sup>2</sup>)")
     alert_total_rp_dose_rf = models.FloatField(blank=True, null=True, default=2.0, verbose_name="Alert level for total dose at reference point from fluoroscopy examination (Gy)")
+    accum_dose_delta_weeks = models.IntegerField(blank=True, null=True, default=6, verbose_name="Number of previous weeks over which to sum DAP and RP dose for each patient")
 
     def get_absolute_url(self):
         return '/admin/rfalertsettings/1/'
@@ -907,6 +908,16 @@ class AccumIntegratedProjRadiogDose(models.Model):  # TID 10007
         """
         if self.dose_area_product_total:
             return 1000000*self.dose_area_product_total
+
+    dose_area_product_total_over_delta_weeks = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
+    dose_rp_total_over_delta_weeks = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
+    pks_of_studies_in_delta_weeks = models.TextField(blank=True, null=True)
+
+    def total_dap_delta_gym2_to_cgycm2(self):
+        """Converts total DAP over delta days from Gy.m2 to cGy.cm2 for display in web interface
+        """
+        if self.dose_area_product_total_over_delta_weeks:
+            return 1000000*self.dose_area_product_total_over_delta_weeks
 
 
 class PatientModuleAttr(models.Model):  # C.7.1.1
