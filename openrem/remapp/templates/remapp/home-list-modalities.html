@@ -2,29 +2,24 @@
 {% load virtualdirectory %}
 {% get_virtual_directory as VIRTUAL_DIRECTORY %}
 <table class="table table-bordered table-hover row-clickable sortable" id="summary_table_{{ modality }}">
-<table class="table table-bordered table-hover row-clickable sortable" id="summary_table_{{ modality }}">
   <tr>
     <th>System name</th>
     <th>Total number of studies</th>
     <th>Latest study</th>
-    {% if home_config.display_workload_stats %}
-      <th>Number in last {{ home_config.day_delta_a }} days</th>
-      <th>Number in last {{ home_config.day_delta_b }} days</th>
-    {% endif %}
   </tr>
   {% for display_name,details in data.items %}
     <tr>
-      <td style="width:25%">
+      <td style="width:33%">
         <a href="/{{ VIRTUAL_DIRECTORY }}openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
           {{ details.displayname }}
         </a>
       </td>
-      <td style="width:25%">
+      <td style="width:33%">
         <a href="/{{ VIRTUAL_DIRECTORY }}openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
           {{ details.total }}
         </a>
       </td>
-      <td style="width:25%">
+      <td style="width:33%">
         <a href="/{{ VIRTUAL_DIRECTORY }}openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
           {{ details.latest|naturaltime }}
         </a>
