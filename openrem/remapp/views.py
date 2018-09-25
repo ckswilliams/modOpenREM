@@ -43,7 +43,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
@@ -1471,9 +1471,14 @@ def mg_detail_view(request, pk=None):
 
 
 def openrem_home(request):
-    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
+    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions, HomePageAdminSettings
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
     from collections import OrderedDict
+
+    try:
+        HomePageAdminSettings.objects.get()
+    except ObjectDoesNotExist:
+        HomePageAdminSettings.objects.create()
 
     test_dicom_store_settings = DicomDeleteSettings.objects.all()
     if not test_dicom_store_settings:
@@ -1545,6 +1550,17 @@ def openrem_home(request):
         'total': allstudies.count(),
     }
 
+    # Determine whether to calculate workload settings
+    display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
+    home_config = {'display_workload_stats': display_workload_stats}
+    if display_workload_stats:
+        if request.user.is_authenticated():
+            home_config['day_delta_a'] = user_profile.summaryWorkloadDaysA
+            home_config['day_delta_b'] = user_profile.summaryWorkloadDaysB
+        else:
+            home_config['day_delta_a'] = 7
+            home_config['day_delta_b'] = 28
+
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)
 
     for group in request.user.groups.all():
@@ -1563,7 +1579,39 @@ def openrem_home(request):
     return render(request, "remapp/home.html",
                   {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
                    'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true,
-                   'modalities': modalities})
+                   'modalities': modalities, 'home_config': home_config})
+
+
+class HomePageAdminSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView for configuring the home page settings
+
+    """
+    from remapp.models import HomePageAdminSettings
+    from remapp.forms import HomePageAdminSettingsForm
+    from django.core.exceptions import ObjectDoesNotExist
+
+    try:
+        HomePageAdminSettings.objects.get()
+    except ObjectDoesNotExist:
+        HomePageAdminSettings.objects.create()
+
+    model = HomePageAdminSettings
+    form_class = HomePageAdminSettingsForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+    def form_valid(self, form):
+        if form.has_changed():
+            messages.success(self.request, "Home page settings have been updated")
+        else:
+            messages.info(self.request, "No changes made")
+        return super(HomePageAdminSettingsUpdate, self).form_valid(form)
 
 
 @csrf_exempt
@@ -1595,8 +1643,75 @@ def update_latest_studies(request):
     :param request: Request object
     :return: HTML table of modalities
     """
-    from django.db.models import Q
+    from django.db.models import Q, Min
     from datetime import datetime
+    from collections import OrderedDict
+    from remapp.models import HomePageAdminSettings
+
+    if request.is_ajax():
+        data = request.POST
+        modality = data.get('modality')
+        if modality == 'DX':
+            studies = GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
+        else:
+            studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
+
+        display_names = studies.values_list(
+            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct().annotate(
+            pk_value=Min('generalequipmentmoduleattr__unique_equipment_name__pk'))
+
+        modalitydata = {}
+
+        if request.user.is_authenticated():
+            day_delta_a = request.user.userprofile.summaryWorkloadDaysA
+            day_delta_b = request.user.userprofile.summaryWorkloadDaysB
+        else:
+            day_delta_a = 7
+            day_delta_b = 28
+
+        for display_name, pk in display_names:
+            display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name)
+            latestdate = display_name_studies.latest('study_date').study_date
+            latestuid = display_name_studies.filter(study_date__exact=latestdate).latest('study_time')
+            latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
+
+            try:
+                displayname = (display_name).encode('utf-8')
+            except AttributeError:
+                displayname = "Error has occurred - import probably unsuccessful"
+
+            modalitydata[display_name] = {
+                'total': display_name_studies.count(),
+                'latest': latestdatetime,
+                'displayname': displayname,
+                'displayname_pk': modality.lower() + str(pk)
+            }
+        ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
+
+        template = 'remapp/home-list-modalities.html'
+        data = ordereddata
+
+        display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
+        home_config = {
+            'display_workload_stats': display_workload_stats,
+            'day_delta_a': day_delta_a,
+            'day_delta_b': day_delta_b
+        }
+
+        return render(request, template, {'data': data, 'modality': modality.lower(), 'home_config': home_config})
+
+
+@csrf_exempt
+def update_study_workload(request):
+    """AJAX function to calculate the number of studies in two user-defined time periods for a particular modality.
+
+    :param request: Request object
+    :return: HTML table of modalities
+    """
+    from django.db.models import Q, Min
+    from datetime import datetime
+    from datetime import timedelta
     from collections import OrderedDict
 
     if request.is_ajax():
@@ -1607,35 +1722,42 @@ def update_latest_studies(request):
                 Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
         else:
             studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality).all()
+
         display_names = studies.values_list(
-            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
+            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct().annotate(
+            pk_value=Min('generalequipmentmoduleattr__unique_equipment_name__pk'))
+
         modalitydata = {}
 
-        for display_name in display_names:
-            latestdate = studies.filter(
-                generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-            ).latest('study_date').study_date
-            latestuid = studies.filter(
-                generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-            ).filter(study_date__exact=latestdate).latest('study_time')
-            latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
+        if request.user.is_authenticated():
+            day_delta_a = request.user.userprofile.summaryWorkloadDaysA
+            day_delta_b = request.user.userprofile.summaryWorkloadDaysB
+        else:
+            day_delta_a = 7
+            day_delta_b = 28
+
+        today = datetime.now()
+        date_a = (datetime.now() - timedelta(days=day_delta_a))
+        date_b = (datetime.now() - timedelta(days=day_delta_b))
+
+        for display_name, pk in display_names:
+            display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name)
 
             try:
-                displayname = (display_name[0]).encode('utf-8')
+                displayname = (display_name).encode('utf-8')
             except AttributeError:
                 displayname = "Error has occurred - import probably unsuccessful"
 
-            modalitydata[display_name[0]] = {
-                'total': studies.filter(
-                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
-                ).count(),
-                'latest': latestdatetime,
-                'displayname': displayname
+            modalitydata[display_name] = {
+                'studies_in_past_days_a': display_name_studies.filter(study_date__range=[date_a, today]).count(),
+                'studies_in_past_days_b': display_name_studies.filter(study_date__range=[date_b, today]).count(),
+                'displayname': displayname,
+                'displayname_pk': modality.lower() + str(pk)
             }
-        ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
+        data = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['displayname_pk'], reverse=True))
 
-        template = 'remapp/home-list-modalities.html'
-        data = ordereddata
+        template = 'remapp/home-modality-workload.html'
+
         return render(request, template, {'data': data, 'modality': modality.lower()})
 
 
@@ -2739,6 +2861,63 @@ def chart_options_view(request):
 
     return render_to_response(
         'remapp/displaychartoptions.html',
+        return_structure,
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
+def homepage_options_view(request):
+    """View to enable user to see and update home page options
+
+    :param request: request object
+    :return: dictionary of home page settings, html template location and request object
+    """
+    from remapp.forms import HomepageOptionsForm
+
+    if request.method == 'POST':
+        homepage_options_form = HomepageOptionsForm(request.POST)
+        if homepage_options_form.is_valid():
+            try:
+                # See if the user has a userprofile
+                user_profile = request.user.userprofile
+            except:
+                # Create a default userprofile for the user if one doesn't exist
+                create_user_profile(sender=request.user, instance=request.user, created=True)
+                user_profile = request.user.userprofile
+
+            user_profile.summaryWorkloadDaysA = homepage_options_form.cleaned_data['dayDeltaA']
+            user_profile.summaryWorkloadDaysB = homepage_options_form.cleaned_data['dayDeltaB']
+
+            user_profile.save()
+
+        messages.success(request, "Home page options have been updated")
+        return HttpResponseRedirect(reverse('home'))
+
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    try:
+        # See if the user has a userprofile
+        user_profile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        user_profile = request.user.userprofile
+
+    homepage_form_data = {'dayDeltaA': user_profile.summaryWorkloadDaysA,
+                          'dayDeltaB': user_profile.summaryWorkloadDaysB}
+
+    homepage_options_form = HomepageOptionsForm(homepage_form_data)
+
+    return_structure = {'admin': admin,
+                        'HomepageOptionsForm': homepage_options_form,
+                        }
+
+    return render_to_response(
+        'remapp/displayhomepageoptions.html',
         return_structure,
         context_instance=RequestContext(request)
     )

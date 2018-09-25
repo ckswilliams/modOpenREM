@@ -6,7 +6,8 @@ from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes,
 import logging
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings, \
-    NotPatientIndicatorsName, NotPatientIndicatorsID, HighDoseMetricAlertSettings
+    NotPatientIndicatorsName, NotPatientIndicatorsID, HighDoseMetricAlertSettings, HomePageAdminSettings
+    NotPatientIndicatorsName, NotPatientIndicatorsID, HomePageAdminSettings
 
 logger = logging.getLogger()
 
@@ -255,6 +256,14 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
     class Meta:
         model = HighDoseMetricAlertSettings
         fields = ['alert_total_dap_rf', 'alert_total_rp_dose_rf']
+
+
+class HomepageOptionsForm(forms.Form):
+    """Form for displaying and changing the home page options
+    """
+
+    dayDeltaA = forms.IntegerField(label='Primary time period to sum studies (days)', required=False)
+    dayDeltaB = forms.IntegerField(label='Secondary time period to sum studies (days)', required=False)
 
 
 class DicomQueryForm(forms.Form):
@@ -535,6 +544,28 @@ class SkinDoseMapCalcSettingsForm(forms.ModelForm):
     class Meta:
         model = SkinDoseMapCalcSettings
         fields = ['enable_skin_dose_maps', 'calc_on_import']
+
+
+class HomePageAdminSettingsForm(forms.ModelForm):
+    """Form for configuring home page settings
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(HomePageAdminSettingsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.layout = Layout(
+            Div(
+                'enable_workload_stats',
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            )
+        )
+
+    class Meta:
+        model = HomePageAdminSettings
+        fields = ['enable_workload_stats']
 
 
 class NotPatientNameForm(forms.ModelForm):

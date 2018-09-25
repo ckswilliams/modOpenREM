@@ -36,7 +36,7 @@ from django.views.generic import ListView, DetailView
 from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
-from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate, RFHighDoseAlertSettings
+from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate, RFHighDoseAlertSettings, HomePageAdminSettingsUpdate
 from remapp.views import NotPatientNameCreate, NotPatientNameUpdate, NotPatientNameDelete
 from remapp.views import NotPatientIDCreate, NotPatientIDUpdate, NotPatientIDDelete
 
@@ -46,6 +46,7 @@ urlpatterns = patterns('remapp.views',
         'openrem_home', name='home'),
                        url(r'^hometotals/$', 'update_modality_totals', name='update_modality_totals'),
                        url(r'^homestudies/$', 'update_latest_studies', name='update_latest_studies'),
+                       url(r'^homeworkload/$', 'update_study_workload', name='update_study_workload'),
 
                        url(r'^rf/$',
         'rf_summary_list_filter', name='rf_summary_list_filter'),
@@ -91,6 +92,7 @@ urlpatterns = patterns('remapp.views',
                        url(r'^admin/review/studiesequipdelete$', 'review_studies_equip_delete', name='review_studies_equip_delete'),
                        url(r'^admin/equipmentlastdateandcount$', 'display_name_last_date_and_count', name='display_name_last_date_and_count'),
                        url(r'^chartoptions/$', 'chart_options_view', name='chart_options_view'),
+                       url(r'^homepageoptions/$', 'homepage_options_view', name='homepage_options_view'),
                        url(r'^admin/dicomsummary', 'dicom_summary', name='dicom_summary'),
                        url(r'^admin/dicomstore/add/$', DicomStoreCreate.as_view(), name='dicomstore_add'),
                        url(r'^admin/dicomstore/(?P<pk>\d+)/$', DicomStoreUpdate.as_view(), name='dicomstore_update'),
@@ -111,7 +113,7 @@ urlpatterns = patterns('remapp.views',
                        url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/delete/$', NotPatientIDDelete.as_view(), name='notpatientid_delete'),
                        url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient', name='admin_questions_hide_not_patient'),
                        url(r'^admin/rfalertsettings/(?P<pk>\d+)/$', RFHighDoseAlertSettings.as_view(), name='rf_alert_settings_update'),
-
+                       url(r'^admin/homepagesettings/(?P<pk>\d+)/$', HomePageAdminSettingsUpdate.as_view(), name='homepageadminsettings_update'),
                        # url(r'^password/$', 'change_password', name='change_password'),
                        url(
                            '^change_password/$',

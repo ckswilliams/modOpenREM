@@ -20,9 +20,9 @@ All studies from one source
 ===========================
 
 .. figure:: img/ConfigMenu.png
+   :figwidth: 30%
    :align: right
    :alt: Admin menu
-   :width: 179px
 
    The ``Config`` menu (admin)
 

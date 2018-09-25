@@ -95,6 +95,13 @@ class HighDoseMetricAlertSettings(SingletonModel):
         return '/admin/rfalertsettings/1/'
 
 
+class HomePageAdminSettings(SingletonModel):
+    enable_workload_stats = models.BooleanField(default=False, verbose_name="Enable calculation and display of workload stats on home page?")
+
+    def get_absolute_url(self):
+        return '/admin/homepagesettings/1/'
+
+
 class DicomDeleteSettings(SingletonModel):
     del_no_match = models.BooleanField(default=False,
                     verbose_name="delete objects that don't match any import functions?")
@@ -364,6 +371,8 @@ class UserProfile(models.Model):
 
     plotCaseInsensitiveCategories = models.BooleanField(default=False)
 
+    summaryWorkloadDaysA = models.IntegerField(blank=True, null=True, default=7, verbose_name="Number of days over which to sum studies A")
+    summaryWorkloadDaysB = models.IntegerField(blank=True, null=True, default=28, verbose_name="Number of days over which to sum studies B")
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
