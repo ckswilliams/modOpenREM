@@ -138,6 +138,18 @@
                         type: "POST",
                         success: function (data) {
                             $('#{{ modality }}-table').html(data);
+                            {% if home_config.display_workload_stats %}
+                            $.ajax(
+                                {
+                                    url: "/openrem/homeworkload/",
+                                    data: {modality: '{{ modality }}'},
+                                    type: "POST",
+                                    success: function (data) {
+                                        $('#{{ modality }}-table').append(data);
+                                    }
+                                }
+                            )
+                            {% endif %}
                         }
                     }
                 )
@@ -150,16 +162,23 @@
     <div id="{{ modality }}-table">
       <table class="table table-bordered table-hover row-clickable">
         <tr>
-          <th style="width:33%">System name</th>
-          <th style="width:33%">Total number of studies</th>
-          <th style="width:33%">Latest study</th>
+          <th style="width:25%">System name</th>
+          <th style="width:25%">Total number of studies</th>
+          <th style="width:25%">Latest study</th>
+          {% if home_config.display_workload_stats %}
+            <th style="width:12.5%">Number in last {{ home_config.day_delta_a }} days</th>
+            <th style="width:12.5%">Number in last {{ home_config.day_delta_b }} days</th>
+          {% endif %}
         </tr>
         <tr>
-          <td colspan="3">Please wait - querying the database</td>
+          <td colspan="4">Please wait - querying the database</td>
         </tr>
       </table>
     </div>
   {% endfor %}
+
+
+
 
   {% if not modalities %}
     <h4>No data to display in the system</h4>

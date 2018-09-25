@@ -2,6 +2,11 @@
 OpenREM version history
 =======================
 
+0.8.2 (2018-xx-xx)
+------------------
+* `#668`_  Code quality: library import and blank space cleanup
+* `#658`_  Interface: Added display of workload stats in home page modality tables
+
 0.8.1 (2018-09-16)
 ------------------
 * `#663`_  Interface: updated column headings on home page
