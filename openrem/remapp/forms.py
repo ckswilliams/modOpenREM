@@ -7,7 +7,6 @@ import logging
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings, \
     NotPatientIndicatorsName, NotPatientIndicatorsID, HighDoseMetricAlertSettings, HomePageAdminSettings
-    NotPatientIndicatorsName, NotPatientIndicatorsID, HomePageAdminSettings
 
 logger = logging.getLogger()
 
