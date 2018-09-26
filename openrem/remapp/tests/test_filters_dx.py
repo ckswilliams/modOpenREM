@@ -52,7 +52,7 @@ class FilterViewTests(TestCase):
         Initial test to ensure five studies are listed with no filter
         """
         self.client.login(username='temporary', password='temporary')
-        response = self.client.get(reverse('dx_summary'), follow=True)
+        response = self.client.get(reverse('dx_summary_list_filter'), follow=True)
         self.assertEqual(response.status_code, 200)
         responses_text = u'There are 5 studies in this list.'
         self.assertContains(response, responses_text)

@@ -254,7 +254,7 @@
 
         {% if request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
             <script>
-                var urlStartStudy = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                var urlStartStudy = '{% url 'ct_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
             </script>
         {% endif %}
 
@@ -347,7 +347,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersAcq;
-                href_start = '/openrem/ct/?acquisitionhist=1&';
+                href_start = '{% url 'ct_summary_list_filter' %}/?acquisitionhist=1&';
                 hide_series_btn_stub = 'acq_dlp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -446,7 +446,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersAcqCTDI;
-                href_start = '/openrem/ct/?acquisitionhist=1&';
+                href_start = '{% url 'ct_summary_list_filter' %}?acquisitionhist=1&';
                 hide_series_btn_stub = 'acq_ctdi_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -493,7 +493,7 @@
                     fitChartToDiv('piechartAcquisitionDIV');
                 });
 
-                var urlStartAcq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+                var urlStartAcq = '{% url 'ct_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
                 result = chartFrequency('piechartAcquisitionDIV', 'Acquisition protocol frequency');
             </script>
         {% endif %}
@@ -579,7 +579,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudy;
-                href_start = '/openrem/ct/?studyhist=1&';
+                href_start = '{% url 'ct_summary_list_filter' %}?studyhist=1&';
                 hide_series_btn_stub = 'study_dlp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -678,7 +678,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudyCTDI;
-                href_start = '/openrem/ct/?studyhist=1&';
+                href_start = '{% url 'ct_summary_list_filter' %}?studyhist=1&';
                 hide_series_btn_stub = 'study_ctdi_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -901,7 +901,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'requested_procedure';
                 tooltip_filters = tooltipFiltersRequest;
-                href_start = '/openrem/ct/?requesthist=1&';
+                href_start = '{% url 'ct_summary_list_filter' %}?requesthist=1&';
                 hide_series_btn_stub = 'req_dlp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -947,7 +947,7 @@
                     chartSetExportSize('piechartRequestDIV');
                     fitChartToDiv('piechartRequestDIV');
                 });
-                var urlStartReq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
+                var urlStartReq = '{% url 'ct_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
                 result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');
             </script>
         {% endif %}
@@ -1117,7 +1117,7 @@
                     fitChartToDiv('studyMeanDLPOverTimeDIV');
                 });
 
-                var urlStartStudyOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                var urlStartStudyOverTime = '{% url 'ct_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
 
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 result = chartAverageOverTime('studyMeanDLPOverTimeDIV', 'DLP', 'mGy.cm', 'Mean');
