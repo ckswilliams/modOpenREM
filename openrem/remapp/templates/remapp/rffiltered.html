@@ -148,7 +148,7 @@
             </td>
             <td>
                 <a href="{% url 'rf_detail_view' pk=exam.id %}">
-                    <table onclick="window.location='/openrem/rf/{{ exam.id }}/';">
+                    <table onclick="window.location='{% url 'rf_detail_view' pk=exam.id %}';">
                         <tr><td class="nowrap">{{ equipment.manufacturer }}</td></tr>
                         <tr><td class="nowrap">{{ equipment.manufacturer_model_name }}</td></tr>
                         <tr><td class="nowrap">{{ equipment.unique_equipment_name.display_name }}</td></tr>
@@ -354,7 +354,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudy;
-                href_start = '/openrem/rf/?';
+                href_start = '{% url 'rf_summary_list_filter' %}?';
                 hide_series_btn_stub = 'study_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -433,7 +433,7 @@
                     chartSetExportSize('piechartStudyDIV');
                     fitChartToDiv('piechartStudyDIV');
                 });
-                var urlStartStudy = '/openrem/rf/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                var urlStartStudy = '{% url 'rf_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');
             </script>
         {% endif %}

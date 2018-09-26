@@ -3,8 +3,7 @@
 {% if complete %}
   <h4>Recently completed export tasks</h4>
 
-  <form action="{% url 'deletefile' %}
-  /openrem/deletefile/" method="POST">
+  <form action="{% url 'deletefile' %}" method="POST">
     <table class="table table-striped">
       <th>Exported</th>
       <th>Modality</th>

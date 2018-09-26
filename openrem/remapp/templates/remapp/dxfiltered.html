@@ -55,7 +55,7 @@
 
     {{ studyfilter }}
 
-    <form action="{% url "dx_summary" %}" method="get" class="form-horizontal" role="form" id="examFilterForm">
+    <form action="{% url 'dx_summary_list_filter' %}" method="get" class="form-horizontal" role="form" id="examFilterForm">
         <div class="panel panel-info small">
             <div class="panel-heading">
                 <h3 class="panel-title">Exam filter</h3>
@@ -253,7 +253,7 @@
 
         {% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeankVpOverTime or request.user.userprofile.plotDXAcquisitionMeanmAsOverTime or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime%}
             <script>
-                var urlStartAcq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+                var urlStartAcq = '{% url 'dx_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
             </script>
         {% endif %}
 
@@ -337,7 +337,7 @@
                 field_multiplier = 0.000001;
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFilters;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
+                href_start = '{% url 'dx_summary_list_filter' %}?acquisitionhist=1&';
                 hide_series_btn_stub = 'acq_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -467,7 +467,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'requested_procedure';
                 tooltip_filters = tooltipFiltersRequest;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
+                href_start = '{% url 'dx_summary_list_filter' %}?acquisitionhist=1&';
                 hide_series_btn_stub = 'req_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -513,7 +513,7 @@
                     chartSetExportSize('piechartRequestDIV');
                     fitChartToDiv('piechartRequestDIV');
                 });
-                var urlStartReq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure_code_meaning=';
+                var urlStartReq = '{% url 'dx_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure_code_meaning=';
                 result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');
             </script>
         {% endif %}
@@ -598,7 +598,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudy;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
+                href_start = '{% url 'dx_summary_list_filter' %}?acquisitionhist=1&';
                 hide_series_btn_stub = 'study_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -644,7 +644,7 @@
                     chartSetExportSize('piechartStudyDIV');
                     fitChartToDiv('piechartStudyDIV');
                 });
-                var urlStartStudy = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                var urlStartStudy = '{% url 'dx_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');
             </script>
         {% endif %}
@@ -726,7 +726,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFilterskVp;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
+                href_start = '{% url 'dx_summary_list_filter' %}?acquisitionhist=1&';
                 hide_series_btn_stub = 'acq_kvp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -821,7 +821,7 @@
                 field_multiplier = 1000;
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersmAs;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
+                href_start = '{% url 'dx_summary_list_filter' %}?acquisitionhist=1&';
                 hide_series_btn_stub = 'acq_mas_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}

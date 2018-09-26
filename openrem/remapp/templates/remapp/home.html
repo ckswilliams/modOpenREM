@@ -115,7 +115,15 @@
   <table class="table table-bordered">
     <tr>
       {% for modality, details in modalities.items %}
-        <th style="width:25%"><a href="{% url modality %}">{{ details.name }}</a></th>
+        {% if modality == 'CT' %}
+            <th style="width:25%"><a href="{% url 'ct_summary_list_filter' %}">{{ details.name }}</a></th>
+        {% elif modality == 'RF' %}
+            <th style="width:25%"><a href="{% url 'rf_summary_list_filter' %}">{{ details.name }}</a></th>
+        {% elif modality == 'MG' %}
+            <th style="width:25%"><a href="{% url 'mg_summary_list_filter' %}">{{ details.name }}</a></th>
+        {% elif modality == 'DX' %}
+            <th style="width:25%"><a href="{% url 'dx_summary_list_filter' %}">{{ details.name }}</a></th>
+        {% endif %}
       {% endfor %}
     </tr>
     <tr>

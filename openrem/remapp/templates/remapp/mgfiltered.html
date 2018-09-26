@@ -150,7 +150,7 @@
             </td>
             <td>
                 <a href="{% url 'mg_detail_view' pk=exam.id %}">
-                    <table onclick="window.location='/openrem/mg/{{ exam.id }}/';">
+                    <table onclick="window.location='{% url 'mg_detail_view' pk=exam.id %}';">
                         <tr><td class="nowrap">{{ equipment.manufacturer }}</td></tr>
                         <tr><td class="nowrap">{{ equipment.manufacturer_model_name }}</td></tr>
                         <tr><td class="nowrap">{{ equipment.unique_equipment_name.display_name }}</td></tr>
@@ -164,7 +164,7 @@
             </td>
             <td>
                 <a href="{% url 'mg_detail_view' pk=exam.id %}">
-                    <table onclick="window.location='/openrem/mg/{{ exam.id }}/';">
+                    <table onclick="window.location='{% url 'mg_detail_view' pk=exam.id %}';">
                         <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
                         <tr><td class="nowrap">{{ exam.procedure_code_meaning }}</td></tr>
                         <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
