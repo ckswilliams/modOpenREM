@@ -486,10 +486,9 @@ def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
     from remapp.forms import RFChartOptionsForm, itemsPerPageForm
-    from remapp.models import HighDoseMetricAlertSettings, AccumIntegratedProjRadiogDose
-    from datetime import datetime, timedelta
+    from remapp.models import HighDoseMetricAlertSettings, AccumIntegratedProjRadiogDose, PKsForSummedRFDoseStudiesInDeltaWeeks
+    from datetime import timedelta
     from django.db.models import Sum
-    import json
 
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(
@@ -575,11 +574,18 @@ def rf_summary_list_filter(request):
     all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
     week_delta = alert_levels['accum_dose_delta_weeks']
     for study in f:
+
+        # ==============================================================================================================
+        # ==============================================================================================================
+        # Code from here...
         patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
         if patient_id:
             study_date = study.study_date
             oldest_date = (study_date - timedelta(weeks=week_delta))
 
+            #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            # The try and except parts of this code are here because some of the studies in my database didn't have the
+            # expected data in the related fields - not sure why. Perhaps an issue with the extractor routine?
             try:
                 accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
             except ObjectDoesNotExist:
@@ -592,12 +598,22 @@ def rf_summary_list_filter(request):
                 except ObjectDoesNotExist:
                     study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.create()
                 accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
+            # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
             accum_int_proj_to_update = AccumIntegratedProjRadiogDose.objects.get(pk=accum_int_proj_pk)
 
             if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks or not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
                 included_studies = all_rf_studies.filter(patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
-                accum_int_proj_to_update.pks_of_studies_in_delta_weeks = json.dumps(list(included_studies.values_list('pk', flat=True)))
+                pks_already_there = PKsForSummedRFDoseStudiesInDeltaWeeks.objects.filter(general_study_module_attributes_id = study.pk).values_list('general_study_module_attributes_id', flat=True)
+                bulk_entries = []
+                for pk in included_studies.values_list('pk', flat=True):
+                    if pk not in pks_already_there:
+                        new_entry = PKsForSummedRFDoseStudiesInDeltaWeeks()
+                        new_entry.general_study_module_attributes_id = study.pk
+                        new_entry.study_pk_in_delta_weeks = pk
+                        bulk_entries.append(new_entry)
+                if len(bulk_entries):
+                    PKsForSummedRFDoseStudiesInDeltaWeeks.objects.bulk_create(bulk_entries)
 
             if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks and not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
                 accum_totals = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total'),
@@ -613,6 +629,17 @@ def rf_summary_list_filter(request):
                 accum_rp_dose_over_delta_weeks = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total')).values()[0]
                 accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_rp_dose_over_delta_weeks
                 accum_int_proj_to_update.save()
+        # ... to here is checking for and creating the summed total DAP and dose at RP. This should really happen at the point
+        # that an individual study is imported into the system, or for all studies after it is instigated by an OpenREM admin
+        # changing the value of delta weeks.
+        #
+        # When updating this data the following needs to happen:
+        #   Empty the whole of the PKsForSummedRFDoseStudiesInDeltaWeeks table
+        #   Remove all entries in the dose_area_product_total_over_delta_weeks and dose_rp_total_over_delta_weeks fields
+        #   in the AccumIntegratedProjRadiogDose table
+        # Perhaps could do this on a study-by-study basis, if emptying whole tables makes anyone nervous
+        # ==============================================================================================================
+        # ==============================================================================================================
 
 
     # # Calculate skin dose map for all objects in the database
@@ -749,6 +776,7 @@ def rf_detail_view(request, pk=None):
     from django.db.models import Sum
     import numpy as np
     import operator
+    from remapp.models import HighDoseMetricAlertSettings
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
@@ -820,6 +848,13 @@ def rf_detail_view(request, pk=None):
     except ObjectDoesNotExist:
         SkinDoseMapCalcSettings.objects.create()
 
+    # Import total DAP and total dose at reference point alert levels. Create with default values if not found.
+    try:
+        alert_levels = HighDoseMetricAlertSettings.objects.values('alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks')[0]
+    except ObjectDoesNotExist:
+        HighDoseMetricAlertSettings.objects.create()
+        alert_levels = HighDoseMetricAlertSettings.objects.values('alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks')[0]
+
     admin = {'openremversion': remapp.__version__,
              'docsversion': remapp.__docs_version__,
              'enable_skin_dose_maps': SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]}
@@ -833,7 +868,8 @@ def rf_detail_view(request, pk=None):
          'study_totals': study_totals,
          'projection_xray_dose_set': projection_xray_dose_set,
          'accumxraydose_set_all_planes': accumxraydose_set_all_planes,
-         'events_all': events_all},
+         'events_all': events_all,
+         'alertLevels': alert_levels},
         context_instance=RequestContext(request)
     )
 
