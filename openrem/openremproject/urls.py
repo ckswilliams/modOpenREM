@@ -11,8 +11,8 @@ urlpatterns = patterns('',
     url(r'^{0}openrem/'.format(VIRTUAL_DIRECTORY), include('remapp.urls')),
     url(r'^{0}admin/'.format(VIRTUAL_DIRECTORY), include(admin.site.urls)),
     # Login / logout.
-    url(r'^{0}login/$'.format(VIRTUAL_DIRECTORY), 'django.contrib.auth.views.login'),
-    url(r'^{0}logout/$'.format(VIRTUAL_DIRECTORY), 'remapp.views.logout_page'),
+    url(r'^{0}login/$'.format(VIRTUAL_DIRECTORY), 'django.contrib.auth.views.login', name='login'),
+    url(r'^{0}logout/$'.format(VIRTUAL_DIRECTORY), 'remapp.views.logout_page', name='logout'),
 
 )
 

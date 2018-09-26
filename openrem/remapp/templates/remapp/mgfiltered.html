@@ -20,31 +20,31 @@
     {% if admin.exportgroup %}
         <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
     <p>
-      <a href="/openrem/exportmgcsv1/0/0/?{{ request.GET.urlencode }}"
+      <a href="{% url 'mgcsv1' 0 0 %}?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
           {% if admin.pidgroup %}
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportmgcsv1/1/0/?{{ request.GET.urlencode }}"
+              <a href="{% url 'mgcsv1' 1 0 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With names</a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportmgcsv1/0/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'mgcsv1' 0 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With ID</a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportmgcsv1/1/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'mgcsv1' 1 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With both</a>
     </p>
     <p>
           {% endif %}
-      <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportmgxlsx1/0/0/?{{ request.GET.urlencode }}"
+      <a href="{% url 'mgxlsx1' 0 0 %}?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to xlsx</a>
           {% if admin.pidgroup %}
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportmgxlsx1/1/0/?{{ request.GET.urlencode }}"
+              <a href="{% url 'mgxlsx1' 1 0 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With names</a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportmgxlsx1/0/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'mgxlsx1' 0 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With ID</a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportmxlsxv1/1/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'mgxlsx1' 1 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With both</a>
     </p>
     <p>
           {% endif %}
-          <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportmgnhsbsp/?{{ request.GET.urlencode }}"
+          <a href="{% url 'mgnhsbsp' %}?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to CSV using the NHSBSP format</a>
     </p>
 
@@ -144,12 +144,12 @@
           {% with accum_mammo_set=projection_set.accumxraydose_set.get.accummammographyxraydose_set.all %}
         <tr>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/mg/{{ exam.id }}/">
+                <a href="{% url 'mg_detail_view' pk=exam.id %}">
                     {{ equipment.institution_name }}
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/mg/{{ exam.id }}/">
+                <a href="{% url 'mg_detail_view' pk=exam.id %}">
                     <table onclick="window.location='/openrem/mg/{{ exam.id }}/';">
                         <tr><td class="nowrap">{{ equipment.manufacturer }}</td></tr>
                         <tr><td class="nowrap">{{ equipment.manufacturer_model_name }}</td></tr>
@@ -158,12 +158,12 @@
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/mg/{{ exam.id }}/">
+                <a href="{% url 'mg_detail_view' pk=exam.id %}">
                     {{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/mg/{{ exam.id }}/">
+                <a href="{% url 'mg_detail_view' pk=exam.id %}">
                     <table onclick="window.location='/openrem/mg/{{ exam.id }}/';">
                         <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
                         <tr><td class="nowrap">{{ exam.procedure_code_meaning }}</td></tr>
@@ -175,12 +175,12 @@
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/mg/{{ exam.id }}/">
+                <a href="{% url 'mg_detail_view' pk=exam.id %}">
                     {{ projection_set.irradeventxraydata_set.count }}
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/mg/{{ exam.id }}/">
+                <a href="{% url 'mg_detail_view' pk=exam.id %}">
                 {% for breast in accum_mammo_set %}
                     {% if breast.laterality.code_meaning == "Left breast" %}
                         Left:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}<br>

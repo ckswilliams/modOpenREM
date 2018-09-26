@@ -19,26 +19,26 @@
     {% if admin.exportgroup %}
         <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
     <p>
-      <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportflcsv1/0/0/?{{ request.GET.urlencode }}"
+      <a href="{% url 'flcsv1' 0 0 %}?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
           {% if admin.pidgroup %}
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportflcsv1/1/0/?{{ request.GET.urlencode }}"
+              <a href="{% url 'flcsv1' 1 0 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With names</a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportflcsv1/0/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'flcsv1' 0 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With ID</a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportflcsv1/1/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'flcsv1' 1 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With both</a>
     </p>
     <p>
           {% endif %}
-          <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportrfxlsx1/0/0/?{{ request.GET.urlencode }}"
+          <a href="{% url 'rfxlsx1' 0 0 %}?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to XLSX</a>
           {% if admin.pidgroup %}
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportrfxlsx1/1/0/?{{ request.GET.urlencode }}"
+              <a href="{% url 'rfxlsx1' 1 0 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With names</a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportrfxlsx1/0/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'rfxlsx1' 0 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With ID</a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/exportrfxlsx1/1/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'rfxlsx1' 1 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With both</a>
           {% endif %}
     </p>
@@ -142,12 +142,12 @@
           {% with accum_set=projection_set.accumxraydose_set.all %}
         <tr>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {{ equipment.institution_name }}
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     <table onclick="window.location='/openrem/rf/{{ exam.id }}/';">
                         <tr><td class="nowrap">{{ equipment.manufacturer }}</td></tr>
                         <tr><td class="nowrap">{{ equipment.manufacturer_model_name }}</td></tr>
@@ -156,13 +156,13 @@
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/{{ exam.id }}/">
-                    <table onclick="window.location='/openrem/rf/{{ exam.id }}/';">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
+                    <table onclick="window.location='{% url 'rf_detail_view' pk=exam.id %}';">
                         <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
                         <tr><td class="nowrap">{{ exam.procedure_code_meaning }}</td></tr>
                         <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
@@ -173,12 +173,12 @@
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {{ projection_set.irradeventxraydata_set.count }}
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {% for record in accum_set %}
                       {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
                         {% if accum_set.count > 1 %}
@@ -191,7 +191,7 @@
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {% for record in accum_set %}
                       {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
                         {% if accum_set.count > 1 %}
@@ -204,7 +204,7 @@
                 </a>
             </td>
             <td>
-                <a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {{ exam.performing_physician_name }}
                 </a>
             </td>

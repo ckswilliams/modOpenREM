@@ -9,10 +9,8 @@
     <meta name="copyright" content="2013-2017 The Royal Marsden NHS Foundation Trust">
     <meta name="licence" content="GPLv3">
     <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">
-{% load virtualdirectory %}
-{% get_virtual_directory as VIRTUAL_DIRECTORY %}
 
-    <title>OpenREM Browser - {{ VIRTUAL_DIRECTORY }}</title>
+    <title>OpenREM Browser</title>
 
     <script src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
     <!-- Bootstrap core CSS -->
@@ -33,10 +31,6 @@
 
   </head>
 
-
-
-
-
   <body>
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
@@ -47,22 +41,22 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/{{ VIRTUAL_DIRECTORY }}openrem/">OpenREM</a>
+          <a class="navbar-brand" href="{%  url 'home' %}">OpenREM</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             {% block navbar %}
                 {% if request.user.userprofile.displayCT %}
-                    {% block navct %}<li>{% endblock %}<a href="/{{ VIRTUAL_DIRECTORY }}openrem/ct/">CT</a></li>
+                    {% block navct %}<li>{% endblock %}<a href="{% url 'ct_summary_list_filter' %}">CT</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayRF %}
-                    {% block navrf %}<li>{% endblock %}<a href="/{{ VIRTUAL_DIRECTORY }}openrem/rf/">Fluoroscopy</a></li>
+                    {% block navrf %}<li>{% endblock %}<a href="{% url 'rf_summary_list_filter' %}">Fluoroscopy</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayMG %}
-                    {% block navmg %}<li>{% endblock %}<a href="/{{ VIRTUAL_DIRECTORY }}openrem/mg/">Mammography</a></li>
+                    {% block navmg %}<li>{% endblock %}<a href="{% url 'mg_summary_list_filter' %}">Mammography</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayDX %}
-                    {% block navdx %}<li>{% endblock %}<a href="/{{ VIRTUAL_DIRECTORY }}openrem/dx/">Radiography</a></li>
+                    {% block navdx %}<li>{% endblock %}<a href="{% url 'dx_summary_list_filter' %}">Radiography</a></li>
                 {% endif %}
             {% endblock %}
           </ul>
@@ -78,13 +72,13 @@
                         </a>
                         <ul class="dropdown-menu">
                             {% if admin.importsizegroup %}
-                            <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/sizeupload">Import patient size info</a></li>
+                            <li><a href="{% url 'size_upload' %}">Import patient size info</a></li>
                             {% endif %}
                             {% if admin.importsizegroup or admin.admingroup %}
-                            <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/sizeimports">Previous patient size imports</a></li>
+                            <li><a href="{% url 'size_imports' %}">Previous patient size imports</a></li>
                             {% endif %}
                             {% if admin.importqrgroup %}
-                            <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/queryremote">Query remote server</a> </li>
+                            <li><a href="{% url 'dicom_qr_page' %}">Query remote server</a> </li>
                             {% endif %}
                         </ul>
                     </li>
@@ -93,7 +87,7 @@
                     {% block exportnav %}
                         <li>
                     {% endblock %}
-                        <a href="/{{ VIRTUAL_DIRECTORY }}openrem/export/">Exports</a></li>
+                        <a href="{% url 'export' %}">Exports</a></li>
                 {% endif %}
 
                 {% block confnav %}
@@ -104,22 +98,22 @@
                     </a>
                     <ul class="dropdown-menu">
                       <li class="dropdown-header">User level config</li>
-                      <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/chartoptions/">Chart options</a></li>
-                      <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/charts_off/">Switch charts off</a></li>
+                      <li><a href="{% url 'chart_options_view' %}">Chart options</a></li>
+                      <li><a href="{%  url 'charts_off' %}">Switch charts off</a></li>
                       {% if not admin.admingroup %}
-                        <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/viewdisplaynames/">View display names & modality</a></li>
-                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/notpatientindicators/">View not-patient indicators</a> </li>
+                        <li><a href="{% url 'display_names_view' %}">View display names & modality</a></li>
+                        <li><a href="{% url 'not_patient_indicators' %}">View not-patient indicators</a> </li>
                       {% endif %}
                       {% if admin.admingroup %}
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">System level settings</li>
-                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/auth/user/">Users</a></li>
-                        <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/viewdisplaynames/">Display names & modality</a></li>
-                        <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/dicomdelsettings/1/">DICOM object deletion</a> </li>
-                        <li><a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/dicomsummary">DICOM networking</a></li>
-                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/patientidsettings/1/">Patient ID</a> </li>
-                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/notpatientindicators/">Not-patient indicators</a> </li>
-                        <li><a href="/{{ VIRTUAL_DIRECTORY }}admin/skindosemapsettings/1/">Skin dose map</a> </li>
+                        <li><a href="{% url 'admin:auth_user_changelist' %}">Users</a></li>
+                        <li><a href="{% url 'display_names_view' %}">Display names & modality</a></li>
+                        <li><a href="{% url 'dicom_delete_settings_update' 1 %}">DICOM object deletion</a> </li>
+                        <li><a href="{% url 'dicom_summary' %}">DICOM networking</a></li>
+                        <li><a href="{% url 'patient_id_settings_update' 1 %}">Patient ID</a> </li>
+                        <li><a href="{% url 'not_patient_indicators' %}">Not-patient indicators</a> </li>
+                        <li><a href="{%  url 'skin_dose_map_settings_update' 1 %}">Skin dose map</a> </li>
                       {% endif %}
                     </ul>
                 </li>
@@ -130,10 +124,10 @@
               <span class="glyphicon glyphicon-user"></span>
               {% if user.is_authenticated %}
                {{ user.get_full_name }} -
-               <a href="/{{ VIRTUAL_DIRECTORY }}logout/" class="navbar-link">logout</a>
+               <a href="{% url 'logout' %}">logout</a>
               {% else %}
                Not signed in -
-              <a href="/{{ VIRTUAL_DIRECTORY }}login/?next={{ request.get_full_path|urlencode }}" class="navbar-link">login</a>
+              <a href="{%  url 'login' %}?next={{ request.get_full_path|urlencode }}" class="navbar-link">login</a>
               {% endif %}
             </p>
 <li class="dropdown">

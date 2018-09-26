@@ -26,7 +26,7 @@
       <div class="panel-body">
         <p>
           You will need to allocate users to a group before using this system -
-          <a href="/{{ VIRTUAL_DIRECTORY }}admin/auth/user/">you can do this here.</a> You will need to know the superuser
+          <a href="{%  url 'admin:auth_user_changelist' %}">you can do this here.</a> You will need to know the superuser
           username and password you used when you installed the database.
         </p>
         <p>
@@ -42,7 +42,7 @@
       </div>
       <div class="panel-body">
         <p>
-          Make sure there is at least one Admin user &mdash; <a href="/{{ VIRTUAL_DIRECTORY }}admin/auth/user/">you can do this here.</a> You
+          Make sure there is at least one Admin user &mdash; <a href="{% url 'admin:auth_user_changelist' %}">you can do this here.</a> You
           will need to know the superuser
           username and password you used when you installed the database.
         </p>
@@ -73,13 +73,13 @@
             <td>
               <strong>Admin question:</strong> Identifying non-patient exposures has changed in release 0.8. Would you
               like this install to match the behaviour of release 0.7.4 and earlier?
-              <a href="/{{ VIRTUAL_DIRECTORY }}admin/adminquestions/hide_not_patient/" role="button" class="btn btn-default pull-right">
+              <a href="{% url 'admin_questions_hide_not_patient' %}" role="button" class="btn btn-default pull-right">
                 Hide
               </a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}admin/notpatientindicators/restore074/" role="button" class="btn btn-default pull-right">
+              <a href="{% url 'not_patient_indicators_as_074' %}" role="button" class="btn btn-default pull-right">
                 Restore 0.7.4 patterns
               </a>
-              <a href="/{{ VIRTUAL_DIRECTORY }}openrem/admin/notpatientindicators/" role="button" class="btn btn-default pull-right">
+              <a href="{%  url 'not_patient_indicators' %}" role="button" class="btn btn-default pull-right">
                 More information
               </a>
             </td>
@@ -98,7 +98,7 @@
           function get_modality_numbers(json) {
               $.ajax(
                   {
-                      url: "/{{ VIRTUAL_DIRECTORY }}openrem/hometotals/",
+                      url: "{% url 'update_modality_totals' %}",
                       type: "POST",
                       dataType: "json",
                       success: function (json) {
@@ -115,7 +115,7 @@
   <table class="table table-bordered">
     <tr>
       {% for modality, details in modalities.items %}
-        <th style="width:25%"><a href="/{{ VIRTUAL_DIRECTORY }}openrem/{{ modality|lower }}/">{{ details.name }}</a></th>
+        <th style="width:25%"><a href="{% url modality %}">{{ details.name }}</a></th>
       {% endfor %}
     </tr>
     <tr>
@@ -133,22 +133,22 @@
             function get_latest_studies(json) {
                 $.ajax(
                     {
-                        url: "/{{ VIRTUAL_DIRECTORY }}openrem/homestudies/",
+                        url: "{% url 'update_latest_studies' %}",
                         data: {modality: '{{ modality }}'},
                         type: "POST",
                         success: function (data) {
                             $('#{{ modality }}-table').html(data);
                             {% if home_config.display_workload_stats %}
-                            $.ajax(
-                                {
-                                    url: "/{{ VIRTUAL_DIRECTORY }}openrem/homeworkload/",
-                                    data: {modality: '{{ modality }}'},
-                                    type: "POST",
-                                    success: function (data) {
-                                        $('#{{ modality }}-table').append(data);
+                                $.ajax(
+                                    {
+                                        url: "{% url 'update_study_workload' %}",
+                                        data: {modality: '{{ modality }}'},
+                                        type: "POST",
+                                        success: function (data) {
+                                            $('#{{ modality }}-table').append(data);
+                                        }
                                     }
-                                }
-                            )
+                                );
                             {% endif %}
                         }
                     }

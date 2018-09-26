@@ -13,7 +13,7 @@
 
 {% block mainblock %}
   {% if admin.admingroup %}
-  <form action="/openrem/updatedisplaynames/" method="post">{% csrf_token %}
+  <form action="{% url 'display_name_update' %}" method="post">{% csrf_token %}
   {% endif %}
   <table class="table table-bordered table-hover row-clickable">
     <row>
@@ -81,7 +81,7 @@
   {% if admin.admingroup %}
   <input class="btn btn-primary" type="submit" value="Update">
   {% endif %}
-  <a class="btn btn-default" href="/{{ VIRTUAL_DIRECTORY }}openrem/viewdisplaynames/" role="button">Cancel</a>
+  <a class="btn btn-default" href="{%  url 'display_names_view' %}" role="button">Cancel</a>
   </form>
 
 {% endblock %}
