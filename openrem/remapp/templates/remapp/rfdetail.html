@@ -60,34 +60,7 @@
                 <li>Performing physician(s): {{ study.performing_physician_name }}</li>
                 <li>Operator(s): {{ study.operator_name }}</li>
                 <li>Test patient indicators? {{ study.patientmoduleattr_set.get.not_patient_indicator }}</li>
-
-                <h3>Info on studies (including this one) matching this patient ID over the {{ alertLevels.accum_dose_delta_weeks }} week{{ alertLevels.accum_dose_delta_weeks|pluralize }} previous to this study date</h3>
-                {% for record in accumxraydose_set_all_planes %}
-                  {% with accumprojection=record.accumintegratedprojradiogdose_set.get %}
-                   <li>
-                        Number of studies: {{ study.pksforsummedrfdosestudiesindeltaweeks_set.count }}
-                        ({% for pk_ref in study.pksforsummedrfdosestudiesindeltaweeks_set.all %}
-                            <a href="/openrem/rf/{{ pk_ref.study_pk_in_delta_weeks }}/">study {{ pk_ref.study_pk_in_delta_weeks }}</a>{% if not forloop.last%}, {% endif %}
-                        {% endfor %})
-                   </li>
-                   <li>
-                        Total DAP summed over this period:
-                        {% if accumprojection.total_dap_delta_gym2_to_cgycm2 >= alertLevels.alert_total_dap_rf %}
-                            <strong style="color: red;">{{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}</strong> cGy.cm<sup>2</sup>
-                        {% else %}
-                            {{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
-                        {% endif %}
-                   </li>
-                   <li>
-                        Total dose at RP summed over this period:
-                       {% if accumprojection.dose_rp_total_over_delta_weeks >= alertLevels.alert_total_rp_dose_rf %}
-                           <strong style="color: red;"><script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script></strong> Gy
-                        {% else %}
-                           <script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script> Gy
-                        {% endif %}
-                   </li>
-                  {% endwith %}
-                {% endfor %}
+            </ul>
 
             <br>
             <table class="table table-condensed table-bordered small">
@@ -113,7 +86,37 @@
                     </tr>
                 {% endfor %}
             </table>
+
+            <h4>Info on studies (including this one) matching this patient ID over the {{ alertLevels.accum_dose_delta_weeks }} week{{ alertLevels.accum_dose_delta_weeks|pluralize }} previous to this study date</h4>
+            <ul>
+            {% with accumxraydose_set_all_planes|first as first_accumxraydose %}
+              {% with accumprojection=first_accumxraydose.accumintegratedprojradiogdose_set.get %}
+               <li>
+                    Number of studies: {{ study.pksforsummedrfdosestudiesindeltaweeks_set.count }}
+                    ({% for pk_ref in study.pksforsummedrfdosestudiesindeltaweeks_set.all %}
+                        <a href="/openrem/rf/{{ pk_ref.study_pk_in_delta_weeks }}/">study {{ pk_ref.study_pk_in_delta_weeks }}</a>{% if not forloop.last%}, {% endif %}
+                    {% endfor %})
+               </li>
+               <li>
+                    Total DAP summed over this period:
+                    {% if accumprojection.total_dap_delta_gym2_to_cgycm2 >= alertLevels.alert_total_dap_rf %}
+                        <strong style="color: red;">{{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}</strong> cGy.cm<sup>2</sup>
+                    {% else %}
+                        {{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
+                    {% endif %}
+               </li>
+               <li>
+                    Total dose at RP summed over this period:
+                   {% if accumprojection.dose_rp_total_over_delta_weeks >= alertLevels.alert_total_rp_dose_rf %}
+                       <strong style="color: red;"><script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script></strong> Gy
+                    {% else %}
+                       <script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script> Gy
+                    {% endif %}
+               </li>
+              {% endwith %}
+            {% endwith %}
             </ul>
+
         </div>
     {% endwith %}{% endwith %}{% endwith %}
 
