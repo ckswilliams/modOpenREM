@@ -171,7 +171,7 @@
           {% endif %}
         </tr>
         <tr>
-          <td colspan="4">Please wait - querying the database</td>
+          <td colspan={% if home_config.display_workload_stats %}"5"{% else %}"3"{% endif %}>Please wait - querying the database</td>
         </tr>
       </table>
     </div>

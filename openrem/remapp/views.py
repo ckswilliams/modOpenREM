@@ -2971,6 +2971,15 @@ def homepage_options_view(request):
     :return: dictionary of home page settings, html template location and request object
     """
     from remapp.forms import HomepageOptionsForm
+    from remapp.models import HomePageAdminSettings
+    from django.utils.safestring import mark_safe
+
+    display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
+    if not display_workload_stats:
+        if request.user.groups.filter(name="admingroup"):
+            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; as a member of the admin group you can change this setting <a href="/admin/homepagesettings/1/">here</a>'))
+        else:
+            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; a member of the admin group can change this setting <a href="/admin/homepagesettings/1/">here</a>'))
 
     if request.method == 'POST':
         homepage_options_form = HomepageOptionsForm(request.POST)
