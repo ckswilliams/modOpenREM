@@ -79,7 +79,10 @@ class NotPatientIndicatorsName(models.Model):
         verbose_name_plural = u'Not-patient indicator names'
 
 
-class SkinDoseMapCalcSettings(SingletonModel):
+class SkinDoseMaipCalcSettings(SingletonModel):
+    """
+    Table to store skin dose map calculation settings
+    """
     enable_skin_dose_maps = models.BooleanField(default=False, verbose_name="Enable skin dose maps?")
     calc_on_import = models.BooleanField(default=True, verbose_name="Calculate skin dose map on import?")
 
@@ -88,6 +91,9 @@ class SkinDoseMapCalcSettings(SingletonModel):
 
 
 class HomePageAdminSettings(SingletonModel):
+    """
+    Table to store home page settings
+    """
     enable_workload_stats = models.BooleanField(default=False, verbose_name="Enable calculation and display of workload stats on home page?")
 
     def get_absolute_url(self):
@@ -95,6 +101,9 @@ class HomePageAdminSettings(SingletonModel):
 
 
 class DicomDeleteSettings(SingletonModel):
+    """
+    Table to store DICOM deletion settings
+    """
     del_no_match = models.BooleanField(default=False,
                     verbose_name="delete objects that don't match any import functions?")
     del_rdsr = models.BooleanField(default=False,
@@ -116,6 +125,9 @@ class DicomDeleteSettings(SingletonModel):
         return reverse('dicom_summary')
 
 class PatientIDSettings(SingletonModel):
+    """
+    Table to store patient ID settings
+    """
     name_stored = models.BooleanField(default=False)
     name_hashed = models.BooleanField(default=True)
     id_stored = models.BooleanField(default=False)
@@ -134,6 +146,9 @@ class PatientIDSettings(SingletonModel):
 
 
 class DicomStoreSCP(models.Model):
+    """
+    Table to store DICOM store settings
+    """
     name = models.CharField(max_length=64, unique=True,
                             verbose_name="Name of local store node - fewer than 64 characters, spaces allowed")
     aetitle = models.CharField(max_length=16, blank=True, null=True,
@@ -150,6 +165,9 @@ class DicomStoreSCP(models.Model):
 
 
 class DicomRemoteQR(models.Model):
+    """
+    Table to store DICOM remote QR settings
+    """
     name = models.CharField(max_length=64, unique=True,
                             verbose_name="Name of QR node - fewer than 64 characters, spaces allowed")
     aetitle = models.CharField(max_length=16, blank=True, null=True,
@@ -170,6 +188,9 @@ class DicomRemoteQR(models.Model):
 
 
 class DicomQuery(models.Model):
+    """
+    Table to store DICOM query settings
+    """
     complete = models.BooleanField(default=False)
     query_id = models.CharField(max_length=64)
     failed = models.BooleanField(default=False)
@@ -225,6 +246,9 @@ from django.db.models.signals import post_save
 
 
 class UserProfile(models.Model):
+    """
+    Table to store user profile settings
+    """
     DAYS = 'days'
     WEEKS = 'weeks'
     MONTHS = 'months'
@@ -374,6 +398,9 @@ post_save.connect(create_user_profile, sender=User)
 
 
 class UniqueEquipmentNames(models.Model):
+    """
+    Table to unique equipment name information
+    """
     manufacturer = models.TextField(blank=True, null=True)
     manufacturer_hash = models.CharField(max_length=64, blank=True, null=True)
     institution_name = models.TextField(blank=True, null=True)
@@ -404,6 +431,9 @@ class UniqueEquipmentNames(models.Model):
 
 
 class SizeUpload(models.Model):
+    """
+    Table to store patient size information
+    """
     sizefile = models.FileField(upload_to='sizeupload')
     height_field = models.TextField(blank=True, null=True)
     weight_field = models.TextField(blank=True, null=True)

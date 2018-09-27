@@ -23,5 +23,5 @@ if len(sys.argv) < 2:
 for arg in sys.argv[1:]:
     for filename in glob(arg):
         dx(filename)
-    
+
 sys.exit()
