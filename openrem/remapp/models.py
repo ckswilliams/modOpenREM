@@ -79,7 +79,7 @@ class NotPatientIndicatorsName(models.Model):
         verbose_name_plural = u'Not-patient indicator names'
 
 
-class SkinDoseMaipCalcSettings(SingletonModel):
+class SkinDoseMapCalcSettings(SingletonModel):
     """
     Table to store skin dose map calculation settings
     """
