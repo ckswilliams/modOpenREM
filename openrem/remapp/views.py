@@ -570,90 +570,90 @@ def rf_summary_list_filter(request):
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
 
-    # Calculate total dose at RP and DAP over previous delta weeks for every study in f
-    all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
-    week_delta = alert_levels['accum_dose_delta_weeks']
-    for study in f:
-
-        # ==============================================================================================================
-        # ==============================================================================================================
-        # Code from here...
-        patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
-        if patient_id:
-            study_date = study.study_date
-            oldest_date = (study_date - timedelta(weeks=week_delta))
-
-            #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            # The try and except parts of this code are here because some of the studies in my database didn't have the
-            # expected data in the related fields - not sure why. Perhaps an issue with the extractor routine?
-            try:
-                study.projectionxrayradiationdose_set.get().accumxraydose_set.all()
-            except ObjectDoesNotExist:
-                study.projectionxrayradiationdose_set.get().accumxraydose_set.create()
-
-            for accumxraydose in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
-                try:
-                    accumxraydose.accumintegratedprojradiogdose_set.get()
-                except:
-                    accumxraydose.accumintegratedprojradiogdose_set.create()
-
-            #accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
-            for accumxraydose in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
-                accum_int_proj_pk = accumxraydose.accumintegratedprojradiogdose_set.get().pk
-            # try:
-            #     accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
-            # except ObjectDoesNotExist:
-            #     try:
-            #         study.projectionxrayradiationdose_set.get().accumxraydose_set.get()
-            #     except ObjectDoesNotExist:
-            #         study.projectionxrayradiationdose_set.get().accumxraydose_set.create()
-            #     try:
-            #         study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
-            #     except ObjectDoesNotExist:
-            #         study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.create()
-            #     accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
-            # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-                accum_int_proj_to_update = AccumIntegratedProjRadiogDose.objects.get(pk=accum_int_proj_pk)
-
-                if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks or not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
-                    included_studies = all_rf_studies.filter(patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
-                    pks_already_there = PKsForSummedRFDoseStudiesInDeltaWeeks.objects.filter(general_study_module_attributes_id = study.pk).values_list('general_study_module_attributes_id', flat=True)
-                    bulk_entries = []
-                    for pk in included_studies.values_list('pk', flat=True):
-                        if pk not in pks_already_there:
-                            new_entry = PKsForSummedRFDoseStudiesInDeltaWeeks()
-                            new_entry.general_study_module_attributes_id = study.pk
-                            new_entry.study_pk_in_delta_weeks = pk
-                            bulk_entries.append(new_entry)
-                    if len(bulk_entries):
-                        PKsForSummedRFDoseStudiesInDeltaWeeks.objects.bulk_create(bulk_entries)
-
-                if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks and not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
-                    accum_totals = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total'),
-                                                              Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total'))
-                    accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__sum']
-                    accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total__sum']
-                    accum_int_proj_to_update.save()
-                elif not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks:
-                    accum_dap_over_delta_weeks = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')).values()[0]
-                    accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_dap_over_delta_weeks
-                    accum_int_proj_to_update.save()
-                elif not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
-                    accum_rp_dose_over_delta_weeks = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total')).values()[0]
-                    accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_rp_dose_over_delta_weeks
-                    accum_int_proj_to_update.save()
-        # ... to here is checking for and creating the summed total DAP and dose at RP. This should really happen at the point
-        # that an individual study is imported into the system, or for all studies after it is instigated by an OpenREM admin
-        # changing the value of delta weeks.
-        #
-        # When updating this data the following needs to happen:
-        #   Empty the whole of the PKsForSummedRFDoseStudiesInDeltaWeeks table
-        #   Remove all entries in the dose_area_product_total_over_delta_weeks and dose_rp_total_over_delta_weeks fields
-        #   in the AccumIntegratedProjRadiogDose table
-        # Perhaps could do this on a study-by-study basis, if emptying whole tables makes anyone nervous
-        # ==============================================================================================================
-        # ==============================================================================================================
+    # # Calculate total dose at RP and DAP over previous delta weeks for every study in f
+    # all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
+    # week_delta = alert_levels['accum_dose_delta_weeks']
+    # for study in f:
+    #
+    #     # ==============================================================================================================
+    #     # ==============================================================================================================
+    #     # Code from here...
+    #     patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+    #     if patient_id:
+    #         study_date = study.study_date
+    #         oldest_date = (study_date - timedelta(weeks=week_delta))
+    #
+    #         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #         # The try and except parts of this code are here because some of the studies in my database didn't have the
+    #         # expected data in the related fields - not sure why. Perhaps an issue with the extractor routine?
+    #         try:
+    #             study.projectionxrayradiationdose_set.get().accumxraydose_set.all()
+    #         except ObjectDoesNotExist:
+    #             study.projectionxrayradiationdose_set.get().accumxraydose_set.create()
+    #
+    #         for accumxraydose in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+    #             try:
+    #                 accumxraydose.accumintegratedprojradiogdose_set.get()
+    #             except:
+    #                 accumxraydose.accumintegratedprojradiogdose_set.create()
+    #
+    #         #accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
+    #         for accumxraydose in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+    #             accum_int_proj_pk = accumxraydose.accumintegratedprojradiogdose_set.get().pk
+    #         # try:
+    #         #     accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
+    #         # except ObjectDoesNotExist:
+    #         #     try:
+    #         #         study.projectionxrayradiationdose_set.get().accumxraydose_set.get()
+    #         #     except ObjectDoesNotExist:
+    #         #         study.projectionxrayradiationdose_set.get().accumxraydose_set.create()
+    #         #     try:
+    #         #         study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+    #         #     except ObjectDoesNotExist:
+    #         #         study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.create()
+    #         #     accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
+    #         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #
+    #             accum_int_proj_to_update = AccumIntegratedProjRadiogDose.objects.get(pk=accum_int_proj_pk)
+    #
+    #             if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks or not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
+    #                 included_studies = all_rf_studies.filter(patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
+    #                 pks_already_there = PKsForSummedRFDoseStudiesInDeltaWeeks.objects.filter(general_study_module_attributes_id = study.pk).values_list('general_study_module_attributes_id', flat=True)
+    #                 bulk_entries = []
+    #                 for pk in included_studies.values_list('pk', flat=True):
+    #                     if pk not in pks_already_there:
+    #                         new_entry = PKsForSummedRFDoseStudiesInDeltaWeeks()
+    #                         new_entry.general_study_module_attributes_id = study.pk
+    #                         new_entry.study_pk_in_delta_weeks = pk
+    #                         bulk_entries.append(new_entry)
+    #                 if len(bulk_entries):
+    #                     PKsForSummedRFDoseStudiesInDeltaWeeks.objects.bulk_create(bulk_entries)
+    #
+    #             if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks and not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
+    #                 accum_totals = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total'),
+    #                                                           Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total'))
+    #                 accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__sum']
+    #                 accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total__sum']
+    #                 accum_int_proj_to_update.save()
+    #             elif not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks:
+    #                 accum_dap_over_delta_weeks = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')).values()[0]
+    #                 accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_dap_over_delta_weeks
+    #                 accum_int_proj_to_update.save()
+    #             elif not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
+    #                 accum_rp_dose_over_delta_weeks = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total')).values()[0]
+    #                 accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_rp_dose_over_delta_weeks
+    #                 accum_int_proj_to_update.save()
+    #     # ... to here is checking for and creating the summed total DAP and dose at RP. This should really happen at the point
+    #     # that an individual study is imported into the system, or for all studies after it is instigated by an OpenREM admin
+    #     # changing the value of delta weeks.
+    #     #
+    #     # When updating this data the following needs to happen:
+    #     #   Empty the whole of the PKsForSummedRFDoseStudiesInDeltaWeeks table
+    #     #   Remove all entries in the dose_area_product_total_over_delta_weeks and dose_rp_total_over_delta_weeks fields
+    #     #   in the AccumIntegratedProjRadiogDose table
+    #     # Perhaps could do this on a study-by-study basis, if emptying whole tables makes anyone nervous
+    #     # ==============================================================================================================
+    #     # ==============================================================================================================
 
 
     # # Calculate skin dose map for all objects in the database
@@ -3304,6 +3304,122 @@ class RFHighDoseAlertSettings(UpdateView):  # pylint: disable=unused-variable
         else:
             messages.info(self.request, "No changes made")
         return super(RFHighDoseAlertSettings, self).form_valid(form)
+
+
+def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable
+    """View to recalculate the summed total DAP and total dose at RP for all RF studies
+
+    """
+    if not request.user.groups.filter(name="admingroup"):
+        messages.error(request, u"Only members of the admin group are allowed to do this")
+        return redirect(reverse('rf_alert_settings_update', args=[1]))
+    else:
+        # Empty the PKsForSummedRFDoseStudiesInDeltaWeeks table
+        from remapp.models import PKsForSummedRFDoseStudiesInDeltaWeeks
+        PKsForSummedRFDoseStudiesInDeltaWeeks.objects.all().delete()
+
+
+        # In the AccumIntegratedProjRadiogDose table delete all dose_area_product_total_over_delta_weeks and dose_rp_total_over_delta_weeks entries
+        from remapp.models import AccumIntegratedProjRadiogDose
+        AccumIntegratedProjRadiogDose.objects.all().update(dose_area_product_total_over_delta_weeks=None, dose_rp_total_over_delta_weeks=None)
+
+
+        # For each RF study recalculate dose_area_product_total_over_delta_weeks and dose_rp_total_over_delta_weeks
+        from datetime import timedelta
+        from django.db.models import Sum
+        from remapp.models import HighDoseMetricAlertSettings
+
+        try:
+            week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+        except ObjectDoesNotExist:
+            HighDoseMetricAlertSettings.objects.create()
+            week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+
+        all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
+        for study in all_rf_studies:
+            # ==============================================================================================================
+            # ==============================================================================================================
+            # Code from here...
+            patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+            if patient_id:
+                study_date = study.study_date
+                oldest_date = (study_date - timedelta(weeks=week_delta))
+
+                # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                # The try and except parts of this code are here because some of the studies in my database didn't have the
+                # expected data in the related fields - not sure why. Perhaps an issue with the extractor routine?
+                try:
+                    study.projectionxrayradiationdose_set.get().accumxraydose_set.all()
+                except ObjectDoesNotExist:
+                    study.projectionxrayradiationdose_set.get().accumxraydose_set.create()
+
+                for accumxraydose in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+                    try:
+                        accumxraydose.accumintegratedprojradiogdose_set.get()
+                    except:
+                        accumxraydose.accumintegratedprojradiogdose_set.create()
+
+                # accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
+                for accumxraydose in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+                    accum_int_proj_pk = accumxraydose.accumintegratedprojradiogdose_set.get().pk
+                    # try:
+                    #     accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
+                    # except ObjectDoesNotExist:
+                    #     try:
+                    #         study.projectionxrayradiationdose_set.get().accumxraydose_set.get()
+                    #     except ObjectDoesNotExist:
+                    #         study.projectionxrayradiationdose_set.get().accumxraydose_set.create()
+                    #     try:
+                    #         study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+                    #     except ObjectDoesNotExist:
+                    #         study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.create()
+                    #     accum_int_proj_pk = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().pk
+                    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+                    accum_int_proj_to_update = AccumIntegratedProjRadiogDose.objects.get(pk=accum_int_proj_pk)
+
+                    if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks or not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
+                        included_studies = all_rf_studies.filter(patientmoduleattr__patient_id__exact=patient_id,
+                                                                 study_date__range=[oldest_date, study_date])
+                        pks_already_there = PKsForSummedRFDoseStudiesInDeltaWeeks.objects.filter(
+                            general_study_module_attributes_id=study.pk).values_list(
+                            'general_study_module_attributes_id', flat=True)
+                        bulk_entries = []
+                        for pk in included_studies.values_list('pk', flat=True):
+                            if pk not in pks_already_there:
+                                new_entry = PKsForSummedRFDoseStudiesInDeltaWeeks()
+                                new_entry.general_study_module_attributes_id = study.pk
+                                new_entry.study_pk_in_delta_weeks = pk
+                                bulk_entries.append(new_entry)
+                        if len(bulk_entries):
+                            PKsForSummedRFDoseStudiesInDeltaWeeks.objects.bulk_create(bulk_entries)
+
+                    if not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks and not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
+                        accum_totals = included_studies.aggregate(Sum(
+                            'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total'),
+                                                                  Sum(
+                                                                      'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total'))
+                        accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_totals[
+                            'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__sum']
+                        accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_totals[
+                            'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total__sum']
+                        accum_int_proj_to_update.save()
+                    elif not accum_int_proj_to_update.dose_area_product_total_over_delta_weeks:
+                        accum_dap_over_delta_weeks = included_studies.aggregate(Sum(
+                            'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')).values()[
+                            0]
+                        accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_dap_over_delta_weeks
+                        accum_int_proj_to_update.save()
+                    elif not accum_int_proj_to_update.dose_rp_total_over_delta_weeks:
+                        accum_rp_dose_over_delta_weeks = included_studies.aggregate(Sum(
+                            'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total')).values()[
+                            0]
+                        accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_rp_dose_over_delta_weeks
+                        accum_int_proj_to_update.save()
+
+        messages.success(request, u"All summed total DAP and total dose at RP doses re-calculated")
+
+        return redirect(reverse('rf_alert_settings_update', args=[1]))
 
 
 class SkinDoseMapCalcSettingsUpdate(UpdateView):  # pylint: disable=unused-variable

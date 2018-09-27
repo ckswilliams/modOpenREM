@@ -114,6 +114,7 @@ urlpatterns = patterns('remapp.views',
                        url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient', name='admin_questions_hide_not_patient'),
                        url(r'^admin/rfalertsettings/(?P<pk>\d+)/$', RFHighDoseAlertSettings.as_view(), name='rf_alert_settings_update'),
                        url(r'^admin/homepagesettings/(?P<pk>\d+)/$', HomePageAdminSettingsUpdate.as_view(), name='homepageadminsettings_update'),
+                       url(r'^admin/rfrecalculateaccumdoses/', 'rf_recalculate_accum_doses', name='rf_recalculate_accum_doses'),
                        # url(r'^password/$', 'change_password', name='change_password'),
                        url(
                            '^change_password/$',

@@ -18,6 +18,8 @@
         {% if admin.admingroup %}
             {% load crispy_forms_tags %}
             {% crispy form %}
+            <a class="btn btn-default" href="{% url 'rf_recalculate_accum_doses' %}">Recalculate all summed data</a>
+
         {% else %}
             <p>Only users in the Admin group can modify these settings.</p>
         {% endif %}
