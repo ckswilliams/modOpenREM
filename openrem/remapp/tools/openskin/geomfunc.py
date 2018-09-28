@@ -1,4 +1,4 @@
-""" 
+"""
     Copyright 2016 Jonathan Cole
 
     This program is free software: you can redistribute it and/or modify
@@ -338,7 +338,7 @@ def getTableMattressTrans(kV, Cu):
         [0.75, 0.78, 0.81, 0.81],
         [0.76, 0.79, 0.83, 0.83],
         [0.79, 0.81, 0.85, 0.85],
-        [0.80, 0.82, 0.85, 0.86]   
+        [0.80, 0.82, 0.85, 0.86]
     ])
 
     return lookupArray[lookup_Cu, lookup_kV]

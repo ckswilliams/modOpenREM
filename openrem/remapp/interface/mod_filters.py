@@ -14,7 +14,7 @@
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
 #    Foundation trust in connection with this Program in any press or
-#    other public announcement without the prior written consent of 
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -28,7 +28,7 @@
 
 """
 
-# Following three lines added so that sphinx autodocumentation works. 
+# Following three lines added so that sphinx autodocumentation works.
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
@@ -361,8 +361,8 @@ class DXSummaryListFilter(django_filters.FilterSet):
     class Meta:
         model = GeneralStudyModuleAttr
         fields = [
-            'date_after', 
-            'date_before', 
+            'date_after',
+            'date_before',
             'institution_name',
             'study_description',
             'procedure_code_meaning',
@@ -370,7 +370,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
             'acquisition_protocol',
             'patient_age_min',
             'patient_age_max',
-            'manufacturer', 
+            'manufacturer',
             'model_name',
             'station_name',
             'display_name',
