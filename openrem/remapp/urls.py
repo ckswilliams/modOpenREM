@@ -124,7 +124,7 @@ urlpatterns = patterns('remapp.views',
                        )
 
 urlpatterns += patterns('remapp.exports.exportviews',
-                        url(r'^export/$', 'export', name ='export'),
+                        url(r'^export/$', 'export', name='export'),
                         url(r'^exportctcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'ctcsv1', name='ctcsv1'),
                         url(r'^exportctxlsx1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'ctxlsx1', name='ctxlsx1'),
                         url(r'^exportdxcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'dxcsv1', name='dxcsv1'),

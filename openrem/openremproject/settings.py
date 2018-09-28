@@ -101,8 +101,8 @@ STATICFILES_DIRS = (
 #
 SECRET_KEY = 'youmustchangethiskeyinlocal_settings'
 
-# URL of the login page
-LOGIN_URL = '/login/'
+# URL name of the login page (as defined in urls.py)
+LOGIN_URL = 'login'
 
 TEMPLATES = [
     {

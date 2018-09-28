@@ -48,6 +48,7 @@ ALLOWED_HOSTS = [
 
 # If running OpenREM in a virtual directory specify the virtual directory here.
 # Eg. if OpenREM is in a virtual directory TST (http://server/TST), specify 'TST/' below.
+# LOGIN_URL (always) should be overridden to include the VIRTUAL_DIRECTORY
 VIRTUAL_DIRECTORY = ''
 
 # Date format for exporting data to Excel xlsx files.
