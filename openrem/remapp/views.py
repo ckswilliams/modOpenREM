@@ -3330,10 +3330,10 @@ def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable
         from remapp.models import HighDoseMetricAlertSettings
 
         try:
-            week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+            HighDoseMetricAlertSettings.objects.all()
         except ObjectDoesNotExist:
             HighDoseMetricAlertSettings.objects.create()
-            week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+        week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
 
         all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
 
