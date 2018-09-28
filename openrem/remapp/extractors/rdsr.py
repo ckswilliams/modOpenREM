@@ -1345,7 +1345,7 @@ def _rsdr2db(dataset):
 
         # Obtain the number of weeks to use to search for previous studies with the same patient ID
         try:
-            HighDoseMetricAlertSettings.objects.all()
+            HighDoseMetricAlertSettings.objects.get()
         except ObjectDoesNotExist:
             HighDoseMetricAlertSettings.objects.create()
         week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]

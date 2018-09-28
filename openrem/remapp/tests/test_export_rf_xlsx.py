@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, Group
 from django.test import RequestFactory, TransactionTestCase
 from remapp.extractors import rdsr
 from remapp.exports.rf_export import rfxlsx
-from remapp.models import PatientIDSettings, Exports, GeneralStudyModuleAttr
+from remapp.models import PatientIDSettings, Exports, GeneralStudyModuleAttr, HighDoseMetricAlertSettings
 
 
 class ExportRFxlsx(TransactionTestCase):  # Not TestCase as raises TransactionManagementError
@@ -26,6 +26,8 @@ class ExportRFxlsx(TransactionTestCase):  # Not TestCase as raises TransactionMa
         pid.id_hashed = False
         pid.dob_stored = True
         pid.save()
+
+        HighDoseMetricAlertSettings.objects.create()
 
         rf_siemens_zee = os.path.join("test_files", "RF-RDSR-Siemens-Zee.dcm")
         rf_philips_allura = os.path.join("test_files", "RF-RDSR-Philips_Allura.dcm")
