@@ -3300,7 +3300,10 @@ class RFHighDoseAlertSettings(UpdateView):  # pylint: disable=unused-variable
 
     def form_valid(self, form):
         if form.has_changed():
-            messages.success(self.request, "Fluoroscopy high dose alert levels have been updated")
+            messages.success(self.request, 'Fluoroscopy high dose alert levels have been updated')
+            if 'accum_dose_delta_weeks' in form.changed_data:
+                messages.info(self.request, 'Time period used to sum total DAP and total dose at RP changed')
+                return redirect(reverse('rf_recalculate_accum_doses'))
         else:
             messages.info(self.request, "No changes made")
         return super(RFHighDoseAlertSettings, self).form_valid(form)
