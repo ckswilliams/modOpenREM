@@ -27,8 +27,6 @@ class ExportRFxlsx(TransactionTestCase):  # Not TestCase as raises TransactionMa
         pid.dob_stored = True
         pid.save()
 
-        HighDoseMetricAlertSettings.objects.create()
-
         rf_siemens_zee = os.path.join("test_files", "RF-RDSR-Siemens-Zee.dcm")
         rf_philips_allura = os.path.join("test_files", "RF-RDSR-Philips_Allura.dcm")
         rf_eurocolumbus = os.path.join("test_files", "RF-RDSR-Eurocolumbus.dcm")

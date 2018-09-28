@@ -27,7 +27,6 @@ class ImportDualRDSRs(TestCase):
 
         PatientIDSettings.objects.create()
         SkinDoseMapCalcSettings.objects.create()  # Bitbucket pipeline requires in order to import reset_dual
-        HighDoseMetricAlertSettings.objects.create()
 
 
         rf_file = "test_files/Dual-RDSR-RF.dcm"

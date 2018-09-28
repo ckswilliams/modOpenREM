@@ -18,7 +18,6 @@ class FilterViewTests(TestCase):
         Load in all the rf objects so that there is something to filter!
         """
         PatientIDSettings.objects.create()
-        HighDoseMetricAlertSettings.objects.create()
         User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
 
         rf1 = "test_files/RF-RDSR-Philips_Allura.dcm"
