@@ -43,7 +43,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
     :param filterdict: Dictionary of query parameters from the mammo filtered page URL.
     :type filterdict: dict
     :returns: None - file is saved to disk and location is stored in database
-    
+
     """
 
     import datetime

@@ -13,7 +13,7 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
+#    Foundation trust in connection with this Program in any press or
 #    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
@@ -80,11 +80,11 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
     from django.db import models
     from remapp.models import GeneralStudyModuleAttr
     from django import db
-    
+
     imp_log = None
     if 'imp_log' in kwargs:
         imp_log = kwargs['imp_log']
-    
+
     if (height or weight) and accno:
         if not siuid:
             e = GeneralStudyModuleAttr.objects.filter(accession_number__exact = accno)
