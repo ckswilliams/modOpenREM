@@ -255,7 +255,6 @@ class UpdateDisplayNamesForm(forms.Form):
 class RFHighDoseFluoroAlertsForm(forms.ModelForm):
     """Form for displaying and changing fluoroscopy high dose alert settings
     """
-    from crispy_forms.layout import Button
 
     def __init__(self, *args, **kwargs):
         from crispy_forms.layout import Button
