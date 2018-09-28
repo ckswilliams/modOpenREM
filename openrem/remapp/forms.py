@@ -255,11 +255,14 @@ class UpdateDisplayNamesForm(forms.Form):
 class RFHighDoseFluoroAlertsForm(forms.ModelForm):
     """Form for displaying and changing fluoroscopy high dose alert settings
     """
+    from crispy_forms.layout import Button
 
     def __init__(self, *args, **kwargs):
+        from crispy_forms.layout import Button
         super(RFHighDoseFluoroAlertsForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_class = 'form-horizontal'
+        self.helper.add_input(Button('recalc_all_summed_data', 'Recalculate all summed data', css_class='btn btn-warning', onclick='javascript:location.href="/admin/rfrecalculateaccumdoses/";'))
         self.helper.layout = Layout(
             Div(
                 'alert_total_dap_rf',
