@@ -257,7 +257,7 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
     """
 
     def __init__(self, *args, **kwargs):
-        from crispy_forms.layout import Button, HTML
+        from crispy_forms.layout import Button
         super(RFHighDoseFluoroAlertsForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_class = 'form-horizontal'

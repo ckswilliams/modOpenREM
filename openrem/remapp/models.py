@@ -94,7 +94,7 @@ class HighDoseMetricAlertSettings(SingletonModel):
     alert_total_dap_rf = models.IntegerField(blank=True, null=True, default=20000, verbose_name="Alert level for total DAP from fluoroscopy examination (cGy.cm<sup>2</sup>)")
     alert_total_rp_dose_rf = models.FloatField(blank=True, null=True, default=2.0, verbose_name="Alert level for total dose at reference point from fluoroscopy examination (Gy)")
     accum_dose_delta_weeks = models.IntegerField(blank=True, null=True, default=12, verbose_name="Number of previous weeks over which to sum DAP and RP dose for each patient")
-    changed_accum_dose_delta_weeks = models.BooleanField(default=False)
+    changed_accum_dose_delta_weeks = models.BooleanField(default=True)
 
     def get_absolute_url(self):
         return '/admin/rfalertsettings/1/'
