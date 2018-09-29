@@ -3302,8 +3302,8 @@ class RFHighDoseAlertSettings(UpdateView):  # pylint: disable=unused-variable
         if form.has_changed():
             messages.success(self.request, 'Fluoroscopy high dose alert levels have been updated')
             if 'accum_dose_delta_weeks' in form.changed_data:
-                messages.info(self.request, 'Time period used to sum total DAP and total dose at RP changed')
-                return redirect(reverse('rf_recalculate_accum_doses'))
+                messages.warning(self.request, 'The time period used to sum total DAP and total dose at RP has changed. The summed data must be recalculated: click on the "Recalculate all summed data" button below. The recalculation can take several minutes')
+            return super(RFHighDoseAlertSettings, self).form_valid(form)
         else:
             messages.info(self.request, "No changes made")
         return super(RFHighDoseAlertSettings, self).form_valid(form)
@@ -3382,6 +3382,8 @@ def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable
                     accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__sum']
                     accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total__sum']
                     accum_int_proj_to_update.save()
+
+        HighDoseMetricAlertSettings.objects.all().update(changed_accum_dose_delta_weeks=False)
 
         messages.success(request, u"All summed total DAP and total dose at RP doses have been re-calculated")
 

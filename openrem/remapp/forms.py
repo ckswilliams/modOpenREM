@@ -257,11 +257,19 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
     """
 
     def __init__(self, *args, **kwargs):
-        from crispy_forms.layout import Button
+        from crispy_forms.layout import Button, HTML
         super(RFHighDoseFluoroAlertsForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_class = 'form-horizontal'
-        self.helper.add_input(Button('recalc_all_summed_data', 'Recalculate all summed data', css_class='btn btn-warning', onclick='javascript:location.href="/admin/rfrecalculateaccumdoses/";'))
+
+        if self.instance.changed_accum_dose_delta_weeks:
+            self.helper.add_input(Button('recalc_all_summed_data', 'Recalculate all summed data', css_class='btn btn-warning', onclick='javascript:location.href="/admin/rfrecalculateaccumdoses/";'))
+
+        if len(self.data):
+            if self.has_changed():
+                if 'accum_dose_delta_weeks' in self.changed_data:
+                    self.instance.changed_accum_dose_delta_weeks = True
+                    self.save()
         self.helper.layout = Layout(
             Div(
                 'alert_total_dap_rf',
