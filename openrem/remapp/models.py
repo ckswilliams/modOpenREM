@@ -95,7 +95,7 @@ class HighDoseMetricAlertSettings(SingletonModel):
     alert_total_rp_dose_rf = models.FloatField(blank=True, null=True, default=2.0, verbose_name="Alert level for total dose at reference point from fluoroscopy examination (Gy)")
     accum_dose_delta_weeks = models.IntegerField(blank=True, null=True, default=12, verbose_name="Number of previous weeks over which to sum DAP and RP dose for each patient")
     changed_accum_dose_delta_weeks = models.BooleanField(default=True)
-    show_accum_dose_over_delta_weeks = models.BooleanField(default=True, verbose_name="Enable display of summed DAP and RP dose on fluoroscopy summary page?")
+    show_accum_dose_over_delta_weeks = models.BooleanField(default=True, verbose_name="Enable display of summed DAP and RP dose on fluoroscopy summary and detail pages?")
     calc_accum_dose_over_delta_weeks_on_import = models.BooleanField(default=True, verbose_name="Calculate summed DAP and RP dose for incoming fluoroscopy studies?")
 
     def get_absolute_url(self):
