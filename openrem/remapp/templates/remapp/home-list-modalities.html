@@ -1,39 +1,41 @@
 {% load humanize %}
-<table class="table table-bordered table-hover row-clickable sortable" id="summary_table_{{ modality }}">
-  <tr>
-    <th>System name</th>
-    <th>Total number of studies</th>
-    <th>Latest study</th>
-    {% if home_config.display_workload_stats %}
-      <th>Number in last {{ home_config.day_delta_a }} days</th>
-      <th>Number in last {{ home_config.day_delta_b }} days</th>
-    {% endif %}
-  </tr>
-  {% for display_name,details in data.items %}
-    <tr>
-      <td style="width:25%">
-        <a href="{% url modality %}?display_name={{ display_name }}&o=-study_date">
-          {{ details.displayname }}
-        </a>
-      </td>
-      <td style="width:25%">
-        <a href="{% url modality %}?display_name={{ display_name }}&o=-study_date">
-          {{ details.total }}
-        </a>
-      </td>
-      <td style="width:25%">
-        <a href="{% url modality %}?display_name={{ display_name }}&o=-study_date">
-          {{ details.latest|naturaltime }}
-        </a>
-      </td>
-      {% if home_config.display_workload_stats %}
-        <td style="width:12.5%">
-          <a href="{% url modality %}?display_name={{ display_name }}&o=-study_date" id="{{ details.displayname_pk }}_a"></a>
-        </td>
-        <td style="width:12.5%">
-          <a href="{% url modality %}?display_name={{ display_name }}&o=-study_date" id="{{ details.displayname_pk }}_b"></a>
-        </td>
-      {% endif %}
-    </tr>
-  {% endfor %}
-</table>
+{%  with modality|add:'_summary_list_filter' as url_name %}
+    <table class="table table-bordered table-hover row-clickable sortable" id="summary_table_{{ modality }}">
+      <tr>
+        <th>System name</th>
+        <th>Total number of studies</th>
+        <th>Latest study</th>
+        {% if home_config.display_workload_stats %}
+          <th>Number in last {{ home_config.day_delta_a }} days</th>
+          <th>Number in last {{ home_config.day_delta_b }} days</th>
+        {% endif %}
+      </tr>
+      {% for display_name,details in data.items %}
+        <tr>
+          <td style="width:25%">
+            <a href="{% url url_name %}?display_name={{ display_name }}&o=-study_date">
+              {{ details.displayname }}
+            </a>
+          </td>
+          <td style="width:25%">
+            <a href="{% url url_name %}?display_name={{ display_name }}&o=-study_date">
+              {{ details.total }}
+            </a>
+          </td>
+          <td style="width:25%">
+            <a href="{% url url_name %}?display_name={{ display_name }}&o=-study_date">
+              {{ details.latest|naturaltime }}
+            </a>
+          </td>
+          {% if home_config.display_workload_stats %}
+            <td style="width:12.5%">
+              <a href="{% url url_name %}?display_name={{ display_name }}&o=-study_date" id="{{ details.displayname_pk }}_a"></a>
+            </td>
+            <td style="width:12.5%">
+              <a href="{% url url_name %}?display_name={{ display_name }}&o=-study_date" id="{{ details.displayname_pk }}_b"></a>
+            </td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </table>
+{% endwith %}
