@@ -580,7 +580,11 @@ def _calibration(dataset, accum, ch):
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Date':
             cal.calibration_date = make_date_time(cont.DateTime)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Factor':
-            cal.calibration_factor = cont.MeasuredValueSequence[0].NumericValue
+            try:
+                float(cont.MeasuredValueSequence[0].NumericValue)
+                cal.calibration_factor = cont.MeasuredValueSequence[0].NumericValue
+            except ValueError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Uncertainty':
             cal.calibration_uncertainty = cont.MeasuredValueSequence[0].NumericValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Responsible Party':
