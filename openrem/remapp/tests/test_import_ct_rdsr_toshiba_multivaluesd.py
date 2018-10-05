@@ -30,4 +30,4 @@ class ImportToshibaWithVariableHelicalPitch(TestCase):
 
         rdsr(dicom_path)
         study = GeneralStudyModuleAttr.objects.order_by('id')[0]
-        self.assertEqual(study.station_name, "Aquilion ONE")
+        self.assertEqual(study.series_instance_uid, "1.3.6.1.4.1.5962.99.1.1042634278.1704769588.1538640959014.8.0")
