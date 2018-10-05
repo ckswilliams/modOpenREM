@@ -3270,7 +3270,12 @@ def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable
         all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
 
         for study in all_rf_studies:
-            patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+            try:
+                study.patientmoduleattr_set.get()
+                patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+            except ObjectDoesNotExist:
+                patient_id = None
+
             if patient_id:
                 study_date = study.study_date
                 oldest_date = (study_date - timedelta(weeks=week_delta))
