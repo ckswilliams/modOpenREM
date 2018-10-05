@@ -1401,6 +1401,31 @@ def _rsdr2db(dataset):
                     accum_int_proj_to_update.save()
 
 
+def _fix_toshiba_vhp(dataset):
+    """
+    Replace forward slash in multi-value decimal string VR with back slash
+    :param dataset: DICOM dataset
+    :return: Repaired DICOM dataset
+    """
+
+    for cont in dataset.ContentSequence:
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == "CT Acquisition":
+            for cont2 in cont.ContentSequence:
+                if cont2.ConceptNameCodeSequence[0].CodeMeaning == "Dose Reduce Parameters" and \
+                        cont2.ConceptNameCodeSequence[0].CodingSchemeDesignator == "99TOSHIBA-TMSC":
+                    for cont3 in cont2.ContentSequence:
+                        if cont3.ConceptNameCodeSequence[0].CodeMeaning == "Standard deviation of population":
+                            try:
+                                cont3.MeasuredValueSequence[0].NumericValue
+                            except ValueError:
+                                vhp_sd = dict.__getitem__(cont3.MeasuredValueSequence[0], 0x40a30a)
+                                vhp_sd_value = vhp_sd.__getattribute__('value')
+                                if '/' in vhp_sd_value:
+                                    vhp_sd_value = vhp_sd_value.replace('/', '\\')
+                                    new_vhp_sd = vhp_sd._replace(value=vhp_sd_value)
+                                    dict.__setitem__(cont3.MeasuredValueSequence[0], 0x40a30a, new_vhp_sd)
+
+
 @shared_task(name='remapp.extractors.rdsr.rdsr')
 def rdsr(rdsr_file):
     """Extract radiation dose related data from DICOM Radiation SR objects.
@@ -1419,7 +1444,12 @@ def rdsr(rdsr_file):
         del_rdsr = False
 
     dataset = dicom.read_file(rdsr_file)
-    dataset.decode()
+    try:
+        dataset.decode()
+    except ValueError as e:
+        if "Invalid tag (0040, a30a): invalid literal for float()" in e.message:
+            _fix_toshiba_vhp(dataset)
+            dataset.decode()
 
     if dataset.SOPClassUID in ('1.2.840.10008.5.1.4.1.1.88.67', '1.2.840.10008.5.1.4.1.1.88.22') and \
             dataset.ConceptNameCodeSequence[0].CodeValue == '113701':

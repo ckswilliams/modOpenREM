@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#670`_  Imports: handle illegal multi-value number in Toshiba RDSR with vHP
 * `#668`_  Code quality: library import and blank space cleanup
 * `#666`_  Query-retrieve: handle non-return of ModalitiesInStudy correctly
 * `#658`_  Interface: Added display of workload stats in home page modality tables
