@@ -227,6 +227,7 @@
 
     {% if request.user.userprofile.plotCharts %}
 
+        <script src="{{ STATIC_URL }}js/django_reverse/reverse.js"></script>
         <script src="{{ STATIC_URL }}js/charts/chartFullScreen.js"></script>
         <script src="{{ STATIC_URL }}js/charts/chartSetExportSize.js"></script>
         <script src="{{ STATIC_URL }}js/chroma.min.js"></script>

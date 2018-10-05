@@ -164,6 +164,7 @@ INSTALLED_APPS = (
     'solo',
     'crispy_forms',
     'debug_toolbar',
+    'django_js_reverse'
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'

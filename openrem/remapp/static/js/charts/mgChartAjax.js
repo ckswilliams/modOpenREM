@@ -10,7 +10,7 @@ $(document).ready(function() {
 
     $.ajax({
         type: "GET",
-        url: "/openrem/mg/chart/",
+        url: Urls.mg_summary_chart_data(),
         data: requestData,
         dataType: "json",
         success: function( json ) {
