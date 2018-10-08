@@ -573,7 +573,7 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
 
 def _calibration(dataset, accum, ch):
     from remapp.models import Calibration
-    from remapp.tools.get_values import get_or_create_cid, safe_strings, test_numeric_value
+    from remapp.tools.get_values import get_or_create_cid, safe_strings
     from remapp.tools.dcmdatetime import make_date_time
     cal = Calibration.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
