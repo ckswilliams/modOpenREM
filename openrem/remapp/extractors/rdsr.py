@@ -701,7 +701,7 @@ def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration':
                 _calibration(cont, accum, ch)
     if proj.acquisition_device_type_cid:
-        if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
+        if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning or u"Azurion" in proj.general_study_module_attributes.generalequipmentmoduleattr_set.get().manufacturer_model_name:
             _accumulatedfluoroxraydose(dataset, accum)
     elif proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
         _accumulatedfluoroxraydose(dataset, accum)
