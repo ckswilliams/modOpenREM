@@ -35,8 +35,6 @@ import sys
 
 import django
 
-from remapp.tools.get_values import test_numeric_value
-
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
@@ -46,6 +44,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
 from celery import shared_task
+from remapp.tools.get_values import test_numeric_value
 
 logger = logging.getLogger('remapp.extractors.rdsr')  # Explicitly named so that it is still handled when using __main__
 
@@ -708,7 +707,8 @@ def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration':
                 _calibration(cont, accum, ch)
     if proj.acquisition_device_type_cid:
-        if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning or u"Azurion" in proj.general_study_module_attributes.generalequipmentmoduleattr_set.get().manufacturer_model_name:
+        if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning or u"Azurion" in \
+                proj.general_study_module_attributes.generalequipmentmoduleattr_set.get().manufacturer_model_name:
             _accumulatedfluoroxraydose(dataset, accum)
     elif proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
         _accumulatedfluoroxraydose(dataset, accum)
@@ -1007,7 +1007,9 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
                                                                 cont.ConceptCodeSequence[0].CodeMeaning)
         if (not equip.unique_equipment_name.user_defined_modality) and (
                 reporttype == 'projection') and proj.acquisition_device_type_cid:
-            if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
+            if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning or \
+                    u"Azurion" in proj.general_study_module_attributes.generalequipmentmoduleattr_set.get(
+                    ).manufacturer_model_name:
                 proj.general_study_module_attributes.modality_type = 'RF'
             elif any(x in proj.acquisition_device_type_cid.code_meaning for x in ['Integrated', 'Cassette-based']):
                 proj.general_study_module_attributes.modality_type = 'DX'
