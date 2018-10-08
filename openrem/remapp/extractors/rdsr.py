@@ -34,6 +34,8 @@ import sys
 import logging
 import django
 
+from remapp.tools.get_values import test_numeric_value
+
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
@@ -231,9 +233,9 @@ def _xrayfilters(content_sequence, source):
             filters.xray_filter_material = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
                                                              cont2.ConceptCodeSequence[0].CodeMeaning)
         elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Minimum':
-            filters.xray_filter_thickness_minimum = cont2.MeasuredValueSequence[0].NumericValue
+            filters.xray_filter_thickness_minimum = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
         elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Maximum':
-            filters.xray_filter_thickness_maximum = cont2.MeasuredValueSequence[0].NumericValue
+            filters.xray_filter_thickness_maximum = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
     filters.save()
 
 
@@ -268,23 +270,23 @@ def _irradiationeventxraymechanicaldata(dataset, event):  # TID 10003c
             mech.crdr_mechanical_configuration = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                                    cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary Angle':
-            mech.positioner_primary_angle = cont.MeasuredValueSequence[0].NumericValue
+            mech.positioner_primary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary Angle':
-            mech.positioner_secondary_angle = cont.MeasuredValueSequence[0].NumericValue
+            mech.positioner_secondary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary End Angle':
-            mech.positioner_primary_end_angle = cont.MeasuredValueSequence[0].NumericValue
+            mech.positioner_primary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary End Angle':
-            mech.positioner_secondary_end_angle = cont.MeasuredValueSequence[0].NumericValue
+            mech.positioner_secondary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Column Angulation':
-            mech.column_angulation = cont.MeasuredValueSequence[0].NumericValue
+            mech.column_angulation = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Head Tilt Angle':
-            mech.table_head_tilt_angle = cont.MeasuredValueSequence[0].NumericValue
+            mech.table_head_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Horizontal Rotation Angle':
-            mech.table_horizontal_rotation_angle = cont.MeasuredValueSequence[0].NumericValue
+            mech.table_horizontal_rotation_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Cradle Tilt Angle':
-            mech.table_cradle_tilt_angle = cont.MeasuredValueSequence[0].NumericValue
+            mech.table_cradle_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Compression Thickness':
-            mech.compression_thickness = cont.MeasuredValueSequence[0].NumericValue
+            mech.compression_thickness = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
     _doserelateddistancemeasurements(dataset, mech)
     mech.save()
 
@@ -305,7 +307,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
     for cont in dataset.ContentSequence:
         try:
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP)':
-                source.dose_rp = cont.MeasuredValueSequence[0].NumericValue
+                source.dose_rp = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
                 try:
                     source.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
@@ -313,32 +315,32 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                 except AttributeError:
                     source.reference_point_definition = safe_strings(cont.TextValue, char_set=ch)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average Glandular Dose':
-                source.average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
+                source.average_glandular_dose = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Mode':
                 source.fluoro_mode = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                        cont.ConceptCodeSequence[0].CodeMeaning)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Rate':
-                source.pulse_rate = cont.MeasuredValueSequence[0].NumericValue
+                source.pulse_rate = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Pulses':
-                source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
+                source.number_of_pulses = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif ((cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Frames') and
                       (cont.ConceptNameCodeSequence[0].CodingSchemeDesignator == '99PHI-IXR-XPER')):
                 # Philips Allura XPer systems: Private coding scheme designator: 99PHI-IXR-XPER; [number of pulses]
-                source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
+                source.number_of_pulses = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
                 # should be a derivation thing in here for when the no. pulses is estimated
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Duration':
-                source.irradiation_duration = cont.MeasuredValueSequence[0].NumericValue
+                source.irradiation_duration = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average X-Ray Tube Current':
-                source.average_xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
+                source.average_xray_tube_current = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time':
-                source.exposure_time = cont.MeasuredValueSequence[0].NumericValue
+                source.exposure_time = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Focal Spot Size':
-                source.focal_spot_size = cont.MeasuredValueSequence[0].NumericValue
+                source.focal_spot_size = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anode Target Material':
                 source.anode_target_material = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                                  cont.ConceptCodeSequence[0].CodeMeaning)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Collimated Field Area':
-                source.collimated_field_area = cont.MeasuredValueSequence[0].NumericValue
+                source.collimated_field_area = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             # TODO: xray_grid no longer exists in this table - it is a model on its own...
             # See https://bitbucket.org/openrem/openrem/issue/181
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Grid':
@@ -369,13 +371,13 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                 try:
                     for cont2 in cont.ContentSequence:
                         if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Bottom Shutter':
-                            bottom_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
+                            bottom_shutter_pos = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                         if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Left Shutter':
-                            left_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
+                            left_shutter_pos = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                         if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Right Shutter':
-                            right_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
+                            right_shutter_pos = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                         if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Top Shutter':
-                            top_shutter_pos = cont2.MeasuredValueSequence[0].NumericValue
+                            top_shutter_pos = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                     # Get distance_source_to_detector (Sdd) in meters
                     # Philips Allura XPer only notes distance_source_to_detector if it changed
                     try:
@@ -428,11 +430,11 @@ def _irradiationeventxraydetectordata(dataset, event, ch):  # TID 10003a
     detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Index':
-            detector.exposure_index = cont.MeasuredValueSequence[0].NumericValue
+            detector.exposure_index = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Exposure Index':
-            detector.target_exposure_index = cont.MeasuredValueSequence[0].NumericValue
+            detector.target_exposure_index = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Deviation Index':
-            detector.deviation_index = cont.MeasuredValueSequence[0].NumericValue
+            detector.deviation_index = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
     _deviceparticipant(dataset, 'detector', detector, ch)
     detector.save()
 
@@ -512,11 +514,11 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
             event.target_region = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product':
-            event.dose_area_product = cont.MeasuredValueSequence[0].NumericValue
+            event.dose_area_product = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Half Value Layer':
-            event.half_value_layer = cont.MeasuredValueSequence[0].NumericValue
+            event.half_value_layer = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Entrance Exposure at RP':
-            event.entrance_exposure_at_rp = cont.MeasuredValueSequence[0].NumericValue
+            event.entrance_exposure_at_rp = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
             try:
                 event.reference_point_definition = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
@@ -570,7 +572,7 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
 
 def _calibration(dataset, accum, ch):
     from remapp.models import Calibration
-    from remapp.tools.get_values import get_or_create_cid, safe_strings
+    from remapp.tools.get_values import get_or_create_cid, safe_strings, test_numeric_value
     from remapp.tools.dcmdatetime import make_date_time
     cal = Calibration.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
@@ -580,13 +582,9 @@ def _calibration(dataset, accum, ch):
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Date':
             cal.calibration_date = make_date_time(cont.DateTime)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Factor':
-            try:
-                float(cont.MeasuredValueSequence[0].NumericValue)
-                cal.calibration_factor = cont.MeasuredValueSequence[0].NumericValue
-            except ValueError:
-                pass
+            cal.calibration_factor = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Uncertainty':
-            cal.calibration_uncertainty = cont.MeasuredValueSequence[0].NumericValue
+            cal.calibration_uncertainty = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Responsible Party':
             cal.calibration_responsible_party = safe_strings(cont.TextValue, char_set=ch)
     cal.save()
@@ -598,7 +596,7 @@ def _accumulatedmammoxraydose(dataset, accum):  # TID 10005
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated Average Glandular Dose':
             accummammo = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
-            accummammo.accumulated_average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
+            accummammo.accumulated_average_glandular_dose = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             for cont2 in cont.ContentSequence:
                 if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Laterality':
                     accummammo.laterality = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
@@ -614,25 +612,25 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
     for cont in dataset.ContentSequence:
         try:
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose Area Product Total':
-                accumproj.fluoro_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+                accumproj.fluoro_dose_area_product_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
-                accumproj.fluoro_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
+                accumproj.fluoro_dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Fluoro Time':
-                accumproj.total_fluoro_time = cont.MeasuredValueSequence[0].NumericValue
+                accumproj.total_fluoro_time = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose Area Product Total':
-                accumproj.acquisition_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+                accumproj.acquisition_dose_area_product_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose (RP) Total':
-                accumproj.acquisition_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
+                accumproj.acquisition_dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Acquisition Time':
-                accumproj.total_acquisition_time = cont.MeasuredValueSequence[0].NumericValue
+                accumproj.total_acquisition_time = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             # TODO: Remove the following four items, as they are also imported (correctly) into
             # _accumulatedtotalprojectionradiographydose
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
-                accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+                accumproj.dose_area_product_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
-                accumproj.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
+                accumproj.dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
-                accumproj.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
+                accumproj.total_number_of_radiographic_frames = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
                 try:
                     accumproj.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
@@ -661,7 +659,7 @@ def _accumulatedcassettebasedprojectionradiographydose(dataset, accum):  # TID 1
             accumcass.detector_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                         cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
-            accumcass.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
+            accumcass.total_number_of_radiographic_frames = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
     accumcass.save()
 
 
@@ -673,11 +671,11 @@ def _accumulatedtotalprojectionradiographydose(dataset, accum):  # TID 10007
     for cont in dataset.ContentSequence:
         try:
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
-                accumint.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+                accumint.dose_area_product_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
-                accumint.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
+                accumint.dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
-                accumint.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
+                accumint.total_number_of_radiographic_frames = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
                 try:
                     accumint.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
@@ -725,19 +723,19 @@ def _scanninglength(dataset, event):  # TID 10014
     try:
         for cont in dataset.ContentSequence:
             if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'scanning length':
-                scanlen.scanning_length = cont.MeasuredValueSequence[0].NumericValue
+                scanlen.scanning_length = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'length of reconstructable volume':
-                scanlen.length_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
+                scanlen.length_of_reconstructable_volume = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'exposed range':
-                scanlen.exposed_range = cont.MeasuredValueSequence[0].NumericValue
+                scanlen.exposed_range = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of reconstructable volume':
-                scanlen.top_z_location_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
+                scanlen.top_z_location_of_reconstructable_volume = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of reconstructable volume':
-                scanlen.bottom_z_location_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
+                scanlen.bottom_z_location_of_reconstructable_volume = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of scanning length':
-                scanlen.top_z_location_of_scanning_length = cont.MeasuredValueSequence[0].NumericValue
+                scanlen.top_z_location_of_scanning_length = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of scanning length':
-                scanlen.bottom_z_location_of_scanning_length = cont.MeasuredValueSequence[0].NumericValue
+                scanlen.bottom_z_location_of_scanning_length = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'irradiation event uid':
                 scanlen.irradiation_event_uid = cont.UID
         scanlen.save()
@@ -754,19 +752,19 @@ def _ctxraysourceparameters(dataset, event):
                             0].CodeMeaning.lower() == 'identification number of the x-ray source':
             param.identification_of_the_xray_source = cont.TextValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'KVP':
-            param.kvp = cont.MeasuredValueSequence[0].NumericValue
+            param.kvp = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'maximum x-ray tube current':
-            param.maximum_xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
+            param.maximum_xray_tube_current = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray tube current':
-            param.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
+            param.xray_tube_current = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeValue == '113734':
             # Additional check as code meaning is wrong for Siemens Intevo see
             # https://bitbucket.org/openrem/openrem/issues/380/siemens-intevo-rdsr-have-wrong-code
-            param.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
+            param.xray_tube_current = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time per Rotation':
-            param.exposure_time_per_rotation = cont.MeasuredValueSequence[0].NumericValue
+            param.exposure_time_per_rotation = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray filter aluminum equivalent':
-            param.xray_filter_aluminum_equivalent = cont.MeasuredValueSequence[0].NumericValue
+            param.xray_filter_aluminum_equivalent = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
     param.save()
 
 
@@ -779,15 +777,15 @@ def _ctdosecheckdetails(dataset, dosecheckdetails, ch, isalertdetails): # TID 10
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Alert Value Configured':
                 dosecheckdetails.dlp_alert_value_configured = (cont.ConceptCodeSequence[0].CodeMeaning == 'Yes')
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Alert Value':
-                dosecheckdetails.dlp_alert_value = cont.MeasuredValueSequence[0].NumericValue
+                dosecheckdetails.dlp_alert_value = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Alert Value Configured':
                 dosecheckdetails.ctdivol_alert_value_configured = (cont.ConceptCodeSequence[0].CodeMeaning == 'Yes')
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Alert Value':
-                dosecheckdetails.ctdivol_alert_value = cont.MeasuredValueSequence[0].NumericValue
+                dosecheckdetails.ctdivol_alert_value = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated DLP Forward Estimate':
-                dosecheckdetails.accumulated_dlp_forward_estimate = cont.MeasuredValueSequence[0].NumericValue
+                dosecheckdetails.accumulated_dlp_forward_estimate = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated CTDIvol Forward Estimate':
-                dosecheckdetails.accumulated_ctdivol_forward_estimate = cont.MeasuredValueSequence[0].NumericValue
+                dosecheckdetails.accumulated_ctdivol_forward_estimate = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reason For Proceeding':
                 dosecheckdetails.alert_reason_for_proceeding = safe_strings(cont.TextValue, ch)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Person Name':
@@ -797,15 +795,15 @@ def _ctdosecheckdetails(dataset, dosecheckdetails, ch, isalertdetails): # TID 10
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Notification Value Configured':
                 dosecheckdetails.dlp_notification_value_configured = (cont.ConceptCodeSequence[0].CodeMeaning == 'Yes')
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Notification Value':
-                dosecheckdetails.dlp_notification_value = cont.MeasuredValueSequence[0].NumericValue
+                dosecheckdetails.dlp_notification_value = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Notification Value Configured':
                 dosecheckdetails.ctdivol_notification_value_configured = (cont.ConceptCodeSequence[0].CodeMeaning == 'Yes')
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Notification Value':
-                dosecheckdetails.ctdivol_notification_value = cont.MeasuredValueSequence[0].NumericValue
+                dosecheckdetails.ctdivol_notification_value = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DLP Forward Estimate':
-                dosecheckdetails.dlp_forward_estimate = cont.MeasuredValueSequence[0].NumericValue
+                dosecheckdetails.dlp_forward_estimate = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIvol Forward Estimate':
-                dosecheckdetails.ctdivol_forward_estimate = cont.MeasuredValueSequence[0].NumericValue
+                dosecheckdetails.ctdivol_forward_estimate = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reason For Proceeding':
                 dosecheckdetails.notification_reason_for_proceeding = safe_strings(cont.TextValue, ch)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Person Name':
@@ -850,15 +848,15 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
                 try:
                     for cont2 in cont.ContentSequence:
                         if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time':
-                            event.exposure_time = cont2.MeasuredValueSequence[0].NumericValue
+                            event.exposure_time = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                         elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Single Collimation Width':
-                            event.nominal_single_collimation_width = cont2.MeasuredValueSequence[0].NumericValue
+                            event.nominal_single_collimation_width = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                         elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Total Collimation Width':
-                            event.nominal_total_collimation_width = cont2.MeasuredValueSequence[0].NumericValue
+                            event.nominal_total_collimation_width = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                         elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Pitch Factor':
-                            event.pitch_factor = cont2.MeasuredValueSequence[0].NumericValue
+                            event.pitch_factor = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                         elif cont2.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'number of x-ray sources':
-                            event.number_of_xray_sources = cont2.MeasuredValueSequence[0].NumericValue
+                            event.number_of_xray_sources = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                         if cont2.ValueType == 'CONTAINER':
                             if cont2.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'ct x-ray source parameters':
                                 _ctxraysourceparameters(cont2, event)
@@ -867,18 +865,18 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose':
                 for cont2 in cont.ContentSequence:
                     if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Mean CTDIvol':
-                        event.mean_ctdivol = cont2.MeasuredValueSequence[0].NumericValue
+                        event.mean_ctdivol = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                     elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
                         event.ctdiw_phantom_type = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
                                                                      cont2.ConceptCodeSequence[0].CodeMeaning)
                     elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIfreeair Calculation Factor':
-                        event.ctdifreeair_calculation_factor = cont2.MeasuredValueSequence[0].NumericValue
+                        event.ctdifreeair_calculation_factor = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                     elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Mean CTDIfreeair':
-                        event.mean_ctdifreeair = cont2.MeasuredValueSequence[0].NumericValue
+                        event.mean_ctdifreeair = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                     elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'DLP':
-                        event.dlp = cont2.MeasuredValueSequence[0].NumericValue
+                        event.dlp = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                     elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Effective Dose':
-                        event.effective_dose = cont2.MeasuredValueSequence[0].NumericValue
+                        event.effective_dose = test_numeric_value(cont2.MeasuredValueSequence[0].NumericValue)
                         ## Effective dose measurement method and conversion factor
                     ## CT Dose Check Details
                     ## Dose Check Alert Details and Notifications Details can appear indepently
@@ -914,11 +912,11 @@ def _ctaccumulateddosedata(dataset, ct, ch):  # TID 10012
     ctacc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
-            ctacc.total_number_of_irradiation_events = cont.MeasuredValueSequence[0].NumericValue
+            ctacc.total_number_of_irradiation_events = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
-            ctacc.ct_dose_length_product_total = cont.MeasuredValueSequence[0].NumericValue
+            ctacc.ct_dose_length_product_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Effective Dose Total':
-            ctacc.ct_effective_dose_total = cont.MeasuredValueSequence[0].NumericValue
+            ctacc.ct_effective_dose_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         #
         # Reference authority code or name belongs here, followed by the effective dose details
         #

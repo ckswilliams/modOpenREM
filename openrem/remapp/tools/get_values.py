@@ -145,10 +145,16 @@ def return_for_export(model, field):
         return None
 
 
-def string_to_float(string_number):
+def test_numeric_value(string_number):
+    """
+    Tests if string can be converted to a float. If it can, return it
+    :param string_number: string to test if is a number
+    :return: string if number, nothing otherwise
+    """
     try:
-        return float(string_number)
-    except TypeError:
+        float(string_number)
+        return string_number
+    except ValueError:
         return None
 
 
