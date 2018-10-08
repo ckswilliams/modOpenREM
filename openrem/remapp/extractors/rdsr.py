@@ -29,9 +29,10 @@
 
 """
 
+import logging
 import os
 import sys
-import logging
+
 import django
 
 from remapp.tools.get_values import test_numeric_value
