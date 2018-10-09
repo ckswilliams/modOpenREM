@@ -67,11 +67,13 @@ be added to the ``openrem`` group, and the 'sticky' group setting below will ena
     mkdir log
     mkdir media
     mkdir -p orthanc/dicom
+    mkdir -p orthanc/physics
     mkdir pixelmed
     mkdir static
     mkdir veopenrem
     sudo chown -R $USER:openrem /var/dose/*
     sudo chmod -R g+s /var/dose/*
+    sudo setfacl -dm u::rwx,g::rwx,o::r orthanc
 
 
 Install apt packages and direct downloads
@@ -157,7 +159,9 @@ each word is not important (one or more).
 
     local   all     openremuser                 md5
 
-Reload postgres::
+Reload postgres:
+
+.. code-block:: console
 
     sudo systemctl reload postgresql
 
@@ -445,18 +449,18 @@ are other settings too that you might like to change in the second section (not 
 
     -- Set this to true if you want Orthanc to keep physics test studies, and have it
     -- put them in the physics_to_keep_folder. Set it to false to disable this feature
-    local use_physics_filtering = false
+    local use_physics_filtering = true
 
     -- Set this to the path where you want to keep physics-related DICOM images
-    local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
+    local physics_to_keep_folder = '/var/dose/orthanc/physics/'
 
     -- Set this to the path and name of your zip utility, and include any switches that
     -- are needed to create an archive (used with physics-related images)
-    local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a'
+    local zip_executable = '/usr/bin/zip -r'
 
     -- Set this to the path and name of your remove folder command, including switches
     -- for it to be quiet (used with physics-related images)
-    local rmdir_cmd = 'rmdir /s/q'
+    local rmdir_cmd = 'rm -r'
     -------------------------------------------------------------------------------------
 
 Add the Lua script to the Orthanc config:
