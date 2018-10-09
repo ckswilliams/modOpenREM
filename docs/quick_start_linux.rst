@@ -13,6 +13,8 @@ A one page install based on Ubuntu 18.04 using:
 Initial prep
 ^^^^^^^^^^^^
 
+**Host file**
+
 First edit ``/etc/hosts`` to add the local server name -- else ``rabbitmq-server`` will not start when installed::
 
     sudo nano /etc/hosts
@@ -23,7 +25,22 @@ second line**::
     127.0.0.1 localhost
     127.0.1.1 openremserver
 
-``Ctrl-o Ctrl-x`` to write out and exit
+``Ctrl-o`` (write-[o]ut), ``Return`` to accept, then ``Ctrl-x`` to e[x]it
+
+**Apt sources**
+
+We will need the ``universe`` repository enabled. Check first::
+
+    less /etc/apt/sources.list
+
+Look for::
+
+    deb http://archive.ubuntu.com/ubuntu/ bionic universe
+    deb http://archive.ubuntu.com/ubuntu/ bionic-updates universe
+
+If these two lines are not there, add them in (``sudo nano /etc/apt/sources.list``).
+
+**Groups**
 
 Now create new group ``openrem`` and add your user to it (``$USER`` will automatically substitute for the user you are
 running as) :
@@ -64,6 +81,7 @@ The ``\`` just allows the ``sudo apt install`` command to spread to two lines --
 .. code-block:: console
 
     sudo apt update
+    sudo apt upgrade
     sudo apt install python python-pip virtualenv rabbitmq-server \
     postgresql nginx orthanc dcmtk default-jre
 
@@ -138,6 +156,10 @@ each word is not important (one or more).
 .. code-block:: console
 
     local   all     openremuser                 md5
+
+Reload postgres::
+
+    sudo systemctl reload postgresql
 
 Configure OpenREM
 -----------------
