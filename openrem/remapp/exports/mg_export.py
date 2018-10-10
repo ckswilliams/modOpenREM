@@ -221,10 +221,10 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
     # Get the data!
     if pid:
         df_filtered_qs = MGFilterPlusPid(
-            filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
+            filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact=u'MG'))
     else:
         df_filtered_qs = MGSummaryListFilter(
-            filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
+            filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact=u'MG'))
     studies = df_filtered_qs.qs
 
     tsk.progress = u'Required study filter complete.'
@@ -309,7 +309,8 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
                     tabtext = sheet_name(protocol)
                     sheet_list[tabtext]['count'] += 1
                     try:
-                        sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0, common_exam_data + series_data)
+                        sheet_list[tabtext]['sheet'].write_row(sheet_list[tabtext]['count'], 0,
+                                                               common_exam_data + series_data)
                     except TypeError:
                         logger.error("Common is |{0}| series is |{1}|".format(common_exam_data, series_data))
                         exit()
@@ -325,9 +326,6 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
                 wsalldata.write(study_index + 1, 0, error_message)
             else:
                 writer.writerow([error_message, ])
-
-
-
 
     if xlsx:
         all_data_headings += _series_headers(max_events)
