@@ -7,7 +7,6 @@ from django.test import TestCase
 from remapp.extractors import rdsr
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
 
-# pylint: disable=unused-variable
 
 class ImportRFRDSRPhilips(TestCase):
     """Tests for importing the Philips Allura RDSR
