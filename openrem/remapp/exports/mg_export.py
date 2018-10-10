@@ -109,6 +109,7 @@ def _mg_get_series_data(event):
             filters, filter_thicknesses = get_xray_filter_info(source_data)
         except ObjectDoesNotExist:
             filters = None
+            filter_thicknesses = None
         try:
             kvp = source_data.kvp_set.get().kvp
         except ObjectDoesNotExist:
@@ -126,6 +127,7 @@ def _mg_get_series_data(event):
         exposure_time = None
         average_glandular_dose = None
         filters = None
+        filter_thicknesses = None
         kvp = None
         exposure = None
 
