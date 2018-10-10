@@ -226,7 +226,10 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         manufacturer = equipment_module.manufacturer
         manufacturer_model_name = equipment_module.manufacturer_model_name
         station_name = equipment_module.station_name
-        display_name = equipment_module.unique_equipment_name.display_name
+        try:
+            display_name = equipment_module.unique_equipment_name.display_name
+        except AttributeError:
+            logger.debug("Export {0}; unique_equipment_name object does not exist".format(modality))
     except ObjectDoesNotExist:
         logger.debug("Export {0}; generalequipmentmoduleattr_set object does not exist".format(modality))
 
