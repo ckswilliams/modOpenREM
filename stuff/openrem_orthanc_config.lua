@@ -12,6 +12,7 @@ local temp_path = 'E:\\conquest\\dicom\\'
 
 -- Set this to 'mkdir' on Windows, or 'mkdir -p' on Linux
 local mkdir_cmd = 'mkdir'
+-- local mkdir_cmd = 'mkdir -p'
 
 -- Set this to '\\'' on Windows, or '/' on Linux
 local dir_sep = '\\'
@@ -24,14 +25,17 @@ local use_physics_filtering = true
 local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
 
 -- Set this to the path and name of your zip utility, and include any switches that
--- are needed to create an archive (used with physics-related images)
--- You can install and use the 'zip' command on Linux without any switches
-local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a'
+-- are needed to create an archive and include all files in a supplied folder
+-- (used with physics-related images)
+local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a -r'
+-- For Linux use the path to your zip command with the -r switch, such as:
+-- local zip_executable = '/usr/bin/zip -r'
 
 -- Set this to the path and name of your remove folder command, including switches
 -- for it to be quiet (used with physics-related images)
--- You can use the command 'rm -r' if you are using Linux
 local rmdir_cmd = 'rmdir /s/q'
+-- You can use the command 'rm -r' if you are using Linux:
+-- local rmdir_cmd = 'rm -r'
 -------------------------------------------------------------------------------------
 
 
@@ -349,8 +353,8 @@ function OnStableStudy(studyId)
                 end
 
                 -- Zip the study files to save space and remove the originals after zipping
-                print('Zipping physics images: ' .. zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '*.dcm"')
-                os.execute(zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '*.dcm"')
+                print('Zipping physics images: ' .. zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '"')
+                os.execute(zip_executable .. ' "' .. temp_files_path .. '.zip"' .. ' "' .. temp_files_path .. dir_sep .. '"')
                 print('Removing physics study folder: ' .. rmdir_cmd .. ' "' .. temp_files_path .. '"')
                 os.execute(rmdir_cmd .. ' "' .. temp_files_path .. '"')
 
