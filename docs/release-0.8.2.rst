@@ -8,6 +8,9 @@ Headline changes
 
 * Interface: added feature to display workload stats in the home page modality tables
 * Query-retrieve: handle non-return of ModalitiesInStudy correctly
+* Imports: fix for empty NumericValues in RDSR
+* Imports: fix for Toshiba RDSR with incorrect multiple values in SD field for vHP
+* Imports: fix for Philips Azurion RDSR with incorrect AcquisitionDeviceType
 
 
 
@@ -16,7 +19,6 @@ Upgrading an OpenREM server with no internet access
 ***************************************************
 
 Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
-
 
 *************************************
 Upgrading from version 0.7.4 or 0.8.x
