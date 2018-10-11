@@ -9,6 +9,7 @@ A one page install based on Ubuntu 18.04 using:
 * Webserver: NGINX with Gunicorn
 * Daemonisation: systemd scripts for Celery and Gunicorn
 * All OpenREM files in ``/var/dose/`` with group owner of ``openrem``
+* Collects any Physics (QA) images and zips them
 
 Initial prep
 ^^^^^^^^^^^^
@@ -426,8 +427,8 @@ working directly in the Ubuntu terminal, something else if you are using PuTTY e
 
 ``nano /var/dose/orthanc/openrem_orthanc_config.lua``
 
-Then edit the top section as follows -- keeping Physics test images has not been configured, feel free to do so! There
-are other settings too that you might like to change in the second section (not displayed here):
+Then edit the top section as follows -- keeping Physics test images has been configured, set to false to change this.
+There are other settings too that you might like to change in the second section (not displayed here):
 
 .. code-block:: lua
 
