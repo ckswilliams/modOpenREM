@@ -54,6 +54,8 @@ running as) :
 
     At a later stage, to add a second administrator just add them to the ``openrem`` group in the same way.
 
+**Folders**
+
 Create the folders we need, and set the permissions. In due course, the ``orthanc`` user and the ``www-data`` user will
 be added to the ``openrem`` group, and the 'sticky' group setting below will enable both users to write to the logs etc:
 
@@ -520,6 +522,36 @@ Restart Orthanc:
 
     sudo systemctl restart orthanc.service
 
+New users, and quick access to physics folder
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This is for new Linux users; for new OpenREM users, refer to :ref:`user-settings`
+
+If you left ``local use_physics_filtering = true``, you might like to give your colleagues a quick method of accessing
+the physics folder from their home folder. Then if they use a program like `WinSCP`_ it is easy to find and copy the QA
+images to another (Windows) computer on the network. WinSCP can also be run directly from a USB stick if you are unable
+to install software :-)
+
+Add the new user (replace  ``newusername`` as appropriate):
+
+.. code-block:: console
+
+    sudo adduser newusername
+
+Then add the new user to the `openrem` group (again, replace the user name):
+
+.. code-block:: console
+
+    sudo adduser newusername openrem
+
+Now add a 'sym-link' to the new users home directory (again, replace the user name):
+
+.. code-block:: console
+
+sudo ln -sT /var/dose/orthanc/physics /home/newusername/physicsimages
+
+The new user should now be able to get to the physics folder by clicking on the ``physicsimages`` link when they log in,
+and should be able to browse, copy and delete the zip files and folders.
+
 Log locations
 ^^^^^^^^^^^^^
 
@@ -531,3 +563,4 @@ Log locations
 * Gunicorn systemd: ``sudo journalctl -u gunicorn-openrem``
 
 
+.. _`WinSCP`: https://winscp.net
