@@ -3,7 +3,9 @@
 
 import os
 from decimal import Decimal
+
 from django.test import TestCase
+
 from remapp.extractors import rdsr
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
 
