@@ -526,7 +526,8 @@ New users, and quick access to physics folder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This is for new Linux users; for new OpenREM users, refer to :ref:`user-settings`
 
-If you left ``local use_physics_filtering = true``, you might like to give your colleagues a quick method of accessing
+If you left ``local use_physics_filtering = true`` in the Orthanc configuration, you might like to give your colleagues
+a quick method of accessing
 the physics folder from their home folder. Then if they use a program like `WinSCP`_ it is easy to find and copy the QA
 images to another (Windows) computer on the network. WinSCP can also be run directly from a USB stick if you are unable
 to install software :-)
@@ -547,7 +548,7 @@ Now add a 'sym-link' to the new users home directory (again, replace the user na
 
 .. code-block:: console
 
-sudo ln -sT /var/dose/orthanc/physics /home/newusername/physicsimages
+    sudo ln -sT /var/dose/orthanc/physics /home/newusername/physicsimages
 
 The new user should now be able to get to the physics folder by clicking on the ``physicsimages`` link when they log in,
 and should be able to browse, copy and delete the zip files and folders.
