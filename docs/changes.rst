@@ -7,6 +7,7 @@ OpenREM version history
 * `#675`_  Exports: improved resilience when export includes malformed studies
 * `#674`_  Documentation: Amended zip command in example Orthanc configuration to work with Linux and Windows
 * `#673`_  Imports: handle empty NumericValues and workaround for incorrect Philips Azurion AcquisitionDeviceType
+* `#672`_  Documentation: improve and extend linux one-page install
 * `#670`_  Imports: handle illegal multi-value number in Toshiba RDSR with vHP
 * `#668`_  Code quality: library import and blank space cleanup
 * `#666`_  Query-retrieve: handle non-return of ModalitiesInStudy correctly
