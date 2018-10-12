@@ -102,6 +102,8 @@ class itemsPerPageForm(forms.Form):
 
 
 class DXChartOptionsForm(forms.Form):
+    """Form for DX chart options
+    """
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition', required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
@@ -123,6 +125,8 @@ class DXChartOptionsForm(forms.Form):
 
 
 class CTChartOptionsForm(forms.Form):
+    """Form for CT chart options
+    """
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotCTAcquisitionMeanDLP = forms.BooleanField(label='DLP per acquisition', required=False)
     plotCTAcquisitionMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per acquisition'),
@@ -145,6 +149,8 @@ class CTChartOptionsForm(forms.Form):
 
 
 class RFChartOptionsForm(forms.Form):
+    """Form for RF chart options
+    """
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
@@ -156,6 +162,8 @@ class RFChartOptionsForm(forms.Form):
 
 
 class RFChartOptionsDisplayForm(forms.Form):
+    """Form for RF chart display options
+    """
     plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
     plotRFStudyDAP = forms.BooleanField(label='DAP per study', required=False)
@@ -164,6 +172,8 @@ class RFChartOptionsDisplayForm(forms.Form):
 
 
 class MGChartOptionsForm(forms.Form):
+    """Form for MG chart options
+    """
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
@@ -176,6 +186,8 @@ class MGChartOptionsForm(forms.Form):
 
 
 class MGChartOptionsDisplayForm(forms.Form):
+    """Form for MG chart display options
+    """
     plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
     plotMGkVpvsThickness = forms.BooleanField(label='kVp vs. compressed thickness', required=False)
@@ -183,6 +195,8 @@ class MGChartOptionsDisplayForm(forms.Form):
 
 
 class DXChartOptionsDisplayForm(forms.Form):
+    """Form for DX chart display options
+    """
     plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition', required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
     plotDXStudyMeanDAP = forms.BooleanField(label='DAP per study', required=False)
@@ -201,6 +215,8 @@ class DXChartOptionsDisplayForm(forms.Form):
 
 
 class CTChartOptionsDisplayForm(forms.Form):
+    """Form for CT chart display options
+    """
     plotCTAcquisitionMeanDLP = forms.BooleanField(label='DLP per acquisition', required=False)
     plotCTAcquisitionMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per acquisition'),
                                                    required=False)
@@ -220,6 +236,8 @@ class CTChartOptionsDisplayForm(forms.Form):
 
 
 class GeneralChartOptionsDisplayForm(forms.Form):
+    """Form for general chart display options
+    """
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
@@ -238,7 +256,6 @@ class UpdateDisplayNamesForm(forms.Form):
 class HomepageOptionsForm(forms.Form):
     """Form for displaying and changing the home page options
     """
-
     dayDeltaA = forms.IntegerField(label='Primary time period to sum studies (days)', required=False)
     dayDeltaB = forms.IntegerField(label='Secondary time period to sum studies (days)', required=False)
 

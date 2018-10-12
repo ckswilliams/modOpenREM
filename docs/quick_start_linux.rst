@@ -9,9 +9,12 @@ A one page install based on Ubuntu 18.04 using:
 * Webserver: NGINX with Gunicorn
 * Daemonisation: systemd scripts for Celery and Gunicorn
 * All OpenREM files in ``/var/dose/`` with group owner of ``openrem``
+* Collects any Physics (QA) images and zips them
 
 Initial prep
 ^^^^^^^^^^^^
+
+**Host file**
 
 First edit ``/etc/hosts`` to add the local server name -- else ``rabbitmq-server`` will not start when installed::
 
@@ -23,7 +26,22 @@ second line**::
     127.0.0.1 localhost
     127.0.1.1 openremserver
 
-``Ctrl-o Ctrl-x`` to write out and exit
+``Ctrl-o`` (write-[o]ut), ``Return`` to accept, then ``Ctrl-x`` to e[x]it
+
+**Apt sources**
+
+We will need the ``universe`` repository enabled. Check first::
+
+    less /etc/apt/sources.list
+
+Look for::
+
+    deb http://archive.ubuntu.com/ubuntu/ bionic universe
+    deb http://archive.ubuntu.com/ubuntu/ bionic-updates universe
+
+If these two lines are not there, add them in (``sudo nano /etc/apt/sources.list``).
+
+**Groups**
 
 Now create new group ``openrem`` and add your user to it (``$USER`` will automatically substitute for the user you are
 running as) :
@@ -36,6 +54,8 @@ running as) :
 .. note::
 
     At a later stage, to add a second administrator just add them to the ``openrem`` group in the same way.
+
+**Folders**
 
 Create the folders we need, and set the permissions. In due course, the ``orthanc`` user and the ``www-data`` user will
 be added to the ``openrem`` group, and the 'sticky' group setting below will enable both users to write to the logs etc:
@@ -50,11 +70,13 @@ be added to the ``openrem`` group, and the 'sticky' group setting below will ena
     mkdir log
     mkdir media
     mkdir -p orthanc/dicom
+    mkdir -p orthanc/physics
     mkdir pixelmed
     mkdir static
     mkdir veopenrem
     sudo chown -R $USER:openrem /var/dose/*
     sudo chmod -R g+s /var/dose/*
+    sudo setfacl -dm u::rwx,g::rwx,o::r orthanc
 
 
 Install apt packages and direct downloads
@@ -64,6 +86,7 @@ The ``\`` just allows the ``sudo apt install`` command to spread to two lines --
 .. code-block:: console
 
     sudo apt update
+    sudo apt upgrade
     sudo apt install python python-pip virtualenv rabbitmq-server \
     postgresql nginx orthanc dcmtk default-jre
 
@@ -138,6 +161,12 @@ each word is not important (one or more).
 .. code-block:: console
 
     local   all     openremuser                 md5
+
+Reload postgres:
+
+.. code-block:: console
+
+    sudo systemctl reload postgresql
 
 Configure OpenREM
 -----------------
@@ -398,8 +427,8 @@ working directly in the Ubuntu terminal, something else if you are using PuTTY e
 
 ``nano /var/dose/orthanc/openrem_orthanc_config.lua``
 
-Then edit the top section as follows -- keeping Physics test images has not been configured, feel free to do so! There
-are other settings too that you might like to change in the second section (not displayed here):
+Then edit the top section as follows -- keeping Physics test images has been configured, set to false to change this.
+There are other settings too that you might like to change in the second section (not displayed here):
 
 .. code-block:: lua
 
@@ -423,18 +452,18 @@ are other settings too that you might like to change in the second section (not 
 
     -- Set this to true if you want Orthanc to keep physics test studies, and have it
     -- put them in the physics_to_keep_folder. Set it to false to disable this feature
-    local use_physics_filtering = false
+    local use_physics_filtering = true
 
     -- Set this to the path where you want to keep physics-related DICOM images
-    local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
+    local physics_to_keep_folder = '/var/dose/orthanc/physics/'
 
     -- Set this to the path and name of your zip utility, and include any switches that
     -- are needed to create an archive (used with physics-related images)
-    local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a'
+    local zip_executable = '/usr/bin/zip -r'
 
     -- Set this to the path and name of your remove folder command, including switches
     -- for it to be quiet (used with physics-related images)
-    local rmdir_cmd = 'rmdir /s/q'
+    local rmdir_cmd = 'rm -r'
     -------------------------------------------------------------------------------------
 
 Add the Lua script to the Orthanc config:
@@ -494,6 +523,37 @@ Restart Orthanc:
 
     sudo systemctl restart orthanc.service
 
+New users, and quick access to physics folder
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This is for new Linux users; for new OpenREM users, refer to :ref:`user-settings`
+
+If you left ``local use_physics_filtering = true`` in the Orthanc configuration, you might like to give your colleagues
+a quick method of accessing
+the physics folder from their home folder. Then if they use a program like `WinSCP`_ it is easy to find and copy the QA
+images to another (Windows) computer on the network. WinSCP can also be run directly from a USB stick if you are unable
+to install software :-)
+
+Add the new user (replace  ``newusername`` as appropriate):
+
+.. code-block:: console
+
+    sudo adduser newusername
+
+Then add the new user to the `openrem` group (again, replace the user name):
+
+.. code-block:: console
+
+    sudo adduser newusername openrem
+
+Now add a 'sym-link' to the new users home directory (again, replace the user name):
+
+.. code-block:: console
+
+    sudo ln -sT /var/dose/orthanc/physics /home/newusername/physicsimages
+
+The new user should now be able to get to the physics folder by clicking on the ``physicsimages`` link when they log in,
+and should be able to browse, copy and delete the zip files and folders.
+
 Log locations
 ^^^^^^^^^^^^^
 
@@ -505,3 +565,4 @@ Log locations
 * Gunicorn systemd: ``sudo journalctl -u gunicorn-openrem``
 
 
+.. _`WinSCP`: https://winscp.net
