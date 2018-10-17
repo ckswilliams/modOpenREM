@@ -169,6 +169,15 @@ class RFFilterPlusPid(RFSummaryListFilter):
         self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label=u'Patient ID')
 
 
+# Values from DICOM CID 10013 CT Acquisition Type
+CT_ACQ_TYPE_CHOICES = (
+    ('Spiral Acquisition',         'Spiral'),
+    ('Sequenced Acquisition',      'Axial'),
+    ('Constant Angle Acquisition', 'Scan projection radiograph'),
+    ('Stationary Acquisition',     'Stationary acquisition'),
+    ('Free Acquisition',           'Free acquisition'),
+)
+
 class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
@@ -179,6 +188,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
     procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
     requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
     acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+    ct_acquisition_type = django_filters.MultipleChoiceFilter(lookup_type='iexact', label=u'Acquisition type', name='ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning', choices=CT_ACQ_TYPE_CHOICES)
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
@@ -455,7 +465,7 @@ def dx_acq_filter(filters, pid=False):
             [o.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid for o in events]
         ))
     studies = GeneralStudyModuleAttr.objects.filter(
-        Q(modality_type__exact='DX') | Q(modality_type__exact='CR'))
+        Q(modality_type__exact='DX') | Q(modality_type__exact='CR')  | Q(modality_type__exact='PX'))
     if filteredInclude:
         studies = studies.filter(study_instance_uid__in = filteredInclude)
     if pid:
