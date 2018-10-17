@@ -465,7 +465,7 @@ def dx_acq_filter(filters, pid=False):
             [o.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid for o in events]
         ))
     studies = GeneralStudyModuleAttr.objects.filter(
-        Q(modality_type__exact='DX') | Q(modality_type__exact='CR')  | Q(modality_type__exact='PX'))
+        Q(modality_type__exact='DX') | Q(modality_type__exact='CR'))
     if filteredInclude:
         studies = studies.filter(study_instance_uid__in = filteredInclude)
     if pid:
