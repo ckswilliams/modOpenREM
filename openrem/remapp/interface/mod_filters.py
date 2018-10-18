@@ -288,6 +288,11 @@ def ct_acq_filter(filters, pid=False):
                 events = events.filter(mean_ctdivol__lte=filters['acquisition_ctdi_max'])
             except InvalidOperation:
                 pass
+        if 'ct_acquisition_type' in filters:
+            try:
+                events = events.filter(ct_acquisition_type__code_meaning__iexact = filters['ct_acquisition_type'])
+            except InvalidOperation:
+                pass
         filteredInclude = list(set(
             [o.ct_radiation_dose.general_study_module_attributes.study_instance_uid for o in events]))
 

@@ -1037,7 +1037,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 # study.
                 study_events = GeneralStudyModuleAttr.objects.exclude(
                     ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-                ).filter(study_instance_uid__in=exp_include)
+                ).filter(study_instance_uid__in=exp_include, ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type'])
             else:
                 # The user hasn't filtered on acquisition, so we can use the faster database querying.
                 study_events = f.qs
@@ -1054,7 +1054,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 # study.
                 request_events = GeneralStudyModuleAttr.objects.exclude(
                     ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-                ).filter(study_instance_uid__in=exp_include)
+                ).filter(study_instance_uid__in=exp_include, ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type'])
             else:
                 # The user hasn't filtered on acquisition, so we can use the faster database querying.
                 request_events = f.qs
@@ -1063,8 +1063,25 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         except KeyError:
             request_events = f.qs
 
+    if plot_acquisition_mean_dlp or plot_acquisition_freq or plot_acquisition_mean_ctdi:
+        try:
+            if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
+                # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
+                # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
+                # study.
+                acq_events = GeneralStudyModuleAttr.objects.exclude(
+                    ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+                ).filter(study_instance_uid__in=exp_include, ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type'])
+            else:
+                # The user hasn't filtered on acquisition, so we can use the faster database querying.
+                acq_events = f.qs
+        except MultiValueDictKeyError:
+            acq_events = f.qs
+        except KeyError:
+            acq_events = f.qs
+
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
-        result = average_chart_inc_histogram_data(f.qs,
+        result = average_chart_inc_histogram_data(acq_events,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'ctradiationdose__ctirradiationeventdata__acquisition_protocol',
                                                   'ctradiationdose__ctirradiationeventdata__dlp',
@@ -1083,7 +1100,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['acquisitionHistogramData'] = result['histogram_data']
 
     if plot_acquisition_mean_ctdi:
-        result = average_chart_inc_histogram_data(f.qs,
+        result = average_chart_inc_histogram_data(acq_events,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'ctradiationdose__ctirradiationeventdata__acquisition_protocol',
                                                   'ctradiationdose__ctirradiationeventdata__mean_ctdivol',
