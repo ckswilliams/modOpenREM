@@ -1020,68 +1020,32 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
     return_structure = {}
 
-    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
-        try:
-            if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
-                exp_include = [o.study_instance_uid for o in f]
-        except MultiValueDictKeyError:
-            pass
-        except KeyError:
-            pass
+    try:
+        if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
+            exp_include = [o.study_instance_uid for o in f]
+    except MultiValueDictKeyError:
+        pass
+    except KeyError:
+        pass
 
-    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
-        try:
-            if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
-                # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
-                # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
-                # study.
-                study_events = GeneralStudyModuleAttr.objects.exclude(
-                    ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-                ).filter(study_instance_uid__in=exp_include, ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type'])
-            else:
-                # The user hasn't filtered on acquisition, so we can use the faster database querying.
-                study_events = f.qs
-        except MultiValueDictKeyError:
-            study_events = f.qs
-        except KeyError:
-            study_events = f.qs
-
-    if plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
-        try:
-            if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
-                # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
-                # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
-                # study.
-                request_events = GeneralStudyModuleAttr.objects.exclude(
-                    ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-                ).filter(study_instance_uid__in=exp_include, ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type'])
-            else:
-                # The user hasn't filtered on acquisition, so we can use the faster database querying.
-                request_events = f.qs
-        except MultiValueDictKeyError:
-            request_events = f.qs
-        except KeyError:
-            request_events = f.qs
-
-    if plot_acquisition_mean_dlp or plot_acquisition_freq or plot_acquisition_mean_ctdi:
-        try:
-            if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
-                # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
-                # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
-                # study.
-                acq_events = GeneralStudyModuleAttr.objects.exclude(
-                    ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-                ).filter(study_instance_uid__in=exp_include, ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type'])
-            else:
-                # The user hasn't filtered on acquisition, so we can use the faster database querying.
-                acq_events = f.qs
-        except MultiValueDictKeyError:
-            acq_events = f.qs
-        except KeyError:
-            acq_events = f.qs
+    try:
+        if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
+            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
+            # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
+            # study.
+            events_to_use = GeneralStudyModuleAttr.objects.exclude(
+                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+            ).filter(study_instance_uid__in=exp_include, ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type'])
+        else:
+            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+            events_to_use = f.qs
+    except MultiValueDictKeyError:
+        events_to_use = f.qs
+    except KeyError:
+        events_to_use = f.qs
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
-        result = average_chart_inc_histogram_data(acq_events,
+        result = average_chart_inc_histogram_data(events_to_use,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'ctradiationdose__ctirradiationeventdata__acquisition_protocol',
                                                   'ctradiationdose__ctirradiationeventdata__dlp',
@@ -1100,7 +1064,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['acquisitionHistogramData'] = result['histogram_data']
 
     if plot_acquisition_mean_ctdi:
-        result = average_chart_inc_histogram_data(acq_events,
+        result = average_chart_inc_histogram_data(events_to_use,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'ctradiationdose__ctirradiationeventdata__acquisition_protocol',
                                                   'ctradiationdose__ctirradiationeventdata__mean_ctdivol',
@@ -1119,7 +1083,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['acquisitionHistogramDataCTDI'] = result['histogram_data']
 
     if plot_study_mean_dlp or plot_study_freq:
-        result = average_chart_inc_histogram_data(study_events,
+        result = average_chart_inc_histogram_data(events_to_use,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'study_description',
                                                   'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
@@ -1137,7 +1101,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['studyHistogramData'] = result['histogram_data']
 
     if plot_study_mean_ctdi:
-        result = average_chart_inc_histogram_data(study_events,
+        result = average_chart_inc_histogram_data(events_to_use,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'study_description',
                                                   'ctradiationdose__ctirradiationeventdata__mean_ctdivol',
@@ -1156,7 +1120,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['studyHistogramDataCTDI'] = result['histogram_data']
 
     if plot_study_num_events:
-        result = average_chart_inc_histogram_data(study_events,
+        result = average_chart_inc_histogram_data(events_to_use,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'study_description',
                                                   'ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events',
@@ -1175,7 +1139,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['studyHistogramDataNumEvents'] = result['histogram_data']
 
     if plot_request_mean_dlp or plot_request_freq:
-        result = average_chart_inc_histogram_data(request_events,
+        result = average_chart_inc_histogram_data(events_to_use,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'requested_procedure_code_meaning',
                                                   'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
@@ -1193,7 +1157,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['requestHistogramData'] = result['histogram_data']
 
     if plot_request_num_events:
-        result = average_chart_inc_histogram_data(request_events,
+        result = average_chart_inc_histogram_data(events_to_use,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'requested_procedure_code_meaning',
                                                   'ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events',
@@ -1212,7 +1176,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['requestHistogramDataNumEvents'] = result['histogram_data']
 
     if plot_study_mean_dlp_over_time:
-        result = average_chart_over_time_data(study_events,
+        result = average_chart_over_time_data(events_to_use,
                                               'study_description',
                                               'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                                               'study_date', 'study_date',
@@ -1227,7 +1191,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['studyNameList'] = result['series_names']
 
     if plot_study_per_day_and_hour:
-        result = workload_chart_data(study_events)
+        result = workload_chart_data(events_to_use)
         return_structure['studiesPerHourInWeekdays'] = result['workload']
 
     return return_structure
