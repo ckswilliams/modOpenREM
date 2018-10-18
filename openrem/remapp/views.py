@@ -1022,7 +1022,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
     if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
         try:
-            if f.form.data['acquisition_protocol']:
+            if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
                 exp_include = [o.study_instance_uid for o in f]
         except MultiValueDictKeyError:
             pass
@@ -1031,7 +1031,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
     if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
         try:
-            if f.form.data['acquisition_protocol']:
+            if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
                 # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
                 # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
                 # study.
@@ -1048,7 +1048,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
     if plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
         try:
-            if f.form.data['acquisition_protocol']:
+            if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
                 # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
                 # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
                 # study.
