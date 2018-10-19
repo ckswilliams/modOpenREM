@@ -354,3 +354,11 @@ a.vert-offset:before {
     height: 52px;
     margin: -52px 0 0;
 }
+
+#id_ct_acquisition_type {
+    list-style: none;
+    padding: 0;
+    height: 5em;
+    overflow: scroll;
+    overflow-x: hidden;
+}

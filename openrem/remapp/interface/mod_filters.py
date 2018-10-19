@@ -188,7 +188,6 @@ class CTSummaryListFilter(django_filters.FilterSet):
     procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
     requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
     acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label=u'Acquisition protocol', name='ctradiationdose__ctirradiationeventdata__acquisition_protocol')
-    ct_acquisition_type = django_filters.MultipleChoiceFilter(lookup_type='iexact', label=u'Acquisition type', name='ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning', choices=CT_ACQ_TYPE_CHOICES)
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label=u'Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label=u'Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label=u'Hospital', name='generalequipmentmoduleattr__institution_name')
@@ -200,6 +199,9 @@ class CTSummaryListFilter(django_filters.FilterSet):
     study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label=u'Max study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
     display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
+    ct_acquisition_type = django_filters.MultipleChoiceFilter(lookup_type='iexact', label=u'Acquisition type restriction',
+                                                              name='ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning',
+                                                              choices=CT_ACQ_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple)
 
     class Meta:
         model = GeneralStudyModuleAttr
