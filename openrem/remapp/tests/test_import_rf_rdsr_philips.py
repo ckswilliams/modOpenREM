@@ -3,11 +3,12 @@
 
 import os
 from decimal import Decimal
+
 from django.test import TestCase
+
 from remapp.extractors import rdsr
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
 
-# pylint: disable=unused-variable
 
 class ImportRFRDSRPhilips(TestCase):
     """Tests for importing the Philips Allura RDSR
@@ -39,3 +40,29 @@ class ImportRFRDSRPhilips(TestCase):
         self.assertAlmostEqual(first_source_data.collimated_field_height, first_field_height)
         self.assertAlmostEqual(first_source_data.collimated_field_width, first_field_width)
         self.assertAlmostEqual(first_source_data.collimated_field_area, first_field_area)
+
+
+class ImportRFRDSRPhilipsAzurion(TestCase):
+    """
+    Test importing Azurion RDSR with empty calibration data and incorrect Acquisition Device Type
+    """
+
+    def _disable_test_azurion_import(self):
+        """
+        Tests that the file was imported without error (empty calibrations)
+        Tests that the accumulated fluoroscopy data is captured (incorrect Acquisition Device Type)
+        :return: None
+        """
+
+        PatientIDSettings.objects.create()
+
+        dicom_file = "test_files/RF-RDSR-Philips_Azurion.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path = os.path.join(root_tests, dicom_file)
+
+        rdsr(dicom_path)
+        study = GeneralStudyModuleAttr.objects.order_by('id')[0]
+
+        fluoro_totals = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
+
+        self.assertAlmostEqual(fluoro_totals.fluoro_dose_area_product_total, Decimal(0.00101567))

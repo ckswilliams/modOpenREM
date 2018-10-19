@@ -213,7 +213,8 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
             if patid:
                 patient_id = patient_module.patient_id
     except ObjectDoesNotExist:
-        logger.debug("Export {0}; patientmoduleattr_set object does not exist".format(modality))
+        logger.debug("Export {0}; patientmoduleattr_set object does not exist. AccNum {1}, Date {2}".format(
+            modality, exams.accession_number, exams.study_date))
 
     institution_name = None
     manufacturer = None
@@ -226,9 +227,14 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         manufacturer = equipment_module.manufacturer
         manufacturer_model_name = equipment_module.manufacturer_model_name
         station_name = equipment_module.station_name
-        display_name = equipment_module.unique_equipment_name.display_name
+        try:
+            display_name = equipment_module.unique_equipment_name.display_name
+        except AttributeError:
+            logger.debug("Export {0}; unique_equipment_name object does not exist. AccNum {1}, Date {2}".format(
+                modality, exams.accession_number, exams.study_date))
     except ObjectDoesNotExist:
-        logger.debug("Export {0}; generalequipmentmoduleattr_set object does not exist".format(modality))
+        logger.debug("Export {0}; generalequipmentmoduleattr_set object does not exist. AccNum {1}, Date {2}".format(
+            modality, exams.accession_number, exams.study_date))
 
     patient_age_decimal = None
     patient_size = None
@@ -239,7 +245,8 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
         patient_size = patient_study_module.patient_size
         patient_weight = patient_study_module.patient_weight
     except ObjectDoesNotExist:
-        logger.debug("Export {0}; patientstudymoduleattr_set object does not exist".format(modality))
+        logger.debug("Export {0}; patientstudymoduleattr_set object does not exist. AccNum {1}, Date {2}".format(
+            modality, exams.accession_number, exams.study_date))
 
     event_count = None
     cgycm2 = None
@@ -253,9 +260,11 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
             try:
                 event_count = int(ct_accumulated.total_number_of_irradiation_events)
             except TypeError:
-                logger.debug("Export CT; couldn't get number of irradiation events")
+                logger.debug("Export CT; couldn't get number of irradiation events. AccNum {0}, Date {1}".format(
+                    exams.accession_number, exams.study_date))
         except ObjectDoesNotExist:
-            logger.debug("Export CT; ctradiationdose_set object does not exist")
+            logger.debug("Export CT; ctradiationdose_set object does not exist. AccNum {0}, Date {1}".format(
+                exams.accession_number, exams.study_date))
 
     elif modality in u"DX":
         try:
@@ -269,13 +278,15 @@ def get_common_data(modality, exams, pid=None, name=None, patid=None):
             else:
                 cgycm2 = None
         except ObjectDoesNotExist:
-            logger.debug("Export DX; projectionxrayradiationdose_set object does not exist")
+            logger.debug("Export DX; projectionxrayradiationdose_set object does not exist."
+                         " AccNum {0}, Date {1}".format(exams.accession_number, exams.study_date))
     elif modality in [u"RF", u"MG"]:
         try:
             event_count = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()
             comment = exams.projectionxrayradiationdose_set.get().comment
         except ObjectDoesNotExist:
-            logger.debug("Export {0}; projectionxrayradiationdose_set object does not exist".format(modality))
+            logger.debug("Export {0}; projectionxrayradiationdose_set object does not exist."
+                         " AccNum {1}, Date {2}".format(modality, exams.accession_number, exams.study_date))
 
     examdata = []
     if pid and name:

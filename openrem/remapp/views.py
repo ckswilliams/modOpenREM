@@ -702,7 +702,9 @@ def rf_detail_view(request, pk=None):
     from django.db.models import Sum
     import numpy as np
     import operator
-    from remapp.models import HighDoseMetricAlertSettings
+    from remapp.models import HighDoseMetricAlertSettings, SkinDoseMapCalcSettings
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import SkinDoseMapCalcSettings
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
@@ -767,8 +769,6 @@ def rf_detail_view(request, pk=None):
 
     study_totals = np.column_stack((irradiation_types, stu_dose_totals, stu_time_totals)).tolist()
 
-    from remapp.models import SkinDoseMapCalcSettings
-    from django.core.exceptions import ObjectDoesNotExist
     try:
         SkinDoseMapCalcSettings.objects.get()
     except ObjectDoesNotExist:
