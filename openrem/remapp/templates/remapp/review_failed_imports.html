@@ -20,7 +20,7 @@
 
 
   <p>
-    There are studies in this list which
+    There are {{ studies_count }} studies in this list which
   has been filtered by the modality {{ modality }} {% if modality == "DX" %}(including CR) {% endif %}
   </p>
 
@@ -119,8 +119,8 @@
       <td colspan="4">Irradiation event data</td>
     </tr>
     <tr>
-      <th>Date</th>
-      <th>Time</th>
+      <th>Date and time</th>
+      <th>Accession number</th>
       <th>General</th>
       <th>Study</th>
       <th>Template</th>
@@ -144,7 +144,7 @@
               function get_review_data(json) {
                   $.ajax(
                       {
-                          url: "/admin/review/study",
+                          url: "/admin/review/failed/study",
                           data: {
                               study_pk: '{{ study.pk }}',
                               csrfmiddlewaretoken: '{{ csrf_token }}'
