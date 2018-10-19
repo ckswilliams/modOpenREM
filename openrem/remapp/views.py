@@ -2700,6 +2700,56 @@ def review_study_details(request):
 
 
 @login_required
+def review_failed_imports(request, modality=None):
+    """View to list 'failed import' studies
+
+    :param request:
+    :param modality: modality to filter by
+    :return:
+    """
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    from django.db.models import Q
+
+    if not modality in [u'CT', u'RF', u'MG', u'DX']:
+        logger.error("Attempt to load review_failed_imports without suitable modality")
+        messages.error(request,
+                       "Faile study imports can only be reviewed with the correct "
+                       "link from the display name page")
+        return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+    if not request.user.groups.filter(name="admingroup"):
+        messages.error(request, "You are not in the administrator group - please contact your administrator")
+        return redirect('/openrem/viewdisplaynames/')
+
+    if request.method == 'GET':
+        if modality == 'DX':
+            all_mod = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact=u'DX') | Q(modality_type__exact=u'CR'))
+        else:
+            all_mod = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality)
+
+        broken_studies = all_mod.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__isnull=True)
+
+        paginator = Paginator(broken_studies, 25)
+        page = request.GET.get('page')
+        try:
+            studies = paginator.page(page)
+        except PageNotAnInteger:
+            studies = paginator.page(1)
+        except EmptyPage:
+            studies = paginator.page(paginator.num_pages)
+
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+        for group in request.user.groups.all():
+            admin[group.name] = True
+
+        template = 'remapp/review_failed_imports.html'
+        return render(request, template, {
+            'modality': modality, 'studies': studies,
+            'studies_count': broken_studies.count(), 'admin': admin})
+
+
+@login_required
 def chart_options_view(request):
     from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm,\
         RFChartOptionsDisplayForm, MGChartOptionsDisplayForm
