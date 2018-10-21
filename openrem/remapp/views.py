@@ -1021,36 +1021,59 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
     return_structure = {}
 
     if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
-        try:
-            if f.form.data['acquisition_protocol'] or f.form.data['ct_acquisition_type']:
-                # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
-                # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
-                # study.
-                exp_include = [o.study_instance_uid for o in f]
-                study_and_request_events = GeneralStudyModuleAttr.objects.exclude(
-                    ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-                ).filter(study_instance_uid__in=exp_include)
-            else:
-                # The user hasn't filtered on acquisition, so we can use the faster database querying.
-                study_and_request_events = f.qs
-        except (MultiValueDictKeyError, KeyError):
-            study_and_request_events = f.qs
+        prefetch_list = ['generalequipmentmoduleattr__unique_equipment_name_id__display_name']
+        if plot_study_mean_dlp or plot_study_freq or plot_study_mean_ctdi or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
+            prefetch_list.append('study_description')
+        if plot_study_mean_dlp or plot_study_freq or plot_request_mean_dlp or plot_request_freq:
+            prefetch_list.append('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
+        if plot_study_mean_ctdi:
+            prefetch_list.append('ctradiationdose__ctirradiationeventdata__mean_ctdivol')
+        if plot_study_num_events:
+            prefetch_list.append('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events')
+        if plot_study_mean_dlp_over_time:
+            prefetch_list.append('study_date')
+        if plot_request_freq or plot_request_mean_dlp or plot_request_num_events:
+            prefetch_list.append('requested_procedure_code_meaning')
+        if plot_request_num_events:
+            prefetch_list.append('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events')
 
-    if plot_acquisition_mean_dlp or plot_acquisition_freq or plot_acquisition_mean_ctdi:
-        try:
+        if ('acquisition_protocol' in f.form.data and f.form.data['acquisition_protocol']) or ('ct_acquisition_type' in f.form.data and f.form.data['ct_acquisition_type']):
             # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
             # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
             # study.
-            exp_include = [o.study_instance_uid for o in f]
-            acquisition_events = GeneralStudyModuleAttr.objects.exclude(
-                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-            ).filter(study_instance_uid__in=exp_include, ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type'])
-        except MultiValueDictKeyError:
-            acquisition_events = GeneralStudyModuleAttr.objects.exclude(
-                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-            ).filter(study_instance_uid__in=exp_include)
-        except KeyError:
-            acquisition_events = f.qs
+            try:
+                exp_include = f.qs.values_list('study_instance_uid')
+                study_and_request_events = GeneralStudyModuleAttr.objects.exclude(
+                    ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+                ).filter(study_instance_uid__in=exp_include).prefetch_related(*prefetch_list).values(*prefetch_list)
+            except KeyError:
+                study_and_request_events = f.qs.prefetch_related(*prefetch_list).values(*prefetch_list)
+        else:
+            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+            study_and_request_events = f.qs.prefetch_related(*prefetch_list).values(*prefetch_list)
+
+    if plot_acquisition_mean_dlp or plot_acquisition_freq or plot_acquisition_mean_ctdi:
+        prefetch_list = ['generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                         'ctradiationdose__ctirradiationeventdata__acquisition_protocol']
+        if plot_acquisition_mean_dlp:
+            prefetch_list.append('ctradiationdose__ctirradiationeventdata__dlp')
+        if plot_acquisition_mean_ctdi:
+            prefetch_list.append('ctradiationdose__ctirradiationeventdata__mean_ctdivol')
+
+        if plot_histograms and 'ct_acquisition_type' in f.form.data and f.form.data['ct_acquisition_type']:
+            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
+            # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
+            # study.
+            try:
+                exp_include = f.qs.values_list('study_instance_uid')
+                acquisition_events = GeneralStudyModuleAttr.objects.exclude(
+                    ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+                ).filter(study_instance_uid__in=exp_include,
+                         ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type']).prefetch_related(*prefetch_list).values(*prefetch_list)
+            except KeyError:
+                acquisition_events = f.qs.prefetch_related(*prefetch_list).values(*prefetch_list)
+        else:
+            acquisition_events = f.qs.prefetch_related(*prefetch_list).values(*prefetch_list)
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
         result = average_chart_inc_histogram_data(acquisition_events,
