@@ -355,7 +355,7 @@ def _ct_get_series_data(s):
             source_parameters[index]['max_current'] = source.maximum_xray_tube_current
             source_parameters[index]['current'] = source.xray_tube_current
             source_parameters[index]['time'] = source.exposure_time_per_rotation
-    except ObjectDoesNotExist:
+    except (ObjectDoesNotExist, KeyError):
         logger.debug("Export: ctxraysourceparameters_set does not exist")
     for source in source_parameters:
         seriesdata += [
