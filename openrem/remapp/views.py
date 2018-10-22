@@ -1045,12 +1045,12 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 exp_include = f.qs.values_list('study_instance_uid')
                 study_and_request_events = GeneralStudyModuleAttr.objects.exclude(
                     ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-                ).filter(study_instance_uid__in=exp_include).prefetch_related(*prefetch_list)
+                ).filter(study_instance_uid__in=exp_include).values(*prefetch_list)
             except KeyError:
-                study_and_request_events = f.qs.prefetch_related(*prefetch_list)
+                study_and_request_events = f.qs.values(*prefetch_list)
         else:
             # The user hasn't filtered on acquisition, so we can use the faster database querying.
-            study_and_request_events = f.qs.prefetch_related(*prefetch_list)
+            study_and_request_events = f.qs.values(*prefetch_list)
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq or plot_acquisition_mean_ctdi:
         prefetch_list = ['generalequipmentmoduleattr__unique_equipment_name_id__display_name',
@@ -1069,11 +1069,11 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 acquisition_events = GeneralStudyModuleAttr.objects.exclude(
                     ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
                 ).filter(study_instance_uid__in=exp_include,
-                         ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type']).prefetch_related(*prefetch_list)
+                         ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__iexact=f.form.data['ct_acquisition_type']).values(*prefetch_list)
             except KeyError:
-                acquisition_events = f.qs.prefetch_related(*prefetch_list)
+                acquisition_events = f.qs.values(*prefetch_list)
         else:
-            acquisition_events = f.qs.prefetch_related(*prefetch_list)
+            acquisition_events = f.qs.values(*prefetch_list)
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
         result = average_chart_inc_histogram_data(acquisition_events,
