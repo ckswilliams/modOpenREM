@@ -36,6 +36,8 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # pylint: disable=unused-variable
 
@@ -107,6 +109,15 @@ class HighDoseMetricAlertSettings(SingletonModel):
 class HighDoseMetricAlertRecipients(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     receive_high_dose_metric_alerts = models.BooleanField(default=False, verbose_name="Receive high dose e-mail alerts?")
+
+
+@receiver(post_save, sender=User)
+def create_or_save_high_dose_metric_alert_recipient_setting(sender, instance, **kwargs):
+    if not hasattr(instance, 'highdosemetricalertrecipients'):
+        new_objects = HighDoseMetricAlertRecipients.objects.create(user=instance)
+        new_objects.save()
+    else:
+        instance.highdosemetricalertrecipients.save()
 
 
 class HomePageAdminSettings(SingletonModel):
