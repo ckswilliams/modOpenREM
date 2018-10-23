@@ -282,6 +282,7 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
                 'accum_dose_delta_weeks',
                 'show_accum_dose_over_delta_weeks',
                 'calc_accum_dose_over_delta_weeks_on_import',
+                'send_high_dose_metric_alert_emails',
             ),
             FormActions(
                 Submit('submit', 'Submit')
@@ -294,7 +295,8 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
                   'alert_total_rp_dose_rf',
                   'accum_dose_delta_weeks',
                   'show_accum_dose_over_delta_weeks',
-                  'calc_accum_dose_over_delta_weeks_on_import']
+                  'calc_accum_dose_over_delta_weeks_on_import',
+                  'send_high_dose_metric_alert_emails']
 
 
 class HomepageOptionsForm(forms.Form):

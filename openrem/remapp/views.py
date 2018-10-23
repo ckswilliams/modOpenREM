@@ -3226,6 +3226,13 @@ class RFHighDoseAlertSettings(UpdateView):  # pylint: disable=unused-variable
                 else:
                     msg += ' disabled'
                 messages.info(self.request, msg)
+            if 'send_high_dose_metric_alert_emails' in form.changed_data:
+                msg = 'E-mail notification of high doses '
+                if form.cleaned_data['send_high_dose_metric_alert_emails']:
+                    msg += 'enabled'
+                else:
+                    msg += ' disabled'
+                messages.info(self.request, msg)
             if 'alert_total_dap_rf' in form.changed_data:
                 messages.info(self.request, 'Total DAP alert level has been changed to {0}'.format(form.cleaned_data['alert_total_dap_rf']))
             if 'alert_total_rp_dose_rf' in form.changed_data:

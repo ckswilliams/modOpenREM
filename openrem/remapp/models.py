@@ -35,6 +35,7 @@ import json
 from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
+from django.contrib.auth.models import User
 
 # pylint: disable=unused-variable
 
@@ -97,9 +98,15 @@ class HighDoseMetricAlertSettings(SingletonModel):
     changed_accum_dose_delta_weeks = models.BooleanField(default=True)
     show_accum_dose_over_delta_weeks = models.BooleanField(default=True, verbose_name="Enable display of summed DAP and RP dose on fluoroscopy summary and detail pages?")
     calc_accum_dose_over_delta_weeks_on_import = models.BooleanField(default=True, verbose_name="Calculate summed DAP and RP dose for incoming fluoroscopy studies?")
+    send_high_dose_metric_alert_emails = models.BooleanField(default=False, verbose_name="Send notification e-mails when alert levels are exceeded?")
 
     def get_absolute_url(self):
         return '/admin/rfalertsettings/1/'
+
+
+class HighDoseMetricAlertRecipients(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    receive_high_dose_metric_alerts = models.BooleanField(default=False, verbose_name="Receive high dose e-mail alerts?")
 
 
 class HomePageAdminSettings(SingletonModel):
@@ -253,7 +260,6 @@ class DicomQRRspImage(models.Model):
     sop_class_uid = models.TextField(blank=True, null=True)
 
 
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
 
