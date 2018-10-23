@@ -112,3 +112,22 @@ JAVA_EXE = 'C:\\Users\\David\\Apps\\doseUtility\\windows\\jre\\bin\\java.exe'
 JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
 PIXELMED_JAR = 'C:\\Users\\David\\Apps\\doseUtility\\pixelmed.jar'
 PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
+
+# E-mail server settings - see https://docs.djangoproject.com/en/1.8/topics/email/
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+EMAIL_HOST_USER = 'a.user.that.can.send'
+EMAIL_HOST_PASSWORD = 'the.above.user.password'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
+
+# The following line can be used to set up a dummy smtp server for testing:
+# python -m smtpd -n -c DebuggingServer localhost:1025
+
+# The following lines will send an e-mail:
+#from django.core.mail import send_mail
+#send_mail('Subject here',
+#          'This is the message',
+#          'from@address',
+#          ['recipient1', 'recipient2', 'recipient3'],
+#          fail_silently=False)
