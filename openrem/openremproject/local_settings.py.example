@@ -120,6 +120,7 @@ EMAIL_HOST_USER = 'a.user.that.can.send'
 EMAIL_HOST_PASSWORD = 'the.above.user.password'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
+EMAIL_DOSE_ALERT_SENDER = 'alert.radiation@ulh.nhs.uk'
 
 # The following line can be used to set up a dummy smtp server for testing:
 # python -m smtpd -n -c DebuggingServer localhost:1025

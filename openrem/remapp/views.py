@@ -1586,6 +1586,27 @@ def openrem_home(request):
         if not_patient_indicator_question:
             admin_questions_true = True  # Doing this instead
 
+    # # Send a test e-mail
+    # from django.core.mail import send_mail
+    # from openremproject import settings
+    # from remapp.models import HighDoseMetricAlertSettings
+    # from django.contrib.auth.models import User
+    #
+    # try:
+    #     HighDoseMetricAlertSettings.objects.get()
+    # except ObjectDoesNotExist:
+    #     HighDoseMetricAlertSettings.objects.create()
+    #
+    # send_alert_emails = HighDoseMetricAlertSettings.objects.values_list('send_high_dose_metric_alert_emails', flat=True)[0]
+    # if send_alert_emails:
+    #     recipients = User.objects.filter(highdosemetricalertrecipients__receive_high_dose_metric_alerts__exact=True).values_list('email', flat=True)
+    #     send_mail('OpenREM high dose alert test',
+    #               'This is a test for high dose alert e-mails from OpenREM',
+    #               settings.EMAIL_DOSE_ALERT_SENDER,
+    #               recipients,
+    #               fail_silently=False)
+    # # End of sending a test e-mail
+
     return render(request, "remapp/home.html",
                   {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
                    'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true,
@@ -3243,6 +3264,36 @@ class RFHighDoseAlertSettings(UpdateView):  # pylint: disable=unused-variable
         else:
             messages.info(self.request, "No changes made")
         return super(RFHighDoseAlertSettings, self).form_valid(form)
+
+
+@login_required
+@csrf_exempt
+def rf_alert_notifications_view(request):
+    from django.contrib.auth.models import User
+
+    if request.method == 'POST' and request.user.groups.filter(name="admingroup"):
+        all_users = User.objects.all()
+        for user in all_users:
+            if str(user.pk) in request.POST.values():
+                user.highdosemetricalertrecipients.receive_high_dose_metric_alerts = True
+            else:
+                user.highdosemetricalertrecipients.receive_high_dose_metric_alerts = False
+            user.save()
+
+    f = User.objects.order_by('username')
+
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    return_structure = {'user_list': f, 'admin': admin}
+
+    return render_to_response(
+        'remapp/rfalertnotificationsview.html',
+        return_structure,
+        context_instance=RequestContext(request)
+    )
 
 
 def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable

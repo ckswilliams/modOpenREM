@@ -1367,20 +1367,19 @@ def _rsdr2db(dataset):
     # weeks in time from this study date. Only do this if activated in the fluoro alert settings (check whether
     # HighDoseMetricAlertSettings.calc_accum_dose_over_delta_weeks_on_import is True).
     if g.modality_type == 'RF':
-        from remapp.models import HighDoseMetricAlertSettings
+        from django.core.urlresolvers import reverse
+        from remapp.models import HighDoseMetricAlertSettings, AccumIntegratedProjRadiogDose
         try:
             HighDoseMetricAlertSettings.objects.get()
         except ObjectDoesNotExist:
             HighDoseMetricAlertSettings.objects.create()
 
+        week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
         calc_accum_dose_over_delta_weeks_on_import = HighDoseMetricAlertSettings.objects.values_list('calc_accum_dose_over_delta_weeks_on_import', flat=True)[0]
         if calc_accum_dose_over_delta_weeks_on_import:
             from datetime import timedelta
             from django.db.models import Sum
-            from remapp.models import AccumIntegratedProjRadiogDose, PKsForSummedRFDoseStudiesInDeltaWeeks
-
-            # Obtain the number of weeks to use to search for previous studies with the same patient ID
-            week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+            from remapp.models import PKsForSummedRFDoseStudiesInDeltaWeeks
 
             all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
 
@@ -1426,6 +1425,84 @@ def _rsdr2db(dataset):
                     accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__sum']
                     accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total__sum']
                     accum_int_proj_to_update.save()
+
+        # Send an e-mail to all high dose alert recipients if this study is at or above threshold levels
+        send_alert_emails = HighDoseMetricAlertSettings.objects.values_list('send_high_dose_metric_alert_emails', flat=True)[0]
+        if send_alert_emails:
+            alert_values = HighDoseMetricAlertSettings.objects.values('alert_total_dap_rf', 'alert_total_rp_dose_rf')[0]
+
+            this_study_dap = g.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+            this_study_rp_dose = g.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_rp_total
+
+            msg_body = 'This is an automatically-generated e-mail from OpenREM. Please do not reply to this message.\r\n'
+            msg_body += '\r\n'
+            msg_body = 'A fluoroscopy study has triggered a high dose alert. See below for details.\r\n'
+            msg_body += '\r\n'
+            msg_body += 'This study\r\n'
+            msg_body += '\tStudy date:\t{0}\r\n'.format(g.study_date.strftime('%x'))
+            msg_body += '\tStudy time:\t{0}\r\n'.format(g.study_time.strftime('%X'))
+            msg_body += '\tInstitution:\t{0}\r\n'.format(g.generalequipmentmoduleattr_set.get().institution_name)
+            msg_body += '\tDisplay name:\t{0}\r\n'.format(g.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name)
+            msg_body += '\tAccession number:\t{0}\r\n'.format(g.accession_number)
+            msg_body += '\tOpenREM link:\t{0}\r\n'.format(reverse('rf_detail_view', args=[g.pk]))
+            msg_body += '\r\n'
+
+            msg_body += '\tTotal DAP (cGy.cm2):\t{0:.1f}'.format(this_study_dap)
+            if this_study_dap >= alert_values['alert_total_dap_rf']:
+                msg_body += '. This is above the alert level of {0:.1f}\r\n'.format(alert_values['alert_total_dap_rf'])
+            else:
+                msg_body += '\r\n'
+            msg_body += '\r\n'
+
+            msg_body += '\tTotal dose at RP (Gy):\t{0:.1f}'.format(this_study_rp_dose)
+            if this_study_rp_dose >= alert_values['alert_total_rp_dose_rf']:
+                msg_body += '. This is above the alert level of {0:.1f}\r\n'.format(alert_values['alert_total_rp_dose_rf'])
+            else:
+                msg_body += '\r\n'
+            msg_body += '\r\n'
+
+            if calc_accum_dose_over_delta_weeks_on_import:
+                try:
+                    if accum_int_proj_to_update.total_dap_delta_gym2_to_cgycm2() >= alert_values['alert_total_dap_rf'] or accum_int_proj_to_update.dose_rp_total_over_delta_weeks >= alert_values['alert_total_rp_dose_rf']:
+                        # Add these items to the message too
+                        msg_body += '\r\n'
+                        msg_body += 'Total DAP and dose and RP for this patient ID from the past {0} weeks\r\n'.format(week_delta)
+                        msg_body += '\tNumber of studies from the past {0} weeks:\t{1}\r\n'.format(week_delta, included_studies.count())
+                        msg_body += '\tTotal DAP from the past {0} weeks (cGy.cm2):\t{1:.1f}'.format(week_delta, accum_int_proj_to_update.total_dap_delta_gym2_to_cgycm2())
+                        if accum_int_proj_to_update.total_dap_delta_gym2_to_cgycm2() >= alert_values['alert_total_dap_rf']:
+                            msg_body += '. This is above the alert level of {1:.1f}\r\n'.format(week_delta, alert_values['alert_total_dap_rf'])
+                        else:
+                            msg_body += '\r\n'
+                        msg_body += '\r\n'
+
+                        msg_body += '\tTotal dose at RP from the past {0} weeks (Gy):\t{1:.1f}'.format(week_delta, accum_int_proj_to_update.dose_rp_total_over_delta_weeks)
+                        if accum_int_proj_to_update.dose_rp_total_over_delta_weeks >= alert_values['alert_total_rp_dose_rf']:
+                            msg_body += '. This is above the alert level of {1:.1f}\r\n'.format(week_delta, alert_values['alert_total_rp_dose_rf'])
+                        else:
+                            msg_body += '\r\n'
+                        msg_body += '\r\n'
+
+                        msg_body += 'All studies for this patient ID from the past {0} weeks are:\r\n'.format(week_delta)
+                        msg_body += 'OpenREM link\tStudy date\tStudy time\tAccession number\tDAP (cGy.cm2)\tDose at RP (Gy)\r\n'
+                        linked_studies = GeneralStudyModuleAttr.objects.filter(pk__in=included_studies.values_list('pk', flat=True))
+                        for linked_study in linked_studies:
+                            linked_study_dap = linked_study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+                            linked_study_rp_dose = linked_study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_rp_total
+                            msg_body += '{0}\t{1}\t{2}\t{3}\t{4:.1f}\t{5:.1f}\r\n'.format(reverse('rf_detail_view', args=[linked_study.pk]), linked_study.study_date.strftime('%x'), linked_study.study_time.strftime('%X'), linked_study.accession_number, linked_study_dap, linked_study_rp_dose)
+
+                except NameError:  # There's a chance that accum_int_proj_to_update or included_studies won't exist
+                    pass
+
+            from django.contrib.auth.models import User
+            from django.core.mail import send_mail
+            from openremproject import settings
+            msg_subject = 'OpenREM high dose alert'
+            recipients = User.objects.filter(highdosemetricalertrecipients__receive_high_dose_metric_alerts__exact=True).values_list('email', flat=True)
+            send_mail(msg_subject,
+                      msg_body,
+                      settings.EMAIL_DOSE_ALERT_SENDER,
+                      recipients,
+                      fail_silently=False)
 
 
 def _fix_toshiba_vhp(dataset):
