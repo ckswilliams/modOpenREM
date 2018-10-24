@@ -2504,6 +2504,7 @@ def _get_review_study_data(study):
         'study_date': study.study_date,
         'study_time': study.study_time,
         'accession_number': study.accession_number,
+        'study_description': study.study_description,
     }
     try:
         patient = study.patientmoduleattr_set.get()
@@ -2721,9 +2722,32 @@ def review_failed_study_details(request):
         study_pk = data.get('study_pk')
         study = GeneralStudyModuleAttr.objects.get(pk__exact=study_pk)
         study_data = _get_review_study_data(study)
+
+        try:
+            equipment = study.generalequipmentmoduleattr_set.get()
+            study_data['station_name'] = equipment.station_name
+            study_data['manufacturer'] = equipment.manufacturer
+            study_data['manufacturer_model_name'] = equipment.manufacturer_model_name
+            study_data['institution_name'] = equipment.institution_name
+            study_data['institution_department_name'] = equipment.institutional_department_name
+            study_data['device_serial_number'] = equipment.device_serial_number
+            study_data['equipmentattr'] = True
+            try:
+                study_data['display_name'] = equipment.unique_equipment_name.display_name
+            except AttributeError:
+                study_data['display_name'] = u"Missing"
+        except ObjectDoesNotExist:
+            study_data['equipmentattr'] = False
+            study_data['station_name'] = u""
+            study_data['manufacturer'] = u""
+            study_data['manufacturer_model_name'] = u""
+            study_data['institution_name'] = u""
+            study_data['institution_department_name'] = u""
+            study_data['device_serial_number'] = u""
+            study_data['display_name'] = u"Missing"
+
         template = 'remapp/review_failed_study.html'
         return render(request, template, study_data)
-
 
 @login_required
 def review_failed_imports(request, modality=None):

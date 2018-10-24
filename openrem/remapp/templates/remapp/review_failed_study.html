@@ -1,5 +1,30 @@
 <td>{{ study_date }} {{ study_time }}</td>
-<td>{{ accession_number }}</td>
+<td>{{ accession_number }} <br> {{ study_description }}</td>
+{% if equipmentattr %}
+  <td>
+  {% if station_name %}
+    {{ station_name }} <br>
+  {% endif %}
+  {% if manufacturer %}
+    {{ manufacturer }} <br>
+  {% endif %}
+  {% if manufacturer_model_name %}
+    {{ manufacturer_model_name }} <br>
+  {% endif %}
+  {% if institution_name %}
+    {{ institution_name }} <br>
+  {% endif %}
+  {% if institution_department_name %}
+    {{ institution_department_name }} <br>
+  {% endif %}
+  {% if device_serial_number %}
+    {{ device_serial_number }} <br>
+  {% endif %}
+  </td>
+{% else %}
+  <td>Missing</td>
+{% endif %}
+<td>{{ display_name }}</td>
 <td>{{ patientmoduleattr |safe }}</td>
 <td>{{ patientstudymoduleattr }}</td>
 <td>{{ ctradiationdose }}</td>
