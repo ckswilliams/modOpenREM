@@ -3270,13 +3270,20 @@ class RFHighDoseAlertSettings(UpdateView):  # pylint: disable=unused-variable
 @csrf_exempt
 def rf_alert_notifications_view(request):
     from django.contrib.auth.models import User
+    from remapp.models import HighDoseMetricAlertRecipients
 
     if request.method == 'POST' and request.user.groups.filter(name="admingroup"):
         all_users = User.objects.all()
         for user in all_users:
             if str(user.pk) in request.POST.values():
+                if not hasattr(user, 'highdosemetricalertrecipients'):
+                    new_objects = HighDoseMetricAlertRecipients.objects.create(user=user)
+                    new_objects.save()
                 user.highdosemetricalertrecipients.receive_high_dose_metric_alerts = True
             else:
+                if not hasattr(user, 'highdosemetricalertrecipients'):
+                    new_objects = HighDoseMetricAlertRecipients.objects.create(user=user)
+                    new_objects.save()
                 user.highdosemetricalertrecipients.receive_high_dose_metric_alerts = False
             user.save()
 
