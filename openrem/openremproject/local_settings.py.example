@@ -120,15 +120,8 @@ EMAIL_HOST_USER = 'a.user.that.can.send'
 EMAIL_HOST_PASSWORD = 'the.above.user.password'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
-EMAIL_DOSE_ALERT_SENDER = 'alert@your.hospital'
+EMAIL_DOSE_ALERT_SENDER = 'your.alert@email.address'
+EMAIL_OPENREM_URL = 'http://your.openrem.server'
 
-# The following line can be used to set up a dummy smtp server for testing:
+# The following line can run on your OpenREM server to set up a dummy smtp server for testing:
 # python -m smtpd -n -c DebuggingServer localhost:1025
-
-# The following lines will send an e-mail:
-#from django.core.mail import send_mail
-#send_mail('Subject here',
-#          'This is the message',
-#          'from@address',
-#          ['recipient1', 'recipient2', 'recipient3'],
-#          fail_silently=False)

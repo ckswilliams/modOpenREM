@@ -1486,7 +1486,7 @@ def openrem_home(request):
     from collections import OrderedDict
 
     from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
-    send_rf_high_dose_alert_email(117685)
+    send_rf_high_dose_alert_email(417864)
 
     try:
         HomePageAdminSettings.objects.get()
