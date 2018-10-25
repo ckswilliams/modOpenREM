@@ -2787,7 +2787,7 @@ def review_failed_imports(request, modality=None):
     if not modality in [u'CT', u'RF', u'MG', u'DX']:
         logger.error("Attempt to load review_failed_imports without suitable modality")
         messages.error(request,
-                       "Faile study imports can only be reviewed with the correct "
+                       "Failed study imports can only be reviewed with the correct "
                        "link from the display name page")
         return HttpResponseRedirect('/openrem/viewdisplaynames/')
 

@@ -10,6 +10,33 @@
     {% endif %}
   </tr>
   {% for display_name,details in data.items %}
+    {% if not display_name %}
+      <tr>
+      <td style="width: 25%">
+        <a href="/admin/review/failed/{{ modality|upper }}/">
+          Failed import - review here
+        </a>
+      </td>
+      <td style="width:25%">
+        <a href="/admin/review/failed/{{ modality|upper }}/">
+          {{ details.total }}
+        </a>
+      </td>
+      <td style="width:25%">
+        <a href="/admin/review/failed/{{ modality|upper }}/">
+          {{ details.latest|naturaltime }}
+        </a>
+      </td>
+      {% if home_config.display_workload_stats %}
+        <td style="width:12.5%">
+          <a href="/admin/review/failed/{{ modality|upper }}/"></a>
+        </td>
+        <td style="width:12.5%">
+          <a href="/admin/review/failed/{{ modality|upper }}/"></a>
+        </td>
+      {% endif %}
+      </tr>
+    {% else %}
     <tr>
       <td style="width:25%">
         <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date">
@@ -34,6 +61,7 @@
           <a href="/openrem/{{ modality }}/?display_name={{ display_name }}&o=-study_date" id="{{ details.displayname_pk }}_b"></a>
         </td>
       {% endif %}
+    {% endif %}
     </tr>
   {% endfor %}
 </table>
