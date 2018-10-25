@@ -2732,10 +2732,6 @@ def review_failed_study_details(request):
             study_data['institution_department_name'] = equipment.institutional_department_name
             study_data['device_serial_number'] = equipment.device_serial_number
             study_data['equipmentattr'] = True
-            try:
-                study_data['display_name'] = equipment.unique_equipment_name.display_name
-            except AttributeError:
-                study_data['display_name'] = u"Missing"
         except ObjectDoesNotExist:
             study_data['equipmentattr'] = False
             study_data['station_name'] = u""
@@ -2744,7 +2740,6 @@ def review_failed_study_details(request):
             study_data['institution_name'] = u""
             study_data['institution_department_name'] = u""
             study_data['device_serial_number'] = u""
-            study_data['display_name'] = u"Missing"
 
         template = 'remapp/review_failed_study.html'
         return render(request, template, study_data)

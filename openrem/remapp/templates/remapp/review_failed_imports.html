@@ -21,7 +21,8 @@
 
   <p>
     There are {{ studies_count }} studies in this list which
-  has been filtered by the modality {{ modality }} {% if modality == "DX" %}(including CR) {% endif %}
+    has been filtered by the modality {{ modality }} {% if modality == "DX" %}(including CR){% endif %} and do not have
+    an entry in the unique_equipment_name table.
   </p>
 
 
@@ -112,7 +113,7 @@
   <table class="table table-bordered table-striped">
     <tr>
       <td colspan="2">General</td>
-      <td colspan="2">Equipment module</td>
+      <td colspan="1">Equipment module</td>
       <td colspan="2">Patient module</td>
       <td colspan="3">CT data</td>
       <td colspan="2">DX/RF/MG</td>
@@ -123,7 +124,6 @@
       <th>Date and time</th>
       <th>Accession number <br> Study description</th>
       <th>Equipment details</th>
-      <th>Unique Equipment table</th>
       <th>General</th>
       <th>Study</th>
       <th>Template</th>

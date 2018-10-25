@@ -2,6 +2,7 @@
 <td>{{ accession_number }} <br> {{ study_description }}</td>
 {% if equipmentattr %}
   <td>
+  Contains: <br>
   {% if station_name %}
     {{ station_name }} <br>
   {% endif %}
@@ -24,7 +25,6 @@
 {% else %}
   <td>Missing</td>
 {% endif %}
-<td>{{ display_name }}</td>
 <td>{{ patientmoduleattr |safe }}</td>
 <td>{{ patientstudymoduleattr }}</td>
 <td>{{ ctradiationdose }}</td>
