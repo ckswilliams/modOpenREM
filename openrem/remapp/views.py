@@ -2373,7 +2373,7 @@ def review_studies_delete(request):
 
 @login_required
 def review_studies_equip_delete(request):
-    """AJAX function to replace Delete button with delete form for euipment table entry and studies
+    """AJAX function to replace Delete button with delete form for equipment table entry and studies
 
     :param request:
     :return:
@@ -2383,6 +2383,20 @@ def review_studies_equip_delete(request):
         template = 'remapp/review_studies_delete_button.html'
         return render(request, template, {'delete_equip': True, 'modality': data['modality'],
                                           'equip_name_pk': data['equip_name_pk']})
+
+
+@login_required
+def review_failed_studies_delete(request):
+    """AJAX function to replace Delete button with delete form for studies without ubique_equipment_name table
+
+    :param request:
+    :return:
+    """
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
+        data = request.POST
+        template = 'remapp/review_studies_delete_button.html'
+        return render(request, template, {'delete_equip': False, 'modality': data['modality'],
+                                          'equip_name_pk': 'n/a'})
 
 
 def reset_dual(pk=None):
@@ -2744,6 +2758,22 @@ def review_failed_study_details(request):
         template = 'remapp/review_failed_study.html'
         return render(request, template, study_data)
 
+
+def _get_broken_studies(modality=None):
+    """Filter studies with no unique_equipment_name table entry
+    :param modality: modality to filter by
+    :return: Query filter of studies
+    """
+    from django.db.models import Q
+
+    if modality == 'DX':
+        all_mod = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact=u'DX') | Q(modality_type__exact=u'CR'))
+    else:
+        all_mod = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality)
+
+    return all_mod.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__isnull=True)
+
+
 @login_required
 def review_failed_imports(request, modality=None):
     """View to list 'failed import' studies
@@ -2753,7 +2783,6 @@ def review_failed_imports(request, modality=None):
     :return:
     """
     from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-    from django.db.models import Q
 
     if not modality in [u'CT', u'RF', u'MG', u'DX']:
         logger.error("Attempt to load review_failed_imports without suitable modality")
@@ -2767,12 +2796,7 @@ def review_failed_imports(request, modality=None):
         return redirect('/openrem/viewdisplaynames/')
 
     if request.method == 'GET':
-        if modality == 'DX':
-            all_mod = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact=u'DX') | Q(modality_type__exact=u'CR'))
-        else:
-            all_mod = GeneralStudyModuleAttr.objects.filter(modality_type__exact=modality)
-
-        broken_studies = all_mod.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__isnull=True)
+        broken_studies = _get_broken_studies(modality)
 
         paginator = Paginator(broken_studies, 25)
         page = request.GET.get('page')
@@ -2793,6 +2817,14 @@ def review_failed_imports(request, modality=None):
             'modality': modality, 'studies': studies,
             'studies_count': broken_studies.count(), 'admin': admin})
 
+    if request.method == 'POST' and request.user.groups.filter(name="admingroup") and modality:
+        broken_studies = _get_broken_studies(modality)
+        broken_studies.delete()
+        messages.info(request, "Studies deleted")
+        return redirect('/admin/review/failed/{0}/'.format(modality))
+    else:
+        messages.error(request, "Incorrect attempt to delete studies.")
+        return redirect('/admin/review/failed/{0}/'.format(modality))
 
 @login_required
 def chart_options_view(request):
