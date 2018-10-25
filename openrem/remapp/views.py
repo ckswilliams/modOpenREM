@@ -1485,9 +1485,6 @@ def openrem_home(request):
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
     from collections import OrderedDict
 
-    from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
-    send_rf_high_dose_alert_email(417864)
-
     try:
         HomePageAdminSettings.objects.get()
     except ObjectDoesNotExist:
