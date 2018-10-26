@@ -19,7 +19,6 @@
 {% block mainblock %}
 
       <div class="row">
-      <div id="div_messages"></div>
       <div class="col-md-6 col-md-offset-3">
         <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
           <h3>Modify fluoroscopy high dose alert settings</h3>
@@ -66,12 +65,10 @@
         });
 
         function update_messages(messages) {
-            $("#div_messages").html("");
             $.each(messages, function (i, m) {
                 var button = "<button type='button' class='close' data-dismiss='alert' aria-label='close'><span aria-hidden='true'>x</span></button>";
                 var msg_div = "<div class='alert alert-" + m.level + " alert-dismissible fade-in'>" + button + m.message + "</div>";
                 $(msg_div).insertBefore(".row");
-                //$("#div_messages").append("<div class='alert alert-" + m.level + " alert-dismissible fade-in'>" + button + m.message + "</div>");
             });
         }
     </script>
