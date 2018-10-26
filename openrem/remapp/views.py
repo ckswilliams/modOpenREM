@@ -3303,23 +3303,24 @@ def rf_alert_notifications_view(request):
     )
 
 
+@login_required
 def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable
     """View to recalculate the summed total DAP and total dose at RP for all RF studies
 
     """
+    from django.http import JsonResponse
+
     if not request.user.groups.filter(name="admingroup"):
-        messages.error(request, u"Only members of the admin group are allowed to do this")
-        return redirect(reverse('rf_alert_settings_update', args=[1]))
+        # Send the user to the home page
+        return HttpResponseRedirect(reverse('home'))
     else:
         # Empty the PKsForSummedRFDoseStudiesInDeltaWeeks table
         from remapp.models import PKsForSummedRFDoseStudiesInDeltaWeeks
         PKsForSummedRFDoseStudiesInDeltaWeeks.objects.all().delete()
 
-
         # In the AccumIntegratedProjRadiogDose table delete all dose_area_product_total_over_delta_weeks and dose_rp_total_over_delta_weeks entries
         from remapp.models import AccumIntegratedProjRadiogDose
         AccumIntegratedProjRadiogDose.objects.all().update(dose_area_product_total_over_delta_weeks=None, dose_rp_total_over_delta_weeks=None)
-
 
         # For each RF study recalculate dose_area_product_total_over_delta_weeks and dose_rp_total_over_delta_weeks
         from datetime import timedelta
@@ -3384,10 +3385,22 @@ def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable
 
         HighDoseMetricAlertSettings.objects.all().update(changed_accum_dose_delta_weeks=False)
 
-        messages.success(request, u"All summed total DAP and total dose at RP doses have been re-calculated")
+        messages.success(request, 'All summed total DAP and total dose at RP doses have been re-calculated')
 
-        #return redirect(reverse('rf_summary_list_filter'))
-        return redirect(reverse('rf_alert_settings_update', args=[1]))
+        django_messages = []
+        for message in messages.get_messages(request):
+            django_messages.append({
+                'level': message.level_tag,
+                'message': message.message,
+                'extra_tags': message.tags,
+            })
+
+        return_structure = {
+            'success': True,
+            'messages': django_messages
+        }
+
+        return JsonResponse(return_structure, safe=False)
 
 
 class SkinDoseMapCalcSettingsUpdate(UpdateView):  # pylint: disable=unused-variable

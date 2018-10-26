@@ -265,7 +265,7 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
         # If HighDoseMetricAlertSettings.changed_accum_dose_delta_weeks is True then the summed DAP and dose at RP
         # values have not yet been recalculated - display the recalculate button on the form.
         if self.instance.changed_accum_dose_delta_weeks:
-            self.helper.add_input(Button('recalc_all_summed_data', 'Recalculate all summed data', css_class='btn btn-warning', onclick='javascript:location.href="/admin/rfrecalculateaccumdoses/";'))
+            self.helper.add_input(Button('recalc_all_summed_data', 'Recalculate all summed data', css_class='btn btn-warning'))
 
         # If there is nothing in self.data and accum_dose_delta_weeks is in self.changed_data then the user must have
         # changed the accum_dose_delta_weeks value: set the changed_accum_dose_delta_weeks flag to True. This updates
