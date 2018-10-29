@@ -13,26 +13,44 @@
     {% if not display_name %}
       <tr>
       <td style="width: 25%">
+        {% if admin.admingroup %}
         <a href="/admin/review/failed/{{ modality|upper }}/">
           Failed import - review here
         </a>
+        {% else %}
+        <a href="#">
+          Failed import - ask an administrator to review
+        </a>
+        {% endif %}
       </td>
       <td style="width:25%">
-        <a href="/admin/review/failed/{{ modality|upper }}/">
+        {% if admin.admingroup %}
+          <a href="/admin/review/failed/{{ modality|upper }}/">
+        {% else %}
+          <a href="#">
+        {% endif %}
           {{ details.total }}
         </a>
       </td>
       <td style="width:25%">
-        <a href="/admin/review/failed/{{ modality|upper }}/">
+        {% if admin.admingroup %}
+          <a href="/admin/review/failed/{{ modality|upper }}/">
+        {% else %}
+          <a href="#">
+        {% endif %}
           {{ details.latest|naturaltime }}
         </a>
       </td>
       {% if home_config.display_workload_stats %}
         <td style="width:12.5%">
+        {% if admin.admingroup %}
           <a href="/admin/review/failed/{{ modality|upper }}/"></a>
+        {% endif %}
         </td>
         <td style="width:12.5%">
+        {% if admin.admingroup %}
           <a href="/admin/review/failed/{{ modality|upper }}/"></a>
+        {% endif %}
         </td>
       {% endif %}
       </tr>

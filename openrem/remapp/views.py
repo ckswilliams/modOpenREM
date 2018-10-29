@@ -1681,6 +1681,10 @@ def update_latest_studies(request):
             }
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
 
+        admin = {}
+        for group in request.user.groups.all():
+            admin[group.name] = True
+
         template = 'remapp/home-list-modalities.html'
         data = ordereddata
 
@@ -1691,7 +1695,8 @@ def update_latest_studies(request):
             'day_delta_b': day_delta_b
         }
 
-        return render(request, template, {'data': data, 'modality': modality.lower(), 'home_config': home_config})
+        return render(request, template, {'data': data, 'modality': modality.lower(), 'home_config': home_config,
+                                          'admin': admin})
 
 
 @csrf_exempt
