@@ -71,6 +71,22 @@
                   }
               )
           }
+      );
+      $(document).ready(
+          function get_failed_imports_list(json) {
+              $.ajax(
+                  {
+                      url: "/populatefailedimportlist",
+                      data: {
+                          csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                      type: "POST",
+                      success: function (data) {
+                          $('#failed-list').html(data);
+                      }
+                  }
+              )
+          }
       )
   </script>
 {% endfor %}
@@ -119,20 +135,25 @@
   <input class="btn btn-default" type="submit" value="Update">
 {% endif %}
 
+  {% if admin.admingroup %}
+  </form>
+{% endif %}
+
+
 <a name="failed" class="vert-offset">
   <h3>Review studies that failed to import</h3>
 </a>
+<p>These are studies that do not have an entry in the unique_equipment_name table, and therefore the import would have
+aborted early in the process.</p>
+<span id="failed-list">
 <ul>
   <li><a href="/admin/review/failed/CT/">CT</a></li>
   <li><a href="/admin/review/failed/MG/">Mammography</a></li>
   <li><a href="/admin/review/failed/DX/">Radiography</a></li>
   <li><a href="/admin/review/failed/RF/">Fluoro</a></li>
 </ul>
+</span>
 
-{#      <td><a href="/admin/ot/{{ eachrow.pk }}/">Review</a></td>#}
 
-{% if admin.admingroup %}
-  </form>
-{% endif %}
 
 {% endblock %}

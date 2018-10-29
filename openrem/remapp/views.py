@@ -2774,6 +2774,20 @@ def _get_broken_studies(modality=None):
     return all_mod.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__isnull=True)
 
 
+def failed_list_populate(request):
+    """View for failed import section of display name view
+
+    :return: render request with modality specific numbers of studies
+    """
+
+    if request.is_ajax():
+        failed = {}
+        for modality in ['CT', 'RF', 'MG', 'DX']:
+            failed[modality] = _get_broken_studies(modality).count()
+        template = 'remapp/failed_summary_list.html'
+        return render(request, template, {'failed': failed})
+
+
 @login_required
 def review_failed_imports(request, modality=None):
     """View to list 'failed import' studies
