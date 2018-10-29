@@ -131,3 +131,10 @@ you can use the 'reprocess' link in the 'User defined modality' cell:
     :width: 500px
 
     Re-sort studies into planar X-ray and fluoroscopy
+
+Review of studies that failed to import
+=======================================
+
+Studies that have failed early in the import process might not have an entry in the ``unique_equipment_name`` table, and
+therefore will not appear in any of the other tables on this page. The table at the end allows the user to review these
+studies and delete them. See :ref:`failed_import_studies` for more details.
