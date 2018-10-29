@@ -1669,9 +1669,9 @@ def update_latest_studies(request):
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
 
             try:
-                displayname = (display_name).encode('utf-8')
+                displayname = display_name.encode('utf-8')
             except AttributeError:
-                displayname = "Error has occurred - import probably unsuccessful"
+                displayname = u"Unexpected display name non-ASCII issue"
 
             modalitydata[display_name] = {
                 'total': display_name_studies.count(),
@@ -1736,9 +1736,9 @@ def update_study_workload(request):
             display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name)
 
             try:
-                displayname = (display_name).encode('utf-8')
+                displayname = display_name.encode('utf-8')
             except AttributeError:
-                displayname = "Error has occurred - import probably unsuccessful"
+                displayname = u"Unexpected display name non-ASCII issue"
 
             modalitydata[display_name] = {
                 'studies_in_past_days_a': display_name_studies.filter(study_date__range=[date_a, today]).count(),
@@ -2070,7 +2070,7 @@ def display_names_view(request):
 
     return_structure = {'name_list': f, 'admin': admin,
                         'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'rf_names': rf_names,
-                        'ot_names': ot_names, 'modalities': ['CT', 'MG', 'DX', 'RF', 'OT']}
+                        'ot_names': ot_names, 'modalities': ['CT', 'RF', 'MG', 'DX', 'OT']}
 
     return render_to_response(
         'remapp/displaynameview.html',

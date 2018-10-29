@@ -30,8 +30,8 @@
     <p>The boxes can be checked or unchecked by clicking anywhere on the row. Tables can be sorted by clicking on
     column headers.{% endif %}</p>
   <p>
-    Jump to <a href="#ct">CT</a> | <a href="#mammo">Mammography</a> | <a href="#dx">DX and CR</a> |
-    <a href="#fluoro">Fluoroscopy</a> | <a href="#others">Others</a> | <a href="#failed">Failed imports</a> |
+    Jump to <a href="#ct">CT</a> | <a href="#fluoro">Fluoroscopy</a> |<a href="#mammo">Mammography</a> |
+    <a href="#dx">DX and CR</a> | <a href="#others">Others</a> | <a href="#failed">Failed imports</a> |
   </p>
 {% endblock %}
 
@@ -98,23 +98,7 @@
 <a name="ct" class="vert-offset">
   <h3>CT</h3>
 </a>
-<span id="CT-names"></span>
-{% if admin.admingroup %}
-  <input class="btn btn-default" type="submit" value="Update">
-{% endif %}
-
-<a name="mammo" class="vert-offset">
-  <h3>Mammography</h3>
-</a>
-<span id="MG-names"></span>
-{% if admin.admingroup %}
-  <input class="btn btn-default" type="submit" value="Update">
-{% endif %}
-
-<a name="dx" class="vert-offset">
-  <h3>DX and CR</h3>
-</a>
-<span id="DX-names"></span>
+<span id="CT-names"><p>Querying the database for display names, please wait</p></span>
 {% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
 {% endif %}
@@ -122,7 +106,23 @@
 <a name="fluoro" class="vert-offset">
   <h3>Fluoroscopy</h3>
 </a>
-<span id="RF-names"></span>
+<span id="RF-names"><p>Querying the database for display names, please wait</p></span>
+{% if admin.admingroup %}
+  <input class="btn btn-default" type="submit" value="Update">
+{% endif %}
+
+<a name="mammo" class="vert-offset">
+  <h3>Mammography</h3>
+</a>
+<span id="MG-names"><p>Querying the database for display names, please wait</p></span>
+{% if admin.admingroup %}
+  <input class="btn btn-default" type="submit" value="Update">
+{% endif %}
+
+<a name="dx" class="vert-offset">
+  <h3>DX and CR</h3>
+</a>
+<span id="DX-names"><p>Querying the database for display names, please wait</p></span>
 {% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
 {% endif %}
@@ -130,7 +130,7 @@
 <a name="others" class="vert-offset">
   <h3>Others</h3>
 </a>
-<span id="OT-names"></span>
+<span id="OT-names"><p>Querying the database for display names, please wait</p></span>
 {% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
 {% endif %}
