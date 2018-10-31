@@ -22,10 +22,10 @@ This study
 	Total dose at RP, {{ record.acquisition_plane }} (Gy):	{{ accumprojection.dose_rp_total|floatformat:1 }}{% if accumprojection.dose_rp_total >= alert_levels.alert_total_rp_dose_rf %}	(This is above the alert level of {{ alert_levels.alert_total_rp_dose_rf|floatformat:1 }}){% endif %}
 {% endwith %}{% endfor %}
 {% if alert_levels.show_accum_dose_over_delta_weeks %}
-Total DAP and dose and RP for this patient ID from the past {{ week_delta }} weeks
+Sudies from the past {{ week_delta }} weeks for this patient ID
 	Number of studies:	{{ study.pksforsummedrfdosestudiesindeltaweeks_set.count }} ({% for pk_ref in study.pksforsummedrfdosestudiesindeltaweeks_set.all %}{{ server_url }}/openrem/rf/{{ pk_ref.study_pk_in_delta_weeks }}/ {% if pk_ref.study_pk_in_delta_weeks == study.pk %}- this study{% endif %}{% if not forloop.last%}, {% endif %}{% endfor %}){% with accumxraydose_set_all_planes|first as first_accumxraydose %}{% with accumprojection=first_accumxraydose.accumintegratedprojradiogdose_set.get %}
-	Total DAP (cGy.cm2):	{{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}{% if accumprojection.total_dap_delta_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}	(This is above the alert level of {{ alert_levels.alert_total_dap_rf|floatformat:1 }}){% endif %}
-	Total dose at RP (Gy):	{{ accumprojection.dose_rp_total_over_delta_weeks|floatformat:1 }}{% if accumprojection.dose_rp_total_over_delta_weeks >= alert_levels.alert_total_rp_dose_rf %}	(This is above the alert level of {{ alert_levels.alert_total_rp_dose_rf|floatformat:1 }}){% endif %}
+	Total DAP from all studies (cGy.cm2):	{{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}{% if accumprojection.total_dap_delta_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}	(This is above the alert level of {{ alert_levels.alert_total_dap_rf|floatformat:1 }}){% endif %}
+	Total dose at RP from all studies (Gy):	{{ accumprojection.dose_rp_total_over_delta_weeks|floatformat:1 }}{% if accumprojection.dose_rp_total_over_delta_weeks >= alert_levels.alert_total_rp_dose_rf %}	(This is above the alert level of {{ alert_levels.alert_total_rp_dose_rf|floatformat:1 }}){% endif %}
 {% endwith %}{% endwith %}
 
 All studies for this patient ID from the past {{ week_delta }} weeks

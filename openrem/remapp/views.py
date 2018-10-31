@@ -1586,6 +1586,8 @@ def openrem_home(request):
         if not_patient_indicator_question:
             admin_questions_true = True  # Doing this instead
 
+    #from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
+    #send_rf_high_dose_alert_email(417637)
     # # Send a test e-mail
     # from django.core.mail import send_mail
     # from openremproject import settings
