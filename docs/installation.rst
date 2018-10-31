@@ -68,6 +68,15 @@ Our recommendations for Windows and Linux are:
     iis_on_windows
     nginx_on_linux
 
+If you want to run OpenREM-webinterface in a virtual directory (other than the root virtual directory), take a look at
+the following documentation before setting up the web server:
+
+..  toctree::
+    :maxdepth: 1
+
+    virtual_directory
+
+
 Quick start: One page complete install
 ======================================
 
