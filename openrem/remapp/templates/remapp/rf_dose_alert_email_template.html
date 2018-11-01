@@ -7,12 +7,9 @@
             body {
                 font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
                 font-size: 14px;
-                line-height: 1.42857143;
+                line-height: 1.0;
                 color: #333;
                 background-color: #fff;
-            }
-
-            body {
                 margin: 0;
             }
 
@@ -24,61 +21,39 @@
 
             html {
                 font-size: 10px;
-            }
-
-            html {
                 font-family: sans-serif;
                 -webkit-text-size-adjust: 100%;
             }
 
-            .h1, h1 {
-                font-size: 36px;
-            }
-
-            .h1, .h2, .h3, h1, h2, h3 {
-                margin-top: 20px;
-                margin-bottom: 10px;
-            }
-
-            .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
-                font-family: inherit;
-                font-weight: 500;
-                line-height: 1.1;
-                color: inherit;
-            }
-
             h1 {
+                font-size: 36px;
                 margin: .67em 0;
                 margin-top: 0.67em;
                 margin-bottom: 0.67em;
                 font-size: 2em;
             }
 
-            .table-bordered {
-                border: 1px solid #ddd;
+            h1, h2 {
+                margin-top: 20px;
+                margin-bottom: 10px;
+                font-family: inherit;
+                font-weight: 500;
+                line-height: 1.1;
+                color: inherit;
             }
 
             .table {
                 margin-bottom: 20px;
             }
 
-            .small, small {
+            small {
                 font-size: 85%;
             }
 
             table {
                 background-color: transparent;
-            }
-
-            table {
                 border-spacing: 0;
                 border-collapse: collapse;
-            }
-
-            * {
-                -webkit-box-sizing: border-box;
-                -moz-box-sizing: border-box;
-                box-sizing: border-box;
             }
 
             .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
@@ -91,7 +66,7 @@
 
             .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
                 padding: 8px;
-                line-height: 1.42857143;
+                line-height: 1.0;
                 vertical-align: top;
                 border-top: 1px solid #ddd;
             }
@@ -112,7 +87,7 @@
             <h1>OpenREM high dose fluoroscopy alert</h1>
             <p>A fluoroscopy study has triggered a high dose alert. See below for details. This message has been
                 automatically sent by OpenREM: please do not reply as this mailbox is not monitored.</p>
-
+            <br>
             <h2>This study</h2>
             <table class="table table-condensed table-bordered">
                 <tr>
@@ -188,13 +163,14 @@
             </table>
 
             {% if alert_levels.show_accum_dose_over_delta_weeks %}
+                <br>
                 <h2>Studies from the past {{ week_delta }} weeks for this patient ID</h2>
                 <table class="table table-condensed table-bordered">
                     <tr>
                         <td>Number of studies:</td>
-                        <td>{{ study.pksforsummedrfdosestudiesindeltaweeks_set.count }}
-                            ({% for pk_ref in study.pksforsummedrfdosestudiesindeltaweeks_set.all %}
-                                <a href="{{ server_url }}/openrem/rf/{{ pk_ref.study_pk_in_delta_weeks }}">{% if pk_ref.study_pk_in_delta_weeks == study.pk %}this study{% else %}study {{ pk_ref.study_pk_in_delta_weeks }}{% endif %}</a>{% if not forloop.last %}, {% endif %}
+                        <td>{{ studies_in_week_delta.count }}
+                            ({% for each_study in studies_in_week_delta %}
+                                <a href="{{ server_url }}/openrem/rf/{{ each_study.pk }}">{% if each_study.pk == study.pk %}this study{% else %}study {{ each_study.pk }}{% endif %}</a>{% if not forloop.last %}, {% endif %}
                             {% endfor %})
                         </td>
                     </tr>
@@ -228,7 +204,7 @@
                         {% endwith %}
                     {% endwith %}
                 </table>
-
+                <br>
                 <table class="table table-condensed table-bordered">
                     <tr>
                         <th>Date</th>

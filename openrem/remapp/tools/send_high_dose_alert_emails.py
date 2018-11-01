@@ -60,16 +60,20 @@ def send_rf_high_dose_alert_email(study_pk=None):
     accum_dap = study.projectionxrayradiationdose_set.get().accumxraydose_set.last().accumintegratedprojradiogdose_set.get().total_dap_delta_gym2_to_cgycm2()
     accum_rp_dose = study.projectionxrayradiationdose_set.get().accumxraydose_set.last().accumintegratedprojradiogdose_set.get().dose_rp_total_over_delta_weeks
 
-    patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
-    if patient_id:
-        study_date = study.study_date
-        week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
-        oldest_date = (study_date - timedelta(weeks=week_delta))
-        included_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF', patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
+    alert_levels = HighDoseMetricAlertSettings.objects.values('show_accum_dose_over_delta_weeks', 'alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks')[0]
+
+    if alert_levels['show_accum_dose_over_delta_weeks']:
+        patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+        if patient_id:
+            study_date = study.study_date
+            week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+            oldest_date = (study_date - timedelta(weeks=week_delta))
+            included_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF', patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
+        else:
+            included_studies = None
     else:
         included_studies = None
 
-    alert_levels = HighDoseMetricAlertSettings.objects.values('show_accum_dose_over_delta_weeks', 'alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks')[0]
     if this_study_dap >= alert_levels['alert_total_dap_rf'] or this_study_rp_dose >= alert_levels['alert_total_rp_dose_rf'] or accum_dap >= alert_levels['alert_total_dap_rf'] or accum_rp_dose >= alert_levels['alert_total_rp_dose_rf']:
 
         projection_xray_dose_set = study.projectionxrayradiationdose_set.get()

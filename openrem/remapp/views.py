@@ -705,6 +705,7 @@ def rf_detail_view(request, pk=None):
     from remapp.models import HighDoseMetricAlertSettings, SkinDoseMapCalcSettings
     from django.core.exceptions import ObjectDoesNotExist
     from remapp.models import SkinDoseMapCalcSettings
+    from datetime import timedelta
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
@@ -781,6 +782,19 @@ def rf_detail_view(request, pk=None):
         HighDoseMetricAlertSettings.objects.create()
     alert_levels = HighDoseMetricAlertSettings.objects.values('show_accum_dose_over_delta_weeks', 'alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks')[0]
 
+    # Obtain the studies that are within delta weeks if needed
+    if alert_levels['show_accum_dose_over_delta_weeks']:
+        patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+        if patient_id:
+            study_date = study.study_date
+            week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+            oldest_date = (study_date - timedelta(weeks=week_delta))
+            included_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF', patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
+        else:
+            included_studies = None
+    else:
+        included_studies = None
+
     admin = {'openremversion': remapp.__version__,
              'docsversion': remapp.__docs_version__,
              'enable_skin_dose_maps': SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]}
@@ -795,7 +809,8 @@ def rf_detail_view(request, pk=None):
          'projection_xray_dose_set': projection_xray_dose_set,
          'accumxraydose_set_all_planes': accumxraydose_set_all_planes,
          'events_all': events_all,
-         'alertLevels': alert_levels},
+         'alert_levels': alert_levels,
+         'studies_in_week_delta': included_studies},
         context_instance=RequestContext(request)
     )
 
@@ -1586,8 +1601,9 @@ def openrem_home(request):
         if not_patient_indicator_question:
             admin_questions_true = True  # Doing this instead
 
-    #from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
+    from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
     #send_rf_high_dose_alert_email(417637)
+    #send_rf_high_dose_alert_email(417973)
     # # Send a test e-mail
     # from django.core.mail import send_mail
     # from openremproject import settings

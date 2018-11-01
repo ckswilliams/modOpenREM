@@ -354,3 +354,11 @@ a.vert-offset:before {
     height: 52px;
     margin: -52px 0 0;
 }
+
+table.table-indent {
+  margin-left: 40px;
+}
+
+ul.no-marker {
+  list-style-type: none;
+}
