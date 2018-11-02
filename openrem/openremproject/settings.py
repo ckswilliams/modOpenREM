@@ -138,7 +138,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'pagination.middleware.PaginationMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'openremproject.urls'
@@ -163,7 +163,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'solo',
     'crispy_forms',
-    'debug_toolbar',
+    # 'debug_toolbar',
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
