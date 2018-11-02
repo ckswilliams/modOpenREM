@@ -73,8 +73,7 @@ urlpatterns = patterns('remapp.views',
         'mg_summary_chart_data', name='mg_summary_chart_data'),
                        url(r'^mg/(?P<pk>\d+)/$', 'mg_detail_view', name='mg_detail_view'),
 
-                       url(r'^viewdisplaynames/$',
-        'display_names_view'),
+                       url(r'^viewdisplaynames/$', 'display_names_view', name='display_names_view'),
 
                        url(r'^delete/(?P<pk>\d+)$', 'study_delete', name='study_delete'),
                        url(r'^admin/sizeupload$', 'size_upload', name='size_upload'),

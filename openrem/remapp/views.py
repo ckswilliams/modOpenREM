@@ -2808,11 +2808,11 @@ def review_failed_imports(request, modality=None):
         messages.error(request,
                        "Failed study imports can only be reviewed with the correct "
                        "link from the display name page")
-        return HttpResponseRedirect('/openrem/viewdisplaynames/')
+        return HttpResponseRedirect(reverse_lazy('display_names_view'))
 
     if not request.user.groups.filter(name="admingroup"):
         messages.error(request, "You are not in the administrator group - please contact your administrator")
-        return redirect('/openrem/viewdisplaynames/')
+        return redirect(reverse_lazy('display_names_view'))
 
     if request.method == 'GET':
         broken_studies = _get_broken_studies(modality)
@@ -2840,10 +2840,11 @@ def review_failed_imports(request, modality=None):
         broken_studies = _get_broken_studies(modality)
         broken_studies.delete()
         messages.info(request, "Studies deleted")
-        return redirect('/admin/review/failed/{0}/'.format(modality))
+        return redirect(reverse_lazy('review_failed_imports', kwargs={'modality': modality}))
     else:
         messages.error(request, "Incorrect attempt to delete studies.")
-        return redirect('/admin/review/failed/{0}/'.format(modality))
+        return redirect(reverse_lazy('review_failed_imports', kwargs={'modality': modality}))
+
 
 @login_required
 def chart_options_view(request):
