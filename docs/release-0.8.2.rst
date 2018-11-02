@@ -12,7 +12,7 @@ Headline changes
 * Imports: fix for Toshiba RDSR with incorrect multiple values in SD field for vHP
 * Imports: fix for Philips Azurion RDSR with incorrect AcquisitionDeviceType
 * Documentation: further refinement of the linux one-page install
-
+* Web server: :doc:`virtual_directory`
 
 
 ***************************************************
