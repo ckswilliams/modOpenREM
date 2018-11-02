@@ -2,7 +2,7 @@
 Running the OpenREM website in a virtual directory
 **************************************************
 
-If you want to run the OpenREM in a virtual directory (like http://server/openrem) you need to configure this in your
+If you want to run the OpenREM in a virtual directory (like http://server/dms/) you need to configure this in your
 web server application that you are using (IIS or nginx). Next to that you also need to configure this in OpenREM.
 The following steps are necessary:
 
