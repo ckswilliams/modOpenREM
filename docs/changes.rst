@@ -5,20 +5,21 @@ OpenREM version history
 0.8.2 (2018-xx-xx)
 ------------------
 * `#675`_  Exports: improved resilience when export includes malformed studies
-* `#674`_  Documentation: Amended zip command in example Orthanc configuration to work with Linux and Windows
+* `#674`_  Documentation: amended zip command in example Orthanc configuration to work with Linux and Windows
 * `#673`_  Imports: handle empty NumericValues and workaround for incorrect Philips Azurion AcquisitionDeviceType
 * `#672`_  Documentation: improve and extend linux one-page install
 * `#670`_  Imports: handle illegal multi-value number in Toshiba RDSR with vHP
 * `#668`_  Code quality: library import and blank space cleanup
 * `#667`_  Web server: enable OpenREM to be hosted from a non-root folder/virtual-directory
 * `#666`_  Query-retrieve: handle non-return of ModalitiesInStudy correctly
-* `#658`_  Interface: Added display of workload stats in home page modality tables
+* `#658`_  Interface: added display of workload stats in home page modality tables
+* `#479`_  Administration: added facility to list and delete failed import studies
 
 0.8.1 (2018-09-16)
 ------------------
 * `#663`_  Interface: updated column headings on home page
-* `#660`_  Documentation: Corrected and improved Linux one-page install
-* `#659`_  Interface: Made the summary tables on the home page sortable by clicking on headers
+* `#660`_  Documentation: corrected and improved Linux one-page install
+* `#659`_  Interface: made the summary tables on the home page sortable by clicking on headers
 * `#656`_  Install: pegged django-debug-toolbar to 1.9.1 until Django is upgraded
 * `#654`_  Documentation: supplemented the Orthanc Lua file config option docs
 * `#653`_  Docs: clarified notes to get link to Orthanc lua file correct on release
