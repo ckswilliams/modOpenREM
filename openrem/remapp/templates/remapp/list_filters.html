@@ -1,0 +1,25 @@
+{% for xrayfilt in sourcedata.xrayfilters_set.select_related.all %}
+    {% if xrayfilt.xray_filter_material.code_value == 'C-120F9' %}
+        Al: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% elif xrayfilt.xray_filter_material.code_value == 'C-127F9' %}
+        Cu: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% elif xrayfilt.xray_filter_material.code_value == 'C-150F9' %}
+        Mo: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% elif xrayfilt.xray_filter_material.code_value == 'C-167F9' %}
+        Rh: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% elif xrayfilt.xray_filter_material.code_value == 'C-1190E' %}
+        Nb: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% elif xrayfilt.xray_filter_material.code_value == 'C-1190F' %}
+        Eu: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% elif xrayfilt.xray_filter_material.code_value == 'C-132F9' %}
+        Pb: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% elif xrayfilt.xray_filter_material.code_value == 'C-156F9' %}
+        Ta: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% elif xrayfilt.xray_filter_material.code_value == 'C-137F9' %}
+        Ag: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% elif xrayfilt.xray_filter_material.code_value == 'C-139F9' %}
+        Sn: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% else %}
+        {{ xrayfilt.xray_filter_material.code_meaning }}: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+    {% endif %}
+{% endfor %}
