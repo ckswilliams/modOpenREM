@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.core.urlresolvers import reverse_lazy
 from remapp.extractors import rdsr
-from remapp.models import PatientIDSettings, HighDoseMetricAlertSettings
+from remapp.models import PatientIDSettings
 
 
 class FilterViewTests(TestCase):

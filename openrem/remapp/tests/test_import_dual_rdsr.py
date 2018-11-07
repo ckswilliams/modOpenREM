@@ -4,7 +4,7 @@
 import os
 from django.test import TestCase
 from remapp.extractors import rdsr
-from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, UniqueEquipmentNames, SkinDoseMapCalcSettings, HighDoseMetricAlertSettings
+from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, UniqueEquipmentNames, SkinDoseMapCalcSettings
 
 
 class ImportDualRDSRs(TestCase):

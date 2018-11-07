@@ -1367,7 +1367,6 @@ def _rsdr2db(dataset):
     # weeks in time from this study date. Only do this if activated in the fluoro alert settings (check whether
     # HighDoseMetricAlertSettings.calc_accum_dose_over_delta_weeks_on_import is True).
     if g.modality_type == 'RF':
-        from django.core.urlresolvers import reverse
         from remapp.models import HighDoseMetricAlertSettings, AccumIntegratedProjRadiogDose
         try:
             HighDoseMetricAlertSettings.objects.get()

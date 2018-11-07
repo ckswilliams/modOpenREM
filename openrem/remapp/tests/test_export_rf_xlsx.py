@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, Group
 from django.test import RequestFactory, TransactionTestCase
 from remapp.extractors import rdsr
 from remapp.exports.rf_export import rfxlsx
-from remapp.models import PatientIDSettings, Exports, GeneralStudyModuleAttr, HighDoseMetricAlertSettings
+from remapp.models import PatientIDSettings, Exports, GeneralStudyModuleAttr
 
 
 class ExportRFxlsx(TransactionTestCase):  # Not TestCase as raises TransactionManagementError
