@@ -169,6 +169,16 @@ class RFFilterPlusPid(RFSummaryListFilter):
         self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label=u'Patient ID')
 
 
+# Values from DICOM CID 10013 CT Acquisition Type
+CT_ACQ_TYPE_CHOICES = (
+    ('Spiral Acquisition',         'Spiral'),
+    ('Sequenced Acquisition',      'Axial'),
+    ('Constant Angle Acquisition', 'Scan projection radiograph'),
+    ('Stationary Acquisition',     'Stationary acquisition'),
+    ('Free Acquisition',           'Free acquisition'),
+)
+
+
 class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
@@ -190,6 +200,9 @@ class CTSummaryListFilter(django_filters.FilterSet):
     study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label=u'Max study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
     display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
+    ct_acquisition_type = django_filters.MultipleChoiceFilter(lookup_type='iexact', label=u'Acquisition type restriction',
+                                                              name='ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning',
+                                                              choices=CT_ACQ_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple)
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -256,6 +269,11 @@ def ct_acq_filter(filters, pid=False):
                 events = events.filter(dlp__lte = filters['acquisition_dlp_max'])
             except InvalidOperation:
                 pass
+        if 'ct_acquisition_type' in filters:
+            try:
+                events = events.filter(ct_acquisition_type__code_meaning__iexact = filters['ct_acquisition_type'])
+            except InvalidOperation:
+                pass
         filteredInclude = events.values_list('ct_radiation_dose__general_study_module_attributes__study_instance_uid').distinct()
 
     elif ('study_description' in filters) and ('acquisition_ctdi_min' in filters) and ('acquisition_ctdi_max' in filters):
@@ -270,6 +288,11 @@ def ct_acq_filter(filters, pid=False):
             try:
                 Decimal(filters['acquisition_ctdi_max'])
                 events = events.filter(mean_ctdivol__lte=filters['acquisition_ctdi_max'])
+            except InvalidOperation:
+                pass
+        if 'ct_acquisition_type' in filters:
+            try:
+                events = events.filter(ct_acquisition_type__code_meaning__iexact = filters['ct_acquisition_type'])
             except InvalidOperation:
                 pass
         filteredInclude = events.values_list('ct_radiation_dose__general_study_module_attributes__study_instance_uid').distinct()
