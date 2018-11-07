@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#682`_  Charts: fixed problem where links from histogram bars didn't filter correctly when case-insensitive categories selected
 * `#675`_  Exports: improved resilience when export includes malformed studies
 * `#674`_  Documentation: amended zip command in example Orthanc configuration to work with Linux and Windows
 * `#673`_  Imports: handle empty NumericValues and workaround for incorrect Philips Azurion AcquisitionDeviceType
