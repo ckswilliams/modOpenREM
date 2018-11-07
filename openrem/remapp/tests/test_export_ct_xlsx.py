@@ -103,8 +103,8 @@ class ExportCTxlsx(TestCase):
         self.assertEqual(u"ERROR", task.status)
 
     def test_acq_type_filter_spiral(self):
-        from remapp.interface.mod_filters import ct_acq_filter
-        """Fill this in...
+        """Test to check that filtering CT by acquisition type works
+        as expected.
 
         """
         filter_set = {"ct_acquisition_type": ["Spiral Acquisition"]}
@@ -118,8 +118,8 @@ class ExportCTxlsx(TestCase):
         self.assertEqual(4, task.num_records)
 
     def test_acq_type_filter_sequenced(self):
-        from remapp.interface.mod_filters import ct_acq_filter
-        """Fill this in...
+        """Test to check that filtering CT by acquisition type works
+        as expected.
 
         """
         filter_set = {"ct_acquisition_type": ["Sequenced Acquisition"]}
@@ -133,8 +133,8 @@ class ExportCTxlsx(TestCase):
         self.assertEqual(1, task.num_records)
 
     def test_acq_type_filter_spiral_and_sequenced(self):
-        from remapp.interface.mod_filters import ct_acq_filter
-        """Fill this in...
+        """Test to check that filtering CT by acquisition type works
+        as expected.
 
         """
         filter_set = {"ct_acquisition_type": ["Spiral Acquisition", "Sequenced Acquisition"]}
