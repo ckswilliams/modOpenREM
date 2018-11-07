@@ -13,7 +13,7 @@ Headline changes
 * Imports: fix for Philips Azurion RDSR with incorrect AcquisitionDeviceType
 * Administration: added facility to list and delete failed import studies
 * Documentation: further refinement of the linux one-page install
-
+* Web server: :doc:`virtual_directory`
 
 
 ***************************************************

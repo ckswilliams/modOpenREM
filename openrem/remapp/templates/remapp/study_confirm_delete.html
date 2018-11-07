@@ -1,7 +1,7 @@
 {% extends "remapp/base.html" %}
 
 
-{% block mainblock %}		
+{% block mainblock %}
 
 <form method="post">{% csrf_token %}
 
@@ -26,7 +26,7 @@
             <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
 {% if exam.modality_type == "CT" %}
             <td>
-                <a href="/openrem/ct/{{ exam.id }}/">{{ exam.study_description }}</a> |
+                <a href="{% url 'ct_detail_view' pk=exam.id %}">{{ exam.study_description }}</a> |
                 {{ exam.accession_number }} |
                 {{ exam.patientstudymoduleattr_set.get.patient_size|floatformat:0 }} cm |
                 {{ exam.patientstudymoduleattr_set.get.patient_weight|floatformat:0 }} kg
@@ -35,7 +35,7 @@
             <td>{{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
 {% elif exam.modality_type == "RF" %}
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">{{ exam.study_description }}</a> |
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">{{ exam.study_description }}</a> |
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
@@ -61,14 +61,14 @@
             <td>{{ exam.performing_physician_name }}</td>
 {% elif exam.modality_type == "DX" or exam.modality_type == "CR" %}
             <td>
-                <a href="/openrem/dx/{{ exam.id }}/">{{ exam.study_description }}</a> |
+                <a href="{% url 'dx_detail_view' pk=exam.id %}">{{ exam.study_description }}</a> |
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
             <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}</td>
 {% elif exam.modality_type == "MG" %}
             <td>
-                <a href="/openrem/mg/{{ exam.id }}/">{{ exam.procedure_code_meaning }}</a> |
+                <a href="{% url 'mg_detail_view' pk=exam.id %}">{{ exam.procedure_code_meaning }}</a> |
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
@@ -109,4 +109,4 @@
 </form>
 
 
-{% endblock %}	
+{% endblock %}

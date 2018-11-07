@@ -11,6 +11,7 @@ OpenREM version history
 * `#672`_  Documentation: improve and extend linux one-page install
 * `#670`_  Imports: handle illegal multi-value number in Toshiba RDSR with vHP
 * `#668`_  Code quality: library import and blank space cleanup
+* `#667`_  Web server: enable OpenREM to be hosted from a non-root folder/virtual-directory
 * `#666`_  Query-retrieve: handle non-return of ModalitiesInStudy correctly
 * `#658`_  Interface: added display of workload stats in home page modality tables
 * `#479`_  Administration: added facility to list and delete failed import studies

@@ -3,7 +3,7 @@
 {% if complete %}
   <h4>Recently completed export tasks</h4>
 
-  <form action="/openrem/deletefile/" method="POST">
+  <form action="{% url 'deletefile' %}" method="POST">
     <table class="table table-striped">
       <th>Exported</th>
       <th>Modality</th>
@@ -21,7 +21,7 @@
           <td>{{ tsk.processtime|naturalduration }} </td>
           <td>{{ tsk.export_user }}</td>
           {% if not tsk.includes_pid or tsk.includes_pid and in_pid_group %}
-            <td><a href="/openrem/download/{{ tsk.task_id }}">{{ tsk.filename }}</a></td>
+            <td><a href="{% url 'download' task_id=tsk.task_id %}">{{ tsk.filename }}</a></td>
           {% else %}
             <td>You don't have sufficient privileges to download this export</td>
           {% endif %}

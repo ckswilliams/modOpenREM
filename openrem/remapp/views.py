@@ -43,7 +43,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
@@ -94,7 +94,7 @@ def logout_page(request):
     Log users out and re-direct them to the main page.
     """
     logout(request)
-    return HttpResponseRedirect('/openrem/')
+    return HttpResponseRedirect(reverse_lazy('home'))
 
 
 @login_required
@@ -460,7 +460,7 @@ def dx_detail_view(request, pk=None):
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
     except:
         messages.error(request, 'That study was not found')
-        return redirect('/openrem/dx/')
+        return redirect(reverse_lazy('dx_summary_list_filter'))
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -700,7 +700,7 @@ def rf_detail_view(request, pk=None):
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
     except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
-        return redirect('/openrem/rf/')
+        return redirect(reverse_lazy('rf_summary_list_filter'))
 
     # get the totals
     irradiation_types = [(u'Fluoroscopy',), (u'Acquisition',)]
@@ -797,7 +797,7 @@ def rf_detail_view_skin_map(request, pk=None):
         GeneralStudyModuleAttr.objects.get(pk=pk)
     except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
-        return redirect('/openrem/rf/')
+        return redirect(reverse_lazy('rf_summary_list_filter'))
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1227,7 +1227,7 @@ def ct_detail_view(request, pk=None):
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
     except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
-        return redirect('/openrem/ct/')
+        return redirect(reverse_lazy('ct_summary_list_filter'))
 
     events_all = study.ctradiationdose_set.get().ctirradiationeventdata_set.select_related(
         'ct_acquisition_type', 'ctdiw_phantom_type').all()
@@ -1439,7 +1439,7 @@ def mg_detail_view(request, pk=None):
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
     except:
         messages.error(request, 'That study was not found')
-        return redirect('/openrem/mg/')
+        return redirect(reverse_lazy('mg_summary_list_filter'))
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1776,7 +1776,7 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
     if 'HTTP_REFERER' in request.META.keys():
         return redirect(request.META['HTTP_REFERER'])
     else:
-        return redirect("/openrem/")
+        return redirect(reverse_lazy('home'))
 
 
 @login_required
@@ -1788,7 +1788,7 @@ def size_upload(request):
 
     if not request.user.groups.filter(name="importsizegroup"):
         messages.error(request, "You are not in the import size group - please contact your administrator")
-        return redirect('/openrem/')
+        return redirect(reverse_lazy('home'))
 
     # Handle file upload
     if request.method == 'POST' and request.user.groups.filter(name="importsizegroup"):
@@ -1798,7 +1798,8 @@ def size_upload(request):
             newcsv.save()
 
             # Redirect to the document list after POST
-            return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(newcsv.id))
+            return HttpResponseRedirect(reverse_lazy('size_process', kwargs={'pk': newcsv.id}))
+
     else:
         form = SizeUploadForm()  # A empty, unbound form
 
@@ -1830,7 +1831,7 @@ def size_process(request, *args, **kwargs):
 
     if not request.user.groups.filter(name="importsizegroup"):
         messages.error(request, "You are not in the import size group - please contact your administrator")
-        return redirect('/openrem/')
+        return redirect(reverse_lazy('home'))
 
     if request.method == 'POST':
 
@@ -1842,7 +1843,7 @@ def size_process(request, *args, **kwargs):
 
             if not csvrecord.sizefile:
                 messages.error(request, "File to be processed doesn't exist. Do you wish to try again?")
-                return HttpResponseRedirect("/openrem/admin/sizeupload")
+                return HttpResponseRedirect(reverse_lazy('size_upload'))
 
             csvrecord.height_field = request.POST['height_field']
             csvrecord.weight_field = request.POST['weight_field']
@@ -1852,11 +1853,11 @@ def size_process(request, *args, **kwargs):
 
             websizeimport.delay(csv_pk=kwargs['pk'])
 
-            return HttpResponseRedirect("/openrem/admin/sizeimports")
+            return HttpResponseRedirect(reverse_lazy('size_imports'))
 
         else:
             messages.error(request, "Duplicate column header selection. Each field must have a different header.")
-            return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(kwargs['pk']))
+            return HttpResponseRedirect(reverse_lazy('size_process', kwargs={'pk': kwargs['pk']}))
 
     else:
 
@@ -1877,18 +1878,18 @@ def size_process(request, *args, **kwargs):
                                    "Doesn't appear to have a header row. First row: {0}. The uploaded file has been deleted.".format(
                                        next(csvfile)))
                     csvrecord[0].sizefile.delete()
-                    return HttpResponseRedirect("/openrem/admin/sizeupload")
+                    return HttpResponseRedirect(reverse_lazy('size_upload'))
             except csv.Error as e:
                 messages.error(request,
                                "Doesn't appear to be a csv file. Error({0}). The uploaded file has been deleted.".format(
                                    e))
                 csvrecord[0].sizefile.delete()
-                return HttpResponseRedirect("/openrem/admin/sizeupload")
+                return HttpResponseRedirect(reverse_lazy('size_upload'))
             except:
                 messages.error(request,
                                "Unexpected error - please contact an administrator: {0}.".format(sys.exc_info()[0]))
                 csvrecord[0].sizefile.delete()
-                return HttpResponseRedirect("/openrem/admin/sizeupload")
+                return HttpResponseRedirect(reverse_lazy('size_upload'))
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1909,7 +1910,7 @@ def size_imports(request, *args, **kwargs):
     """
     if not request.user.groups.filter(name="importsizegroup") and not request.user.groups.filter(name="admingroup"):
         messages.error(request, "You are not in the import size group - please contact your administrator")
-        return redirect('/openrem/')
+        return redirect(reverse_lazy('home'))
 
     imports = SizeUpload.objects.all().order_by('-import_date')
 
@@ -1955,7 +1956,7 @@ def size_delete(request):
                 messages.error(request,
                                "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
-    return HttpResponseRedirect(reverse(size_imports))
+    return HttpResponseRedirect(reverse('size_imports'))
 
 
 @login_required
@@ -1978,7 +1979,7 @@ def size_abort(request, pk):
     else:
         messages.error(request, "Only members of the importsizegroup or admingroup can abort a size import task")
 
-    return HttpResponseRedirect("/openrem/admin/sizeimports/")
+    return HttpResponseRedirect(reverse_lazy('size_imports'))
 
 
 @login_required
@@ -2004,11 +2005,11 @@ def size_download(request, task_id):
         exp = SizeUpload.objects.get(task_id__exact = task_id)
     except:
         messages.error(request, "Can't match the task ID, download aborted")
-        return redirect('/openrem/admin/sizeimports/')
+        return redirect(reverse_lazy('size_imports'))
 
     if not importperm:
         messages.error(request, "You don't have permission to download import logs")
-        return redirect('/openrem/admin/sizeimports')
+        return redirect(reverse_lazy('size_imports'))
 
     file_path = os.path.join(MEDIA_ROOT, exp.logfile.name)
     file_wrapper = FileWrapper(file(file_path,'rb'))
@@ -2146,16 +2147,16 @@ def display_name_update(request):
 
         if error_message:
             messages.error(request, error_message)
-        return HttpResponseRedirect('/openrem/viewdisplaynames/')
+        return HttpResponseRedirect(reverse_lazy('display_names_view'))
 
     else:
         if request.GET.__len__() == 0:
-            return HttpResponseRedirect('/openrem/viewdisplaynames/')
+            return HttpResponseRedirect(reverse_lazy('display_names_view'))
 
         max_pk = UniqueEquipmentNames.objects.all().order_by('-pk').values_list('pk')[0][0]
         for current_pk in request.GET:
             if int(current_pk) > max_pk:
-                return HttpResponseRedirect('/openrem/viewdisplaynames/')
+                return HttpResponseRedirect(reverse_lazy('display_names_view'))
 
         f = UniqueEquipmentNames.objects.filter(pk__in=map(int, request.GET.values()))
 
@@ -2310,11 +2311,11 @@ def review_summary_list(request, equip_name_pk=None, modality=None, delete_equip
         messages.error(request,
                        "Partial and broken imports can only be reviewed with the correct "
                        "link from the display name page")
-        return HttpResponseRedirect('/openrem/viewdisplaynames/')
+        return HttpResponseRedirect(reverse_lazy('display_names_view'))
 
     if not request.user.groups.filter(name="admingroup"):
         messages.error(request, "You are not in the administrator group - please contact your administrator")
-        return redirect('/openrem/viewdisplaynames/')
+        return redirect(reverse_lazy('display_names_view'))
 
     if request.method == 'GET':
         equipment = UniqueEquipmentNames.objects.get(pk=equip_name_pk)
@@ -2344,22 +2345,25 @@ def review_summary_list(request, equip_name_pk=None, modality=None, delete_equip
             studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
             studies.delete()
             messages.info(request, "Studies deleted")
-            return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+            return redirect(reverse_lazy('review_summary_list', kwargs={'equip_name_pk': equip_name_pk,
+                                                                        'modality': modality}))
         else:
             studies, count_all = display_name_modality_filter(equip_name_pk=equip_name_pk, modality=modality)
             if count_all > studies.count():
                 messages.warning(request,
                                  "Can't delete table entry - non-{0} studies are associated with it".format(modality))
                 logger.warning("Can't delete table entry - non-{0} studies are associated with it".format(modality))
-                return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+                return redirect(reverse_lazy('review_summary_list', kwargs={'equip_name_pk': equip_name_pk,
+                                                                            'modality': modality}))
             else:
                 studies.delete()
                 UniqueEquipmentNames.objects.get(pk=equip_name_pk).delete()
                 messages.info(request, "Studies and equipment name table entry deleted")
-                return redirect('/openrem/viewdisplaynames/')
+                return redirect(reverse_lazy('display_names_view'))
     else:
         messages.error(request, "Incorrect attempt to delete studies.")
-        return redirect('/admin/review/{0}/{1}'.format(equip_name_pk, modality))
+        return redirect(reverse_lazy('review_summary_list', kwargs={'equip_name_pk': equip_name_pk,
+                                                                    'modality': modality}))
 
 
 @login_required
@@ -2504,13 +2508,13 @@ def reprocess_dual(request, pk=None):
 
     if not request.user.groups.filter(name="admingroup"):
         messages.error(request, "You are not in the administrator group - please contact your administrator")
-        return redirect('/openrem/viewdisplaynames/')
+        return redirect(reverse_lazy('display_names_view'))
 
     if request.method == 'GET' and pk:
         status_message = reset_dual(pk=pk)
         messages.info(request, status_message)
 
-    return HttpResponseRedirect('/openrem/viewdisplaynames/')
+    return HttpResponseRedirect(reverse_lazy('display_names_view'))
 
 
 def _get_review_study_data(study):
@@ -3040,7 +3044,7 @@ def homepage_options_view(request):
             user_profile.save()
 
         messages.success(request, "Home page options have been updated")
-        return HttpResponseRedirect(reverse('home'))
+        return HttpResponseRedirect(reverse_lazy('home'))
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
