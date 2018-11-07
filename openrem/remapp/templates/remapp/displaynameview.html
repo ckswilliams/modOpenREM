@@ -30,8 +30,8 @@
     <p>The boxes can be checked or unchecked by clicking anywhere on the row. Tables can be sorted by clicking on
     column headers.{% endif %}</p>
   <p>
-    Jump to <a href="#ct">CT</a> | <a href="#mammo">Mammography</a> | <a href="#dx">DX and CR</a> |
-    <a href="#fluoro">Fluoroscopy</a> | <a href="#others">Others</a>
+    Jump to <a href="#ct">CT</a> | <a href="#fluoro">Fluoroscopy</a> |<a href="#mammo">Mammography</a> |
+    <a href="#dx">DX and CR</a> | <a href="#others">Others</a> | <a href="#failed">Failed imports</a> |
   </p>
 {% endblock %}
 
@@ -71,30 +71,34 @@
                   }
               )
           }
+      );
+      $(document).ready(
+          function get_failed_imports_list(json) {
+              $.ajax(
+                  {
+                      url: "/populatefailedimportlist",
+                      data: {
+                          csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                      type: "POST",
+                      success: function (data) {
+                          $('#failed-list').html(data);
+                      }
+                  }
+              )
+          }
       )
   </script>
 {% endfor %}
 
+{% if admin.admingroup %}
+  <input class="btn btn-default" type="submit" value="Update">
+{% endif %}
+
 <a name="ct" class="vert-offset">
   <h3>CT</h3>
 </a>
-<span id="CT-names"></span>
-{% if admin.admingroup %}
-  <input class="btn btn-default" type="submit" value="Update">
-{% endif %}
-
-<a name="mammo" class="vert-offset">
-  <h3>Mammography</h3>
-</a>
-<span id="MG-names"></span>
-{% if admin.admingroup %}
-  <input class="btn btn-default" type="submit" value="Update">
-{% endif %}
-
-<a name="dx" class="vert-offset">
-  <h3>DX and CR</h3>
-</a>
-<span id="DX-names"></span>
+<span id="CT-names"><p>Querying the database for display names, please wait</p></span>
 {% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
 {% endif %}
@@ -102,7 +106,23 @@
 <a name="fluoro" class="vert-offset">
   <h3>Fluoroscopy</h3>
 </a>
-<span id="RF-names"></span>
+<span id="RF-names"><p>Querying the database for display names, please wait</p></span>
+{% if admin.admingroup %}
+  <input class="btn btn-default" type="submit" value="Update">
+{% endif %}
+
+<a name="mammo" class="vert-offset">
+  <h3>Mammography</h3>
+</a>
+<span id="MG-names"><p>Querying the database for display names, please wait</p></span>
+{% if admin.admingroup %}
+  <input class="btn btn-default" type="submit" value="Update">
+{% endif %}
+
+<a name="dx" class="vert-offset">
+  <h3>DX and CR</h3>
+</a>
+<span id="DX-names"><p>Querying the database for display names, please wait</p></span>
 {% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
 {% endif %}
@@ -110,16 +130,30 @@
 <a name="others" class="vert-offset">
   <h3>Others</h3>
 </a>
-<span id="OT-names"></span>
+<span id="OT-names"><p>Querying the database for display names, please wait</p></span>
 {% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
 {% endif %}
 
-
-{#      <td><a href="/admin/ot/{{ eachrow.pk }}/">Review</a></td>#}
-
-{% if admin.admingroup %}
+  {% if admin.admingroup %}
   </form>
 {% endif %}
+
+
+<a name="failed" class="vert-offset">
+  <h3>Review studies that failed to import</h3>
+</a>
+<p>These are studies that do not have an entry in the unique_equipment_name table, and therefore the import would have
+aborted early in the process. Members of the admingroup can click through to review and delete these studies.</p>
+<span id="failed-list">
+<ul>
+  <li><a href="/admin/review/failed/CT/">CT</a></li>
+  <li><a href="/admin/review/failed/MG/">Mammography</a></li>
+  <li><a href="/admin/review/failed/DX/">Radiography</a></li>
+  <li><a href="/admin/review/failed/RF/">Fluoro</a></li>
+</ul>
+</span>
+
+
 
 {% endblock %}

@@ -11,6 +11,8 @@ Headline changes
 * Imports: fix for empty NumericValues in RDSR
 * Imports: fix for Toshiba RDSR with incorrect multiple values in SD field for vHP
 * Imports: fix for Philips Azurion RDSR with incorrect AcquisitionDeviceType
+* Administration: added facility to list and delete failed import studies
+* Documentation: further refinement of the linux one-page install
 
 
 

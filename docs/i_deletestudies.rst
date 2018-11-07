@@ -71,3 +71,23 @@ name, you can leave the entry in the Unique Equipment Names table. You might wan
 a Display name of 'CR' or 'Imported'. Again, there is a confirmation step.
 
 Again, only the studies associated with this equipment that have the same modality type as shown will be deleted.
+
+.. _failed_import_studies:
+
+Failed import studies
+=====================
+
+At the bottom of the ``Display names & modality`` page is a table listing the number of studies that are in the
+database, but do not have an entry in the ``unique_equipment_name`` table. This usually indicates a study that has
+failed early in the import process.
+
+Users in the ``admingroup`` are able to click on the links to review the studies on a per-modality basis. This will list
+the information that is available, which might indicate which system they came from, what times, dates and accession
+numbers.
+
+The user is then able to delete all the failed import studies in the list.
+
+Before release 0.8.2, these studies would appear in the homepage listing as
+*Error has occurred - import probably unsuccessful*. This has now changed to a link to the review page for that modality
+with the text *Failed import - review here* for users in the ``admingroup`` and
+*Failed import - ask an administrator to review* for other users.
