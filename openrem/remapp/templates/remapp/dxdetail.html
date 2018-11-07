@@ -90,7 +90,6 @@
         <td>
           {% for exposure_value in sourcedata.exposure_set.all %}
            {{ exposure_value.convert_uAs_to_mAs|floatformat:1 }}
-{# .convert_uAs_to_mAs|floatformat:1#}
           {% endfor %}
         </td>
         <td>{{ sourcedata.average_xray_tube_current|floatformat:1 }}</td>
