@@ -31,10 +31,6 @@
 
   </head>
 
-
-
-
-
   <body>
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
@@ -45,22 +41,22 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/openrem/">OpenREM</a>
+          <a class="navbar-brand" href="{%  url 'home' %}">OpenREM</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             {% block navbar %}
                 {% if request.user.userprofile.displayCT %}
-                    {% block navct %}<li>{% endblock %}<a href="/openrem/ct/">CT</a></li>
+                    {% block navct %}<li>{% endblock %}<a href="{% url 'ct_summary_list_filter' %}">CT</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayRF %}
-                    {% block navrf %}<li>{% endblock %}<a href="/openrem/rf/">Fluoroscopy</a></li>
+                    {% block navrf %}<li>{% endblock %}<a href="{% url 'rf_summary_list_filter' %}">Fluoroscopy</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayMG %}
-                    {% block navmg %}<li>{% endblock %}<a href="/openrem/mg/">Mammography</a></li>
+                    {% block navmg %}<li>{% endblock %}<a href="{% url 'mg_summary_list_filter' %}">Mammography</a></li>
                 {% endif %}
                 {% if request.user.userprofile.displayDX %}
-                    {% block navdx %}<li>{% endblock %}<a href="/openrem/dx/">Radiography</a></li>
+                    {% block navdx %}<li>{% endblock %}<a href="{% url 'dx_summary_list_filter' %}">Radiography</a></li>
                 {% endif %}
             {% endblock %}
           </ul>
@@ -71,18 +67,18 @@
                     {% block importnav %}
                     <li class="dropdown">
                     {% endblock %}
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                             Imports <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
                             {% if admin.importsizegroup %}
-                            <li><a href="/openrem/admin/sizeupload">Import patient size info</a></li>
+                            <li><a href="{% url 'size_upload' %}">Import patient size info</a></li>
                             {% endif %}
                             {% if admin.importsizegroup or admin.admingroup %}
-                            <li><a href="/openrem/admin/sizeimports">Previous patient size imports</a></li>
+                            <li><a href="{% url 'size_imports' %}">Previous patient size imports</a></li>
                             {% endif %}
                             {% if admin.importqrgroup %}
-                            <li><a href="/openrem/admin/queryremote">Query remote server</a> </li>
+                            <li><a href="{% url 'dicom_qr_page' %}">Query remote server</a> </li>
                             {% endif %}
                         </ul>
                     </li>
@@ -91,37 +87,37 @@
                     {% block exportnav %}
                         <li>
                     {% endblock %}
-                        <a href="/openrem/export/">Exports</a></li>
+                        <a href="{% url 'export' %}">Exports</a></li>
                 {% endif %}
 
                 {% block confnav %}
                 <li class="dropdown">
                 {% endblock %}
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                       <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Config <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
                       <li class="dropdown-header">User level config</li>
-                      <li><a href="/openrem/chartoptions/">Chart options</a></li>
-                      <li><a href="/openrem/charts_off/">Switch charts off</a></li>
-                      <li><a href="/openrem/homepageoptions/">Home page options</a></li>
+                      <li><a href="{% url 'chart_options_view' %}">Chart options</a></li>
+                      <li><a href="{%  url 'charts_off' %}">Switch charts off</a></li>
                       {% if not admin.admingroup %}
-                        <li><a href="/openrem/viewdisplaynames/">View display names & modality</a></li>
-                        <li><a href="/admin/notpatientindicators/">View not-patient indicators</a> </li>
+                        <li><a href="{% url 'display_names_view' %}">View display names & modality</a></li>
+                        <li><a href="{% url 'not_patient_indicators' %}">View not-patient indicators</a></li>
+                        <li><a href="{% url 'homepage_options_view' %}">Home page options</a></li>
                       {% endif %}
                       {% if admin.admingroup %}
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">System level settings</li>
-                        <li><a href="/admin/auth/user/">Users</a></li>
-                        <li><a href="/openrem/viewdisplaynames/">Display names & modality</a></li>
-                        <li><a href="/openrem/admin/dicomdelsettings/1/">DICOM object deletion</a> </li>
-                        <li><a href="/openrem/admin/dicomsummary">DICOM networking</a></li>
-                        <li><a href="/admin/patientidsettings/1/">Patient ID</a> </li>
-                        <li><a href="/admin/notpatientindicators/">Not-patient indicators</a> </li>
-                        <li><a href="/admin/skindosemapsettings/1/">Skin dose map</a> </li>
-                        <li><a href="/admin/rfalertsettings/1/">Fluoro alert levels</a> </li>
-                        <li><a href="/admin/rfalertnotifications/">Fluoro alert notification</a> </li>
-                        <li><a href="/admin/homepagesettings/1/">Home page options</a> </li>
+                        <li><a href="{% url 'admin:auth_user_changelist' %}">Users</a></li>
+                        <li><a href="{% url 'display_names_view' %}">Display names & modality</a></li>
+                        <li><a href="{% url 'dicom_delete_settings_update' 1 %}">DICOM object deletion</a> </li>
+                        <li><a href="{% url 'dicom_summary' %}">DICOM networking</a></li>
+                        <li><a href="{% url 'patient_id_settings_update' 1 %}">Patient ID</a> </li>
+                        <li><a href="{% url 'not_patient_indicators' %}">Not-patient indicators</a> </li>
+                        <li><a href="{% url 'skin_dose_map_settings_update' 1 %}">Skin dose map</a> </li>
+                        <li><a href="{% url 'rf_alert_settings_update' 1 %}">Fluoro alert levels</a> </li>
+                        <li><a href="{% url 'rf_alert_notifications_view' %}">Fluoro alert notification</a> </li>
+                        <li><a href="{% url 'homepageadminsettings_update' 1 %}">Home page options</a> </li>
                       {% endif %}
                     </ul>
                 </li>
@@ -131,7 +127,7 @@
             {% block usernav %}
                 <li class="dropdown">
             {% endblock %}
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                     {% if user.is_authenticated %}
                         {{ user.get_full_name }}
@@ -142,20 +138,20 @@
                 </a>
                 <ul class="dropdown-menu">
                     {% if user.is_authenticated %}
-                        <li><a href="/openrem/change_password/">Change password</a></li>
-                        <li><a href="/logout/">Logout</a></li>
+                        <li><a href="{% url 'password_change' %}">Change password</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
                     {% else %}
-                        <li><a href="/login/?next={{ request.get_full_path|urlencode }}">Login</a></li>
+                        <li><a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">Login</a></li>
                     {% endif %}
                 </ul>
 
 <li class="dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Docs <span class="caret"></span>
     </a>
     <ul class="dropdown-menu">
         <li>
-            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/" target="_blank" data-toggle="tooltip" title="OpenREM documentation - opens in a new tab">
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/" target="_blank" data-toggle="tooltip" title="OpenREM documentation - opens in a new tab">
                 OpenREM Documentation ({{ admin.docsversion }})
             </a>
         </li>

@@ -30,7 +30,7 @@
       {% if next %}
         <input type="hidden" name="next" value="{{ next }}" />
       {% else %}
-        <input type="hidden" name="next" value="/openrem/auth/" />
+        <input type="hidden" name="next" value="{% url 'home' %}" />
       {% endif %}
       </form>
 

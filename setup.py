@@ -27,6 +27,7 @@ requires = [
     'testfixtures >= 6.0',
     'mock',
     'django-debug-toolbar <= 1.9.1',
+    'django-js-reverse'
     ]
 
 setup(

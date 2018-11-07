@@ -17,7 +17,7 @@
 
 {% block importnav %}<li class="dropdown active">{% endblock %}
 
-{% block mainblock %}		
+{% block mainblock %}
    {% load humanize %}
    {% load remappduration %}
 
@@ -32,7 +32,7 @@
             <td>{{ tsk.sizefile.name }}</td>
             <td>{{ tsk.import_date|naturaltime }}</td>
             <td>{{ tsk.progress }}</td>
-            <td><a href="/openrem/admin/sizeimport/abort/{{ tsk.pk }}" class="btn btn-danger">Abort</a></td>
+            <td><a href="{% url 'size_abort' pk=tsk.pk %}" class="btn btn-danger">Abort</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -47,15 +47,15 @@
             <td>{{ tsk.sizefile.name }}</td>
             <td>{{ tsk.import_date|naturaltime }}</td>
             <td>{{ tsk.progress }}</td>
-            <td><a href="/openrem/admin/sizeimport/abort/{{ tsk.pk }}" class="btn btn-default">Delete import</a></td>
+            <td><a href="{% url 'size_abort' pk=tsk.pk %}" class="btn btn-default">Delete import</a></td>
         </tr>
         {% endfor %}
     </table>
     {% endif %}
 
     <h4>Completed import tasks</h4>
-    <form action="/openrem/admin/sizedelete/" method="POST">
-    {% csrf_token %} 
+    <form action="{% url 'size_delete' %}" method="POST">
+    {% csrf_token %}
     <table class="table table-striped">
         <th>Import started</th><th>Import time</th><th>No. rows</th><th>Download logfile</th><th>Delete?</th>
         {% for tsk in complete %}
@@ -63,7 +63,7 @@
             <td>{{ tsk.import_date|naturaltime }}</td>
             <td>{{ tsk.processtime|naturalduration }}</td>
             <td>{{ tsk.num_records }}</td>
-            <td><a href="/openrem/admin/sizelogs/{{ tsk.task_id }}">Download</a></a></td>
+            <td><a href="{% url 'size_download' task_id=tsk.task_id %}">Download</a></a></td>
             <td>
                 <div class = "checkbox">
                     <label>
@@ -83,7 +83,7 @@
         </tr>
     </table>
     </form>
-    
+
 {% else %}
 
       <div class="row col-md-offset-2">
@@ -97,7 +97,7 @@
       </p>
       </div>
       </div>
-      
+
 {% endif %}
 
-{% endblock %}	
+{% endblock %}

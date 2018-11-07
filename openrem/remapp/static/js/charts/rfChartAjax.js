@@ -11,7 +11,7 @@ $(document).ready(function() {
 
     $.ajax({
         type: "GET",
-        url: "/openrem/rf/chart/",
+        url: Urls.rf_summary_chart_data(),
         data: requestData,
         dataType: "json",
         success: function( json ) {

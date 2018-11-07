@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.safestring import mark_safe
+from django.core.urlresolvers import reverse
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, HTML, Div
 from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes, Accordion, AccordionGroup
@@ -438,7 +439,7 @@ class DicomDeleteSettingsForm(forms.ModelForm):
             Div(
                 HTML("""
                 <div class="col-lg-4 col-lg-offset-2">
-                    <a href="/openrem/admin/dicomsummary#delete" role="button" class="btn btn-default">
+                    <a href='""" + reverse('dicom_summary') + """#delete' role="button" class="btn btn-default">
                         Cancel and return to the DICOM configuration and DICOM object delete summary page
                     </a>
                 </div>
@@ -492,7 +493,7 @@ class DicomQRForm(forms.ModelForm):
             Div(
                 HTML("""
                 <div class="col-lg-4 col-lg-offset-4">
-                    <a href="/openrem/admin/dicomsummary" role="button" class="btn btn-default">
+                    <a href='""" + reverse('dicom_summary') + """' role="button" class="btn btn-default">
                         Cancel and return to DICOM configuration summary page
                     </a>
                 </div>
@@ -545,7 +546,7 @@ class DicomStoreForm(forms.ModelForm):
             Div(
                 HTML("""
                 <div class="col-lg-4 col-lg-offset-4">
-                    <a href="/openrem/admin/dicomsummary" role="button" class="btn btn-default">
+                    <a href='""" + reverse('dicom_summary') + """' role="button" class="btn btn-default">
                         Cancel and return to DICOM configuration summary page
                     </a>
                 </div>
@@ -628,7 +629,7 @@ class NotPatientNameForm(forms.ModelForm):
             Div(
                 HTML("""
                 <div class="col-lg-4 col-lg-offset-4">
-                    <a href="/openrem/admin/notpatientindicators/" role="button" class="btn btn-default">
+                    <a href='""" + reverse('not_patient_indicators') + """' role="button" class="btn btn-default">
                         Cancel and return to not-patient indicator summary page
                     </a>
                 </div>
@@ -663,7 +664,7 @@ class NotPatientIDForm(forms.ModelForm):
             Div(
                 HTML("""
                 <div class="col-lg-4 col-lg-offset-4">
-                    <a href="/openrem/admin/notpatientindicators/" role="button" class="btn btn-default">
+                    <a href='""" + reverse('not_patient_indicators') + """' role="button" class="btn btn-default">
                         Cancel and return to not-patient indicator summary page
                     </a>
                 </div>
