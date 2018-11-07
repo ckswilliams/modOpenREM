@@ -35,6 +35,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
+from django.core.urlresolvers import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 import remapp
 
@@ -49,7 +50,7 @@ def run_store(request, pk):
         store.run = True
         store.save()
         storetask = web_store(store_pk=pk)
-    return redirect('/openrem/admin/dicomsummary/')
+    return redirect(reverse_lazy('dicom_summary'))
 
 @csrf_exempt
 @login_required
@@ -65,7 +66,7 @@ def stop_store(request, pk):
             store[0].save()
         else:
             print u"Can't stop store SCP: Invalid primary key"
-    return redirect('/openrem/admin/dicomsummary/')
+    return redirect(reverse_lazy('dicom_summary'))
 
 import json
 from django.http import HttpResponseRedirect, HttpResponse
@@ -87,15 +88,22 @@ def status_update_store(request):
 
     if echo is "Success":
         resp['message'] = u"<div>Last status: {0}</div>".format(store.status)
-        resp['statusindicator'] = u"<h3 class='pull-right panel-title'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Server is alive</h3>"
+        resp['statusindicator'] = u"<h3 class='pull-right panel-title'>" \
+                                  u"<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>" \
+                                  u"<span class='sr-only'>OK:</span> Server is alive</h3>"
         resp['delbutton'] = u"<button type='button' class='btn btn-primary' disabled='disabled'>Delete</button>"
         resp['startbutton'] = u""
-        resp['stopbutton'] = u"<a class='btn btn-danger' href='/openrem/admin/dicomstore/{0}/stop/' role='button'>Stop server</a>".format(scp_pk)
+        resp['stopbutton'] = u"<a class='btn btn-danger' href='" + \
+                             reverse_lazy('stop_store', kwargs={'pk', scp_pk}) + u"' role='button'>Stop server</a>"
     elif echo is "AssocFail":
         resp['message'] = u"<div>Last status: {0}</div>".format(store.status)
-        resp['statusindicator'] = u"<h3 class='pull-right panel-title status-red'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Association fail - server not running?</h3>"
-        resp['delbutton'] = u"<a class='btn btn-primary' href='/openrem/admin/dicomstore/{0}/delete/' role='button'>Delete</a>".format(scp_pk)
-        resp['startbutton'] = u"<a class='btn btn-success' href='/openrem/admin/dicomstore/{0}/start/' role='button'>Start server</a>".format(scp_pk)
+        resp['statusindicator'] = u"<h3 class='pull-right panel-title status-red'>" \
+                                  u"<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span>" \
+                                  u"<span class='sr-only'>Error:</span> Association fail - server not running?</h3>"
+        resp['delbutton'] = u"<a class='btn btn-primary' href='" + \
+                            reverse_lazy('dicomstore_delete', kwargs={'pk', scp_pk}) + u"' role='button'>Delete</a>"
+        resp['startbutton'] = u"<a class='btn btn-success' href='" + \
+                              reverse_lazy('run_store', kwargs={'pk', scp_pk}) + u"' role='button'>Start server</a>"
         resp['stopbutton'] = u""
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
@@ -267,7 +275,7 @@ def dicom_qr_page(request, *args, **kwargs):
 
     if not request.user.groups.filter(name="importqrgroup"):
         messages.error(request, u"You are not in the importqrgroup - please contact your administrator")
-        return redirect('/openrem/')
+        return redirect(reverse_lazy('home'))
 
     form = DicomQueryForm
 

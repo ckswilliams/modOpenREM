@@ -174,7 +174,7 @@ $(document).ready(function() {
                         "<p>Please consider feeding this back to the <a href='http://bitbucket.org/openskin/openskin/'>openSkin BitBucket project</a> " +
                         "or <a href='http://groups.google.com/forum/#!forum/openrem'>OpenREM discussion group</a> so that the issue can be addressed.</p>";
 
-                    errorMessage += "<p>Create <a href='/openrem/exportrfopenskin/" + json.primary_key +"'>openSkin export</a>. (Not available if you don't have export permissions.)</p>";
+                    errorMessage += "<p>Create <a href='" + Urls.rfopenskin({pk: json.primary_key}) + "'>openSkin export</a>. (Not available if you don't have export permissions.)</p>";
 
                     skinDoseMapContainer.html(errorMessage);
                 }

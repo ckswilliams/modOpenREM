@@ -19,26 +19,26 @@
     {% if admin.exportgroup %}
         <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
     <p>
-      <a href="/openrem/exportflcsv1/0/0/?{{ request.GET.urlencode }}"
+      <a href="{% url 'flcsv1' 0 0 %}?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
           {% if admin.pidgroup %}
-              <a href="/openrem/exportflcsv1/1/0/?{{ request.GET.urlencode }}"
+              <a href="{% url 'flcsv1' 1 0 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With names</a>
-              <a href="/openrem/exportflcsv1/0/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'flcsv1' 0 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With ID</a>
-              <a href="/openrem/exportflcsv1/1/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'flcsv1' 1 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With both</a>
     </p>
     <p>
           {% endif %}
-          <a href="/openrem/exportrfxlsx1/0/0/?{{ request.GET.urlencode }}"
+          <a href="{% url 'rfxlsx1' 0 0 %}?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to XLSX</a>
           {% if admin.pidgroup %}
-              <a href="/openrem/exportrfxlsx1/1/0/?{{ request.GET.urlencode }}"
+              <a href="{% url 'rfxlsx1' 1 0 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With names</a>
-              <a href="/openrem/exportrfxlsx1/0/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'rfxlsx1' 0 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With ID</a>
-              <a href="/openrem/exportrfxlsx1/1/1/?{{ request.GET.urlencode }}"
+              <a href="{% url 'rfxlsx1' 1 1 %}?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With both</a>
           {% endif %}
     </p>
@@ -142,13 +142,13 @@
           {% with accum_set=projection_set.accumxraydose_set.all %}
         <tr>
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {{ equipment.institution_name }}
                 </a>
             </td>
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">
-                    <table onclick="window.location='/openrem/rf/{{ exam.id }}/';">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
+                    <table onclick="window.location='{% url 'rf_detail_view' pk=exam.id %}';">
                         <tr><td class="nowrap">{{ equipment.manufacturer }}</td></tr>
                         <tr><td class="nowrap">{{ equipment.manufacturer_model_name }}</td></tr>
                         <tr><td class="nowrap">{{ equipment.unique_equipment_name.display_name }}</td></tr>
@@ -156,13 +156,13 @@
                 </a>
             </td>
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}
                 </a>
             </td>
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">
-                    <table onclick="window.location='/openrem/rf/{{ exam.id }}/';">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
+                    <table onclick="window.location='{% url 'rf_detail_view' pk=exam.id %}';">
                         <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
                         <tr><td class="nowrap">{{ exam.procedure_code_meaning }}</td></tr>
                         <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
@@ -173,12 +173,12 @@
                 </a>
             </td>
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {{ projection_set.irradeventxraydata_set.count }}
                 </a>
             </td>
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {% for record in accum_set %}
                       {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
                         {% if accum_set.count > 1 %}
@@ -191,7 +191,7 @@
                 </a>
             </td>
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {% for record in accum_set %}
                       {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
                         {% if accum_set.count > 1 %}
@@ -204,7 +204,7 @@
                 </a>
             </td>
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">
+                <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {{ exam.performing_physician_name }}
                 </a>
             </td>
@@ -227,6 +227,7 @@
 
     {% if request.user.userprofile.plotCharts %}
 
+        <script src="{{ STATIC_URL }}js/django_reverse/reverse.js"></script>
         <script src="{{ STATIC_URL }}js/charts/chartFullScreen.js"></script>
         <script src="{{ STATIC_URL }}js/charts/chartSetExportSize.js"></script>
         <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
@@ -354,7 +355,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudy;
-                href_start = '/openrem/rf/?';
+                href_start = '{% url 'rf_summary_list_filter' %}?';
                 hide_series_btn_stub = 'study_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
@@ -433,7 +434,7 @@
                     chartSetExportSize('piechartStudyDIV');
                     fitChartToDiv('piechartStudyDIV');
                 });
-                var urlStartStudy = '/openrem/rf/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                var urlStartStudy = '{% url 'rf_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');
             </script>
         {% endif %}

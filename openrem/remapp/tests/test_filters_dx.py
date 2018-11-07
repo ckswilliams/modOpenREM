@@ -4,7 +4,7 @@
 import os
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse_lazy
 from remapp.extractors import rdsr, dx
 from remapp.models import PatientIDSettings
 
@@ -52,7 +52,7 @@ class FilterViewTests(TestCase):
         Initial test to ensure five studies are listed with no filter
         """
         self.client.login(username='temporary', password='temporary')
-        response = self.client.get(reverse('dx_summary'), follow=True)
+        response = self.client.get(reverse_lazy('dx_summary_list_filter'), follow=True)
         self.assertEqual(response.status_code, 200)
         responses_text = u'There are 5 studies in this list.'
         self.assertContains(response, responses_text)
@@ -62,7 +62,7 @@ class FilterViewTests(TestCase):
         Apply study description filter
         """
         self.client.login(username='temporary', password='temporary')
-        response = self.client.get('http://test/openrem/dx/?study_description=CR', follow=True)
+        response = self.client.get(reverse_lazy('dx_summary_list_filter') + '?study_description=CR', follow=True)
         self.assertEqual(response.status_code, 200)
         one_responses_text = u'There are 2 studies in this list.'
         self.assertContains(response, one_responses_text)
@@ -76,7 +76,7 @@ class FilterViewTests(TestCase):
         Apply acquisition protocol filter
         """
         self.client.login(username='temporary', password='temporary')
-        response = self.client.get('http://test/openrem/dx/?acquisition_protocol=thigh', follow=True)
+        response = self.client.get(reverse_lazy('dx_summary_list_filter') + '?acquisition_protocol=thigh', follow=True)
         self.assertEqual(response.status_code, 200)
         one_responses_text = u'There are 1 studies in this list.'
         self.assertContains(response, one_responses_text)
