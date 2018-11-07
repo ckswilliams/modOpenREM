@@ -14,7 +14,7 @@ $(document).ready(function() {
 
     $.ajax({
         type: "GET",
-        url: "/openrem/dx/chart/",
+        url: Urls.dx_summary_chart_data(),
         data: requestData,
         dataType: "json",
         success: function( json ) {

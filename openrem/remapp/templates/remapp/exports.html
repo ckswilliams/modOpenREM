@@ -26,7 +26,7 @@
             function get_current_exports(json) {
                 $.ajax(
                     {
-                        url: "/openrem/export/updateactive",
+                        url: "{%  url 'update_active' %}",
                         type: "POST",
                         success: function (data) {
                             $('#current').html(data);
@@ -46,7 +46,7 @@
             function get_error_exports(json) {
                 $.ajax(
                     {
-                        url: "/openrem/export/updateerror",
+                        url: "{%  url 'update_error' %}",
                         type: "POST",
                         success: function (data) {
                             $('#error').html(data);
@@ -67,7 +67,7 @@
             function get_complete_exports(json) {
                 $.ajax(
                     {
-                        url: "/openrem/export/updatecomplete",
+                        url: "{% url 'update_complete' %}",
                         data: {
                             latest_complete_pk: '{{latest_complete_pk}}',
                             in_pid_group: '{{ admin.pidgroup }}'
@@ -87,7 +87,7 @@
     <div id="complete">latest_current_pk is {{ latest_complete_pk }}</div>
 
     <h4>Completed export tasks</h4>
-    <form action="/openrem/deletefile/" method="POST">
+    <form action="{% url 'deletefile' %}" method="POST">
       <table class="table table-striped">
         <th>Exported</th>
         <th>Modality</th>
@@ -106,7 +106,7 @@
             <td>{{ tsk.processtime|naturalduration }} </td>
             <td>{{ tsk.export_user }}</td>
             {% if not tsk.includes_pid or tsk.includes_pid and admin.pidgroup %}
-              <td><a href="/openrem/download/{{ tsk.task_id }}">{{ tsk.filename }}</a></td>
+              <td><a href="{% url 'download' task_id=tsk.task_id %}">{{ tsk.filename }}</a></td>
             {% else %}
               <td>You don't have sufficient privileges to download this export</td>
             {% endif %}

@@ -9,7 +9,7 @@ Depending on your web server setup, your web interface to OpenREM will
 usually be at http://yourserver/openrem or if you are using the test web
 server then it might be at http://localhost:8000/openrem.
 
-The home page for OpenREM should look something like this when it is 
+The home page for OpenREM should look something like this when it is
 populated with studies:
 
 .. figure:: img/Home.png
@@ -31,7 +31,7 @@ If you are not logged in, clicking any of the links will bring up the log in pag
 Filtering for specific studies
 ==============================
 
-This image shows the CT studies view, available to any logged in user, filtered by entering terms in the 
+This image shows the CT studies view, available to any logged in user, filtered by entering terms in the
 boxes on the right hand side to show just the studies where the modality
 model name includes the term 'soma':
 
@@ -100,7 +100,7 @@ chart options:
 Viewing study details
 =====================
 
-By clicking on the study description link (in blue), you can see more 
+By clicking on the study description link (in blue), you can see more
 details for an individual study:
 
 .. figure:: img/CTDetail.png
@@ -116,10 +116,10 @@ to be most useful. If there are others you'd like to see, add an issue to the tr
 
 The final field in the summary at the top is called 'Test patient indicators?'
 When studies are imported the ID and patient name fields are both ignored, but they
-are parsed to check if they have 'phy', 'test' or 'qa' in them to help exclude them 
-from the data analysis. If they do, then this information is added to the 
-field and is displayed both in the web interface as a Test patient indicator 
-and in the Excel export. The name and ID themselves are not reproduced, 
+are parsed to check if they have 'phy', 'test' or 'qa' in them to help exclude them
+from the data analysis. If they do, then this information is added to the
+field and is displayed both in the web interface as a Test patient indicator
+and in the Excel export. The name and ID themselves are not reproduced,
 simply the presence of one of the key words. Therefore a patient named
 'Phyliss' would trigger this, but only 'Phy' would be reproduced in this field.
 Other fields will also help to confirm whether a study is for a real patient

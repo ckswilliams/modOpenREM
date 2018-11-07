@@ -1,10 +1,10 @@
 {% extends "remapp/base.html" %}
 
 {% block navbar %}
-            {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-            {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-            {% if request.user.userprofile.displayMG %}<li class="active"><a href="/openrem/mg">Mammography</a></li>{% endif %}
-            {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
+            {% if request.user.userprofile.displayCT %}<li><a href="{% url 'ct_summary_list_filter' %}">CT</a></li>{% endif %}
+            {% if request.user.userprofile.displayRF %}<li><a href="{% url 'rf_summary_list_filter' %}">Fluoroscopy</a></li>{% endif %}
+            {% if request.user.userprofile.displayMG %}<li class="active"><a href="{% url 'mg_summary_list_filter' %}">Mammography</a></li>{% endif %}
+            {% if request.user.userprofile.displayDX %}<li><a href="{% url 'dx_summary_list_filter' %}">Radiography</a></li>{% endif %}
 {% endblock %}
 
 

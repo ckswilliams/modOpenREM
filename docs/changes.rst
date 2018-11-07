@@ -4,6 +4,8 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+=======
+* `#682`_  Charts: fixed problem where links from histogram bars didn't filter correctly when case-insensitive categories selected
 * `#679`_  Interface: added ability to filter CT studies on acquisition type
 * `#675`_  Exports: improved resilience when export includes malformed studies
 * `#674`_  Documentation: amended zip command in example Orthanc configuration to work with Linux and Windows
@@ -11,6 +13,7 @@ OpenREM version history
 * `#672`_  Documentation: improve and extend linux one-page install
 * `#670`_  Imports: handle illegal multi-value number in Toshiba RDSR with vHP
 * `#668`_  Code quality: library import and blank space cleanup
+* `#667`_  Web server: enable OpenREM to be hosted from a non-root folder/virtual-directory
 * `#666`_  Query-retrieve: handle non-return of ModalitiesInStudy correctly
 * `#658`_  Interface: added display of workload stats in home page modality tables
 * `#479`_  Administration: added facility to list and delete failed import studies

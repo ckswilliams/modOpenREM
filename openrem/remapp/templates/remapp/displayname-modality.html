@@ -31,7 +31,7 @@
       {% if dual %}
         <td>
           {% if admin.admingroup and eachrow.user_defined_modality == 'dual' %}
-            <a href="/admin/reprocessdual/{{ eachrow.pk }}/">Dual: reprocess</a>
+            <a href="{% url 'reprocess_dual' %}{{ eachrow.pk }}/">Dual: reprocess</a>
           {% else %}
             <a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a>
           {% endif %}
@@ -52,7 +52,7 @@
                 function get_latest_studies(json) {
                     $.ajax(
                         {
-                            url: "/admin/equipmentlastdateandcount",
+                            url: "{% url 'display_name_last_date_and_count' %}",
                             data: {
                                 modality: '{{ modality }}',
                                 equip_name_pk: '{{ eachrow.pk }}',
@@ -70,7 +70,7 @@
             )
         </script>
     {% if admin.admingroup %}
-      <td><a href="/admin/review/{{ eachrow.pk }}/{{ modality }}/">Review</a></td>
+      <td><a href="{% url 'review_summary_list' equip_name_pk=eachrow.pk modality=modality %}">Review</a></td>
     {% endif %}
     </tr>
   {% endfor %}
