@@ -4,7 +4,7 @@
 import os
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse_lazy
 from remapp.extractors import rdsr
 from remapp.models import PatientIDSettings
 
@@ -34,7 +34,7 @@ class FilterViewTests(TestCase):
         Initial test to ensure two studies are listed with no filter
         """
         self.client.login(username='temporary', password='temporary')
-        response = self.client.get(reverse('rf_summary_list_filter'), follow=True)
+        response = self.client.get(reverse_lazy('rf_summary_list_filter'), follow=True)
         self.assertEqual(response.status_code, 200)
         three_responses_text = u'There are 2 studies in this list.'
         self.assertContains(response, three_responses_text)
@@ -44,7 +44,7 @@ class FilterViewTests(TestCase):
         Apply study description filter
         """
         self.client.login(username='temporary', password='temporary')
-        response = self.client.get('http://test/openrem/rf/?study_description=liuotushoidon+raajojen', follow=True)
+        response = self.client.get(reverse_lazy('rf_summary_list_filter') + '?study_description=liuotushoidon+raajojen', follow=True)
         self.assertEqual(response.status_code, 200)
         one_responses_text = u'There are 1 studies in this list.'
         self.assertContains(response, one_responses_text)
@@ -56,7 +56,7 @@ class FilterViewTests(TestCase):
         Apply acquisition protocol filter
         """
         self.client.login(username='temporary', password='temporary')
-        response = self.client.get('http://test/openrem/rf/?acquisition_protocol=2fps', follow=True)
+        response = self.client.get(reverse_lazy('rf_summary_list_filter') + '?acquisition_protocol=2fps', follow=True)
         self.assertEqual(response.status_code, 200)
         one_responses_text = u'There are 1 studies in this list.'
         self.assertContains(response, one_responses_text)

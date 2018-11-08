@@ -35,7 +35,7 @@
               server to start.
           </p>
           <p>
-              <a class="btn btn-primary" href="/openrem/admin/dicomstore/add/" role="button">Add new Store</a>
+              <a class="btn btn-primary" href="{% url 'dicomstore_add' %}" role="button">Add new Store</a>
           </p>
 
 
@@ -44,7 +44,7 @@
               $(document).ready(
                       function statusupdate{{ scp.pk }}( json ){
                           $.ajax({
-                              url: "/openrem/admin/dicomstore/statusupdate",
+                              url: "{% url 'status_update_store' %}",
                               data: {
                                   scp_pk: {{ scp.pk }}
                               },
@@ -101,13 +101,12 @@
 
 
                   <hr>
-                  <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/" role="button">Modify</a>
+                  <a class="btn btn-primary" href="{% url 'dicomstore_update' pk=scp.id %}" role="button">Modify</a>
                   <span id="store-delete-{{ scp.pk }}"></span>
                   {% if scp.controlled %}
                       <span id="store-start-{{ scp.pk }}" class="pull-right"></span>
                       <span id="store-stop-{{ scp.pk }}" class="pull-right"></span>
                   {% endif %}
-{#                  <a class="btn btn-danger" href="/openrem/admin/dicomstore/{{ scp.id }}/stop/" role="button">Stop server</a>#}
               </div>
           </div>
           {% endfor %}
@@ -125,8 +124,8 @@
               You can either enter a hostname or an IP address - if you enter both, the hostname will be used.
           </p>
           <p>
-              <a class="btn btn-primary" href="/openrem/admin/dicomqr/add/" role="button">Add new QR Node</a>
-              <a class="btn btn-default pull-right" href="/openrem/admin/queryremote" role="button">Query remote server</a>
+              <a class="btn btn-primary" href="{% url 'dicomqr_add' %}" role="button">Add new QR Node</a>
+              <a class="btn btn-default pull-right" href="{% url 'dicom_qr_page' %}" role="button">Query remote server</a>
           </p>
 
 
@@ -168,8 +167,8 @@
                       </table>
 
                       <hr>
-                      <a class="btn btn-primary" href="/openrem/admin/dicomqr/{{ qr.id }}/" role="button">Modify</a>
-                      <a class="btn btn-primary" href="/openrem/admin/dicomqr/{{ qr.id }}/delete/" role="button">Delete</a>
+                      <a class="btn btn-primary" href="{% url 'dicomqr_update' pk=qr.id %}" role="button">Modify</a>
+                      <a class="btn btn-primary" href="{% url 'dicomqr_delete' pk=qr.id %}" role="button">Delete</a>
 
                   </div>
               </div>
@@ -190,7 +189,7 @@
               </p>
               <div class="panel panel-info">
                   <div class="panel-heading">
-                      <a class="btn btn-primary pull-right btn-sm" href="/openrem/admin/dicomdelsettings/1/" role="button">
+                      <a class="btn btn-primary pull-right btn-sm" href="{% url 'dicom_delete_settings_update' 1 %}" role="button">
                           Modify DICOM object delete settings
                       </a>
                       <h3 class="panel-title">Settings for all Store SCPs</h3>
