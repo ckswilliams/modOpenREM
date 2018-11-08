@@ -250,7 +250,7 @@ LOGGING = {
     }
 }
 
-# Dummy locations of various tools for DICOM RDSR creation from CT images. Don't set value here - copy variable into
+# Dummy locations of various tools for DICOM RDSR creation from CT images. Don't set value here - copy variables into
 # # local_settings.py and configure there.
 DCMTK_PATH = ''
 DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
