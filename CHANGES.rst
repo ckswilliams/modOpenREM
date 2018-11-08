@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#683`_  Installation: added VIRTUAL_DIRECTORY to the settings file to avoid updating local_settings file on upgrade
 * `#682`_  Charts: fixed problem where links from histogram bars didn't filter correctly when case-insensitive categories selected
 * `#675`_  Exports: improved resilience when export includes malformed studies
 * `#674`_  Documentation: amended zip command in example Orthanc configuration to work with Linux and Windows
