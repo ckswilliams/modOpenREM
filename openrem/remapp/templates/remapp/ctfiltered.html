@@ -347,7 +347,7 @@
                 field_multiplier = 1.0;
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersAcq;
-                href_start = '{% url 'ct_summary_list_filter' %}/?acquisitionhist=1&';
+                href_start = '{% url 'ct_summary_list_filter' %}?acquisitionhist=1&';
                 hide_series_btn_stub = 'acq_dlp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
