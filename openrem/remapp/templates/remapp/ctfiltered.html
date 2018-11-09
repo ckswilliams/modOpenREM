@@ -334,9 +334,7 @@
                     chartSetExportSize('histogramAcquisitionPlotDLPdiv');
                     fitChartToDiv('histogramAcquisitionPlotDLPdiv');
                 });
-                {% spaceless %}
                 var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{% if field.name == 'ct_acquisition_type' %}{% for each_value in field.value %}{{ field.name }}={{ each_value }}{% endfor %}{% else %}{{ field.name }}={{ field.value }}{% endif %}{% endif %}{% endfor %}';
-                {% endspaceless %}
                 norm_btn_class = '.acq-hist-norm-btn';
                 instr_class = '.acq-instructions';
                 render_div = 'histogramAcquisitionPlotDLPdiv';
