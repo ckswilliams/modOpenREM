@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#685`_  Charts: fixed link code that would otherwise cause DLP per acqusition protocol chart histogram links to fail
 * `#683`_  Installation: added VIRTUAL_DIRECTORY to the settings file to avoid updating local_settings file on upgrade
 * `#682`_  Charts: fixed problem where links from histogram bars didn't filter correctly when case-insensitive categories selected
 * `#677`_  Interface: added additional filter materials to convert to abbreviations
