@@ -91,6 +91,44 @@ the above links.
         rabbitmq_service.bat install
         rabbitmq_service.bat start
 
+Enable RadbbitMQ queue management interface
+-------------------------------------------
+
+Linux
+
+.. code-block:: console
+
+    sudo rabbitmq-plugins enable rabbitmq_management
+
+Now you need to create a RabbitMQ Administrator. The password is printed to the terminal, so add a space before
+the ``sudo`` so that the command does not get saved to your history file, and then we will ``clear`` the terminal so it
+isn't displayed any longer:
+
+.. code-block:: console
+
+    sudo rabbitmqctl add_user <username> <password>
+    clear
+    sudo rabbitmqctl set_user_tags <username> administrator
+    sudo rabbitmqctl set_permissions -p / <username> "." "." ".*"
+
+Windows
+
+    In a terminal, find the sbin folder of the RabbitMQ installation directory - it will be something like
+    ``C:\Program Files\RabbitMQ Server\rabbitmq_server-3.7.8\sbin``. You might like to find the ``sbin`` folder using
+    Windows Explorer and then type  ``cd`` into a terminal followed by a space then drag the folder icon from the left
+    hand end of the address bar and drop it into the terminal, followed by the ``Enter`` key.
+
+    Now we need to enable the management plugin and add a user. Windows doesn't have command history, but we'll still
+    clear the terminal after we put our password in:
+
+    .. code-block:: console
+
+    rabbitmq-plugins enable rabbitmq_management
+    rabbitmqctl add_user <username> <password>
+    cls
+    rabbitmqctl set_user_tags <username> administrator
+    rabbitmqctl set_permissions -p / <username> "." "." ".*"
+
 ..  Note::
 
     Before continuing, `consider virtualenv`_
