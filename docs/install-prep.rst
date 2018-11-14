@@ -123,11 +123,11 @@ Windows
 
     .. code-block:: console
 
-    rabbitmq-plugins enable rabbitmq_management
-    rabbitmqctl add_user <username> <password>
-    cls
-    rabbitmqctl set_user_tags <username> administrator
-    rabbitmqctl set_permissions -p / <username> "." "." ".*"
+        rabbitmq-plugins enable rabbitmq_management
+        rabbitmqctl add_user <username> <password>
+        cls
+        rabbitmqctl set_user_tags <username> administrator
+        rabbitmqctl set_permissions -p / <username> "." "." ".*"
 
 ..  Note::
 
