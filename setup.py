@@ -28,6 +28,7 @@ requires = [
     'mock',
     'django-debug-toolbar <= 1.9.1',
     'django-js-reverse'
+    'requests'
     ]
 
 setup(

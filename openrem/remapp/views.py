@@ -3141,6 +3141,36 @@ def admin_questions_hide_not_patient(request):
     return redirect(reverse_lazy('not_patient_indicators'))
 
 
+def _create_admin_dict(request):
+    """Function to factor out creating admin dict with admin true/false
+
+    :return: dict containing version numbers and admin group membership
+    """
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+    for group in request.user.groups.all():
+        admin[group.name] = True
+    return admin
+
+
+@login_required
+def rabbitmq_admin(request):
+
+    admin = _create_admin_dict(request)
+
+    template = 'remapp/rabbitmq_admin.html'
+    return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
+
+
+def rabbitmq_default_queue_length(request):
+    """AJAX function to get current number of messages in default queue"""
+    import requests
+
+    if request.is_ajax():
+        default_len = requests.get(
+            'http://localhost:15672/api/queues/%2f/default', auth=('guest', 'guest')).json()['messages']
+        return HttpResponse(json.dumps(default_len), content_type="application/json")
+
+
 @login_required
 def dicom_summary(request):
     """Displays current DICOM configuration
@@ -3157,10 +3187,7 @@ def dicom_summary(request):
     store = DicomStoreSCP.objects.all()
     remoteqr = DicomRemoteQR.objects.all()
 
-    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
-
-    for group in request.user.groups.all():
-        admin[group.name] = True
+    admin = _create_admin_dict(request)
 
     # Render list page with the documents and the form
     return render_to_response(
