@@ -35,6 +35,30 @@
     The default RabbitMQ queue has <span id="default_len">?</span> messages currently.
   </p>
   </div>
+  <div class="col-md-8 col-md-offset-2">
+          <script>
+              $(document).ready(
+                      function queues_update( json ){
+                          $.ajax({
+                              url: "{% url 'rabbitmq_queues' %}",
+                              data: {
+                                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                              },
+                              type: "POST",
+                              success: function( data ){
+                                  $( '#queues' ).html( data );
+                                  setTimeout(function(){
+                                      queues_update();
+                                  }, 2000);
+                              }
+                          })
+                      }
+              )
+          </script>
+  <p id="queues">
+    The list of queues should appear here...
+  </p>
+  </div>
   </div>
 
 

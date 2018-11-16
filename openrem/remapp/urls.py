@@ -130,7 +130,8 @@ urlpatterns = patterns('remapp.views',
                            {'template_name': 'registration/changepassworddone.html'}, name='password_change_done'),
                        url('^admin/rabbitmq/$', 'rabbitmq_admin', name='rabbitmq_admin'),
                        url('^admin/rabbitmq/default_len/$', 'rabbitmq_default_queue_length',
-                           name='rabbitmq_default_queue_length')
+                           name='rabbitmq_default_queue_length'),
+                       url('^admin/rabbitmq/queues/$', 'rabbitmq_queues', name='rabbitmq_queues'),
                        )
 
 urlpatterns += patterns('remapp.exports.exportviews',

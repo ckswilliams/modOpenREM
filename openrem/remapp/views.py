@@ -3171,6 +3171,17 @@ def rabbitmq_default_queue_length(request):
         return HttpResponse(json.dumps(default_len), content_type="application/json")
 
 
+def rabbitmq_queues(request):
+    """AJAX function to get current queue details"""
+    import requests
+
+    if request.is_ajax():
+        queues = requests.get(
+            'http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
+        template = 'remapp/rabbitmq_queues.html'
+        return render_to_response(template, {'queues': queues}, context_instance=RequestContext(request))
+
+
 @login_required
 def dicom_summary(request):
     """Displays current DICOM configuration
