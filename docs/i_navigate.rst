@@ -52,6 +52,36 @@ for a future release.
 
 The last box below the filtering search boxes is the ordering preference.
 
+A note on filtering CT studies by acquisition type
+--------------------------------------------------
+
+The CT study filters includes the ability to restrict the displayed studies
+by acquisition type, such as ``Spiral`` or ``Axial``. By default none of these
+are selected, and studies containing all acquisition types are shown. Ticking
+one of the acquisition type restrictions and clicking submit will filter the
+displayed studies to only include those which have at least one acquisition of
+the selected type. Ticking more than one acquisition type restriction will show
+studies that contain at least one acquisition of any of the selected
+acquisition types.
+
+Acquisition-level charts will only show acquisition protocols that correspond
+to the chosen acquisition type restrictions. Acquisitions of any other type
+present within the study data will not be shown on these charts.
+
+Study- and request-level charts will show studies that have at least one
+acquisition of a type matching the selected restrictions: these studies and
+requests may contain acquisition types other than those chosen in the
+restrictions.
+
+For example, if all studies contain a mixture of ``Axial`` and ``Spiral``
+acquisitions and the user ticks the ``Axial`` acquisition type restriction then
+all studies will still be displayed in the filtered list. However, any
+acquisition-level charts will only show ``Axial`` acquisitions: the ``Spiral``
+acquisitions present in the studies will not be shown in the chart. Any study-
+or request-level chart will show all the data as every one of them includes
+at least one ``Axial`` acquisition.
+
+
 Setting the number of studies displayed per page
 ================================================
 

@@ -102,3 +102,47 @@ class ExportCTxlsx(TestCase):
         task = Exports.objects.all()[0]
         self.assertEqual(u"ERROR", task.status)
 
+    def test_acq_type_filter_spiral(self):
+        """Test to check that filtering CT by acquisition type works
+        as expected.
+
+        """
+        filter_set = {"ct_acquisition_type": ["Spiral Acquisition"]}
+        pid = True
+        name = False
+        patient_id = True
+
+        ctxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
+
+        task = Exports.objects.all()[0]
+        self.assertEqual(4, task.num_records)
+
+    def test_acq_type_filter_sequenced(self):
+        """Test to check that filtering CT by acquisition type works
+        as expected.
+
+        """
+        filter_set = {"ct_acquisition_type": ["Sequenced Acquisition"]}
+        pid = True
+        name = False
+        patient_id = True
+
+        ctxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
+
+        task = Exports.objects.all()[0]
+        self.assertEqual(1, task.num_records)
+
+    def test_acq_type_filter_spiral_and_sequenced(self):
+        """Test to check that filtering CT by acquisition type works
+        as expected.
+
+        """
+        filter_set = {"ct_acquisition_type": ["Spiral Acquisition", "Sequenced Acquisition"]}
+        pid = True
+        name = False
+        patient_id = True
+
+        ctxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
+
+        task = Exports.objects.all()[0]
+        self.assertEqual(4, task.num_records)

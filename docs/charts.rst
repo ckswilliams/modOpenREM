@@ -391,9 +391,8 @@ All chart types
 ===============
 
 For any study- or request-based charts, filtering using `Acquisition protocol`
-forces OpenREM to use a much slower method of querying the database for chart
-data. Where possible avoid filtering using this field, especially when viewing
-a large amount of data.
+forces OpenREM to use a slightly slower method of querying the database for chart
+data.
 
 ==========
 Bar charts
