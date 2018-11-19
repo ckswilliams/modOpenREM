@@ -3182,6 +3182,16 @@ def rabbitmq_queues(request):
         return render_to_response(template, {'queues': queues}, context_instance=RequestContext(request))
 
 
+def rabbitmq_purge(request, queue=None):
+    """Function to purge one of the RabbitMQ queues"""
+    import requests
+
+    if queue:
+        queue_url = 'http://localhost:15672/api/queues/%2f/{0}/contents'.format(queue)
+        requests.delete(queue_url, auth=('guest', 'guest'))
+        return redirect(reverse_lazy('rabbitmq_admin'))
+
+
 @login_required
 def dicom_summary(request):
     """Displays current DICOM configuration

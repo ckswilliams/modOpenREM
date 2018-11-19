@@ -31,9 +31,7 @@
                       }
               )
           </script>
-  <p>
-    The default RabbitMQ queue has <span id="default_len">?</span> messages currently.
-  </p>
+
   </div>
   <div class="col-md-8 col-md-offset-2">
           <script>
@@ -55,6 +53,14 @@
                       }
               )
           </script>
+  <p>
+    This table will normally list several queue names. Only one queue is used by OpenREM, named <b>default</b>. If Celery
+    is running, there will also be a queue named default@hostname.celery.pidbox.
+  </p>
+  <p>
+    The queues with names like "27a97cf0-6f16-3e78-aca2-357900cd2dc4" tend to be success reports from completed Celery
+    tasks.
+  </p>
   <p id="queues">
     The list of queues should appear here...
   </p>

@@ -132,6 +132,8 @@ urlpatterns = patterns('remapp.views',
                        url('^admin/rabbitmq/default_len/$', 'rabbitmq_default_queue_length',
                            name='rabbitmq_default_queue_length'),
                        url('^admin/rabbitmq/queues/$', 'rabbitmq_queues', name='rabbitmq_queues'),
+                       url('^admin/rabbitmq/purge_queue/(?P<queue>[0-9a-zA-Z.@-]+)$', 'rabbitmq_purge',
+                           name='rabbitmq_purge'),
                        )
 
 urlpatterns += patterns('remapp.exports.exportviews',
