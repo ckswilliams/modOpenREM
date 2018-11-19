@@ -3161,16 +3161,6 @@ def rabbitmq_admin(request):
     return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
 
 
-def rabbitmq_default_queue_length(request):
-    """AJAX function to get current number of messages in default queue"""
-    import requests
-
-    if request.is_ajax():
-        default_len = requests.get(
-            'http://localhost:15672/api/queues/%2f/default', auth=('guest', 'guest')).json()['messages']
-        return HttpResponse(json.dumps(default_len), content_type="application/json")
-
-
 def rabbitmq_queues(request):
     """AJAX function to get current queue details"""
     import requests

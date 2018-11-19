@@ -13,29 +13,6 @@
   <div class="col-md-8 col-md-offset-2">
           <script>
               $(document).ready(
-                      function default_len_update( json ){
-                          $.ajax({
-                              url: "{% url 'rabbitmq_default_queue_length' %}",
-                              data: {
-                                  csrfmiddlewaretoken: '{{ csrf_token }}'
-                              },
-                              type: "POST",
-                              dataType: "json",
-                              success: function( json ){
-                                  $( '#default_len' ).html( json );
-                                  setTimeout(function(){
-                                      default_len_update();
-                                  }, 2000);
-                              }
-                          })
-                      }
-              )
-          </script>
-
-  </div>
-  <div class="col-md-8 col-md-offset-2">
-          <script>
-              $(document).ready(
                       function queues_update( json ){
                           $.ajax({
                               url: "{% url 'rabbitmq_queues' %}",
@@ -61,6 +38,10 @@
     The queues with names like "27a97cf0-6f16-3e78-aca2-357900cd2dc4" tend to be success reports from completed Celery
     tasks.
   </p>
+  </div></div>
+    <div class="row">
+  <div class="col-md-8 col-md-offset-2">
+
   <p id="queues">
     The list of queues should appear here...
   </p>
