@@ -9,7 +9,6 @@ Troubleshooting
     troubleencoding
     trouble_dictionary
     troubledbtlaterality
-    rabbitmq_management
 
 If you have a modality where every study has one event (usually CT), review
 
@@ -26,6 +25,10 @@ For DICOM networking:
 
 * :ref:`qrtroubleshooting` for query retrieve
 * :ref:`storetroubleshooting` for DICOM store
+
+For RabbitMQ/task management:
+
+* :ref:`rabbitmq_management`
 
 Log files
 =========
