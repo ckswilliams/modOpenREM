@@ -91,7 +91,7 @@ the above links.
         rabbitmq_service.bat install
         rabbitmq_service.bat start
 
-Enable RadbbitMQ queue management interface
+Enable RabbitMQ queue management interface
 -------------------------------------------
 
 Linux
