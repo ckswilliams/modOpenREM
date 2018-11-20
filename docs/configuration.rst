@@ -1,6 +1,6 @@
-###############################
-Configuration and adminstration
-###############################
+################################
+Configuration and administration
+################################
 
 See also: ``local_settings.py`` :ref:`localsettingsconfig`
 
@@ -14,3 +14,4 @@ See also: ``local_settings.py`` :ref:`localsettingsconfig`
     patientid
     i_deletestudies
     i_patientsize
+    rabbitmq_management
