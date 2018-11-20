@@ -28,7 +28,7 @@ For DICOM networking:
 
 For RabbitMQ/task management:
 
-* :ref:`rabbitmq_management`
+* :doc:`rabbitmq_management`
 
 Log files
 =========

@@ -30,6 +30,9 @@ The tasks are persistent, so RabbitMQ will attempt to get them processed even if
 machine. Sometimes this is not desirable, and it can be necessary to delete the tasks from the queue. To do this, click
 on the Purge button for that queue (see figure 2).
 
+In the example below, four tasks are currently being processed by Celery, two are waiting to be processed, and two have
+finished.
+
 .. figure:: img/RabbitMQQueueList.png
    :figwidth: 100%
    :align: center
