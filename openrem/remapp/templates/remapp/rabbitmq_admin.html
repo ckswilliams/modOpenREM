@@ -31,6 +31,13 @@
               )
           </script>
   <p>
+    RabbitMQ is used to queue up tasks until Celery is
+    ready to process them. If Celery is not running, RabbitMQ will hold onto the tasks until Celery is ready to
+    process them, and if Celery fails to complete them, RabbitMQ will resend the job to Celery can try again.
+    Sometimes it is necessary to remove (purge) tasks from the RabbitMQ queue, and this interface can be used to do
+    that too.
+  </p>
+    <p>
     This table will normally list several queue names. Only one queue is used by OpenREM, named <b>default</b>. If Celery
     is running, there will also be a queue named default@hostname.celery.pidbox.
   </p>

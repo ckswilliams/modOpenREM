@@ -3166,8 +3166,13 @@ def rabbitmq_queues(request):
     import requests
 
     if request.is_ajax():
-        queues = requests.get(
-            'http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
+        try:
+            queues = requests.get(
+                'http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
+        except requests.ConnectionError:
+            admin = _create_admin_dict(request)
+            template = 'remapp/rabbitmq_connection_error.html'
+            return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
         template = 'remapp/rabbitmq_queues.html'
         return render_to_response(template, {'queues': queues}, context_instance=RequestContext(request))
 

@@ -9,16 +9,17 @@
     <th>Auto-delete</th>
   </tr>
   {% for queue in queues %}
-    <tr>
-      {% if queue.name == "default" %}
+    {% if queue.name == "default" %}
+    <tr class="success">
         <td><b>{{ queue.name }}</b></td>
         <td><b>{{ queue.messages_ready }}</b></td>
         <td><b>{{ queue.messages_unacknowledged }}</b></td>
-      {% else %}
+    {% else %}
+    <tr>
         <td>{{ queue.name }}</td>
         <td>{{ queue.messages_ready }}</td>
         <td>{{ queue.messages_unacknowledged }}</td>
-      {% endif %}
+    {% endif %}
       <td>
         {% if queue.messages > 0 %}
           <a class="btn btn-danger" href="/admin/rabbitmq/purge_queue/{{ queue.name }}" role="button">Purge</a>
