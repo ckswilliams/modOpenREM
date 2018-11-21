@@ -43,6 +43,9 @@ django.setup()
 
 
 def send_rf_high_dose_alert_email(study_pk=None):
+    """
+    Function to send users a fluoroscopy high dose alert e-mail
+    """
     from remapp.models import GeneralStudyModuleAttr, HighDoseMetricAlertSettings
     from datetime import timedelta
     from django.contrib.auth.models import User

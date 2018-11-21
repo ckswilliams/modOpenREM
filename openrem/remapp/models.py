@@ -94,6 +94,9 @@ class SkinDoseMapCalcSettings(SingletonModel):
 
 
 class HighDoseMetricAlertSettings(SingletonModel):
+    """
+    Table to store high dose fluoroscopy alert settings
+    """
     alert_total_dap_rf = models.IntegerField(blank=True, null=True, default=20000, verbose_name="Alert level for total DAP from fluoroscopy examination (cGy.cm<sup>2</sup>)")
     alert_total_rp_dose_rf = models.FloatField(blank=True, null=True, default=2.0, verbose_name="Alert level for total dose at reference point from fluoroscopy examination (Gy)")
     accum_dose_delta_weeks = models.IntegerField(blank=True, null=True, default=12, verbose_name="Number of previous weeks over which to sum DAP and RP dose for each patient")
@@ -107,12 +110,18 @@ class HighDoseMetricAlertSettings(SingletonModel):
 
 
 class HighDoseMetricAlertRecipients(models.Model):
+    """
+    Table to store whether users should receive high dose fluoroscopy alerts
+    """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     receive_high_dose_metric_alerts = models.BooleanField(default=False, verbose_name="Receive high dose e-mail alerts?")
 
 
 @receiver(post_save, sender=User)
 def create_or_save_high_dose_metric_alert_recipient_setting(sender, instance, **kwargs):
+    """
+    Function to create or save fluoroscopy high dose alert recipient settings
+    """
     if not hasattr(instance, 'highdosemetricalertrecipients'):
         new_objects = HighDoseMetricAlertRecipients.objects.create(user=instance)
         new_objects.save()

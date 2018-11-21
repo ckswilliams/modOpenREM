@@ -3449,6 +3449,9 @@ class RFHighDoseAlertSettings(UpdateView):  # pylint: disable=unused-variable
 @login_required
 @csrf_exempt
 def rf_alert_notifications_view(request):
+    """View for display and modification of fluoroscopy high dose alert recipients
+
+    """
     from django.contrib.auth.models import User
     from remapp.models import HighDoseMetricAlertRecipients
 
