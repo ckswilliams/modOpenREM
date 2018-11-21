@@ -139,6 +139,8 @@ Windows
 
     Windows:
 
+    .. code-block:: console
+
         rabbitmqctl add_user <username> <password>
         cls
         rabbitmqctl set_user_tags <username> administrator
