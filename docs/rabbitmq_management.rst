@@ -4,6 +4,12 @@ RabbitMQ management
 
 .. contents::
 
+Enabling RabbitMQ management
+============================
+
+Installation instructions were added in 0.8.2. Users upgrading from previous versions should review
+:ref:`enableRabbitMQ`.
+
 Viewing and purging RabbitMQ queues
 ===================================
 

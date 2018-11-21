@@ -91,6 +91,8 @@ the above links.
         rabbitmq_service.bat install
         rabbitmq_service.bat start
 
+.. _enableRabbitMQ:
+
 Enable RabbitMQ queue management interface
 -------------------------------------------
 
@@ -102,9 +104,30 @@ Linux
 
         sudo rabbitmq-plugins enable rabbitmq_management
 
-    Now you need to create a RabbitMQ Administrator. The password is printed to the terminal, so add a space before
-    the ``sudo`` so that the command does not get saved to your history file, and then we will ``clear`` the terminal so it
-    isn't displayed any longer:
+Windows
+
+    In a terminal, find the sbin folder of the RabbitMQ installation directory - it will be something like
+    ``C:\Program Files\RabbitMQ Server\rabbitmq_server-3.7.8\sbin``. You might like to find the ``sbin`` folder using
+    Windows Explorer and then type  ``cd`` into a terminal followed by a space then drag the folder icon from the left
+    hand end of the address bar and drop it into the terminal, followed by the ``Enter`` key.
+
+    .. code-block:: console
+
+        rabbitmq-plugins enable rabbitmq_management
+
+.. admonition:: Optional - RabbitMQ Administrator
+
+    An administrator user is not required to view RabbitMQ queues and to purge queues from the OpenREM web interface.
+
+    However, if you wish to interact directly with the RabbitMQ management interface, you should create a user for this
+    purpose.
+
+
+    The password is printed to the terminal, so in Linux add a space before
+    the ``sudo`` so that the command does not get saved to your history file, and then ``clear`` the terminal so it
+    isn't displayed any longer. In Windows, use ``cls``:
+
+    Linux:
 
     .. code-block:: console
 
@@ -113,19 +136,9 @@ Linux
         sudo rabbitmqctl set_user_tags <username> administrator
         sudo rabbitmqctl set_permissions -p / <username> "." "." ".*"
 
-Windows
 
-    In a terminal, find the sbin folder of the RabbitMQ installation directory - it will be something like
-    ``C:\Program Files\RabbitMQ Server\rabbitmq_server-3.7.8\sbin``. You might like to find the ``sbin`` folder using
-    Windows Explorer and then type  ``cd`` into a terminal followed by a space then drag the folder icon from the left
-    hand end of the address bar and drop it into the terminal, followed by the ``Enter`` key.
+    Windows:
 
-    Now we need to enable the management plugin and add a user. Windows doesn't have command history, but we'll still
-    clear the terminal after we put our password in:
-
-    .. code-block:: console
-
-        rabbitmq-plugins enable rabbitmq_management
         rabbitmqctl add_user <username> <password>
         cls
         rabbitmqctl set_user_tags <username> administrator

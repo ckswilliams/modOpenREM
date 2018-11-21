@@ -2,6 +2,15 @@
 
 {% block confnav %}<li class="dropdown active">{% endblock %}
 
+{% block navhelp %}
+        <li>
+            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/rabbitmq_management.html"
+               target="_blank" data-toggle="tooltip" title="RabbitMQ management documentation - opens in a new tab">
+                RabbitMQ management documentation
+            </a>
+        </li>
+{% endblock %}
+
 {% block mainblock %}
 
 {% if admin.admingroup %}
