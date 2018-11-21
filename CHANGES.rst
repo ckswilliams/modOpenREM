@@ -17,7 +17,9 @@ OpenREM version history
 * `#668`_  Code quality: library import and blank space cleanup
 * `#667`_  Web server: enable OpenREM to be hosted from a non-root folder/virtual-directory
 * `#666`_  Query-retrieve: handle non-return of ModalitiesInStudy correctly
+* `#662`_  Administration: added facility to list and purge RabbitMQ queues
 * `#658`_  Interface: added display of workload stats in home page modality tables
+* `#637`_  Administration: added facility to list and purge RabbitMQ queues
 * `#479`_  Administration: added facility to list and delete failed import studies
 
 0.8.1 (2018-09-16)
