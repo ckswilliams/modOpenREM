@@ -27,17 +27,27 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+import logging
+
 from celery import shared_task
+from django.core.exceptions import ObjectDoesNotExist
+
+logger = logging.getLogger(__name__)
 
 
-def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *args, **kwargs): # C.7.2.2
+def _patientstudymoduleattributes(exam, height, weight, verbose, *args, **kwargs):  # C.7.2.2
     from decimal import Decimal
 
     imp_log = None
     if 'imp_log' in kwargs:
         imp_log = kwargs['imp_log']
 
-    patientatt = exam.patientstudymoduleattr_set.get()
+    try:
+        patientatt = exam.patientstudymoduleattr_set.get()
+    except ObjectDoesNotExist:
+        logger.error(u"Attempt to import pt size info for study UID {0}/acc. number {1} failed due to a "
+                     u"failed import".format(exam.study_instance_uid, exam.accession_number))
+        return
     if height:
         if not patientatt.patient_size:
             patientatt.patient_size = (Decimal(height) / Decimal(100.))
@@ -51,10 +61,13 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("\r\n    Height of {0} cm not inserted as {1:.2f} cm already in the database".format(height, (patientatt.patient_size*Decimal(100.))))
+                imp_log.write(
+                    "\r\n    Height of {0} cm not inserted as {1:.2f} cm already in the database".format(height, (
+                                patientatt.patient_size * Decimal(100.))))
                 imp_log.file.close()
             else:
-                print "    Height of {0} cm not inserted as {1:.2f} cm already in the database".format(height, (patientatt.patient_size*Decimal(100.)))
+                print "    Height of {0} cm not inserted as {1:.2f} cm already in the database".format(height, (
+                            patientatt.patient_size * Decimal(100.)))
 
     if weight:
         if not patientatt.patient_weight:
@@ -69,15 +82,17 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("\r\n    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight, patientatt.patient_weight))
+                imp_log.write(
+                    "\r\n    Weight of {0} kg not inserted as {1:.1f} kg already in the "
+                    "database".format(weight, patientatt.patient_weight))
                 imp_log.file.close()
             else:
-                print "    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight, patientatt.patient_weight)
+                print "    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight,
+                                                                                                       patientatt.patient_weight)
     patientatt.save()
 
 
 def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwargs):
-    from django.db import models
     from remapp.models import GeneralStudyModuleAttr
     from django import db
 
@@ -87,9 +102,9 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
 
     if (height or weight) and accno:
         if not siuid:
-            e = GeneralStudyModuleAttr.objects.filter(accession_number__exact = accno)
+            e = GeneralStudyModuleAttr.objects.filter(accession_number__exact=accno)
         else:
-            e = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = accno)
+            e = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=accno)
         if e:
             for exam in e:
                 if verbose:
@@ -99,13 +114,13 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
                         imp_log.file.close()
                     else:
                         print accno + ":"
-                _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, imp_log = imp_log)
+                _patientstudymoduleattributes(exam, height, weight, verbose, imp_log=imp_log)
 
     db.reset_queries()
 
 
 @shared_task
-def websizeimport(csv_pk = None, *args, **kwargs):
+def websizeimport(csv_pk=None, *args, **kwargs):
     """Task to import patient size data from the OpenREM web interface.
 
     :param csv_pk: Database index key for the import record, containing
@@ -113,13 +128,14 @@ def websizeimport(csv_pk = None, *args, **kwargs):
 
     """
 
-
-    import os, sys, csv, datetime
+    import sys
+    import csv
+    import datetime
     from django.core.files.base import ContentFile
     from remapp.models import SizeUpload
 
     if csv_pk:
-        csvrecord = SizeUpload.objects.all().filter(id__exact = csv_pk)[0]
+        csvrecord = SizeUpload.objects.all().filter(id__exact=csv_pk)[0]
         csvrecord.task_id = websizeimport.request.id
         datestamp = datetime.datetime.now()
         csvrecord.import_date = datestamp
@@ -136,21 +152,23 @@ def websizeimport(csv_pk = None, *args, **kwargs):
             headerrow = ContentFile("Patient size import from {0}\r\n".format(csvrecord.sizefile.name))
 
             try:
-                csvrecord.logfile.save(logfile,headerrow)
+                csvrecord.logfile.save(logfile, headerrow)
             except OSError as e:
-                csvrecord.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+                csvrecord.progress = "Error saving export file - please contact an administrator. " \
+                                     "Error({0}): {1}".format(e.errno, e.strerror)
                 csvrecord.status = 'ERROR'
                 csvrecord.save()
                 return
             except:
-                csvrecord.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+                csvrecord.progress = "Unexpected error saving export file - please contact an " \
+                                     "administrator: {0}".format(sys.exc_info()[0])
                 csvrecord.status = 'ERROR'
                 csvrecord.save()
                 return
 
             l = csvrecord.logfile
             l.file.close()
-                # Method used for opening and writing to file as per https://code.djangoproject.com/ticket/13809
+            # Method used for opening and writing to file as per https://code.djangoproject.com/ticket/13809
 
             csvrecord.sizefile.open(mode='rb')
             f = csvrecord.sizefile.readlines()
@@ -168,7 +186,7 @@ def websizeimport(csv_pk = None, *args, **kwargs):
                         si_uid,
                         verbose,
                         csvrecord,
-                        imp_log = l)
+                        imp_log=l)
             finally:
                 csvrecord.sizefile.delete()
                 csvrecord.processtime = (datetime.datetime.now() - datestamp).total_seconds()
@@ -196,21 +214,24 @@ def csv2db(*args, **kwargs):
 
     """
 
-    import os, sys, csv
+    import os, csv
     import argparse
     import django
     import openrem_settings
 
     # Required and optional arguments
-    parser = argparse.ArgumentParser(description="Import height and weight data into an OpenREM database. If either is missing just add a blank column with appropriate title.")
-    parser.add_argument("-u", "--si-uid", action="store_true", help="Use Study Instance UID instead of Accession Number")
+    parser = argparse.ArgumentParser(
+        description="Import height and weight data into an OpenREM database. If either is missing just add a blank "
+                    "column with appropriate title.")
+    parser.add_argument("-u", "--si-uid", action="store_true",
+                        help="Use Study Instance UID instead of Accession Number")
     parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
     parser.add_argument("csvfile", help="csv file containing the height and/or weight information and study identifier")
     parser.add_argument("id", help="Column title for the accession number or study instance UID")
     parser.add_argument("height", help="Column title for the patient height, values in cm")
     parser.add_argument("weight", help="Column title for the patient weight, values in kg")
-    args=parser.parse_args()
-    
+    args = parser.parse_args()
+
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
     openrem_settings.add_project_to_path()
     django.setup()
@@ -224,6 +245,8 @@ def csv2db(*args, **kwargs):
     finally:
         f.close()
 
+
 if __name__ == "__main__":
     import sys
+
     sys.exit(csv2db())
