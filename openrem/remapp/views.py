@@ -3154,6 +3154,7 @@ def _create_admin_dict(request):
 
 @login_required
 def rabbitmq_admin(request):
+    """View to show RabbitMQ queues. Content generated using AJAX"""
 
     admin = _create_admin_dict(request)
 
