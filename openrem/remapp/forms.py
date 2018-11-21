@@ -7,7 +7,7 @@ from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes,
 import logging
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings, \
-    NotPatientIndicatorsName, NotPatientIndicatorsID, HighDoseMetricAlertSettings, HighDoseMetricAlertRecipients, HomePageAdminSettings
+    NotPatientIndicatorsName, NotPatientIndicatorsID, HighDoseMetricAlertSettings, HomePageAdminSettings
 
 logger = logging.getLogger()
 

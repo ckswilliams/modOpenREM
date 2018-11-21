@@ -280,9 +280,6 @@ class DicomQRRspImage(models.Model):
     sop_class_uid = models.TextField(blank=True, null=True)
 
 
-from django.db.models.signals import post_save
-
-
 class UserProfile(models.Model):
     """
     Table to store user profile settings

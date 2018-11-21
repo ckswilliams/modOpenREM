@@ -704,7 +704,6 @@ def rf_detail_view(request, pk=None):
     import operator
     from remapp.models import HighDoseMetricAlertSettings, SkinDoseMapCalcSettings
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.models import SkinDoseMapCalcSettings
     from datetime import timedelta
 
     try:
