@@ -22,8 +22,7 @@
     {% endif %}
       <td>
         {% if queue.messages > 0 %}
-          <a class="btn btn-danger" href="/admin/rabbitmq/purge_queue/{{ queue.name }}" role="button">Purge</a>
-{#          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge</a>#}
+          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge</a>
         {% else %}
           <a class="btn btn-default" disabled="disabled">Purge</a>
         {% endif %}
