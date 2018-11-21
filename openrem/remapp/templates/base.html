@@ -103,8 +103,12 @@
                       {% if not admin.admingroup %}
                         <li><a href="{% url 'display_names_view' %}">View display names & modality</a></li>
                         <li><a href="{% url 'not_patient_indicators' %}">View not-patient indicators</a></li>
+                      {% endif %}
+
+                      {% if home_config.display_workload_stats %}
                         <li><a href="{% url 'homepage_options_view' %}">Home page options</a></li>
                       {% endif %}
+
                       {% if admin.admingroup %}
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">System level settings</li>

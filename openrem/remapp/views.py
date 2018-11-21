@@ -1601,17 +1601,24 @@ class HomePageAdminSettingsUpdate(UpdateView):  # pylint: disable=unused-variabl
     model = HomePageAdminSettings
     form_class = HomePageAdminSettingsForm
 
+    # Determine whether to calculate workload settings
+    display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
+    home_config = {'display_workload_stats': display_workload_stats}
+
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
         admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
+        context['home_config'] = self.home_config
         return context
 
     def form_valid(self, form):
         if form.has_changed():
             messages.success(self.request, "Home page settings have been updated")
+            if 'enable_workload_stats' in form.changed_data:
+                self.home_config['display_workload_stats'] = form.cleaned_data['enable_workload_stats']
         else:
             messages.info(self.request, "No changes made")
         return super(HomePageAdminSettingsUpdate, self).form_valid(form)
@@ -3075,8 +3082,11 @@ def homepage_options_view(request):
 
     homepage_options_form = HomepageOptionsForm(homepage_form_data)
 
+    home_config = {'display_workload_stats': display_workload_stats}
+
     return_structure = {'admin': admin,
                         'HomepageOptionsForm': homepage_options_form,
+                        'home_config': home_config
                         }
 
     return render_to_response(
