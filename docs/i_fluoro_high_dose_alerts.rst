@@ -11,6 +11,7 @@ Alert level configuration
    :figwidth: 30%
    :align: right
    :alt: Config options
+   :target: _images/ConfigMenu.png
 
    Figure 1: The ``Config`` menu (user and admin)
 
@@ -26,6 +27,7 @@ reference point (figure 2).
    :figwidth: 100%
    :align: center
    :alt: Fluoroscopy high dose alert settings
+   :target: _images/fluoroHighDoseAlertSettings.png
 
    Figure 2: Fluoroscopy high dose alert settings
 
@@ -36,6 +38,7 @@ highlighted in the filtered and detailed fluoroscopy views.
    :figwidth: 100%
    :align: center
    :alt: Filtered view showing the highlighting of some high dose studies
+   :target: _images/fluoroHighDoseAlertFilteredView.png
 
    Figure 3: Filtered view showing the highlighting of some high dose studies
 
@@ -44,6 +47,7 @@ highlighted in the filtered and detailed fluoroscopy views.
    :figwidth: 100%
    :align: center
    :alt: Detailed view showing high-dose highlighting
+   :target: _images/fluoroHighDoseAlertDetailedView.png
 
    Figure 4: Detailed view showing high-dose highlighting
 
@@ -60,28 +64,29 @@ dose at reference point values. The time period that is used is configured by
 an OpenREM administrator, and defaults to 12 weeks (figure 2).
 
 For this feature to work the storage of patient ID or encrypted patient ID must
-be enabled (see the ``Patient Identifiable data`` :ref:`i_not_patient_indicator`
-documentation).
+be enabled (see the :doc:`i_not_patient_indicator` documentation).
 
 The configuration settings for this feature are (figure 2):
 
 * The number of previous weeks over which to sum DAP and dose at RP for studies
-with matching patient ID is defined in the options
+  with matching patient ID is defined in the options
 
-* The display of summed DAP and dose at RP values on the fluoroscopy filtered
-view
+* The display of summed DAP and dose at RP values in the fluoroscopy filtered
+  and detailed views, and in e-mail notifications
 
-* The automatic calculation of summed DAP and dose at RP for incoming studies
+* The automatic calculation of summed DAP and dose at RP for new studies
+  imported into OpenREM
 
 An example of a study where there is another study with matching patient ID is
-shown below in figure 5. In this example neither of the two studies were
-individually above an alert level, but when summed together the total dose at
-RP does exceed the corresponding alert.
+shown below in figure 5. In this example neither of the two individual studies
+had doses that exceeded an alert level, but when summed together the total dose
+at RP does exceed the corresponding alert.
 
 .. figure:: img/fluoroHighDoseAlertDetailedViewTwoStudies.png
    :figwidth: 100%
    :align: center
    :alt: Detailed view showing associated studies over a time period
+   :target: _images/fluoroHighDoseAlertDetailedViewTwoStudies.png
 
    Figure 5: Detailed view showing associated studies over a time period
 
@@ -91,13 +96,15 @@ Recalculation of summed data
 
 After upgrading from a version of OpenREM prior to 0.8.2, or after changing
 the alert levels or number of weeks to look for matching data, the summed
-dose values need to be recalculated. The user is prompted to do this via
-the display of an orange button, as shown in figure 6 below.
+dose values must be recalculated. The user is prompted to do this via the
+display of an orange button, as shown in figure 6 below. If settings have
+changed an information message is also displayed at the top of the screen.
 
 .. figure:: img/fluoroHighDoseAlertSettingsRecalculate.png
    :figwidth: 100%
    :align: center
    :alt: Prompt to recalculate the summed dose values
+   :target: _images/fluoroHighDoseAlertSettingsRecalculate.png
 
    Figure 6: Prompt to recalculate the summed dose values
 
@@ -110,6 +117,7 @@ the calculations are complete.
    :figwidth: 100%
    :align: center
    :alt: Recalculating the summed dose values
+   :target: _images/fluoroHighDoseAlertSettingsRecalculating.png
 
    Figure 7: Prompt to recalculate the summed dose values
 
@@ -121,6 +129,7 @@ success message at the top of the screen (figure 8, below).
    :figwidth: 100%
    :align: center
    :alt: Recalculating the summed dose values
+   :target: _images/fluoroHighDoseAlertSettingsRecalculated.png
 
    Figure 8: Message on successful recalculation
 
@@ -151,5 +160,6 @@ settings.
    :figwidth: 100%
    :align: center
    :alt: E-mail user-notification of high-dose alerts
+   :target: _images/fluoroHighDoseAlertNotifications.png
 
    Figure 9: E-mail user-notification of high-dose alerts
