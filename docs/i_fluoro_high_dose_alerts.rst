@@ -64,7 +64,7 @@ dose at reference point values. The time period that is used is configured by
 an OpenREM administrator, and defaults to 12 weeks (figure 2).
 
 For this feature to work the storage of patient ID or encrypted patient ID must
-be enabled (see the :doc:`i_not_patient_indicator` documentation).
+be enabled (see the :doc:`patientid` documentation).
 
 The configuration settings for this feature are (figure 2):
 
