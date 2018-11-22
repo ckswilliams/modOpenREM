@@ -215,7 +215,7 @@ def csv2db(*args, **kwargs):
     :type weight: str
 
     Example::
-        
+
         openrem_ptsizecsv.py -s MyRISExport.csv StudyInstanceUID height weight
 
     """
