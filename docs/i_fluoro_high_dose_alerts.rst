@@ -48,27 +48,32 @@ highlighted in the filtered and detailed fluoroscopy views.
    Figure 4: Detailed view showing high-dose highlighting
 
 
-Alerts for accumulated dose over a period of time
-=================================================
+Alerts for cumulative dose over a period of time
+================================================
 
 As well as alerting to individual studies that exceed alert levels the system
-can be configured to calculate accumulated dose over a defined number of weeks
-for studies with matching patient ID.
+can be configured to calculate cumulative dose over a defined number of weeks
+for studies with matching patient IDs. When this is activated, for each study
+OpenREM looks for earlier fluoroscopy studies that have taken place that share
+the same patient ID, or encrypted patient ID, and sums the study DAP and total
+dose at reference point values. The time period that is used is configured by
+an OpenREM administrator, and defaults to 12 weeks (figure 2).
 
-For this to work the storage of patient ID or encrypted patient ID must be
-enabled (see the ``Patient Identifiable data`` :ref:`i_not_patient_indicator`
+For this feature to work the storage of patient ID or encrypted patient ID must
+be enabled (see the ``Patient Identifiable data`` :ref:`i_not_patient_indicator`
 documentation).
 
-The number of previous weeks over which to sum DAP and dose at RP for studies
-with matching patient ID is defined in the options (figure 2).
+The configuration settings for this feature are (figure 2):
 
-The display of summed DAP and dose at RP values on the fluoroscopy filtered
-view can be enabled or disabled (figure 2).
+* The number of previous weeks over which to sum DAP and dose at RP for studies
+with matching patient ID is defined in the options
 
-The calculation of summed DAP and dose at RP for incoming studies can also be
-enabled or disabled (figure 2).
+* The display of summed DAP and dose at RP values on the fluoroscopy filtered
+view
 
-An example of a study where there is another study on a matching patient ID is
+* The automatic calculation of summed DAP and dose at RP for incoming studies
+
+An example of a study where there is another study with matching patient ID is
 shown below in figure 5. In this example neither of the two studies were
 individually above an alert level, but when summed together the total dose at
 RP does exceed the corresponding alert.
@@ -98,7 +103,8 @@ the display of an orange button, as shown in figure 6 below.
 
 Recalculation of the summed data is likely to take several minutes. During this
 time the form buttons are faded out and disabled, and a spinning icon is shown
-in the middle of the page (figure 7).
+in the middle of the page (figure 7). The user must remain on this page until
+the calculations are complete.
 
 .. figure:: img/fluoroHighDoseAlertSettingsRecalculating.png
    :figwidth: 100%
@@ -122,20 +128,24 @@ success message at the top of the screen (figure 8, below).
 E-mail notifications of high dose alerts
 ========================================
 
-E-mail notifications of high dose studies can be enabled or disabled on the
-high dose alerts configuration page as shown in figure 2.
+OpenREM users can be automatically sent e-mail notifications of studies that
+have exceeded a high dose alert level. This feature can be enabled or disabled
+on the high dose alerts configuration page (figure 2).
 
-Any OpenREM user can be configured to receive these messages; these users can
-be chosen by navigating to the `Fluoro alert notifcation` option on the
-`Config` menu (figure 2). This takes you to a page where notification
-recipients can be configured (figure 9).
+Any OpenREM user can be configured to receive these messages; these users are
+chosen by navigating to the `Fluoro alert notifcation` option on the `Config`
+menu (figure 2). This takes the user to a page where notification recipients
+can be configured (figure 9).
 
 It should be noted that any OpenREM user selected to recieve high dose alerts
-must have an e-mail address entered in their user configuration. Successful
-e-mail sending is also dependent on the correct configuration of the e-mail
-section of the OpenREM settings.
+must have an e-mail address entered in their user profile. Successful e-mail
+sending is also dependent on the correct configuration of the e-mail section of
+the OpenREM settings and configuration of the e-mail server defined in those
+settings.
 
-Include example e-mail?
+** Include example e-mail? **
+
+** Write e-mail configuration documentation **
 
 .. figure:: img/fluoroHighDoseAlertNotifications.png
    :figwidth: 100%
