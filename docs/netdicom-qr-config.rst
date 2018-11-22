@@ -5,7 +5,7 @@ Configuration required for query-retrieve
 You need a DICOM store service set up - see :doc:`import` for details.
 
 If you are using a third party DICOM Store server, then you will need to add the details as per :doc:`netdicom-nodes`
-but do not use the 'advaanced' section.
+but do not use the 'advanced' section.
 
 To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM networking``, then click
 ``Add new QR Node`` and fill in the details:
