@@ -47,6 +47,12 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, *args, **kwargs
     except ObjectDoesNotExist:
         logger.error(u"Attempt to import pt size info for study UID {0}/acc. number {1} failed due to a "
                      u"failed import".format(exam.study_instance_uid, exam.accession_number))
+        if imp_log:
+            imp_log.file.open("ab")
+            imp_log.write("\r\n    ********* Failed to insert size - database entry incomplete *********")
+            imp_log.file.close()
+        else:
+            print(u"    ********* Failed to insert size - database entry incomplete *********")
         return
     if height:
         if not patientatt.patient_size:
@@ -57,7 +63,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, *args, **kwargs
                     imp_log.write("\r\n    Inserted height of {0} cm".format(height))
                     imp_log.file.close()
                 else:
-                    print "    Inserted height of " + height
+                    print(u"    Inserted height of {0}".format(height))
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
@@ -66,8 +72,8 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, *args, **kwargs
                                 patientatt.patient_size * Decimal(100.))))
                 imp_log.file.close()
             else:
-                print "    Height of {0} cm not inserted as {1:.2f} cm already in the database".format(height, (
-                            patientatt.patient_size * Decimal(100.)))
+                print(u"    Height of {0} cm not inserted as {1:.2f} cm already in the database".format(height, (
+                            patientatt.patient_size * Decimal(100.))))
 
     if weight:
         if not patientatt.patient_weight:
@@ -78,7 +84,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, *args, **kwargs
                     imp_log.write("\r\n    Inserted weight of {0} kg".format(weight))
                     imp_log.file.close()
                 else:
-                    print "    Inserted weight of " + weight
+                    print(u"    Inserted weight of {0}".format(weight))
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
@@ -87,8 +93,8 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, *args, **kwargs
                     "database".format(weight, patientatt.patient_weight))
                 imp_log.file.close()
             else:
-                print "    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight,
-                                                                                                       patientatt.patient_weight)
+                print(u"    Weight of {0} kg not inserted as {1:.1f} kg already "
+                      u"in the database".format(weight, patientatt.patient_weight))
     patientatt.save()
 
 
@@ -113,7 +119,7 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
                         imp_log.write("\r\n{0}:".format(accno))
                         imp_log.file.close()
                     else:
-                        print accno + ":"
+                        print(u"{0}:".format(accno))
                 _patientstudymoduleattributes(exam, height, weight, verbose, imp_log=imp_log)
 
     db.reset_queries()
@@ -196,7 +202,7 @@ def websizeimport(csv_pk=None, *args, **kwargs):
 
 def csv2db(*args, **kwargs):
     """ Import patient height and weight data from csv RIS exports. Can be called from ``openrem_ptsizecsv.py`` script
-        
+
     :param --si-uid: Use Study Instance UID instead of Accession Number. Short form -s.
     :type --si-uid: bool
     :param csvfile: relative or absolute path to csv file
