@@ -276,6 +276,49 @@ the link above, and you will need to provide the path to where you have saved it
     If you do not intend to use the RDSR creation feature (all your CT scanners create RDSRs already, or your older
     scanners are Philips), then these paths do not need to be changed for your install.
 
+.. _email_configuration:
+
+E-mail configuration
+^^^^^^^^^^^^^^^^^^^^
+
+The settings below must be correctly configured for fluoroscopy high dose alert
+e-mail messages to be sent. It is recommended that you liaise with your IT
+department in order to obtain the settings required in this section.
+
+The host name and port of the e-mail server that you wish to use must be
+entered in the ``EMAIL_HOST`` and ``EMAIL_PORT`` fields.
+
+If the e-mail server is set to only allow authenticated users to send messages
+then a suitable user and password must be entered in the ``EMAIL_HOST_USER``
+and ``EMAIL_HOST_PASSWORD`` fields. If this approach is used then it may be
+useful to request that an e-mail account is created specifically for sending
+these OpenREM alert messages.
+
+It may be possible to configure your e-mail server to allow sending of messages
+that originate from the OpenREM server without authentication, in which case
+the user and password settings below should not be required.
+
+The ``EMAIL_USE_TLS`` and ``EMAIL_USE_TLS`` options should be configured to
+match the encryption requirements of your e-mail server.
+
+The ``EMAIL_DOSE_ALERT_SENDER`` should contain the e-mail address that you want
+to use as the sender address.
+
+The ``EMAIL_OPENREM_URL`` must contain the URL of your OpenREM installation in
+order for hyperlinks in the e-mail alert messages to function correctly.
+
+.. sourcecode:: python
+
+    # E-mail server settings
+    EMAIL_HOST = 'localhost'
+    EMAIL_PORT = 1025
+    EMAIL_HOST_USER = 'a.user.that.can.send'
+    EMAIL_HOST_PASSWORD = 'the.above.user.password'
+    EMAIL_USE_TLS = False
+    EMAIL_USE_SSL = False
+    EMAIL_DOSE_ALERT_SENDER = 'your.alert@email.address'
+    EMAIL_OPENREM_URL = 'http://your.openrem.server'
+
 .. _database_creation:
 
 Create the database

@@ -137,6 +137,11 @@ success message at the top of the screen (figure 8, below).
 E-mail notifications of high dose alerts
 ========================================
 
+For this feature to function the e-mail section in ``local_settings.py`` must
+be correctly completed (see the :ref:`email_configuration` documentation) and
+the e-mail server must allow sending of messages from the OpenREM server, or
+from the user specified in the e-mail settings.
+
 OpenREM users can be automatically sent e-mail notifications of studies that
 have exceeded a high dose alert level. This feature can be enabled or disabled
 on the high dose alerts configuration page (figure 2).
@@ -151,10 +156,6 @@ must have an e-mail address entered in their user profile. Successful e-mail
 sending is also dependent on the correct configuration of the e-mail section of
 the OpenREM settings and configuration of the e-mail server defined in those
 settings.
-
-** Include example e-mail? **
-
-** Write e-mail configuration documentation **
 
 .. figure:: img/fluoroHighDoseAlertNotifications.png
    :figwidth: 100%
