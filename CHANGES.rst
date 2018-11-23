@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#691`_  Interface: fixed URL lookup error for Display Names page
 * `#690`_  Interface: added workload stats user option entry back into config menu
 * `#689`_  Interface: fixed URL lookup error for DICOM summary page
 * `#685`_  Charts: fixed link code that would otherwise cause DLP per acqusition protocol chart histogram links to fail

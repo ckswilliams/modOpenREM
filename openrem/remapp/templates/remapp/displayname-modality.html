@@ -31,7 +31,7 @@
       {% if dual %}
         <td>
           {% if admin.admingroup and eachrow.user_defined_modality == 'dual' %}
-            <a href="{% url 'reprocess_dual' %}{{ eachrow.pk }}/">Dual: reprocess</a>
+            <a href="{% url 'reprocess_dual' pk=eachrow.pk %}">Dual: reprocess</a>
           {% else %}
             <a style="text-decoration: none">{{ eachrow.user_defined_modality }}</a>
           {% endif %}
