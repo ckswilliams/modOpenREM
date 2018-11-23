@@ -89,7 +89,13 @@ def ctcsv1(request, name=None, pat_id=None):
     pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = ct_csv.delay(request.GET, pid['pidgroup'], pid['include_names'],
+        # The 'ct_acquisition_type' filter values must be passed to ct_csv as a list, so convert the GET to a dict and
+        # then update the 'ct_acquisition_type' value with a list.
+        filter_dict = request.GET.dict()
+        if 'ct_acquisition_type' in filter_dict:
+            filter_dict['ct_acquisition_type'] = request.GET.getlist('ct_acquisition_type')
+
+        job = ct_csv.delay(filter_dict, pid['pidgroup'], pid['include_names'],
                            pid['include_pat_id'], request.user.id)
         logger.debug(u'Export CT to CSV job is {0}'.format(job))
     return redirect(reverse_lazy('export'))
@@ -111,7 +117,13 @@ def ctxlsx1(request, name=None, pat_id=None):
     pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = ctxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
+        # The 'ct_acquisition_type' filter values must be passed to ctxlsx as a list, so convert the GET to a dict and
+        # then update the 'ct_acquisition_type' value with a list.
+        filter_dict = request.GET.dict()
+        if 'ct_acquisition_type' in filter_dict:
+            filter_dict['ct_acquisition_type'] = request.GET.getlist('ct_acquisition_type')
+
+        job = ctxlsx.delay(filter_dict, pid['pidgroup'], pid['include_names'],
                            pid['include_pat_id'], request.user.id)
         logger.debug(u'Export CT to XLSX job is {0}'.format(job))
 
