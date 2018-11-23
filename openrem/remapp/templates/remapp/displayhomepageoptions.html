@@ -24,7 +24,29 @@
       <div class="panel-body">
         <table>
           {% csrf_token %}
-          {{ HomepageOptionsForm }}
+            {% for field in HomepageOptionsForm %}
+                {% if field.name == "enable_workload_stats" %}
+                    {% if admin.admingroup %}
+                        <tr>
+                            <th>{{ field.label_tag }}</th>
+                            <td>
+                                {{ field.errors }}
+                                {{ field }}
+                                {{ field.help_text }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% else %}
+                    <tr>
+                        <th>{{ field.label_tag }}</th>
+                        <td>
+                            {{ field.errors }}
+                            {{ field }}
+                            {{ field.help_text }}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
         </table>
         <input class="btn btn-default" name="submit" type="submit" />
       </div>

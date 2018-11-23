@@ -258,6 +258,7 @@ class HomepageOptionsForm(forms.Form):
     """
     dayDeltaA = forms.IntegerField(label='Primary time period to sum studies (days)', required=False)
     dayDeltaB = forms.IntegerField(label='Secondary time period to sum studies (days)', required=False)
+    enable_workload_stats = forms.BooleanField(label='Enable calculation and display of workload stats on home page?', required=False)
 
 
 class DicomQueryForm(forms.Form):
@@ -538,28 +539,6 @@ class SkinDoseMapCalcSettingsForm(forms.ModelForm):
     class Meta:
         model = SkinDoseMapCalcSettings
         fields = ['enable_skin_dose_maps', 'calc_on_import']
-
-
-class HomePageAdminSettingsForm(forms.ModelForm):
-    """Form for configuring home page settings
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(HomePageAdminSettingsForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper(self)
-        self.helper.form_class = 'form-horizontal'
-        self.helper.layout = Layout(
-            Div(
-                'enable_workload_stats',
-            ),
-            FormActions(
-                Submit('submit', 'Submit')
-            )
-        )
-
-    class Meta:
-        model = HomePageAdminSettings
-        fields = ['enable_workload_stats']
 
 
 class NotPatientNameForm(forms.ModelForm):
