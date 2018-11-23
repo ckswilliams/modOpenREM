@@ -1585,38 +1585,6 @@ def openrem_home(request):
                    'modalities': modalities, 'home_config': home_config})
 
 
-class HomePageAdminSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
-    """UpdateView for configuring the home page settings
-
-    """
-    from remapp.models import HomePageAdminSettings
-    from remapp.forms import HomePageAdminSettingsForm
-    from django.core.exceptions import ObjectDoesNotExist
-
-    try:
-        HomePageAdminSettings.objects.get()
-    except ObjectDoesNotExist:
-        HomePageAdminSettings.objects.create()
-
-    model = HomePageAdminSettings
-    form_class = HomePageAdminSettingsForm
-
-    def get_context_data(self, **context):
-        context[self.context_object_name] = self.object
-        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
-        for group in self.request.user.groups.all():
-            admin[group.name] = True
-        context['admin'] = admin
-        return context
-
-    def form_valid(self, form):
-        if form.has_changed():
-            messages.success(self.request, "Home page settings have been updated")
-        else:
-            messages.info(self.request, "No changes made")
-        return super(HomePageAdminSettingsUpdate, self).form_valid(form)
-
-
 @csrf_exempt
 def update_modality_totals(request):
     """AJAX function to update study numbers automatically
@@ -3031,12 +2999,15 @@ def homepage_options_view(request):
     from remapp.models import HomePageAdminSettings
     from django.utils.safestring import mark_safe
 
+    try:
+        HomePageAdminSettings.objects.get()
+    except ObjectDoesNotExist:
+        HomePageAdminSettings.objects.create()
+
     display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
     if not display_workload_stats:
-        if request.user.groups.filter(name="admingroup"):
-            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; as a member of the admin group you can change this setting <a href="/admin/homepagesettings/1/">here</a>'))
-        else:
-            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; a member of the admin group can change this setting <a href="/admin/homepagesettings/1/">here</a>'))
+        if not request.user.groups.filter(name="admingroup"):
+            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; only a member of the admin group can change this setting')) # nosec
 
     if request.method == 'POST':
         homepage_options_form = HomepageOptionsForm(request.POST)
@@ -3054,8 +3025,18 @@ def homepage_options_view(request):
 
             user_profile.save()
 
+            if request.user.groups.filter(name="admingroup"):
+                if homepage_options_form.cleaned_data['enable_workload_stats'] != display_workload_stats:
+                    homepage_admin_settings = HomePageAdminSettings.objects.all()[0]
+                    homepage_admin_settings.enable_workload_stats = homepage_options_form.cleaned_data['enable_workload_stats']
+                    homepage_admin_settings.save()
+                    if homepage_options_form.cleaned_data['enable_workload_stats']:
+                        messages.info(request, "Display of workload stats enabled")
+                    else:
+                        messages.info(request, "Display of workload stats disabled")
+
         messages.success(request, "Home page options have been updated")
-        return HttpResponseRedirect(reverse_lazy('home'))
+        return HttpResponseRedirect(reverse_lazy('homepage_options_view'))
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -3071,12 +3052,16 @@ def homepage_options_view(request):
         user_profile = request.user.userprofile
 
     homepage_form_data = {'dayDeltaA': user_profile.summaryWorkloadDaysA,
-                          'dayDeltaB': user_profile.summaryWorkloadDaysB}
+                          'dayDeltaB': user_profile.summaryWorkloadDaysB,
+                          'enable_workload_stats': display_workload_stats}
 
     homepage_options_form = HomepageOptionsForm(homepage_form_data)
 
+    home_config = {'display_workload_stats': display_workload_stats}
+
     return_structure = {'admin': admin,
                         'HomepageOptionsForm': homepage_options_form,
+                        'home_config': home_config
                         }
 
     return render_to_response(
