@@ -2,8 +2,8 @@
 
 {% block navhelp %}
         <li>
-            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/i_navigate.html" target="_blank" data-toggle="tooltip" title="Navigation options documentation - opens in a new tab">
-                Navigation options documentation
+            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/i_homepage.html" target="_blank" data-toggle="tooltip" title="Home page configuration - opens in a new tab">
+                Home page configuration documentation
             </a>
         </li>
 {% endblock %}
@@ -22,6 +22,7 @@
         <h3 class="panel-title">Home page options</h3>
       </div>
       <div class="panel-body">
+      <h4>Display of workload data on the home page</h4>
         <table>
           {% csrf_token %}
             {% for field in HomepageOptionsForm %}
