@@ -554,6 +554,24 @@ Now add a 'sym-link' to the new users home directory (again, replace the user na
 The new user should now be able to get to the physics folder by clicking on the ``physicsimages`` link when they log in,
 and should be able to browse, copy and delete the zip files and folders.
 
+Enable RadbbitMQ queue management interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: console
+
+    sudo rabbitmq-plugins enable rabbitmq_management
+
+Now you need to create a RabbitMQ Administrator. The password is printed to the terminal, so add a space before
+the ``sudo`` so that the command does not get saved to your history file, and then we will ``clear`` the terminal so it
+isn't displayed any longer:
+
+.. code-block:: console
+
+    sudo rabbitmqctl add_user <username> <password>
+    clear
+    sudo rabbitmqctl set_user_tags <username> administrator
+    sudo rabbitmqctl set_permissions -p / <username> "." "." ".*"
+
 Log locations
 ^^^^^^^^^^^^^
 

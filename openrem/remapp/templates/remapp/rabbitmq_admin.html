@@ -1,0 +1,90 @@
+{% extends "remapp/base.html" %}
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block navhelp %}
+        <li>
+            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/rabbitmq_management.html"
+               target="_blank" data-toggle="tooltip" title="RabbitMQ management documentation - opens in a new tab">
+                RabbitMQ management documentation
+            </a>
+        </li>
+{% endblock %}
+
+{% block mainblock %}
+
+{% if admin.admingroup %}
+  <div class="row col-md-offset-2">
+    <h3>RabbitMQ administration </h3>
+  </div>
+
+  <div class="row">
+  <div class="col-md-8 col-md-offset-2">
+          <script>
+              $(document).ready(
+                      function queues_update( json ){
+                          $.ajax({
+                              url: "{% url 'rabbitmq_queues' %}",
+                              data: {
+                                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                              },
+                              type: "POST",
+                              success: function( data ){
+                                  $( '#queues' ).html( data );
+                                  setTimeout(function(){
+                                      queues_update();
+                                  }, 2000);
+                              }
+                          })
+                      }
+              )
+          </script>
+  <p>
+    RabbitMQ is used to queue up tasks until Celery is
+    ready to process them. If Celery is not running, RabbitMQ will hold onto the tasks until Celery is ready to
+    process them, and if Celery fails to complete them, RabbitMQ will resend the job to Celery can try again.
+    Sometimes it is necessary to remove (purge) tasks from the RabbitMQ queue, and this interface can be used to do
+    that too.
+  </p>
+    <p>
+    This table will normally list several queue names. Only one queue is used by OpenREM, named <b>default</b>. If Celery
+    is running, there will also be a queue named default@hostname.celery.pidbox.
+  </p>
+  <p>
+    The queues with names like "27a97cf0-6f16-3e78-aca2-357900cd2dc4" tend to be success reports from completed Celery
+    tasks.
+  </p>
+  </div></div>
+    <div class="row">
+  <div class="col-md-8 col-md-offset-2">
+
+  <p id="queues">
+    The list of queues should appear here...
+  </p>
+  </div>
+  </div>
+
+
+{% else %}
+
+  <div class="row col-md-offset-2">
+    <h3>RabbitMQ administration </h3>
+  </div>
+
+  <div class="row">
+  <div class="col-md-8 col-md-offset-2">
+  <p>
+    This function can only be accessed if you are logged in to OpenREM with admin
+    permissions.
+  </p>
+  </div>
+  </div>
+
+{% endif %}
+
+
+
+
+{% endblock %}
+
+

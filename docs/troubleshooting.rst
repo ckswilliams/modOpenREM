@@ -26,6 +26,10 @@ For DICOM networking:
 * :ref:`qrtroubleshooting` for query retrieve
 * :ref:`storetroubleshooting` for DICOM store
 
+For RabbitMQ/task management:
+
+* :doc:`rabbitmq_management`
+
 Log files
 =========
 
