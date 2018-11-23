@@ -22,16 +22,21 @@ options`` entry under ``User level config`` shown in the upper section of
 figure 1. This takes the user to a page where the two time periods can be
 viewed and updated (figure 2).
 
-By default the display of workload information is disabled. This setting can be
-changed by an OpenREM administrator via the ``Home page options`` entry under
-the ``System level settings`` section of the ``Config`` menu (lower portion of
-figure 1). This brings up a simple form where the current setting can viewed
-and modified.
-
 .. figure:: img/homePageOptions.png
    :figwidth: 100%
    :align: center
-   :alt: List of current display names
+   :alt: The home page options form
 
    Figure 2: The home page options form
 
+By default the display of workload information is disabled; this can be changed
+by an OpenREM administrator via the ``Home page options``. When an OpenREM
+administrator views the home page options a tick box is included that enables or
+disables the display of workload data on the home page (figure 3).
+
+.. figure:: img/homePageOptionsAdmin.png
+   :figwidth: 100%
+   :align: center
+   :alt: The home page options admin form
+
+   Figure 3: The home page options admin form

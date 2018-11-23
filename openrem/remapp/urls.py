@@ -33,7 +33,7 @@ from django.contrib.auth import views as auth_views
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
 from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate, \
-                         RFHighDoseAlertSettings, HomePageAdminSettingsUpdate
+                         RFHighDoseAlertSettings
 from remapp.views import NotPatientNameCreate, NotPatientNameUpdate, NotPatientNameDelete
 from remapp.views import NotPatientIDCreate, NotPatientIDUpdate, NotPatientIDDelete
 
@@ -121,8 +121,6 @@ urlpatterns = patterns('remapp.views',
                            name='notpatientid_delete'),
                        url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient',
                            name='admin_questions_hide_not_patient'),
-                       url(r'^admin/homepagesettings/(?P<pk>\d+)/$', HomePageAdminSettingsUpdate.as_view(),
-                           name='homepageadminsettings_update'),
                        url(r'^admin/rfalertsettings/(?P<pk>\d+)/$', RFHighDoseAlertSettings.as_view(),
                            name='rf_alert_settings_update'),
                        url(r'^admin/rfalertnotifications/$', 'rf_alert_notifications_view',

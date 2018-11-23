@@ -7,7 +7,7 @@ from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes,
 import logging
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings, \
-    NotPatientIndicatorsName, NotPatientIndicatorsID, HighDoseMetricAlertSettings, HomePageAdminSettings
+    NotPatientIndicatorsName, NotPatientIndicatorsID, HighDoseMetricAlertSettings
 
 logger = logging.getLogger()
 
@@ -130,10 +130,10 @@ class CTChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotCTAcquisitionMeanDLP = forms.BooleanField(label='DLP per acquisition', required=False)
     plotCTAcquisitionMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per acquisition'),
-                                                   required=False)
+                                                   required=False) # nosec
     plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
     plotCTStudyMeanDLP = forms.BooleanField(label='DLP per study', required=False)
-    plotCTStudyMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per study'), required=False)
+    plotCTStudyMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per study'), required=False)  # nosec
     plotCTStudyFreq = forms.BooleanField(label='Study frequency', required=False)
     plotCTStudyNumEvents = forms.BooleanField(label='# events per study', required=False)
     plotCTRequestMeanDLP = forms.BooleanField(label='DLP per requested procedure', required=False)
@@ -168,7 +168,7 @@ class RFChartOptionsDisplayForm(forms.Form):
     plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
     plotRFStudyDAP = forms.BooleanField(label='DAP per study', required=False)
     plotRFInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_DX,
-                                               required=False)
+                                                   required=False)
 
 
 class MGChartOptionsForm(forms.Form):
@@ -219,10 +219,10 @@ class CTChartOptionsDisplayForm(forms.Form):
     """
     plotCTAcquisitionMeanDLP = forms.BooleanField(label='DLP per acquisition', required=False)
     plotCTAcquisitionMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per acquisition'),
-                                                   required=False)
+                                                   required=False) # nosec
     plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
     plotCTStudyMeanDLP = forms.BooleanField(label='DLP per study', required=False)
-    plotCTStudyMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per study'), required=False)
+    plotCTStudyMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per study'), required=False) # nosec
     plotCTStudyFreq = forms.BooleanField(label='Study frequency', required=False)
     plotCTStudyNumEvents = forms.BooleanField(label='# events per study', required=False)
     plotCTRequestMeanDLP = forms.BooleanField(label='DLP per requested procedure', required=False)
@@ -305,6 +305,8 @@ class HomepageOptionsForm(forms.Form):
     """
     dayDeltaA = forms.IntegerField(label='Primary time period to sum studies (days)', required=False)
     dayDeltaB = forms.IntegerField(label='Secondary time period to sum studies (days)', required=False)
+    enable_workload_stats = forms.BooleanField(label='Enable calculation and display of workload stats on home page?',
+                                               required=False)
 
 
 class DicomQueryForm(forms.Form):
@@ -332,7 +334,7 @@ class DicomQueryForm(forms.Form):
     modality_field = forms.MultipleChoiceField(
         choices=MODALITIES, widget=forms.CheckboxSelectMultiple(
             attrs={"checked": ""}), required=False, help_text=("At least one modality must be ticked - if SR only is "
-                                                              "ticked (Advanced) these modalities will be ignored"))
+                                                               "ticked (Advanced) these modalities will be ignored"))
     inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=False,
                                       help_text="Only use with stores containing only RDSRs, "
                                                 "with no accompanying images")
@@ -346,14 +348,14 @@ class DicomQueryForm(forms.Form):
                                          label="Only keep studies with these terms in the study description:",
                                          help_text="Comma separated list of terms")
     stationname_exclude_field = forms.CharField(required=False,
-                                         label="Exclude studies or series with these terms in the station name:",
-                                         help_text="Comma separated list of terms")
+                                                label="Exclude studies or series with these terms in the station name:",
+                                                help_text="Comma separated list of terms")
     stationname_include_field = forms.CharField(required=False,
-                                         label="Only keep studies or series with these terms in the station name:",
-                                         help_text="Comma separated list of terms")
+                                                label="Only keep studies or series with these terms in the station name:",
+                                                help_text="Comma separated list of terms")
     get_toshiba_images_field = forms.BooleanField(label=u"Attempt to get Toshiba dose images", required=False,
-                                            help_text=u"Only applicable if using Toshiba RDSR generator extension, "
-                                                      u"see Docs")
+                                                  help_text=u"Only applicable if using Toshiba RDSR generator extension, "
+                                                            u"see Docs")
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
@@ -409,6 +411,7 @@ class DicomQueryForm(forms.Form):
         elif not mods:
             raise forms.ValidationError("You must select at least one modality (or Advanced SR Only)")
         return cleaned_data
+
 
 class DicomDeleteSettingsForm(forms.ModelForm):
     """Form for configuring whether DICOM objects are stored or deleted once processed
@@ -587,28 +590,6 @@ class SkinDoseMapCalcSettingsForm(forms.ModelForm):
         fields = ['enable_skin_dose_maps', 'calc_on_import']
 
 
-class HomePageAdminSettingsForm(forms.ModelForm):
-    """Form for configuring home page settings
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(HomePageAdminSettingsForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper(self)
-        self.helper.form_class = 'form-horizontal'
-        self.helper.layout = Layout(
-            Div(
-                'enable_workload_stats',
-            ),
-            FormActions(
-                Submit('submit', 'Submit')
-            )
-        )
-
-    class Meta:
-        model = HomePageAdminSettings
-        fields = ['enable_workload_stats']
-
-
 class NotPatientNameForm(forms.ModelForm):
     """Form for configuring not-patient name patterns
     """
@@ -639,10 +620,11 @@ class NotPatientNameForm(forms.ModelForm):
 
     class Meta:
         model = NotPatientIndicatorsName
-        fields = ['not_patient_name',]
+        fields = ['not_patient_name', ]
         labels = {
             'not_patient_name': "pattern for name matching",
         }
+
 
 class NotPatientIDForm(forms.ModelForm):
     """Form for configuring not-patient ID patterns
@@ -674,7 +656,7 @@ class NotPatientIDForm(forms.ModelForm):
 
     class Meta:
         model = NotPatientIndicatorsID
-        fields = ['not_patient_id',]
+        fields = ['not_patient_id', ]
         labels = {
             'not_patient_id': "pattern for ID matching",
         }
