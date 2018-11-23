@@ -3007,7 +3007,7 @@ def homepage_options_view(request):
     display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
     if not display_workload_stats:
         if not request.user.groups.filter(name="admingroup"):
-            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; only a member of the admin group can change this setting'))
+            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; only a member of the admin group can change this setting')) # nosec
 
     if request.method == 'POST':
         homepage_options_form = HomepageOptionsForm(request.POST)
