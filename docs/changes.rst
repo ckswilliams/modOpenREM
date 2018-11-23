@@ -10,6 +10,7 @@ OpenREM version history
 * `#685`_  Charts: fixed link code that would otherwise cause DLP per acqusition protocol chart histogram links to fail
 * `#683`_  Installation: added VIRTUAL_DIRECTORY to the settings file to avoid updating local_settings file on upgrade
 * `#682`_  Charts: fixed problem where links from histogram bars didn't filter correctly when case-insensitive categories selected
+* `#681`_  Imports: modified RDSR import to work with Varian RDSRs
 * `#679`_  Interface: added ability to filter CT studies on acquisition type
 * `#677`_  Interface: added additional filter materials to convert to abbreviations
 * `#676`_  Imports: improved error handling on patient size imports
