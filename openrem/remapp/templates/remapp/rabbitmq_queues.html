@@ -1,0 +1,33 @@
+
+
+<table class="table">
+  <tr>
+    <th>Queue Name</th>
+    <th>Messages waiting to be passed to Celery</th>
+    <th>Messages waiting for acknowledgment the task is complete</th>
+    <th>Purge queue</th>
+    <th>Auto-delete</th>
+  </tr>
+  {% for queue in queues %}
+    {% if queue.name == "default" %}
+    <tr class="success">
+        <td><b>{{ queue.name }}</b></td>
+        <td><b>{{ queue.messages_ready }}</b></td>
+        <td><b>{{ queue.messages_unacknowledged }}</b></td>
+    {% else %}
+    <tr>
+        <td>{{ queue.name }}</td>
+        <td>{{ queue.messages_ready }}</td>
+        <td>{{ queue.messages_unacknowledged }}</td>
+    {% endif %}
+      <td>
+        {% if queue.messages > 0 %}
+          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge</a>
+        {% else %}
+          <a class="btn btn-default" disabled="disabled">Purge</a>
+        {% endif %}
+      </td>
+      <td>{{ queue.auto_delete }}</td>
+    </tr>
+  {% endfor %}
+</table>

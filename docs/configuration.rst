@@ -1,6 +1,6 @@
-###############################
-Configuration and adminstration
-###############################
+################################
+Configuration and administration
+################################
 
 See also: ``local_settings.py`` :ref:`localsettingsconfig`
 
@@ -15,3 +15,4 @@ See also: ``local_settings.py`` :ref:`localsettingsconfig`
     i_deletestudies
     i_patientsize
     i_fluoro_high_dose_alerts
+    rabbitmq_management

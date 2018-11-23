@@ -132,6 +132,10 @@ urlpatterns = patterns('remapp.views',
                            {'template_name': 'registration/changepassword.html'}, name='password_change'),
                        url('^change_password/done/$', auth_views.password_change_done,
                            {'template_name': 'registration/changepassworddone.html'}, name='password_change_done'),
+                       url('^admin/rabbitmq/$', 'rabbitmq_admin', name='rabbitmq_admin'),
+                       url('^admin/rabbitmq/queues/$', 'rabbitmq_queues', name='rabbitmq_queues'),
+                       url('^admin/rabbitmq/purge_queue/(?P<queue>[0-9a-zA-Z.@-]+)$', 'rabbitmq_purge',
+                           name='rabbitmq_purge'),
                        )
 
 urlpatterns += patterns('remapp.exports.exportviews',

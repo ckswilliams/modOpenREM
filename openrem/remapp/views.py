@@ -3192,6 +3192,53 @@ def admin_questions_hide_not_patient(request):
     return redirect(reverse_lazy('not_patient_indicators'))
 
 
+def _create_admin_dict(request):
+    """Function to factor out creating admin dict with admin true/false
+
+    :return: dict containing version numbers and admin group membership
+    """
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+    for group in request.user.groups.all():
+        admin[group.name] = True
+    return admin
+
+
+@login_required
+def rabbitmq_admin(request):
+    """View to show RabbitMQ queues. Content generated using AJAX"""
+
+    admin = _create_admin_dict(request)
+
+    template = 'remapp/rabbitmq_admin.html'
+    return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
+
+
+def rabbitmq_queues(request):
+    """AJAX function to get current queue details"""
+    import requests
+
+    if request.is_ajax():
+        try:
+            queues = requests.get(
+                'http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
+        except requests.ConnectionError:
+            admin = _create_admin_dict(request)
+            template = 'remapp/rabbitmq_connection_error.html'
+            return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
+        template = 'remapp/rabbitmq_queues.html'
+        return render_to_response(template, {'queues': queues}, context_instance=RequestContext(request))
+
+
+def rabbitmq_purge(request, queue=None):
+    """Function to purge one of the RabbitMQ queues"""
+    import requests
+
+    if queue:
+        queue_url = 'http://localhost:15672/api/queues/%2f/{0}/contents'.format(queue)
+        requests.delete(queue_url, auth=('guest', 'guest'))
+        return redirect(reverse_lazy('rabbitmq_admin'))
+
+
 @login_required
 def dicom_summary(request):
     """Displays current DICOM configuration
@@ -3208,10 +3255,7 @@ def dicom_summary(request):
     store = DicomStoreSCP.objects.all()
     remoteqr = DicomRemoteQR.objects.all()
 
-    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
-
-    for group in request.user.groups.all():
-        admin[group.name] = True
+    admin = _create_admin_dict(request)
 
     # Render list page with the documents and the form
     return render_to_response(
