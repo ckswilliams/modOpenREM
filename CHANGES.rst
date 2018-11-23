@@ -12,6 +12,7 @@ OpenREM version history
 * `#682`_  Charts: fixed problem where links from histogram bars didn't filter correctly when case-insensitive categories selected
 * `#679`_  Interface: added ability to filter CT studies on acquisition type
 * `#677`_  Interface: added additional filter materials to convert to abbreviations
+* `#676`_  Imports: improved error handling on patient size imports
 * `#675`_  Exports: improved resilience when export includes malformed studies
 * `#674`_  Documentation: amended zip command in example Orthanc configuration to work with Linux and Windows
 * `#673`_  Imports: handle empty NumericValues and workaround for incorrect Philips Azurion AcquisitionDeviceType
