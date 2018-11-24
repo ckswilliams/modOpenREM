@@ -1165,15 +1165,34 @@ def _generalstudymoduleattributes(dataset, g, ch):
     from datetime import datetime
     from remapp.models import PatientIDSettings
     from remapp.tools.get_values import get_value_kw, get_seq_code_value, get_seq_code_meaning, list_to_string
-    from remapp.tools.dcmdatetime import get_date, get_time
+    from remapp.tools.dcmdatetime import get_date, get_time, make_date, make_time
     from remapp.tools.hash_id import hash_id
 
     g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
     g.series_instance_uid = get_value_kw('SeriesInstanceUID', dataset)
     g.study_date = get_date('StudyDate', dataset)
+    if not g.study_date:
+        g.study_date = get_date('ContentDate', dataset)
+    if not g.study_date:
+        g.study_date = get_date('SeriesDate', dataset)
+    if not g.study_date:
+        logger.error(u"Study UID {0} of modality {1} has no date information which is needed in the interface - "
+                     u"date has been set to 1900!".format(
+            g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset)))
+        g.study_date = make_date("19000101")
     g.study_time = get_time('StudyTime', dataset)
     g.series_time = get_time('SeriesTime', dataset)
     g.content_time = get_time('ContentTime', dataset)
+    if not g.study_time:
+        if g.content_time:
+            g.study_time = g.content_time
+        elif g.series_time:
+            g.study_time = g.series_time
+        else:
+            logger.warning(u"Study UID {0} of modality {1} has no time information which is needed in the interface - "
+                         u"time has been set to midnight.".format(
+                g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset)))
+            g.study_time = make_time(000000)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900, 1, 1)), datetime.time(g.study_time))
     g.referring_physician_name = list_to_string(get_value_kw('ReferringPhysicianName', dataset))
     g.referring_physician_identification = list_to_string(get_value_kw('ReferringPhysicianIdentification', dataset))
