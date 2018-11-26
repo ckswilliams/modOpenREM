@@ -56,7 +56,6 @@ def send_rf_high_dose_alert_email(study_pk=None, test_message=None, test_user=No
     from socket import gaierror as gai_error
     from smtplib import SMTPException
     from ssl import SSLError
-    import errno
 
     # Send a test message to the e-mail address contained in test_user
     if test_message:
@@ -69,24 +68,13 @@ def send_rf_high_dose_alert_email(study_pk=None, test_message=None, test_user=No
                 msg = EmailMultiAlternatives(msg_subject, text_msg_content, settings.EMAIL_DOSE_ALERT_SENDER, recipients)
                 msg.attach_alternative(html_msg_content, 'text/html')
                 msg.send()
-            except SSLError as ssl_err:
-                # Raised if SSL unsupported by mail server but configured in local_settings.py
-                return ssl_err
-            except SMTPException as smtp_err:
-                # Raised if TLS unsupported by mail server but configured in local_settings.py
-                return smtp_err
-            except ValueError as v_err:
-                # Raised if the user has set both TLS and SSL security options
-                return v_err
-            except gai_error as gai_err:
-                # Raised if user has misconfigured the mail server hostname
-                return gai_err
-            except socket_error as s_err:
-                if s_err.errno != errno.ECONNREFUSED:
-                    # Not a connection error, so re-raise
-                    raise s_err
-                # Catches connection refused errors
-                return s_err
+            except (SSLError, SMTPException, ValueError, gai_error, socket_error) as the_error:
+                # SSLError raised if SSL unsupported by mail server but configured in local_settings.py
+                # SMTPException raised if TLS unsupported by mail server but configured in local_settings.py
+                # ValueError raised if the user has set both TLS and SSL security options
+                # gai_error raised if the user has misconfigured the mail server hostname
+                # socket_error catches various things including connection errors
+                return the_error
         return
 
     if study_pk:
