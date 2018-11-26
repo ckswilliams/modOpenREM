@@ -42,7 +42,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
 
-def send_rf_high_dose_alert_email(study_pk=None):
+def send_rf_high_dose_alert_email(study_pk=None, test_message=None, test_user=None):
     """
     Function to send users a fluoroscopy high dose alert e-mail
     """
@@ -52,6 +52,18 @@ def send_rf_high_dose_alert_email(study_pk=None):
     from django.core.mail import EmailMultiAlternatives
     from django.template.loader import render_to_string
     from openremproject import settings
+
+    # Send a test message to the e-mail address contained in test_user
+    if test_message:
+        if test_user:
+            text_msg_content = render_to_string('remapp/email_test_template.txt')
+            html_msg_content = render_to_string('remapp/email_test_template.html')
+            recipients = [test_user]
+            msg_subject = 'OpenREM e-mail test message'
+            msg = EmailMultiAlternatives(msg_subject, text_msg_content, settings.EMAIL_DOSE_ALERT_SENDER, recipients)
+            msg.attach_alternative(html_msg_content, 'text/html')
+            msg.send()
+        return
 
     if study_pk:
         study = GeneralStudyModuleAttr.objects.get(pk=study_pk)

@@ -42,6 +42,7 @@
                     <th>Last name</th>
                     <th>E-mail address</th>
                     <th>Receive high dose alert e-mails?</th>
+                    <th>Send test message</th>
                 </tr>
 
                 {% for eachuser in user_list %}
@@ -50,8 +51,8 @@
                         <td><a style="text-decoration: none">{{ eachuser.first_name }}</a></td>
                         <td><a style="text-decoration: none">{{ eachuser.last_name }}</a></td>
                         <td><a style="text-decoration: none">{{ eachuser.email }}</a></td>
-                        <td><a style="text-decoration: none"><input type="checkbox" title="" name="{{ eachuser.id }}" value="{{ eachuser.id }}" {% if eachuser.highdosemetricalertrecipients.receive_high_dose_metric_alerts %}checked{% endif %}></a>
-                        </td>
+                        <td><a style="text-decoration: none"><input type="checkbox" title="" name="{{ eachuser.id }}" value="{{ eachuser.id }}" {% if eachuser.highdosemetricalertrecipients.receive_high_dose_metric_alerts %}checked{% endif %}></a></td>
+                        <td><a style="text-decoration: none"><input class="btn btn-default" type="submit" title="Send test" name="{{ eachuser.email }}" value="Send test"></a></td>
                     </tr>
                 {% endfor %}
             </table>
