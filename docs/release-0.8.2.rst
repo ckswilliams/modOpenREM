@@ -7,6 +7,8 @@ Headline changes
 ****************
 
 * Interface: added feature to display workload stats in the home page modality tables
+* Interface: added :doc:`i_fluoro_high_dose_alerts` feature
+* Administration: automatic e-mail alerts sent when fluoroscopy studies exceed a dose alert level
 * Query-retrieve: handle non-return of ModalitiesInStudy correctly
 * Imports: fix for empty NumericValues in RDSR
 * Imports: fix for Toshiba RDSR with incorrect multiple values in SD field for vHP
@@ -85,6 +87,37 @@ Enable the RabbitMQ management interface
 
 To make use of the RabbitMQ queue display and purge control, the management interface needs to be enabled. To do so,
 follow the instructions at :ref:`enableRabbitMQ`.
+
+
+Update the configuration
+========================
+
+Locate and edit your local_settings file
+
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openremproject/local_settings.py``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\openremproject\local_settings.py``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\openremproject\local_settings.py``
+
+E-mail server settings
+^^^^^^^^^^^^^^^^^^^^^^
+If you want selected OpenREM users to be automatically sent fluroscopy high
+dose alerts then set the details of the e-mail server to be used in the
+`E-mail server settings` part of your ``local_settings.py`` file:
+
+.. sourcecode:: python
+
+    EMAIL_HOST = 'localhost'
+    EMAIL_PORT = 1025
+    EMAIL_HOST_USER = 'a.user.that.can.send'
+    EMAIL_HOST_PASSWORD = 'the.above.user.password'
+    EMAIL_USE_TLS = False
+    EMAIL_USE_SSL = False
+    EMAIL_DOSE_ALERT_SENDER = 'your.alert@email.address'
+    EMAIL_OPENREM_URL = 'http://your.openrem.server'
+
+See the ref:`email_configuration` documentation for full details.
 
 
 Restart all the services
