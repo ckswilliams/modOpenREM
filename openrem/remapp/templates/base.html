@@ -103,8 +103,12 @@
                       {% if not admin.admingroup %}
                         <li><a href="{% url 'display_names_view' %}">View display names & modality</a></li>
                         <li><a href="{% url 'not_patient_indicators' %}">View not-patient indicators</a></li>
+                      {% endif %}
+
+                      {% if home_config.display_workload_stats or admin.admingroup %}
                         <li><a href="{% url 'homepage_options_view' %}">Home page options</a></li>
                       {% endif %}
+
                       {% if admin.admingroup %}
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">System level settings</li>
@@ -115,7 +119,7 @@
                         <li><a href="{% url 'patient_id_settings_update' 1 %}">Patient ID</a> </li>
                         <li><a href="{% url 'not_patient_indicators' %}">Not-patient indicators</a> </li>
                         <li><a href="{% url 'skin_dose_map_settings_update' 1 %}">Skin dose map</a> </li>
-                        <li><a href="{% url 'homepageadminsettings_update' 1 %}">Home page options</a> </li>
+                        <li><a href="{% url 'rabbitmq_admin' %}">RabbitMQ</a></li>
                       {% endif %}
                     </ul>
                 </li>

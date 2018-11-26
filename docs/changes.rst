@@ -4,12 +4,16 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#691`_  Interface: fixed URL lookup error for Display Names page
+* `#690`_  Interface: added workload stats user option entry back into config menu
 * `#689`_  Interface: fixed URL lookup error for DICOM summary page
 * `#685`_  Charts: fixed link code that would otherwise cause DLP per acqusition protocol chart histogram links to fail
 * `#683`_  Installation: added VIRTUAL_DIRECTORY to the settings file to avoid updating local_settings file on upgrade
 * `#682`_  Charts: fixed problem where links from histogram bars didn't filter correctly when case-insensitive categories selected
+* `#681`_  Imports: modified RDSR import to work with Varian RDSRs
 * `#679`_  Interface: added ability to filter CT studies on acquisition type
 * `#677`_  Interface: added additional filter materials to convert to abbreviations
+* `#676`_  Imports: improved error handling on patient size imports
 * `#675`_  Exports: improved resilience when export includes malformed studies
 * `#674`_  Documentation: amended zip command in example Orthanc configuration to work with Linux and Windows
 * `#673`_  Imports: handle empty NumericValues and workaround for incorrect Philips Azurion AcquisitionDeviceType
@@ -18,7 +22,9 @@ OpenREM version history
 * `#668`_  Code quality: library import and blank space cleanup
 * `#667`_  Web server: enable OpenREM to be hosted from a non-root folder/virtual-directory
 * `#666`_  Query-retrieve: handle non-return of ModalitiesInStudy correctly
+* `#662`_  Administration: added facility to list and purge RabbitMQ queues
 * `#658`_  Interface: added display of workload stats in home page modality tables
+* `#637`_  Administration: added facility to list and purge RabbitMQ queues
 * `#479`_  Administration: added facility to list and delete failed import studies
 
 0.8.1 (2018-09-16)

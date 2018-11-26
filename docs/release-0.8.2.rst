@@ -11,7 +11,9 @@ Headline changes
 * Imports: fix for empty NumericValues in RDSR
 * Imports: fix for Toshiba RDSR with incorrect multiple values in SD field for vHP
 * Imports: fix for Philips Azurion RDSR with incorrect AcquisitionDeviceType
+* Imports: fix for Varian RDSRs
 * Administration: added facility to list and delete failed import studies
+* Administration: added interface to RabbitMQ queues
 * Documentation: further refinement of the linux one-page install
 * Web server: :doc:`virtual_directory`
 
@@ -76,6 +78,13 @@ just installed (assuming you are using a production web server...):
 .. sourcecode:: bash
 
     python manage.py collectstatic --clear
+
+
+Enable the RabbitMQ management interface
+========================================
+
+To make use of the RabbitMQ queue display and purge control, the management interface needs to be enabled. To do so,
+follow the instructions at :ref:`enableRabbitMQ`.
 
 
 Restart all the services

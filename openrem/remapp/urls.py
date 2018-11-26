@@ -32,8 +32,7 @@ from django.conf.urls import patterns, url
 from django.contrib.auth import views as auth_views
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
-from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate, \
-                         HomePageAdminSettingsUpdate
+from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate
 from remapp.views import NotPatientNameCreate, NotPatientNameUpdate, NotPatientNameDelete
 from remapp.views import NotPatientIDCreate, NotPatientIDUpdate, NotPatientIDDelete
 
@@ -121,13 +120,15 @@ urlpatterns = patterns('remapp.views',
                            name='notpatientid_delete'),
                        url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient',
                            name='admin_questions_hide_not_patient'),
-                       url(r'^admin/homepagesettings/(?P<pk>\d+)/$', HomePageAdminSettingsUpdate.as_view(),
-                           name='homepageadminsettings_update'),
                        # url(r'^password/$', 'change_password', name='change_password'),
                        url('^change_password/$', auth_views.password_change,
                            {'template_name': 'registration/changepassword.html'}, name='password_change'),
                        url('^change_password/done/$', auth_views.password_change_done,
                            {'template_name': 'registration/changepassworddone.html'}, name='password_change_done'),
+                       url('^admin/rabbitmq/$', 'rabbitmq_admin', name='rabbitmq_admin'),
+                       url('^admin/rabbitmq/queues/$', 'rabbitmq_queues', name='rabbitmq_queues'),
+                       url('^admin/rabbitmq/purge_queue/(?P<queue>[0-9a-zA-Z.@-]+)$', 'rabbitmq_purge',
+                           name='rabbitmq_purge'),
                        )
 
 urlpatterns += patterns('remapp.exports.exportviews',

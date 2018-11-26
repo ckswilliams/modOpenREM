@@ -136,8 +136,8 @@ class RFSummaryListFilter(django_filters.FilterSet):
     performing_physician_name = django_filters.CharFilter(lookup_type='icontains', label=u'Physician')
     accession_number = django_filters.MethodFilter(action=custom_acc_filter, label=u'Accession number')
     display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
-    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe(u'Min study DAP (cGy.cm<sup>2</sup>)'))
-    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe(u'Max study DAP (cGy.cm<sup>2</sup>)'))
+    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe(u'Min study DAP (cGy.cm<sup>2</sup>)')) # nosec
+    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe(u'Max study DAP (cGy.cm<sup>2</sup>)')) # nosec
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
@@ -372,10 +372,10 @@ class DXSummaryListFilter(django_filters.FilterSet):
     model_name = django_filters.CharFilter(lookup_type='icontains', label=u'Model', name='generalequipmentmoduleattr__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label=u'Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.MethodFilter(action=custom_acc_filter, label=u'Accession number')
-    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe(u'Min study DAP (cGy.cm<sup>2</sup>)'))
-    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe(u'Max study DAP (cGy.cm<sup>2</sup>)'))
-    # acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
-    # acquisition_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
+    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe(u'Min study DAP (cGy.cm<sup>2</sup>)')) # nosec
+    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe(u'Max study DAP (cGy.cm<sup>2</sup>)')) # nosec
+    # acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product') # nosec
+    # acquisition_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product') # nosec
     display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
