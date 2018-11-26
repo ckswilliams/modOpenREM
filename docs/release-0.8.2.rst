@@ -109,8 +109,8 @@ be used:
 
     EMAIL_HOST = 'localhost'
     EMAIL_PORT = 1025
-    EMAIL_HOST_USER = 'a.user.that.can.send'
-    EMAIL_HOST_PASSWORD = 'the.above.user.password'
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
     EMAIL_USE_TLS = False
     EMAIL_USE_SSL = False
     EMAIL_DOSE_ALERT_SENDER = 'your.alert@email.address'
