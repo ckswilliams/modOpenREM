@@ -117,7 +117,7 @@ dose alerts then set the details of the e-mail server to be used in the
     EMAIL_DOSE_ALERT_SENDER = 'your.alert@email.address'
     EMAIL_OPENREM_URL = 'http://your.openrem.server'
 
-See the ref:`email_configuration` documentation for full details.
+See the :ref:`email_configuration` documentation for full details.
 
 
 Restart all the services
