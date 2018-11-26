@@ -86,88 +86,92 @@
                 {% endfor %}
             </table>
 
-            {% if alert_levels.show_accum_dose_over_delta_weeks %}
-                <h4>Summary of studies (including this one) matching this patient ID over the {{ alert_levels.accum_dose_delta_weeks }} week{{ alert_levels.accum_dose_delta_weeks|pluralize }} previous to this study</h4>
-                <ul class="no-marker">
-                {% with accumxraydose_set_all_planes|first as first_accumxraydose %}
-                  {% with accumprojection=first_accumxraydose.accumintegratedprojradiogdose_set.get %}
-                   <li>
-                        Number of studies: {{ studies_in_week_delta.count }}
-                        ({% for each_study in studies_in_week_delta %}
-                            {% if each_study.pk == study.pk %}this study{% else %}<a href="/openrem/rf/{{ each_study.pk }}/">study {{ each_study.pk }}</a>{% endif %}{% if not forloop.last%}, {% endif %}
-                        {% endfor %})
-                   </li>
-                   <li>
-                        Total DAP summed over this period:
-                        {% if accumprojection.total_dap_delta_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}
-                            <strong style="color: red;">{{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}</strong> cGy.cm<sup>2</sup>
-                        {% else %}
-                            {{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
-                        {% endif %}
-                   </li>
-                   <li>
-                        Total dose at RP summed over this period:
-                       {% if accumprojection.dose_rp_total_over_delta_weeks >= alert_levels.alert_total_rp_dose_rf %}
-                           <strong style="color: red;"><script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script></strong> Gy
-                        {% else %}
-                           <script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script> Gy
-                        {% endif %}
-                   </li>
-                  {% endwith %}
-                {% endwith %}
-                </ul>
-
-                <table class="table table-condensed table-bordered small table-indent">
-                    <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Accession number</th>
-                        <th>Total DAP (cGy.cm<sup>2</sup>)</th>
-                        <th>Total dose at RP (Gy)</th>
-                        <th>OpenREM link</th>
-                    </tr>
-                    {% for each_study in studies_in_week_delta %}
-                        <tr>
-                            <td>{{ each_study.study_date|date:"d/m/y" }}</td>
-                            <td>{{ each_study.study_time|date:"H:i" }}</td>
-                            <td>{{ each_study.accession_number }}</td>
-
-                            <td>
-                                {% for accumxraydoseset_allplanes in each_study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
-                                    {% with accumprojection=accumxraydoseset_allplanes.accumintegratedprojradiogdose_set.get %}
-                                        {{ accumxraydoseset_allplanes.acquisition_plane }}:
-                                        {% if accumprojection.convert_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}
-                                            <strong style="color: red;">{{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }}</strong>
+                {% if alert_levels.show_accum_dose_over_delta_weeks %}
+                    {% if study.patientmoduleattr_set.get.patient_id %}
+                        <h4>Summary of studies (including this one) matching this patient ID over the {{ alert_levels.accum_dose_delta_weeks }} week{{ alert_levels.accum_dose_delta_weeks|pluralize }} previous to this study</h4>
+                        <ul class="no-marker">
+                            {% with accumxraydose_set_all_planes|first as first_accumxraydose %}
+                                {% with accumprojection=first_accumxraydose.accumintegratedprojradiogdose_set.get %}
+                                    <li>
+                                        Number of studies: {{ studies_in_week_delta.count }}
+                                        ({% for each_study in studies_in_week_delta %}
+                                        {% if each_study.pk == study.pk %}this study{% else %}<a href="/openrem/rf/{{ each_study.pk }}/">study {{ each_study.pk }}</a>{% endif %}{% if not forloop.last%}, {% endif %}
+                                    {% endfor %})
+                                    </li>
+                                    <li>
+                                        Total DAP summed over this period:
+                                        {% if accumprojection.total_dap_delta_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}
+                                            <strong style="color: red;">{{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}</strong> cGy.cm<sup>2</sup>
                                         {% else %}
-                                            {{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }}
+                                            {{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
                                         {% endif %}
-                                        <br>
-                                    {% endwith %}
-                                {% endfor %}
-                            </td>
-
-                            <td>
-                                {% for accumxraydoseset_allplanes in each_study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
-                                    {% with accumprojection=accumxraydoseset_allplanes.accumintegratedprojradiogdose_set.get %}
-                                        {{ accumxraydoseset_allplanes.acquisition_plane }}:
-                                        {% if accumprojection.dose_rp_total >= alert_levels.alert_total_rp_dose_rf %}
-                                            <strong style="color: red;">{{ accumprojection.dose_rp_total|floatformat:1 }}</strong>
+                                    </li>
+                                    <li>
+                                        Total dose at RP summed over this period:
+                                        {% if accumprojection.dose_rp_total_over_delta_weeks >= alert_levels.alert_total_rp_dose_rf %}
+                                            <strong style="color: red;"><script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script></strong> Gy
                                         {% else %}
-                                            {{ accumprojection.dose_rp_total|floatformat:1 }}
+                                            <script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script> Gy
                                         {% endif %}
-                                        <br>
-                                    {% endwith %}
-                                {% endfor %}
-                            </td>
+                                    </li>
+                                {% endwith %}
+                            {% endwith %}
+                        </ul>
 
-                            <td>{% if each_study.pk == study.pk %}This study{% else %}
-                                <a href="{{ server_url }}/openrem/rf/{{ each_study.pk }}">Study {{ each_study.pk }}</a>{% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
+                        <table class="table table-condensed table-bordered small table-indent">
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Accession number</th>
+                                <th>Total DAP (cGy.cm<sup>2</sup>)</th>
+                                <th>Total dose at RP (Gy)</th>
+                                <th>OpenREM link</th>
+                            </tr>
+                            {% for each_study in studies_in_week_delta %}
+                                <tr>
+                                    <td>{{ each_study.study_date|date:"d/m/y" }}</td>
+                                    <td>{{ each_study.study_time|date:"H:i" }}</td>
+                                    <td>{{ each_study.accession_number }}</td>
 
-            {% endif %}
+                                    <td>
+                                        {% for accumxraydoseset_allplanes in each_study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                                            {% with accumprojection=accumxraydoseset_allplanes.accumintegratedprojradiogdose_set.get %}
+                                                {{ accumxraydoseset_allplanes.acquisition_plane }}:
+                                                {% if accumprojection.convert_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}
+                                                    <strong style="color: red;">{{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }}</strong>
+                                                {% else %}
+                                                    {{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }}
+                                                {% endif %}
+                                                <br>
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </td>
+
+                                    <td>
+                                        {% for accumxraydoseset_allplanes in each_study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                                            {% with accumprojection=accumxraydoseset_allplanes.accumintegratedprojradiogdose_set.get %}
+                                                {{ accumxraydoseset_allplanes.acquisition_plane }}:
+                                                {% if accumprojection.dose_rp_total >= alert_levels.alert_total_rp_dose_rf %}
+                                                    <strong style="color: red;">{{ accumprojection.dose_rp_total|floatformat:1 }}</strong>
+                                                {% else %}
+                                                    {{ accumprojection.dose_rp_total|floatformat:1 }}
+                                                {% endif %}
+                                                <br>
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </td>
+
+                                    <td>{% if each_study.pk == study.pk %}This study{% else %}
+                                        <a href="{{ server_url }}/openrem/rf/{{ each_study.pk }}">Study {{ each_study.pk }}</a>{% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <h4>Summary of studies (including this one) matching this patient ID over the {{ alert_levels.accum_dose_delta_weeks }} week{{ alert_levels.accum_dose_delta_weeks|pluralize }} previous to this study</h4>
+                        <p>Data unavailable: no patient ID for this study.</p>
+                    {% endif %}
+                {% endif %}
         </div>
     {% endwith %}{% endwith %}{% endwith %}
 
