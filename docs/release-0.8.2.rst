@@ -89,10 +89,12 @@ To make use of the RabbitMQ queue display and purge control, the management inte
 follow the instructions at :ref:`enableRabbitMQ`.
 
 
-Update the configuration
-========================
-
-Locate and edit your local_settings file
+E-mail server settings
+======================
+If you want selected OpenREM users to be automatically sent fluroscopy high
+dose alerts then set the details of the e-mail server to be used in the
+`E-mail server settings` part of your ``local_settings.py`` file. Locate and
+edit your local_settings file
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openremproject/local_settings.py``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
@@ -100,11 +102,8 @@ Locate and edit your local_settings file
 * Windows: ``C:\Python27\Lib\site-packages\openrem\openremproject\local_settings.py``
 * Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\openremproject\local_settings.py``
 
-E-mail server settings
-^^^^^^^^^^^^^^^^^^^^^^
-If you want selected OpenREM users to be automatically sent fluroscopy high
-dose alerts then set the details of the e-mail server to be used in the
-`E-mail server settings` part of your ``local_settings.py`` file:
+Then change the e-mail section settings to reflect the e-mail server that is to
+be used:
 
 .. sourcecode:: python
 
