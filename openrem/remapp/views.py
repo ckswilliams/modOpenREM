@@ -3488,7 +3488,11 @@ def rf_alert_notifications_view(request):
         # Check to see if we need to send a test message
         if 'Send test' in request.POST.values():
             recipient = request.POST.dict().keys()[0]
-            send_rf_high_dose_alert_email(study_pk=None, test_message=True, test_user=recipient)
+            email_response = send_rf_high_dose_alert_email(study_pk=None, test_message=True, test_user=recipient)
+            if email_response == None:
+                messages.success(request, 'Sent test e-mail to {0}'.format(recipient))
+            else:
+                messages.error(request, 'Sending test e-mail failed: {0}'.format(email_response))
 
         all_users = User.objects.all()
         for user in all_users:

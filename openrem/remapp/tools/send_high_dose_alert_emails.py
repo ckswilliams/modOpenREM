@@ -52,17 +52,41 @@ def send_rf_high_dose_alert_email(study_pk=None, test_message=None, test_user=No
     from django.core.mail import EmailMultiAlternatives
     from django.template.loader import render_to_string
     from openremproject import settings
+    from socket import error as socket_error
+    from socket import gaierror as gai_error
+    from smtplib import SMTPException
+    from ssl import SSLError
+    import errno
 
     # Send a test message to the e-mail address contained in test_user
     if test_message:
         if test_user:
-            text_msg_content = render_to_string('remapp/email_test_template.txt')
-            html_msg_content = render_to_string('remapp/email_test_template.html')
-            recipients = [test_user]
-            msg_subject = 'OpenREM e-mail test message'
-            msg = EmailMultiAlternatives(msg_subject, text_msg_content, settings.EMAIL_DOSE_ALERT_SENDER, recipients)
-            msg.attach_alternative(html_msg_content, 'text/html')
-            msg.send()
+            try:
+                text_msg_content = render_to_string('remapp/email_test_template.txt')
+                html_msg_content = render_to_string('remapp/email_test_template.html')
+                recipients = [test_user]
+                msg_subject = 'OpenREM e-mail test message'
+                msg = EmailMultiAlternatives(msg_subject, text_msg_content, settings.EMAIL_DOSE_ALERT_SENDER, recipients)
+                msg.attach_alternative(html_msg_content, 'text/html')
+                msg.send()
+            except SSLError as ssl_err:
+                # Raised if SSL unsupported by mail server but configured in local_settings.py
+                return ssl_err
+            except SMTPException as smtp_err:
+                # Raised if TLS unsupported by mail server but configured in local_settings.py
+                return smtp_err
+            except ValueError as v_err:
+                # Raised if the user has set both TLS and SSL security options
+                return v_err
+            except gai_error as gai_err:
+                # Raised if user has misconfigured the mail server hostname
+                return gai_err
+            except socket_error as s_err:
+                if s_err.errno != errno.ECONNREFUSED:
+                    # Not a connection error, so re-raise
+                    raise s_err
+                # Catches connection refused errors
+                return s_err
         return
 
     if study_pk:
