@@ -9,7 +9,7 @@ register = template.Library()
 
 @register.filter
 def sigdig(value, digits=3):
-    if value > Decimal(0):
+    if value == Decimal(0):
         order = int(math.floor(math.log10(math.fabs(value))))
         places = digits - order - 1
         if places > 0:
