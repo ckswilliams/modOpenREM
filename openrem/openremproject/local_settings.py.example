@@ -120,7 +120,7 @@ PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
 
 # E-mail server settings - see https://docs.djangoproject.com/en/1.8/topics/email/
 EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
+EMAIL_PORT = 25
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
@@ -129,4 +129,4 @@ EMAIL_DOSE_ALERT_SENDER = 'your.alert@email.address'
 EMAIL_OPENREM_URL = 'http://your.openrem.server'
 
 # The following line can run on your OpenREM server to set up a dummy smtp server for testing:
-# python -m smtpd -n -c DebuggingServer localhost:1025
+# python -m smtpd -n -c DebuggingServer localhost:25

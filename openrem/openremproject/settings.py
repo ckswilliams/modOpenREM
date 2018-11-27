@@ -266,7 +266,7 @@ VIRTUAL_DIRECTORY = ''
 
 # E-mail server settings - see https://docs.djangoproject.com/en/1.8/topics/email/
 EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
+EMAIL_PORT = 25
 EMAIL_HOST_USER = 'a.user.that.can.send'
 EMAIL_HOST_PASSWORD = 'the.above.user.password'
 EMAIL_USE_TLS = False
