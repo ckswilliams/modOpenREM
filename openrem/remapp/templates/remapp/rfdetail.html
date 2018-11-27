@@ -41,9 +41,9 @@
                   <li>
                         Total dose at RP, {{ record.acquisition_plane }}:
                         {% if accumprojection.dose_rp_total >= alert_levels.alert_total_rp_dose_rf %}
-                            <strong style="color: red;"><script>document.write({{ accumprojection.dose_rp_total }}.toPrecision(3));</script></strong> Gy
+                            <strong style="color: red;">{{ accumprojection.dose_rp_total | sigdig }} </strong> Gy
                         {% else %}
-                            <script>document.write({{ accumprojection.dose_rp_total }}.toPrecision(3));</script> Gy
+                            {{ accumprojection.dose_rp_total | sigdig }} Gy
                         {% endif %}
                         <br>
                    </li>
@@ -110,9 +110,9 @@
                                     <li>
                                         Total dose at RP summed over this period:
                                         {% if accumprojection.dose_rp_total_over_delta_weeks >= alert_levels.alert_total_rp_dose_rf %}
-                                            <strong style="color: red;"><script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script></strong> Gy
+                                            <strong style="color: red;">{{ accumprojection.dose_rp_total_over_delta_weeks | sigdig }} </strong> Gy
                                         {% else %}
-                                            <script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script> Gy
+                                            {{ accumprojection.dose_rp_total_over_delta_weeks | sigdig }} Gy
                                         {% endif %}
                                     </li>
                                 {% endwith %}
