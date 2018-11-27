@@ -22,7 +22,7 @@
     {% if admin.admingroup %}
         <p>Check one or more boxes and click an Update button to select which users receive e-mail
             notification of fluoroscopy high dose alerts.</p>
-        <p>The table can be sorted by clicking on the column headers.</p>
+        <p>The table can be sorted by clicking on the column headers. To add or update email addresses go to <a href="{% url 'admin:auth_user_changelist' %}">User configuration</a>.</p>
     {% else %}
         <p>Only users in the Admin group can view these settings.</p>
     {% endif %}
