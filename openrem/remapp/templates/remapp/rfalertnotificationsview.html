@@ -52,7 +52,7 @@
                         <td style="vertical-align: middle"><a style="text-decoration: none">{{ eachuser.last_name }}</a></td>
                         <td style="vertical-align: middle"><a style="text-decoration: none">{{ eachuser.email }}</a></td>
                         <td style="text-align: center; vertical-align: middle"><a style="text-decoration: none"><input type="checkbox" title="" name="{{ eachuser.id }}" value="{{ eachuser.id }}" {% if eachuser.highdosemetricalertrecipients.receive_high_dose_metric_alerts %}checked{% endif %}></a></td>
-                        <td style="text-align: center; vertical-align: middle"><a style="text-decoration: none"><input class="btn btn-basic" type="submit" title="Send test" name="{{ eachuser.email }}" value="Send test"></a></td>
+                        <td style="text-align: center; vertical-align: middle">{% if eachuser.email %}<a style="text-decoration: none"><input class="btn btn-basic" type="submit" title="Send test" name="{{ eachuser.email }}" value="Send test"></a>{% endif %}</td>
                     </tr>
                 {% endfor %}
             </table>
