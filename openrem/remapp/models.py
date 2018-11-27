@@ -35,6 +35,9 @@ import json
 from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # pylint: disable=unused-variable
 
@@ -88,6 +91,42 @@ class SkinDoseMapCalcSettings(SingletonModel):
 
     def get_absolute_url(self):
         return '/admin/skindosemapsettings/1/'
+
+
+class HighDoseMetricAlertSettings(SingletonModel):
+    """
+    Table to store high dose fluoroscopy alert settings
+    """
+    alert_total_dap_rf = models.IntegerField(blank=True, null=True, default=20000, verbose_name="Alert level for total DAP from fluoroscopy examination (cGy.cm<sup>2</sup>)")
+    alert_total_rp_dose_rf = models.FloatField(blank=True, null=True, default=2.0, verbose_name="Alert level for total dose at reference point from fluoroscopy examination (Gy)")
+    accum_dose_delta_weeks = models.IntegerField(blank=True, null=True, default=12, verbose_name="Number of previous weeks over which to sum DAP and RP dose for each patient")
+    changed_accum_dose_delta_weeks = models.BooleanField(default=True)
+    show_accum_dose_over_delta_weeks = models.BooleanField(default=True, verbose_name="Enable display of summed DAP and RP dose in e-mail alerts and on summary and detail pages?")
+    calc_accum_dose_over_delta_weeks_on_import = models.BooleanField(default=True, verbose_name="Calculate summed DAP and RP dose for incoming fluoroscopy studies?")
+    send_high_dose_metric_alert_emails = models.BooleanField(default=False, verbose_name="Send notification e-mails when alert levels are exceeded?")
+
+    def get_absolute_url(self):
+        return '/admin/rfalertsettings/1/'
+
+
+class HighDoseMetricAlertRecipients(models.Model):
+    """
+    Table to store whether users should receive high dose fluoroscopy alerts
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    receive_high_dose_metric_alerts = models.BooleanField(default=False, verbose_name="Receive high dose e-mail alerts?")
+
+
+@receiver(post_save, sender=User)
+def create_or_save_high_dose_metric_alert_recipient_setting(sender, instance, **kwargs):
+    """
+    Function to create or save fluoroscopy high dose alert recipient settings
+    """
+    if not hasattr(instance, 'highdosemetricalertrecipients'):
+        new_objects = HighDoseMetricAlertRecipients.objects.create(user=instance)
+        new_objects.save()
+    else:
+        instance.highdosemetricalertrecipients.save()
 
 
 class HomePageAdminSettings(SingletonModel):
@@ -239,10 +278,6 @@ class DicomQRRspImage(models.Model):
     sop_instance_uid = models.TextField(blank=True, null=True)
     instance_number = models.IntegerField(blank=True, null=True)
     sop_class_uid = models.TextField(blank=True, null=True)
-
-
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
 
 
 class UserProfile(models.Model):
@@ -929,6 +964,23 @@ class AccumIntegratedProjRadiogDose(models.Model):  # TID 10007
         """
         if self.dose_area_product_total:
             return 1000000*self.dose_area_product_total
+
+    dose_area_product_total_over_delta_weeks = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
+    dose_rp_total_over_delta_weeks = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
+
+    def total_dap_delta_gym2_to_cgycm2(self):
+        """Converts total DAP over delta days from Gy.m2 to cGy.cm2 for display in web interface
+        """
+        if self.dose_area_product_total_over_delta_weeks:
+            return 1000000*self.dose_area_product_total_over_delta_weeks
+
+
+class PKsForSummedRFDoseStudiesInDeltaWeeks(models.Model):
+    """Table to hold foreign keys of all studies that fall within the delta
+    weeks of each RF study.
+    """
+    general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
+    study_pk_in_delta_weeks = models.IntegerField(blank=True, null=True)
 
 
 class PatientModuleAttr(models.Model):  # C.7.1.1

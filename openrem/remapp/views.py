@@ -486,6 +486,7 @@ def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
     from remapp.forms import RFChartOptionsForm, itemsPerPageForm
+    from remapp.models import HighDoseMetricAlertSettings
 
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(
@@ -557,7 +558,15 @@ def rf_summary_list_filter(request):
             form_data = {'itemsPerPage': user_profile.itemsPerPage}
             items_per_page_form = itemsPerPageForm(form_data)
 
+    # Import total DAP and total dose at reference point alert levels. Create with default values if not found.
+    try:
+        HighDoseMetricAlertSettings.objects.get()
+    except ObjectDoesNotExist:
+        HighDoseMetricAlertSettings.objects.create()
+    alert_levels = HighDoseMetricAlertSettings.objects.values('show_accum_dose_over_delta_weeks', 'alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks')[0]
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
 
     # # Calculate skin dose map for all objects in the database
     # import cPickle as pickle
@@ -597,7 +606,7 @@ def rf_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form, 'alertLevels': alert_levels}
 
     return render_to_response(
         'remapp/rffiltered.html',
@@ -693,8 +702,9 @@ def rf_detail_view(request, pk=None):
     from django.db.models import Sum
     import numpy as np
     import operator
+    from remapp.models import HighDoseMetricAlertSettings, SkinDoseMapCalcSettings
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.models import SkinDoseMapCalcSettings
+    from datetime import timedelta
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
@@ -764,6 +774,26 @@ def rf_detail_view(request, pk=None):
     except ObjectDoesNotExist:
         SkinDoseMapCalcSettings.objects.create()
 
+    # Import total DAP and total dose at reference point alert levels. Create with default values if not found.
+    try:
+        HighDoseMetricAlertSettings.objects.get()
+    except ObjectDoesNotExist:
+        HighDoseMetricAlertSettings.objects.create()
+    alert_levels = HighDoseMetricAlertSettings.objects.values('show_accum_dose_over_delta_weeks', 'alert_total_dap_rf', 'alert_total_rp_dose_rf', 'accum_dose_delta_weeks')[0]
+
+    # Obtain the studies that are within delta weeks if needed
+    if alert_levels['show_accum_dose_over_delta_weeks']:
+        patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+        if patient_id:
+            study_date = study.study_date
+            week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+            oldest_date = (study_date - timedelta(weeks=week_delta))
+            included_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF', patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
+        else:
+            included_studies = None
+    else:
+        included_studies = None
+
     admin = {'openremversion': remapp.__version__,
              'docsversion': remapp.__docs_version__,
              'enable_skin_dose_maps': SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]}
@@ -777,7 +807,9 @@ def rf_detail_view(request, pk=None):
          'study_totals': study_totals,
          'projection_xray_dose_set': projection_xray_dose_set,
          'accumxraydose_set_all_planes': accumxraydose_set_all_planes,
-         'events_all': events_all},
+         'events_all': events_all,
+         'alert_levels': alert_levels,
+         'studies_in_week_delta': included_studies},
         context_instance=RequestContext(request)
     )
 
@@ -1579,6 +1611,30 @@ def openrem_home(request):
         if not_patient_indicator_question:
             admin_questions_true = True  # Doing this instead
 
+    #from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
+    #send_rf_high_dose_alert_email(417637)
+    #send_rf_high_dose_alert_email(417973)
+    # # Send a test e-mail
+    # from django.core.mail import send_mail
+    # from openremproject import settings
+    # from remapp.models import HighDoseMetricAlertSettings
+    # from django.contrib.auth.models import User
+    #
+    # try:
+    #     HighDoseMetricAlertSettings.objects.get()
+    # except ObjectDoesNotExist:
+    #     HighDoseMetricAlertSettings.objects.create()
+    #
+    # send_alert_emails = HighDoseMetricAlertSettings.objects.values_list('send_high_dose_metric_alert_emails', flat=True)[0]
+    # if send_alert_emails:
+    #     recipients = User.objects.filter(highdosemetricalertrecipients__receive_high_dose_metric_alerts__exact=True).values_list('email', flat=True)
+    #     send_mail('OpenREM high dose alert test',
+    #               'This is a test for high dose alert e-mails from OpenREM',
+    #               settings.EMAIL_DOSE_ALERT_SENDER,
+    #               recipients,
+    #               fail_silently=False)
+    # # End of sending a test e-mail
+
     return render(request, "remapp/home.html",
                   {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
                    'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true,
@@ -1686,8 +1742,7 @@ def update_study_workload(request):
     :return: HTML table of modalities
     """
     from django.db.models import Q, Min
-    from datetime import datetime
-    from datetime import timedelta
+    from datetime import datetime, timedelta
     from collections import OrderedDict
 
     if request.is_ajax():
@@ -1713,8 +1768,8 @@ def update_study_workload(request):
             day_delta_b = 28
 
         today = datetime.now()
-        date_a = (datetime.now() - timedelta(days=day_delta_a))
-        date_b = (datetime.now() - timedelta(days=day_delta_b))
+        date_a = (today - timedelta(days=day_delta_a))
+        date_b = (today - timedelta(days=day_delta_b))
 
         for display_name, pk in display_names:
             display_name_studies = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name)
@@ -3358,6 +3413,216 @@ class DicomDeleteSettingsUpdate(UpdateView):  # pylint: disable=unused-variable
             admin[group.name] = True
         context['admin'] = admin
         return context
+
+
+class RFHighDoseAlertSettings(UpdateView):  # pylint: disable=unused-variable
+    """UpdateView for configuring the fluoroscopy high dose alert settings
+
+    """
+    from remapp.models import HighDoseMetricAlertSettings
+    from remapp.forms import RFHighDoseFluoroAlertsForm
+    from django.core.exceptions import ObjectDoesNotExist
+
+    try:
+        HighDoseMetricAlertSettings.objects.get()
+    except ObjectDoesNotExist:
+        HighDoseMetricAlertSettings.objects.create()
+
+    model = HighDoseMetricAlertSettings
+    form_class = RFHighDoseFluoroAlertsForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+    def form_valid(self, form):
+        if form.has_changed():
+            if 'show_accum_dose_over_delta_weeks' in form.changed_data:
+                msg = 'Display of summed total DAP and total dose at RP on summary page '
+                if form.cleaned_data['show_accum_dose_over_delta_weeks']:
+                    msg += 'enabled'
+                else:
+                    msg += ' disabled'
+                messages.info(self.request, msg)
+            if 'calc_accum_dose_over_delta_weeks_on_import' in form.changed_data:
+                msg = 'Calculation of summed total DAP and total dose at RP for incoming studies '
+                if form.cleaned_data['calc_accum_dose_over_delta_weeks_on_import']:
+                    msg += 'enabled'
+                else:
+                    msg += ' disabled'
+                messages.info(self.request, msg)
+            if 'send_high_dose_metric_alert_emails' in form.changed_data:
+                msg = 'E-mail notification of high doses '
+                if form.cleaned_data['send_high_dose_metric_alert_emails']:
+                    msg += 'enabled'
+                else:
+                    msg += ' disabled'
+                messages.info(self.request, msg)
+            if 'alert_total_dap_rf' in form.changed_data:
+                messages.info(self.request, 'Total DAP alert level has been changed to {0}'.format(form.cleaned_data['alert_total_dap_rf']))
+            if 'alert_total_rp_dose_rf' in form.changed_data:
+                messages.info(self.request, 'Total dose at reference point alert level has been changed to {0}'.format(form.cleaned_data['alert_total_rp_dose_rf']))
+            if 'accum_dose_delta_weeks' in form.changed_data:
+                messages.warning(self.request, 'The time period used to sum total DAP and total dose at RP has changed. The summed data must be recalculated: click on the "Recalculate all summed data" button below. The recalculation can take several minutes')
+            return super(RFHighDoseAlertSettings, self).form_valid(form)
+        else:
+            messages.info(self.request, "No changes made")
+        return super(RFHighDoseAlertSettings, self).form_valid(form)
+
+
+@login_required
+@csrf_exempt
+def rf_alert_notifications_view(request):
+    """View for display and modification of fluoroscopy high dose alert recipients
+
+    """
+    from django.contrib.auth.models import User
+    from remapp.models import HighDoseMetricAlertRecipients
+    from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
+    from tools.get_values import get_keys_by_value
+
+    if request.method == 'POST' and request.user.groups.filter(name="admingroup"):
+        # Check to see if we need to send a test message
+        if 'Send test' in request.POST.values():
+            recipient = get_keys_by_value(request.POST, 'Send test')[0]
+            email_response = send_rf_high_dose_alert_email(study_pk=None, test_message=True, test_user=recipient)
+            if email_response == None:
+                messages.success(request, 'Test e-mail sent to {0}'.format(recipient))
+            else:
+                messages.error(request, 'Test e-mail failed: {0}'.format(email_response))
+
+        all_users = User.objects.all()
+        for user in all_users:
+            if str(user.pk) in request.POST.values():
+                if not hasattr(user, 'highdosemetricalertrecipients'):
+                    new_objects = HighDoseMetricAlertRecipients.objects.create(user=user)
+                    new_objects.save()
+                user.highdosemetricalertrecipients.receive_high_dose_metric_alerts = True
+            else:
+                if not hasattr(user, 'highdosemetricalertrecipients'):
+                    new_objects = HighDoseMetricAlertRecipients.objects.create(user=user)
+                    new_objects.save()
+                user.highdosemetricalertrecipients.receive_high_dose_metric_alerts = False
+            user.save()
+
+    f = User.objects.order_by('username')
+
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    return_structure = {'user_list': f, 'admin': admin}
+
+    return render_to_response(
+        'remapp/rfalertnotificationsview.html',
+        return_structure,
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
+def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable
+    """View to recalculate the summed total DAP and total dose at RP for all RF studies
+
+    """
+    from django.http import JsonResponse
+
+    if not request.user.groups.filter(name="admingroup"):
+        # Send the user to the home page
+        return HttpResponseRedirect(reverse('home'))
+    else:
+        # Empty the PKsForSummedRFDoseStudiesInDeltaWeeks table
+        from remapp.models import PKsForSummedRFDoseStudiesInDeltaWeeks
+        PKsForSummedRFDoseStudiesInDeltaWeeks.objects.all().delete()
+
+        # In the AccumIntegratedProjRadiogDose table delete all dose_area_product_total_over_delta_weeks and dose_rp_total_over_delta_weeks entries
+        from remapp.models import AccumIntegratedProjRadiogDose
+        AccumIntegratedProjRadiogDose.objects.all().update(dose_area_product_total_over_delta_weeks=None, dose_rp_total_over_delta_weeks=None)
+
+        # For each RF study recalculate dose_area_product_total_over_delta_weeks and dose_rp_total_over_delta_weeks
+        from datetime import timedelta
+        from django.db.models import Sum
+        from remapp.models import HighDoseMetricAlertSettings
+
+        try:
+            HighDoseMetricAlertSettings.objects.get()
+        except ObjectDoesNotExist:
+            HighDoseMetricAlertSettings.objects.create()
+        week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+
+        all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
+
+        for study in all_rf_studies:
+            try:
+                study.patientmoduleattr_set.get()
+                patient_id = study.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+            except ObjectDoesNotExist:
+                patient_id = None
+
+            if patient_id:
+                study_date = study.study_date
+                oldest_date = (study_date - timedelta(weeks=week_delta))
+
+                # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                # The try and except parts of this code are here because some of the studies in my database didn't have the
+                # expected data in the related fields - not sure why. Perhaps an issue with the extractor routine?
+                try:
+                    study.projectionxrayradiationdose_set.get().accumxraydose_set.all()
+                except ObjectDoesNotExist:
+                    study.projectionxrayradiationdose_set.get().accumxraydose_set.create()
+
+                for accumxraydose in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+                    try:
+                        accumxraydose.accumintegratedprojradiogdose_set.get()
+                    except:
+                        accumxraydose.accumintegratedprojradiogdose_set.create()
+
+                for accumxraydose in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+                    accum_int_proj_pk = accumxraydose.accumintegratedprojradiogdose_set.get().pk
+
+                    accum_int_proj_to_update = AccumIntegratedProjRadiogDose.objects.get(pk=accum_int_proj_pk)
+
+                    included_studies = all_rf_studies.filter(patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
+
+                    bulk_entries = []
+                    for pk in included_studies.values_list('pk', flat=True):
+                        new_entry = PKsForSummedRFDoseStudiesInDeltaWeeks()
+                        new_entry.general_study_module_attributes_id = study.pk
+                        new_entry.study_pk_in_delta_weeks = pk
+                        bulk_entries.append(new_entry)
+
+                    if len(bulk_entries):
+                        PKsForSummedRFDoseStudiesInDeltaWeeks.objects.bulk_create(bulk_entries)
+
+                    accum_totals = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total'),
+                                                              Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total'))
+                    accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__sum']
+                    accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total__sum']
+                    accum_int_proj_to_update.save()
+
+        HighDoseMetricAlertSettings.objects.all().update(changed_accum_dose_delta_weeks=False)
+
+        messages.success(request, 'All summed total DAP and total dose at RP doses have been re-calculated')
+
+        django_messages = []
+        for message in messages.get_messages(request):
+            django_messages.append({
+                'level': message.level_tag,
+                'message': message.message,
+                'extra_tags': message.tags,
+            })
+
+        return_structure = {
+            'success': True,
+            'messages': django_messages
+        }
+
+        return JsonResponse(return_structure, safe=False)
 
 
 class SkinDoseMapCalcSettingsUpdate(UpdateView):  # pylint: disable=unused-variable

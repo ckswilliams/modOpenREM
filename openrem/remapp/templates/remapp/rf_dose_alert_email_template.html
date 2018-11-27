@@ -1,0 +1,259 @@
+{% spaceless %}
+    <!DOCTYPE html>
+    <html>
+
+    <head>
+        <style>
+            body {
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: 14px;
+                line-height: 1.0;
+                color: #333;
+                background-color: #fff;
+                margin: 0;
+            }
+
+            * {
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+
+            html {
+                font-size: 10px;
+                font-family: sans-serif;
+                -webkit-text-size-adjust: 100%;
+            }
+
+            h1 {
+                font-size: 36px;
+                margin: .67em 0;
+                margin-top: 0.67em;
+                margin-bottom: 0.67em;
+                font-size: 2em;
+            }
+
+            h1, h2 {
+                margin-top: 20px;
+                margin-bottom: 10px;
+                font-family: inherit;
+                font-weight: 500;
+                line-height: 1.1;
+                color: inherit;
+            }
+
+            .table {
+                margin-bottom: 20px;
+            }
+
+            small {
+                font-size: 85%;
+            }
+
+            table {
+                background-color: transparent;
+                border-spacing: 0;
+                border-collapse: collapse;
+            }
+
+            .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+                border: 1px solid #ddd;
+            }
+
+            .table-condensed > tbody > tr > td, .table-condensed > tbody > tr > th, .table-condensed > tfoot > tr > td, .table-condensed > tfoot > tr > th, .table-condensed > thead > tr > td, .table-condensed > thead > tr > th {
+                padding: 0px;
+            }
+
+            .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+                padding: 8px;
+                line-height: 1.0;
+                vertical-align: top;
+                border-top: 1px solid #ddd;
+            }
+
+            th {
+                text-align: left;
+            }
+
+            td, th {
+                padding-right: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+    {% with patientstudy=study.patientstudymoduleattr_set.get %}
+        {% with equipment=study.generalequipmentmoduleattr_set.get %}
+            <h1>OpenREM high dose fluoroscopy alert</h1>
+            <p>A fluoroscopy study has triggered a high dose alert. See below for details. This message has been
+                automatically sent by OpenREM: please do not reply as this mailbox is not monitored.</p>
+            <br>
+            <h2>This study</h2>
+            <table class="table table-condensed table-bordered">
+                <tr>
+                    <td>Study date:</td>
+                    <td>{{ study.study_date|date:"d/m/y" }}</td>
+                </tr>
+                <tr>
+                    <td>Study time:</td>
+                    <td>{{ study.study_time|date:"H:i" }}</td>
+                </tr>
+                <tr>
+                    <td>Study description:</td>
+                    <td>{{ study.study_description }}</td>
+                </tr>
+                <tr>
+                    <td>Procedure:</td>
+                    <td>{{ study.procedure_code_meaning }}</td>
+                </tr>
+                <tr>
+                    <td>Requested procedure:</td>
+                    <td>{{ study.requested_procedure_code_meaning }}</td>
+                </tr>
+                <tr>
+                    <td>Patient height (m):</td>
+                    <td>{{ patientstudy.patient_size|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td>Patient weight (kg):</td>
+                    <td>{{ patientstudy.patient_weight|floatformat:1 }}</td>
+                </tr>
+                <tr>
+                    <td>Institution:</td>
+                    <td>{{ equipment.institution_name }}</td>
+                </tr>
+                <tr>
+                    <td>Display name:</td>
+                    <td>{{ study.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td>
+                </tr>
+                <tr>
+                    <td>Accession number:</td>
+                    <td>{{ study.accession_number }}</td>
+                </tr>
+                <tr>
+                    <td>OpenREM link:</td>
+                    <td><a href="{{ server_url }}/openrem/rf/{{ study.pk }}">This study</a></td>
+                </tr>
+
+                {% for record in accumxraydose_set_all_planes %}
+                    {% with accumprojection=record.accumintegratedprojradiogdose_set.get %}
+                        <tr>
+                            <td>Total DAP, {{ record.acquisition_plane }} (cGy.cm<sup>2</sup>):</td>
+                            <td>{% if accumprojection.convert_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}
+                                <strong style="color: red;">{{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }}</strong>
+                                (This is above the alert level of
+                                {{ alert_levels.alert_total_dap_rf|floatformat:1 }})
+                            {% else %}
+                                {{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }}
+                            {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Total dose at RP, {{ record.acquisition_plane }} (Gy):</td>
+                            <td>{% if accumprojection.dose_rp_total >= alert_levels.alert_total_rp_dose_rf %}
+                                <strong style="color: red;">{{ accumprojection.dose_rp_total|floatformat:1 }}</strong>
+                                (This is above the alert level of
+                                {{ alert_levels.alert_total_rp_dose_rf|floatformat:1 }})
+                            {% else %}
+                                {{ accumprojection.dose_rp_total|floatformat:1 }}
+                            {% endif %}
+                            </td>
+                        </tr>
+                    {% endwith %}{% endfor %}
+            </table>
+
+            {% if alert_levels.show_accum_dose_over_delta_weeks %}
+                <br>
+                <h2>Studies from the past {{ week_delta }} weeks for this patient ID</h2>
+                <table class="table table-condensed table-bordered">
+                    <tr>
+                        <td>Number of studies:</td>
+                        <td>{{ studies_in_week_delta.count }}
+                            ({% for each_study in studies_in_week_delta %}
+                                <a href="{{ server_url }}/openrem/rf/{{ each_study.pk }}">{% if each_study.pk == study.pk %}this study{% else %}study {{ each_study.pk }}{% endif %}</a>{% if not forloop.last %}, {% endif %}
+                            {% endfor %})
+                        </td>
+                    </tr>
+                    {% with accumxraydose_set_all_planes|first as first_accumxraydose %}
+                        {% with accumprojection=first_accumxraydose.accumintegratedprojradiogdose_set.get %}
+                            <tr>
+                                <td>Total DAP from all studies (cGy.cm<sup>2</sup>):</td>
+                                <td>
+                                    {% if accumprojection.total_dap_delta_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}
+                                        <strong style="color: red;">{{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}</strong>
+                                        (This is above the alert level of
+                                        {{ alert_levels.alert_total_dap_rf|floatformat:1 }})
+                                    {% else %}
+                                        {{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Total dose at RP from all studies (Gy):</td>
+                                <td>
+                                    {% if accumprojection.dose_rp_total_over_delta_weeks >= alert_levels.alert_total_rp_dose_rf %}
+                                        <strong style="color: red;">
+                                            {{ accumprojection.dose_rp_total_over_delta_weeks|floatformat:1 }}
+                                        </strong> (This is above the alert level of
+                                        {{ alert_levels.alert_total_rp_dose_rf|floatformat:1 }})
+                                    {% else %}
+                                        {{ accumprojection.dose_rp_total_over_delta_weeks|floatformat:1 }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endwith %}
+                    {% endwith %}
+                </table>
+                <br>
+                <table class="table table-condensed table-bordered">
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Accession number</th>
+                        <th>Total DAP (cGy.cm<sup>2</sup>)</th>
+                        <th>Total dose at RP (Gy)</th>
+                        <th>OpenREM link</th>
+                    </tr>
+                    {% for each_study in studies_in_week_delta %}
+                        <tr>
+                            <td>{{ each_study.study_date|date:"d/m/y" }}</td>
+                            <td>{{ each_study.study_time|date:"H:i" }}</td>
+                            <td>{{ each_study.accession_number }}</td>
+
+                            <td>
+                                {% for accumxraydoseset_allplanes in each_study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                                    {% with accumprojection=accumxraydoseset_allplanes.accumintegratedprojradiogdose_set.get %}
+                                        {{ accumxraydoseset_allplanes.acquisition_plane }}:
+                                        {% if accumprojection.convert_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}
+                                            <strong style="color: red;">{{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }}</strong>
+                                        {% else %}
+                                            {{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }}
+                                        {% endif %}
+                                        <br>
+                                    {% endwith %}
+                                {% endfor %}
+                            </td>
+
+                            <td>
+                                {% for accumxraydoseset_allplanes in each_study.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                                    {% with accumprojection=accumxraydoseset_allplanes.accumintegratedprojradiogdose_set.get %}
+                                        {{ accumxraydoseset_allplanes.acquisition_plane }}:
+                                        {% if accumprojection.dose_rp_total >= alert_levels.alert_total_rp_dose_rf %}
+                                            <strong style="color: red;">{{ accumprojection.dose_rp_total|floatformat:1 }}</strong>
+                                        {% else %}
+                                            {{ accumprojection.dose_rp_total|floatformat:1 }}
+                                        {% endif %}
+                                        <br>
+                                    {% endwith %}
+                                {% endfor %}
+                            </td>
+
+                            <td><a href="{{ server_url }}/openrem/rf/{{ each_study.pk }}">{% if each_study.pk == study.pk %}This study{% else %}Study {{ each_study.pk }}{% endif %}</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        {% endwith %}{% endwith %}
+    </body>
+    </html>
+{% endspaceless %}

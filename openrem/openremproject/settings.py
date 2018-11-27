@@ -264,6 +264,16 @@ PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
 # local_settings.py and configure there.
 VIRTUAL_DIRECTORY = ''
 
+# E-mail server settings - see https://docs.djangoproject.com/en/1.8/topics/email/
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'a.user.that.can.send'
+EMAIL_HOST_PASSWORD = 'the.above.user.password'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
+EMAIL_DOSE_ALERT_SENDER = 'your.alert@email.address'
+EMAIL_OPENREM_URL = 'http://your.openrem.server'
+
 try:
     LOCAL_SETTINGS
 except NameError:

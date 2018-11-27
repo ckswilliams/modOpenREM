@@ -7,7 +7,7 @@ from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes,
 import logging
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings, \
-    NotPatientIndicatorsName, NotPatientIndicatorsID
+    NotPatientIndicatorsName, NotPatientIndicatorsID, HighDoseMetricAlertSettings
 
 logger = logging.getLogger()
 
@@ -251,6 +251,53 @@ class GeneralChartOptionsDisplayForm(forms.Form):
 
 class UpdateDisplayNamesForm(forms.Form):
     display_names = forms.CharField()
+
+
+class RFHighDoseFluoroAlertsForm(forms.ModelForm):
+    """Form for displaying and changing fluoroscopy high dose alert settings
+    """
+
+    def __init__(self, *args, **kwargs):
+        from crispy_forms.layout import Button
+        super(RFHighDoseFluoroAlertsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+
+        # If HighDoseMetricAlertSettings.changed_accum_dose_delta_weeks is True then the summed DAP and dose at RP
+        # values have not yet been recalculated - display the recalculate button on the form.
+        if self.instance.changed_accum_dose_delta_weeks:
+            self.helper.add_input(Button('recalc_all_summed_data', 'Recalculate all summed data', css_class='btn btn-warning'))
+
+        # If there is nothing in self.data and accum_dose_delta_weeks is in self.changed_data then the user must have
+        # changed the accum_dose_delta_weeks value: set the changed_accum_dose_delta_weeks flag to True. This updates
+        # the HighDoseMetricAlertSettings.changed_accum_dose_delta_weeks to True.
+        if len(self.data):
+            if self.has_changed():
+                if 'accum_dose_delta_weeks' in self.changed_data:
+                    self.instance.changed_accum_dose_delta_weeks = True
+                    self.save()
+        self.helper.layout = Layout(
+            Div(
+                'alert_total_dap_rf',
+                'alert_total_rp_dose_rf',
+                'accum_dose_delta_weeks',
+                'show_accum_dose_over_delta_weeks',
+                'calc_accum_dose_over_delta_weeks_on_import',
+                'send_high_dose_metric_alert_emails',
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            )
+        )
+
+    class Meta:
+        model = HighDoseMetricAlertSettings
+        fields = ['alert_total_dap_rf',
+                  'alert_total_rp_dose_rf',
+                  'accum_dose_delta_weeks',
+                  'show_accum_dose_over_delta_weeks',
+                  'calc_accum_dose_over_delta_weeks_on_import',
+                  'send_high_dose_metric_alert_emails']
 
 
 class HomepageOptionsForm(forms.Form):

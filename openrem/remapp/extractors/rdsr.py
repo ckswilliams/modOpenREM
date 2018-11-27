@@ -1378,9 +1378,77 @@ def _rsdr2db(dataset):
 
     enable_skin_dose_maps = SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]
     calc_on_import = SkinDoseMapCalcSettings.objects.values_list('calc_on_import', flat=True)[0]
-    if g.modality_type == "RF" and enable_skin_dose_maps and calc_on_import:
+    if g.modality_type == 'RF' and enable_skin_dose_maps and calc_on_import:
         from remapp.tools.make_skin_map import make_skin_map
         make_skin_map.delay(g.pk)
+
+    # Calculate summed total DAP and dose at RP for studies that have this study's patient ID, going back week_delta
+    # weeks in time from this study date. Only do this if activated in the fluoro alert settings (check whether
+    # HighDoseMetricAlertSettings.calc_accum_dose_over_delta_weeks_on_import is True).
+    if g.modality_type == 'RF':
+        from remapp.models import HighDoseMetricAlertSettings, AccumIntegratedProjRadiogDose
+        try:
+            HighDoseMetricAlertSettings.objects.get()
+        except ObjectDoesNotExist:
+            HighDoseMetricAlertSettings.objects.create()
+
+        week_delta = HighDoseMetricAlertSettings.objects.values_list('accum_dose_delta_weeks', flat=True)[0]
+        calc_accum_dose_over_delta_weeks_on_import = HighDoseMetricAlertSettings.objects.values_list('calc_accum_dose_over_delta_weeks_on_import', flat=True)[0]
+        if calc_accum_dose_over_delta_weeks_on_import:
+            from datetime import timedelta
+            from django.db.models import Sum
+            from remapp.models import PKsForSummedRFDoseStudiesInDeltaWeeks
+
+            all_rf_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').all()
+
+            patient_id = g.patientmoduleattr_set.values_list('patient_id', flat=True)[0]
+            if patient_id:
+                study_date = g.study_date
+                oldest_date = (study_date - timedelta(weeks=week_delta))
+
+                # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                # The try and except parts of this code are here because some of the studies in my database didn't have the
+                # expected data in the related fields - not sure why. Perhaps an issue with the extractor routine?
+                try:
+                    g.projectionxrayradiationdose_set.get().accumxraydose_set.all()
+                except ObjectDoesNotExist:
+                    g.projectionxrayradiationdose_set.get().accumxraydose_set.create()
+
+                for accumxraydose in g.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+                    try:
+                        accumxraydose.accumintegratedprojradiogdose_set.get()
+                    except:
+                        accumxraydose.accumintegratedprojradiogdose_set.create()
+                # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+                for accumxraydose in g.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+                    accum_int_proj_pk = accumxraydose.accumintegratedprojradiogdose_set.get().pk
+
+                    accum_int_proj_to_update = AccumIntegratedProjRadiogDose.objects.get(pk=accum_int_proj_pk)
+
+                    included_studies = all_rf_studies.filter(patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
+
+                    bulk_entries = []
+                    for pk in included_studies.values_list('pk', flat=True):
+                        new_entry = PKsForSummedRFDoseStudiesInDeltaWeeks()
+                        new_entry.general_study_module_attributes_id = g.pk
+                        new_entry.study_pk_in_delta_weeks = pk
+                        bulk_entries.append(new_entry)
+
+                    if len(bulk_entries):
+                        PKsForSummedRFDoseStudiesInDeltaWeeks.objects.bulk_create(bulk_entries)
+
+                    accum_totals = included_studies.aggregate(Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total'),
+                                                              Sum('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total'))
+                    accum_int_proj_to_update.dose_area_product_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__sum']
+                    accum_int_proj_to_update.dose_rp_total_over_delta_weeks = accum_totals['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total__sum']
+                    accum_int_proj_to_update.save()
+
+        # Send an e-mail to all high dose alert recipients if this study is at or above threshold levels
+        send_alert_emails = HighDoseMetricAlertSettings.objects.values_list('send_high_dose_metric_alert_emails', flat=True)[0]
+        if send_alert_emails:
+            from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
+            send_rf_high_dose_alert_email(g.pk)
 
 
 def _fix_toshiba_vhp(dataset):

@@ -131,6 +131,11 @@
             <th>Number of events</th>
             <th>Total DAP (cGy.cm<sup>2</sup>)</th>
             <th>Total dose at RP (Gy)</th>
+            {% if alertLevels.show_accum_dose_over_delta_weeks %}
+                <th>Total DAP summed over <br>{{ alertLevels.accum_dose_delta_weeks }} weeks before study(cGy.cm<sup>2</sup>)</th>
+                <th>Total dose at RP summed over <br>{{ alertLevels.accum_dose_delta_weeks }} weeks before study (Gy)</th>
+            {% endif %}
+
             <th>Physician</th>
             {% if admin.admingroup %}
             <th>Delete?</th>
@@ -140,6 +145,7 @@
           {% with equipment=exam.generalequipmentmoduleattr_set.get %}
           {% with projection_set=exam.projectionxrayradiationdose_set.get %}
           {% with accum_set=projection_set.accumxraydose_set.all %}
+          {% with study_delta_pk_set=exam.pksforsummedrfdosestudiesindeltaweeks_set.all %}
         <tr>
             <td>
                 <a href="{% url 'rf_detail_view' pk=exam.id %}">
@@ -184,7 +190,13 @@
                         {% if accum_set.count > 1 %}
                             {{ record.acquisition_plane }}:
                         {% endif %}
-                        {{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }}
+
+                        {% if accum_integrated.convert_gym2_to_cgycm2 >= alertLevels.alert_total_dap_rf %}
+                            <strong style="color: red;">{{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }}</strong>
+                        {% else %}
+                            {{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }}
+                        {% endif %}
+
                         <br>
                       {% endwith %}
                     {% endfor %}
@@ -197,12 +209,52 @@
                         {% if accum_set.count > 1 %}
                             {{ record.acquisition_plane }}:
                         {% endif %}
-                        <script>document.write({{ accum_integrated.dose_rp_total }}.toPrecision(3));</script>
+
+                        {% if accum_integrated.dose_rp_total >= alertLevels.alert_total_rp_dose_rf %}
+                            <strong style="color: red;"><script>document.write({{ accum_integrated.dose_rp_total }}.toPrecision(3));</script></strong>
+                        {% else %}
+                            <script>document.write({{ accum_integrated.dose_rp_total }}.toPrecision(3));</script>
+                        {% endif %}
+
                         <br>
                       {% endwith %}
                     {% endfor %}
                 </a>
             </td>
+            {% if alertLevels.show_accum_dose_over_delta_weeks %}
+                {% with accum_set|first as first_accum_set %}
+                    <td>
+                        <a href="/openrem/rf/{{ exam.id }}/">
+                          {% with accum_integrated=first_accum_set.accumintegratedprojradiogdose_set.get %}
+                            {% if accum_integrated.total_dap_delta_gym2_to_cgycm2 >= alertLevels.alert_total_dap_rf %}
+                                <strong style="color: red;">{{ accum_integrated.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}</strong>
+                            {% else %}
+                                {{ accum_integrated.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}
+                            {% endif %}
+
+                            {% with n_studies=study_delta_pk_set.count %}
+                                 ({{ n_studies }} exam{{ n_studies|pluralize }})
+                            {% endwith %}
+                          {% endwith %}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="/openrem/rf/{{ exam.id }}/">
+                          {% with accum_integrated=first_accum_set.accumintegratedprojradiogdose_set.get %}
+                            {% if accum_integrated.dose_rp_total_over_delta_weeks >= alertLevels.alert_total_rp_dose_rf %}
+                                <strong style="color: red;"><script>document.write({{ accum_integrated.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script></strong>
+                            {% else %}
+                                <script>document.write({{ accum_integrated.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script>
+                            {% endif %}
+
+                            {% with n_studies=study_delta_pk_set.count %}
+                                 ({{ n_studies }} exam{{ n_studies|pluralize }})
+                            {% endwith %}
+                          {% endwith %}
+                        </a>
+                    </td>
+                {% endwith %}
+            {% endif %}
             <td>
                 <a href="{% url 'rf_detail_view' pk=exam.id %}">
                     {{ exam.performing_physician_name }}
@@ -214,7 +266,7 @@
             </td>
             {% endif %}
         </tr>
-          {% endwith %}{% endwith %}{% endwith %}
+          {% endwith %}{% endwith %}{% endwith %}{% endwith %}
         {% endfor %}
     </table>
 

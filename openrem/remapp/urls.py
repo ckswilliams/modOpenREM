@@ -32,7 +32,8 @@ from django.conf.urls import patterns, url
 from django.contrib.auth import views as auth_views
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
-from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate
+from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate, \
+                         RFHighDoseAlertSettings
 from remapp.views import NotPatientNameCreate, NotPatientNameUpdate, NotPatientNameDelete
 from remapp.views import NotPatientIDCreate, NotPatientIDUpdate, NotPatientIDDelete
 
@@ -120,6 +121,12 @@ urlpatterns = patterns('remapp.views',
                            name='notpatientid_delete'),
                        url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient',
                            name='admin_questions_hide_not_patient'),
+                       url(r'^admin/rfalertsettings/(?P<pk>\d+)/$', RFHighDoseAlertSettings.as_view(),
+                           name='rf_alert_settings_update'),
+                       url(r'^admin/rfalertnotifications/$', 'rf_alert_notifications_view',
+                           name='rf_alert_notifications_view'),
+                       url(r'^admin/rfrecalculateaccumdoses/', 'rf_recalculate_accum_doses',
+                           name='rf_recalculate_accum_doses'),
                        # url(r'^password/$', 'change_password', name='change_password'),
                        url('^change_password/$', auth_views.password_change,
                            {'template_name': 'registration/changepassword.html'}, name='password_change'),
@@ -170,3 +177,4 @@ urlpatterns += patterns('remapp.netdicom.dicomviews',
                         url(r'admin/queryretrieve$', 'r_start', name='r_start'),
                         url(r'admin/moveupdate$', 'r_update', name='r_update'),
                         )
+
