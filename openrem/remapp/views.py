@@ -3483,11 +3483,12 @@ def rf_alert_notifications_view(request):
     from django.contrib.auth.models import User
     from remapp.models import HighDoseMetricAlertRecipients
     from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
+    from tools.get_values import get_keys_by_value
 
     if request.method == 'POST' and request.user.groups.filter(name="admingroup"):
         # Check to see if we need to send a test message
         if 'Send test' in request.POST.values():
-            recipient = request.POST.dict().keys()[0]
+            recipient = get_keys_by_value(request.POST, 'Send test')[0]
             email_response = send_rf_high_dose_alert_email(study_pk=None, test_message=True, test_user=recipient)
             if email_response == None:
                 messages.success(request, 'Test e-mail sent to {0}'.format(recipient))
