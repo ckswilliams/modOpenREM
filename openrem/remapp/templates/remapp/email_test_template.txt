@@ -1,0 +1,5 @@
+** OpenREM test e-mail message **
+
+This is a message to test OpenREM e-mail sending functionality.
+
+This message has been automatically sent by OpenREM: please do not reply as this mailbox is not monitored.

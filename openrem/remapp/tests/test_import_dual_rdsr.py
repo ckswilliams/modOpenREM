@@ -28,6 +28,7 @@ class ImportDualRDSRs(TestCase):
         PatientIDSettings.objects.create()
         SkinDoseMapCalcSettings.objects.create()  # Bitbucket pipeline requires in order to import reset_dual
 
+
         rf_file = "test_files/Dual-RDSR-RF.dcm"
         dx_file = "test_files/Dual-RDSR-DX.dcm"
         root_tests = os.path.dirname(os.path.abspath(__file__))

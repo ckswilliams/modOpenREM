@@ -1,0 +1,63 @@
+{% extends "remapp/base.html" %}
+
+{% block headextras %}
+    <script src="{{ STATIC_URL }}js/sorttable.js"></script>
+{% endblock %}
+
+{% block confnav %}
+    <li class="dropdown active">{% endblock %}
+
+{% block navhelp %}
+    <li>
+        <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/i_fluoro_high_dose_alerts.html" target="_blank"
+           data-toggle="tooltip" title="Fluoroscopy high dose alerts documentation - opens in a new tab">
+            Fluoroscopy high dose alerts documentation
+        </a>
+    </li>
+{% endblock %}
+
+{% block toprow %}
+    {% load pagination_tags %}
+    <a name="#top"></a>
+    {% if admin.admingroup %}
+        <p>Check one or more boxes and click an Update button to select which users receive e-mail
+            notification of fluoroscopy high dose alerts.</p>
+        <p>The table can be sorted by clicking on the column headers. To add or update email addresses go to <a href="{% url 'admin:auth_user_changelist' %}">User configuration</a>.</p>
+    {% else %}
+        <p>Only users in the Admin group can view these settings.</p>
+    {% endif %}
+{% endblock %}
+
+
+{% block mainblock %}
+    {% paginate %}
+
+    {% if admin.admingroup %}
+        <form action="/admin/rfalertnotifications/" method="post">
+
+            <table class="table table-bordered table-hover row-clickable sortable" id="alert_recipient_table">
+                <tr>
+                    <th>User name</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>E-mail address</th>
+                    <th style="text-align: center">Receive high dose alert e-mails?</th>
+                    <th style="text-align: center">Send test e-mail</th>
+                </tr>
+
+                {% for eachuser in user_list %}
+                    <tr class="clickable-row" row_name="{{ eachuser.id }}">
+                        <td style="vertical-align: middle"><a style="text-decoration: none">{{ eachuser.username }}</a></td>
+                        <td style="vertical-align: middle"><a style="text-decoration: none">{{ eachuser.first_name }}</a></td>
+                        <td style="vertical-align: middle"><a style="text-decoration: none">{{ eachuser.last_name }}</a></td>
+                        <td style="vertical-align: middle"><a style="text-decoration: none">{{ eachuser.email }}</a></td>
+                        <td style="text-align: center; vertical-align: middle"><a style="text-decoration: none"><input type="checkbox" title="" name="{{ eachuser.id }}" value="{{ eachuser.id }}" {% if eachuser.highdosemetricalertrecipients.receive_high_dose_metric_alerts %}checked{% endif %}></a></td>
+                        <td style="text-align: center; vertical-align: middle">{% if eachuser.email %}<a style="text-decoration: none"><input class="btn btn-basic" type="submit" title="Send test" name="{{ eachuser.email }}" value="Send test"></a>{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            <input class="btn btn-primary" type="submit" value="Update">
+        </form>
+    {% endif %}
+{% endblock %}

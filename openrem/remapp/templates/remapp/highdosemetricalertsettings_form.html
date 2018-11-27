@@ -1,0 +1,76 @@
+{% extends "remapp/base.html" %}
+
+    {% block headextras %}
+    <!-- Including chartCommonFunctions to use urlToArray and arrayToUrl functions -->
+    <script src="{{ STATIC_URL }}js/charts/chartCommonFunctions.js"></script>
+    {% endblock %}
+
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block navhelp %}
+        <li>
+            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/i_fluoro_high_dose_alerts.html" target="_blank"
+               data-toggle="tooltip" title="Fluoroscopy high dose alerts documentation - opens in a new tab">
+                Fluoroscopy high dose alerts documentation
+            </a>
+        </li>
+{% endblock %}
+
+{% block mainblock %}
+
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+          <h3>Modify fluoroscopy high dose alert settings</h3>
+        {% if admin.admingroup %}
+            {% load crispy_forms_tags %}
+            {% crispy form %}
+        {% else %}
+            <p>Only users in the Admin group can modify these settings.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            var requestData = arrayToURL(urlToArray(this.URL));
+
+            $("#button-id-recalc_all_summed_data").click(function(e) {
+                e.preventDefault();
+                $(".ajax-progress").show();
+                $("#submit-id-submit").attr("disabled", true);
+                $("#button-id-recalc_all_summed_data").val("Recalculating - this may take some time").attr("disabled", true);
+                $.ajax({
+                    type: "GET",
+                    url: "/admin/rfrecalculateaccumdoses/",
+                    data: requestData,
+                    dataType: "json",
+                    success: function( json ) {
+                        update_messages(json.messages);
+                        $(".ajax-progress").hide();
+                        $("#submit-id-submit").removeAttr("disabled");
+                        $("#button-id-recalc_all_summed_data").val("Recalculate all summed data").removeAttr("disabled").hide();
+                    },
+                    error: function( xhr, status, errorThrown ) {
+                        $(".ajax-progress").hide();
+                        $("#submit-id-submit").removeAttr("disabled");
+                        $("#button-id-recalc_all_summed_data").val("Recalculation failed - try again?").removeAttr("disabled");
+                        console.log( "Error: " + errorThrown );
+                        console.log( "Status: " + status );
+                        console.dir( xhr );
+                    }
+                });
+                return false;
+            })
+        });
+
+        function update_messages(messages) {
+            $.each(messages, function (i, m) {
+                var button = "<button type='button' class='close' data-dismiss='alert' aria-label='close'><span aria-hidden='true'>x</span></button>";
+                var msg_div = "<div class='alert alert-" + m.level + " alert-dismissible fade-in'>" + button + m.message + "</div>";
+                $(msg_div).insertBefore(".row");
+            });
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% with patientstudy=study.patientstudymoduleattr_set.get %}{% with equipment=study.generalequipmentmoduleattr_set.get %}
+**OpenREM high dose fluoroscopy alert**
+
+A fluoroscopy study has triggered a high dose alert. See below for details. This message has been
+automatically sent by OpenREM: please do not reply as this mailbox is not monitored.
+
+This study
+	Study date:		{{ study.study_date|date:"d/m/y" }}
+	Study time:		{{ study.study_time|date:"H:i" }}
+	Study description:	{{ study.study_description }}
+	Procedure:		{{ study.procedure_code_meaning }}
+	Requested procedure:	{{ study.requested_procedure_code_meaning }}
+	Patient height:		{{ patientstudy.patient_size|floatformat:2 }} m
+	Patient weight:		{{ patientstudy.patient_weight|floatformat:1 }} kg
+
+	Institution:		{{ equipment.institution_name }}
+	Display name:		{{ study.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
+	Accession number:	{{ study.accession_number }}
+	OpenREM link:		{{ server_url }}/openrem/rf/{{ study.pk }}/
+{% for record in accumxraydose_set_all_planes %}{% with accumprojection=record.accumintegratedprojradiogdose_set.get %}
+	Total DAP, {{ record.acquisition_plane }} (cGy.cm2):	{{ accumprojection.convert_gym2_to_cgycm2|floatformat:1 }}{% if accumprojection.convert_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}	(This is above the alert level of {{ alert_levels.alert_total_dap_rf|floatformat:1 }}){% endif %}
+	Total dose at RP, {{ record.acquisition_plane }} (Gy):	{{ accumprojection.dose_rp_total|floatformat:1 }}{% if accumprojection.dose_rp_total >= alert_levels.alert_total_rp_dose_rf %}	(This is above the alert level of {{ alert_levels.alert_total_rp_dose_rf|floatformat:1 }}){% endif %}
+{% endwith %}{% endfor %}
+{% if alert_levels.show_accum_dose_over_delta_weeks %}
+Sudies from the past {{ week_delta }} weeks for this patient ID
+	Number of studies:	{{ studies_in_week_delta.count }} ({% for each_study in studies_in_week_delta %}{{ server_url }}/openrem/rf/{{ each_study.pk }}/ {% if each_study.pk == study.pk %}- this study{% endif %}{% if not forloop.last%}, {% endif %}{% endfor %}){% with accumxraydose_set_all_planes|first as first_accumxraydose %}{% with accumprojection=first_accumxraydose.accumintegratedprojradiogdose_set.get %}
+	Total DAP from all studies (cGy.cm2):	{{ accumprojection.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}{% if accumprojection.total_dap_delta_gym2_to_cgycm2 >= alert_levels.alert_total_dap_rf %}	(This is above the alert level of {{ alert_levels.alert_total_dap_rf|floatformat:1 }}){% endif %}
+	Total dose at RP from all studies (Gy):	{{ accumprojection.dose_rp_total_over_delta_weeks|floatformat:1 }}{% if accumprojection.dose_rp_total_over_delta_weeks >= alert_levels.alert_total_rp_dose_rf %}	(This is above the alert level of {{ alert_levels.alert_total_rp_dose_rf|floatformat:1 }}){% endif %}
+{% endwith %}{% endwith %}
+
+All studies for this patient ID from the past {{ week_delta }} weeks
+	Date		Time	Accession number	OpenREM link{% for each_study in studies_in_week_delta %}
+	{{ each_study.study_date|date:"d/m/y" }}	{{ each_study.study_time|date:"H:i" }}	{{ each_study.accession_number }}			{{ server_url }}/openrem/rf/{{ each_study.pk }}/{% if each_study.pk == study.pk %} (This study){% endif %}{% endfor %}
+{% endif %}
+{% endwith %}{% endwith %}
