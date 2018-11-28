@@ -774,13 +774,16 @@ def qrscu(
     modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, assoc)
 
     # Now we have all our studies. Time to throw duplicates and away any we don't want
-    logger.debug(u"Time to throw away any studies or series that are not useful before requesting moves")
     distinct_rsp = query.dicomqrrspstudy_set.all().distinct('study_instance_uid')
     try:
         distinct_rsp.count()  # To trigger error if using SLQite3 or other unsupported db for distinct()
         study_rsp = distinct_rsp
     except NotImplementedError:
         study_rsp = query.dicomqrrspstudy_set.all()
+    study_numbers = {'initial': study_rsp.count()}
+    study_numbers['current'] = study_numbers['initial']
+    logger.info(u"{0} studies returned, will now process to remove studies that are not useful.".format(
+        study_numbers['initial']))
 
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
     # We are assuming that if remote matches on modality it will populate ModalitiesInStudy and conversely
@@ -791,7 +794,10 @@ def qrscu(
             mods = study.get_modalities_in_study()
             if mods != ['SR']:
                 study.delete()
-        logger.debug(u"Finished removing studies that have anything other than SR in.")
+        study_numbers['current'] = study_rsp.count()
+        study_numbers['sr_only_removed'] = study_numbers['initial'] - study_numbers['current']
+        logger.info(u"Finished removing studies that have anything other than SR in, {0} removed, {1} remain".format(
+            study_numbers['sr_only_removed'], study_numbers['current']))
 
     filter_logs = []
     if filters['study_desc_inc']:
@@ -806,11 +812,17 @@ def qrscu(
     query.stage = u"Pruning study responses based on inc/exc options"
     query.save()
     logger.info(u"Pruning study responses based on inc/exc options: {0}".format(u"".join(filter_logs)))
+    before_study_prune = study_numbers['current']
     _prune_study_responses(query, filters)
     study_rsp = query.dicomqrrspstudy_set.all()
+    study_numbers['current'] = study_rsp.count()
+    study_numbers['inc_exc_removed'] = before_study_prune - study_numbers['current']
+    logger.info(u"Pruning studies based on inc/exc has removed {0} studies, {1} studies remain.".format(
+        study_numbers['inc_exc_removed'], study_numbers['current']))
 
     query.stage = u"Querying at series level to get more details about studies"
     query.save()
+    logger.info(u"Querying at series level to get more details about studies")
     for rsp in study_rsp:
         # Series level query
         d2 = Dataset()
@@ -841,7 +853,7 @@ def qrscu(
                             delete = False
             if delete:
                 study_rsp.filter(modalities_in_study__exact=mod_set).delete()
-        logger.info(u'Now have {0} studies'.format(study_rsp.count()))
+        logger.info(u'Removed studies of other modalities, now have {0} studies'.format(study_rsp.count()))
 
     query.stage = u"Pruning series responses"
     query.save()
