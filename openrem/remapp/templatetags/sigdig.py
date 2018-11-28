@@ -9,14 +9,15 @@ register = template.Library()
 
 @register.filter
 def sigdig(value, digits=3):
-    if value is not None:
-        if value != Decimal(0):
-            order = int(math.floor(math.log10(math.fabs(value))))
-            places = digits - order - 1
-        else:
-            places = 2
-        if places > 0:
-            fmtstr = "%%.%df" % (places)
-        else:
-            fmtstr = "%.0f"
-        return Decimal(fmtstr % (round(value, places)))
+    if value is None:
+        return ''
+    if value != Decimal(0):
+        order = int(math.floor(math.log10(math.fabs(value))))
+        places = digits - order - 1
+    else:
+        places = 2
+    if places > 0:
+        fmtstr = "%%.%df" % (places)
+    else:
+        fmtstr = "%.0f"
+    return Decimal(fmtstr % (round(value, places)))
