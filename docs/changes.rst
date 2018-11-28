@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#695`_  Imports: added missing name attribute for size_abort url
 * `#691`_  Interface: fixed URL lookup error for Display Names page
 * `#690`_  Interface: added workload stats user option entry back into config menu
 * `#689`_  Interface: fixed URL lookup error for DICOM summary page
