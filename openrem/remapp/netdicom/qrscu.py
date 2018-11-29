@@ -431,6 +431,15 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False, msg_id=N
 
 
 def _query_series(assoc, d2, studyrsp, query_id):
+    """Query for series level data for each study
+
+    :param assoc: DICOM association with C-FIND SCP
+    :param d2: DICOM dataset containing StudyInstanceUID to be used for series level query
+    :param studyrsp: database entry for the study
+    :param query_id: UID identifying this query (common to study/series/image level)
+    :return: None
+    """
+
     from remapp.tools.dcmdatetime import get_time
     from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspSeries
@@ -444,8 +453,8 @@ def _query_series(assoc, d2, studyrsp, query_id):
     d2.SpecificCharacterSet = ''
     d2.SeriesTime = ''
 
-    logger.debug(u'Query_id {0}: In _query_series'.format(query_id))
-    logger.debug(u'Query_id {0}: series query is {1}'.format(query_id, d2))
+    logger.debug(u'{0} In _query_series'.format(query_id))
+    logger.debug(u'{0} series query is {1}'.format(query_id, d2))
 
     st2 = assoc.StudyRootFindSOPClass.SCU(d2, 1)
 
@@ -466,7 +475,7 @@ def _query_series(assoc, d2, studyrsp, query_id):
             seriesrsp.modality = series[1].Modality
         except AttributeError:
             seriesrsp.modality = u"OT"  # not sure why a series is returned without, assume we don't want it.
-            logger.warning(u"Series Response {0}: Illegal response with no modality at series level".format(query_id))
+            logger.warning(u"{0} Illegal response with no modality at series level".format(query_id))
         try:
             seriesrsp.series_number = series[1].SeriesNumber
         except AttributeError:
@@ -480,11 +489,10 @@ def _query_series(assoc, d2, studyrsp, query_id):
             seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
         seriesrsp.station_name = get_value_kw('StationName', series[1])
         seriesrsp.series_time = get_time('SeriesTime', series[1])
-        logger.debug(u"Series Response {0}: Modality {1}, StationName {2}, StudyUID {3}, Series No. {4}, "
+        logger.debug(u"{6} Series Response {0}: Modality {1}, StationName {2}, StudyUID {3}, Series No. {4}, "
                      u"Series description {5}".format(
                             seRspNo, seriesrsp.modality, seriesrsp.station_name, d2.StudyInstanceUID,
-                            seriesrsp.series_number, seriesrsp.series_description))
-
+                            seriesrsp.series_number, seriesrsp.series_description, query_id))
         seriesrsp.save()
 
 
@@ -677,16 +685,19 @@ def qrscu(
                  u"filters={11}".format(qr_scp_pk, store_scp_pk, implicit, explicit, move, query_id,
                                        date_from, date_until, modalities, inc_sr, remove_duplicates, filters))
 
+    if not query_id:
+        query_id = uuid.uuid4()
     # Currently, if called from qrscu_script modalities will either be a list of modalities or it will be "SR".
     # Web interface hasn't changed, so will be a list of modalities and or the inc_sr flag
     # Need to normalise one way or the other.
-    logger.debug(u"Checking for modality selection and sr_only clash")
+    logger.debug(u"Query_id is {0}".format(query_id))
+    logger.debug(u"{0} Checking for modality selection and sr_only clash".format(query_id))
     if modalities is None and inc_sr is False:
-        logger.error(u"Query retrieve routine called with no modalities selected")
+        logger.error(u"{0} Query retrieve routine called with no modalities selected".format(query_id))
         return
     elif modalities is not None and inc_sr is True:
-        logger.error(u"Query retrieve routine should be called with a modality selection _or_ SR only query, not both"
-                     u"Modalities is {0}, inc_sr is {1}".format(modalities, inc_sr))
+        logger.error(u"{2} Query retrieve routine should be called with a modality selection _or_ SR only query, not "
+                     u"both. Modalities is {0}, inc_sr is {1}".format(modalities, inc_sr, query_id))
         return
     elif modalities is None and inc_sr is True:
         modalities = ["SR"]
@@ -715,15 +726,11 @@ def qrscu(
 
     my_ae = create_ae(aet.encode('ascii', 'ignore'), transfer_syntax=ts)
     my_ae.start()
-    logger.debug(u"my_ae {0} started".format(my_ae))
+    logger.debug(u"{1} my_ae {0} started".format(my_ae, query_id))
 
     # remote application entity
     remote_ae = dict(Address=rh, Port=rp, AET=aec.encode('ascii', 'ignore'))
-    logger.debug(u"Remote AE is {0}".format(remote_ae))
-
-    if not query_id:
-        query_id = uuid.uuid4()
-    logger.debug(u"Query_id is {0}".format(query_id))
+    logger.debug(u"{1} Remote AE is {0}".format(remote_ae, query_id))
 
     query = DicomQuery.objects.create()
     query.query_id = query_id
@@ -734,24 +741,21 @@ def qrscu(
 
     assoc = _create_association(my_ae, rh, rp, remote_ae, query)
     if not assoc:
-        logger.warning(u"Query_id {0}: Query aborted as could not create initial association.")
+        logger.warning(u"{0} Query aborted as could not create initial association.")
         return
 
     # perform a DICOM ECHO
-    logger.info(u"DICOM Echo ... ")
+    logger.info(u"{0} DICOM Echo ... ".format(query_id))
     echo_response = _echo(assoc, query_id)
     if echo_response.Type != u'Success':
-        logger.error(u"Echo response was {0} instead of Success. Aborting query".format(echo_response))
+        logger.error(u"{1} Echo response was {0} instead of Success. Aborting query".format(echo_response, query_id))
         query.stage = u"Echo response was {0} instead of Success. Aborting query".format(echo_response)
         query.complete = True
         query.save()
         my_ae.Quit()
         return
 
-    # logger.info(u"Query_id {0}: Releasing initial association (we'll start another one for C-Find)".format(query_id))
-    # assoc.Release(0)
-
-    logger.info(u"DICOM FindSCU ... ")
+    logger.info(u"{0} DICOM FindSCU ... ".format(query_id))
     d = Dataset()
     d.StudyDate = str(make_dcm_date_range(date_from, date_until) or '')
 
@@ -782,22 +786,23 @@ def qrscu(
         study_rsp = query.dicomqrrspstudy_set.all()
     study_numbers = {'initial': study_rsp.count()}
     study_numbers['current'] = study_numbers['initial']
-    logger.info(u"{0} studies returned, will now process to remove studies that are not useful.".format(
+    logger.info(u"{0} {1} studies returned, will now process to remove studies that are not useful.".format(query_id,
         study_numbers['initial']))
 
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
     # We are assuming that if remote matches on modality it will populate ModalitiesInStudy and conversely
     # if remote doesn't match on modality it won't return a populated ModalitiesInStudy.
     if modalities_returned and inc_sr:
-        logger.info(u"Modalities_returned is true and we only want studies with only SR in; removing everything else.")
+        logger.info(u"{0} Modalities_returned is true and we only want studies with only SR in; removing everything "
+                    u"else.".format(query_id))
         for study in study_rsp:
             mods = study.get_modalities_in_study()
             if mods != ['SR']:
                 study.delete()
         study_numbers['current'] = study_rsp.count()
         study_numbers['sr_only_removed'] = study_numbers['initial'] - study_numbers['current']
-        logger.info(u"Finished removing studies that have anything other than SR in, {0} removed, {1} remain".format(
-            study_numbers['sr_only_removed'], study_numbers['current']))
+        logger.info(u"{2} Finished removing studies that have anything other than SR in, {0} removed, {1}"
+                    u" remain".format(study_numbers['sr_only_removed'], study_numbers['current'], query_id))
 
     filter_logs = []
     if filters['study_desc_inc']:
@@ -811,18 +816,18 @@ def qrscu(
 
     query.stage = u"Pruning study responses based on inc/exc options"
     query.save()
-    logger.info(u"Pruning study responses based on inc/exc options: {0}".format(u"".join(filter_logs)))
+    logger.info(u"{1} Pruning study responses based on inc/exc options: {0}".format(u"".join(filter_logs), query_id))
     before_study_prune = study_numbers['current']
     _prune_study_responses(query, filters)
     study_rsp = query.dicomqrrspstudy_set.all()
     study_numbers['current'] = study_rsp.count()
     study_numbers['inc_exc_removed'] = before_study_prune - study_numbers['current']
-    logger.info(u"Pruning studies based on inc/exc has removed {0} studies, {1} studies remain.".format(
-        study_numbers['inc_exc_removed'], study_numbers['current']))
+    logger.info(u"{2} Pruning studies based on inc/exc has removed {0} studies, {1} studies remain.".format(
+        study_numbers['inc_exc_removed'], study_numbers['current'], query_id))
 
     query.stage = u"Querying at series level to get more details about studies"
     query.save()
-    logger.info(u"Querying at series level to get more details about studies")
+    logger.info(u"{0} Querying at series level to get more details about studies".format(query_id))
     for rsp in study_rsp:
         # Series level query
         d2 = Dataset()
@@ -830,22 +835,23 @@ def qrscu(
         _query_series(assoc, d2, rsp, query_id)
         if not modalities_returned:
             _generate_modalities_in_study(rsp)
+    logger.debug(u"{0} Series level query complete.".format(query_id))
 
     if not modality_matching:
         mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
-        logger.debug(u"mods in study are: {0}".format(study_rsp.values('modalities_in_study')))
+        logger.debug(u"{1} mods in study are: {0}".format(study_rsp.values('modalities_in_study'), query_id))
         query.stage = u"Deleting studies we didn't ask for"
         query.save()
-        logger.info(u"Deleting studies we didn't ask for")
-        logger.debug(u"mods_in_study_set is {0}".format(mods_in_study_set))
+        logger.info(u"{0} Deleting studies we didn't ask for".format(query_id))
+        logger.debug(u"{1} mods_in_study_set is {0}".format(mods_in_study_set, query_id))
         for mod_set in mods_in_study_set:
-            logger.info(u"mod_set is {0}".format(mod_set))
+            logger.info(u"{1} mod_set is {0}".format(mod_set, query_id))
             delete = True
             for mod_choice, details in all_mods.items():
                 if details['inc']:
-                    logger.info(u"mod_choice {0}, details {1}".format(mod_choice, details))
+                    logger.info(u"{2} mod_choice {0}, details {1}".format(mod_choice, details, query_id))
                     for mod in details['mods']:
-                        logger.info(u"mod is {0}, mod_set is {1}".format(mod, mod_set))
+                        logger.info(u"{2} mod is {0}, mod_set is {1}".format(mod, mod_set, query_id))
                         if mod in mod_set:
                             delete = False
                             continue
@@ -853,7 +859,8 @@ def qrscu(
                             delete = False
             if delete:
                 study_rsp.filter(modalities_in_study__exact=mod_set).delete()
-        logger.info(u'Removed studies of other modalities, now have {0} studies'.format(study_rsp.count()))
+        logger.info(u'{1} Removed studies of other modalities, now have {0} studies'.format(
+            study_rsp.count(), query_id))
 
     query.stage = u"Pruning series responses"
     query.save()
