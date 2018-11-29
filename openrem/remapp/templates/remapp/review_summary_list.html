@@ -81,7 +81,7 @@
       function studiesEquipDeleteButton() {
           $.ajax(
               {
-                  url: "'{% url 'review_studies_equip_delete' %}",
+                  url: "{% url 'review_studies_equip_delete' %}",
                   data: {
                       csrfmiddlewaretoken: '{{ csrf_token }}',
                       equip_name_pk: '{{ equip_name_pk }}',
