@@ -1,4 +1,5 @@
 {% extends "remapp/rfdetailbase.html" %}
+{% load sigdig %}
 
 {% block navrf %}<li class="active">{% endblock %}
 
@@ -40,9 +41,9 @@
                   <li>
                         Total dose at RP, {{ record.acquisition_plane }}:
                         {% if accumprojection.dose_rp_total >= alert_levels.alert_total_rp_dose_rf %}
-                            <strong style="color: red;"><script>document.write({{ accumprojection.dose_rp_total }}.toPrecision(3));</script></strong> Gy
+                            <strong style="color: red;">{{ accumprojection.dose_rp_total | sigdig }} </strong> Gy
                         {% else %}
-                            <script>document.write({{ accumprojection.dose_rp_total }}.toPrecision(3));</script> Gy
+                            {{ accumprojection.dose_rp_total | sigdig }} Gy
                         {% endif %}
                         <br>
                    </li>
@@ -68,19 +69,19 @@
                     <tr>
                     {% if '- ' in irr_type.0 %}
                         <td><i>{{ irr_type.0 }}</i></td>
-                        <td style="text-align:right"><i>{% if irr_type.1 %}<script>document.write({{ irr_type.1 }}.toFixed(2));</script>{% endif %}</i></td>
-                        <td style="text-align:right"><i>{% if irr_type.2 %}<script>document.write({{ irr_type.2 }}.toPrecision(3));</script>{% endif %}</i></td>
-                        <td style="text-align:right"><i>{% if irr_type.3 %}<script>document.write({{ irr_type.3 }}.toFixed(2));</script>{% endif %}</i></td>
+                        <td style="text-align:right"><i>{% if irr_type.1 %}{{ irr_type.1 | floatformat:2 }} {% endif %}</i></td>
+                        <td style="text-align:right"><i>{% if irr_type.2 %}{{ irr_type.2 | sigdig }} {% endif %}</i></td>
+                        <td style="text-align:right"><i>{% if irr_type.3 %}{{ irr_type.3 | floatformat:2 }} {% endif %}</i></td>
                     {% elif 'Total' in irr_type.0 %}
                         <td><strong>{{ irr_type.0 }}</strong></td>
-                        <td><strong>{% if irr_type.1 %}<script>document.write({{ irr_type.1 }}.toFixed(2));</script>{% endif %}</strong></td>
-                        <td><strong>{% if irr_type.2 %}<script>document.write({{ irr_type.2 }}.toPrecision(3));</script>{% endif %}</strong></td>
-                        <td><strong>{% if irr_type.3 %}<script>document.write({{ irr_type.3 }}.toFixed(2));</script>{% endif %}</strong></td>
+                        <td><strong>{% if irr_type.1 %}{{ irr_type.1 | floatformat:2 }} {% endif %}</strong></td>
+                        <td><strong>{% if irr_type.2 %}{{ irr_type.2 | sigdig }} {% endif %}</strong></td>
+                        <td><strong>{% if irr_type.3 %}{{ irr_type.3 | floatformat:2 }} {% endif %}</strong></td>
                     {% else %}
                         <td>{{ irr_type.0 }}</td>
-                        <td>{% if irr_type.1 %}<script>document.write({{ irr_type.1 }}.toFixed(2));</script>{% endif %}</td>
-                        <td>{% if irr_type.2 %}<script>document.write({{ irr_type.2 }}.toPrecision(3));</script>{% endif %}</td>
-                        <td>{% if irr_type.3 %}<script>document.write({{ irr_type.3 }}.toFixed(2));</script>{% endif %}</td>
+                        <td>{% if irr_type.1 %}{{ irr_type.1 | floatformat:2 }} {% endif %}</td>
+                        <td>{% if irr_type.2 %}{{ irr_type.2 | sigdig }} {% endif %}</td>
+                        <td>{% if irr_type.3 %}{{ irr_type.3 | floatformat:2 }} {% endif %}</td>
                     {% endif %}
                     </tr>
                 {% endfor %}
@@ -109,9 +110,9 @@
                                     <li>
                                         Total dose at RP summed over this period:
                                         {% if accumprojection.dose_rp_total_over_delta_weeks >= alert_levels.alert_total_rp_dose_rf %}
-                                            <strong style="color: red;"><script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script></strong> Gy
+                                            <strong style="color: red;">{{ accumprojection.dose_rp_total_over_delta_weeks | sigdig }} </strong> Gy
                                         {% else %}
-                                            <script>document.write({{ accumprojection.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script> Gy
+                                            {{ accumprojection.dose_rp_total_over_delta_weeks | sigdig }} Gy
                                         {% endif %}
                                     </li>
                                 {% endwith %}
@@ -443,8 +444,8 @@
         <td>{{ event.irradiation_event_type }}</td>
         <td>{{ sourcedata.pulse_rate|floatformat:2 }}</td>
         <td>{{ event.acquisition_plane }}</td>
-        <td>{% if event.convert_gym2_to_cgycm2 %}<script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script>{% endif %}</td>
-        <td>{% if sourcedata.convert_gy_to_mgy %}<script>document.write({{ sourcedata.convert_gy_to_mgy }}.toPrecision(3));</script>{% endif %}</td>
+        <td>{% if event.convert_gym2_to_cgycm2 %}{{ event.convert_gym2_to_cgycm2 | sigdig }} {% endif %}</td>
+        <td>{% if sourcedata.convert_gy_to_mgy %}{{ sourcedata.convert_gy_to_mgy | sigdig }} {% endif %}</td>
         <td>
         {% if sourcedata.irradiation_duration %}
             {{ sourcedata.irradiation_duration|multiply:1000|floatformat:1 }}
