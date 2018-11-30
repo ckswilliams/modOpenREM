@@ -4,6 +4,7 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#697`_  Testing: added tests for fluoroscopy high dose alerts (single-plane systems)
 * `#696`_  Interface: fixed broken Delete Studies and Entry button
 * `#695`_  Imports: added missing name attribute for size_abort url
 * `#693`_  Interface: fixed display of numbers with significant places settings and comma localisation
