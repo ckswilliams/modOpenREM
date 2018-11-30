@@ -161,11 +161,11 @@ class RFHighDoseAlert(TestCase):
         response = self.client.get(reverse_lazy('rf_summary_list_filter'), follow=True)
 
         # Cumulative RP dose should be highlighted for the latest study
-        response_text = u'<strong style="color: red;"><script>document.write(0.005040000000.toPrecision(3));</script></strong>'
+        response_text = u'<strong style="color: red;">0.00504 </strong>'
         self.assertContains(response, response_text, count=1)
 
         # Cumulative RP dose should not be highlighted for the earlier study, and nor should the total dose at RP
-        response_text = u'<strong style="color: red;"><script>document.write(0.002520000000.toPrecision(3));</script></strong>'
+        response_text = u'<strong style="color: red;">0.00252 </strong>'
         self.assertNotContains(response, response_text)
 
         # Second dose at RP test
@@ -181,12 +181,12 @@ class RFHighDoseAlert(TestCase):
         response = self.client.get(reverse_lazy('rf_summary_list_filter'), follow=True)
 
         # Cumulative RP dose should be highlighted for the latest study
-        response_text = u'<strong style="color: red;"><script>document.write(0.005040000000.toPrecision(3));</script></strong>'
+        response_text = u'<strong style="color: red;">0.00504 </strong>'
         self.assertContains(response, response_text, count=1)
 
         # The latest study should have total RP dose highlighted, and the earlier study should have
         # total RP dose and cumulative RP dose highlighted
-        response_text = u'<strong style="color: red;"><script>document.write(0.002520000000.toPrecision(3));</script></strong>'
+        response_text = u'<strong style="color: red;">0.00252 </strong>'
         self.assertContains(response, response_text, count=3)
 
     def test_detail_view_alerts(self):
@@ -214,7 +214,7 @@ class RFHighDoseAlert(TestCase):
         self.assertContains(response, response_text, count=1)
 
         # Cumulative RP dose should be highlighted for the latest study
-        response_text = u'<strong style="color: red;"><script>document.write(0.005040000000.toPrecision(3));</script></strong>'
+        response_text = u'<strong style="color: red;">0.00504 </strong>'
         self.assertContains(response, response_text, count=1)
 
         # Obtain the response from the RF summary list filter for the older study - this includes the html of the page
@@ -225,7 +225,7 @@ class RFHighDoseAlert(TestCase):
         self.assertNotContains(response, response_text)
 
         # Cumulative RP dose should not be highlighted for the earlier study
-        response_text = u'<strong style="color: red;"><script>document.write(0.002520000000.toPrecision(3));</script></strong>'
+        response_text = u'<strong style="color: red;">0.00252 </strong>'
         self.assertNotContains(response, response_text)
 
         # Second DAP and RP dose alert level tests
@@ -247,7 +247,7 @@ class RFHighDoseAlert(TestCase):
         self.assertContains(response, response_text, count=1)
 
         # Cumulative RP dose should be highlighted for the latest study
-        response_text = u'<strong style="color: red;"><script>document.write(0.005040000000.toPrecision(3));</script></strong>'
+        response_text = u'<strong style="color: red;">0.00504 </strong>'
         self.assertContains(response, response_text, count=1)
 
         # Total DAP should be highlighted for the most recent study, and twice in the summary of studies in past two weeks
@@ -256,7 +256,7 @@ class RFHighDoseAlert(TestCase):
 
         # Total dose at RP dose should be highlighted for the latest study, and twice in the summary of studies in past two weeks
         # The two entries in the summary table are rounded
-        response_text = u'<strong style="color: red;"><script>document.write(0.002520000000.toPrecision(3));</script></strong>'
+        response_text = u'<strong style="color: red;">0.00252 </strong>'
         self.assertContains(response, response_text, count=1)
         response_text = u'<strong style="color: red;">0.0</strong>'
         self.assertContains(response, response_text, count=2)
@@ -270,7 +270,7 @@ class RFHighDoseAlert(TestCase):
 
         # Cumulative RP dose should be highlighted for the older study, together with total dose at RP and total dose at RP in summary of past two weeks
         # The two entries in the summary table are rounded
-        response_text = u'<strong style="color: red;"><script>document.write(0.002520000000.toPrecision(3));</script></strong>'
+        response_text = u'<strong style="color: red;">0.00252 </strong>'
         self.assertContains(response, response_text, count=2)
         response_text = u'<strong style="color: red;">0.0</strong>'
         self.assertContains(response, response_text, count=1)
