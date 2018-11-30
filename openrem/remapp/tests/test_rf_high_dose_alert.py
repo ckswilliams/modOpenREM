@@ -86,7 +86,7 @@ class RFHighDoseAlert(TestCase):
         self.assertAlmostEqual(total_rp_dose_over_week_delta, expected_value, places=7, msg=None)
 
     def test_dap_alert(self):
-        """Test that DAP alert highlights the value in red appropriately
+        """Test that DAP alert highlights the value in red appropriately in the RF summary view
         The test uses two different alert levels
         """
         self.client.login(username='temporary', password='temporary')
@@ -142,7 +142,7 @@ class RFHighDoseAlert(TestCase):
         self.assertContains(response, response_text, count=3)
 
     def test_rp_dose_alert(self):
-        """Test that dose at RP alert highlights the value in red appropriately
+        """Test that dose at RP alert highlights the value in red appropriately in the RF summary view
         The test uses two different alert levels
         """
         self.client.login(username='temporary', password='temporary')
@@ -188,3 +188,89 @@ class RFHighDoseAlert(TestCase):
         # total RP dose and cumulative RP dose highlighted
         response_text = u'<strong style="color: red;"><script>document.write(0.002520000000.toPrecision(3));</script></strong>'
         self.assertContains(response, response_text, count=3)
+
+    def test_detail_view_alerts(self):
+        """Test that DAP and RP dose alert highlights the value in red appropriately in the RF detail view
+        The test uses two different alert levels
+        """
+        self.client.login(username='temporary', password='temporary')
+
+        # First DAP and RP dose alert level tests
+        # Second study should alert on cumulative DAP
+        alert_settings = HighDoseMetricAlertSettings.objects.all()[0]
+        alert_settings.alert_total_dap_rf = 30.0
+        alert_settings.alert_total_rp_dose_rf = 0.0050
+        alert_settings.show_accum_dose_over_delta_weeks = True
+        alert_settings.save()
+
+        # Recalculate the cumulative dose data because DAP alert changed
+        self.client.get(reverse_lazy('rf_recalculate_accum_doses'), follow=True)
+
+        # Obtain the response from the RF summary list filter for the newest study - this includes the html of the page
+        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 2}), follow=True)
+
+        # Cumulative DAP should be highlighted for the most recent study
+        response_text = u'<strong style="color: red;">32.0</strong>'
+        self.assertContains(response, response_text, count=1)
+
+        # Cumulative RP dose should be highlighted for the latest study
+        response_text = u'<strong style="color: red;"><script>document.write(0.005040000000.toPrecision(3));</script></strong>'
+        self.assertContains(response, response_text, count=1)
+
+        # Obtain the response from the RF summary list filter for the older study - this includes the html of the page
+        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 1}), follow=True)
+
+        # Cumulative DAP should not be highlighted for the older study
+        response_text = u'<strong style="color: red;">16.0</strong>'
+        self.assertNotContains(response, response_text)
+
+        # Cumulative RP dose should not be highlighted for the earlier study
+        response_text = u'<strong style="color: red;"><script>document.write(0.002520000000.toPrecision(3));</script></strong>'
+        self.assertNotContains(response, response_text)
+
+        # Second DAP and RP dose alert level tests
+        # Second study should alert on cumulative DAP
+        alert_settings = HighDoseMetricAlertSettings.objects.all()[0]
+        alert_settings.alert_total_dap_rf = 15.0
+        alert_settings.alert_total_rp_dose_rf = 0.0025
+        alert_settings.show_accum_dose_over_delta_weeks = True
+        alert_settings.save()
+
+        # Recalculate the cumulative dose data because DAP alert changed
+        self.client.get(reverse_lazy('rf_recalculate_accum_doses'), follow=True)
+
+        # Obtain the response from the RF summary list filter for the newest study - this includes the html of the page
+        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 2}), follow=True)
+
+        # Cumulative DAP should be highlighted for the most recent study
+        response_text = u'<strong style="color: red;">32.0</strong>'
+        self.assertContains(response, response_text, count=1)
+
+        # Cumulative RP dose should be highlighted for the latest study
+        response_text = u'<strong style="color: red;"><script>document.write(0.005040000000.toPrecision(3));</script></strong>'
+        self.assertContains(response, response_text, count=1)
+
+        # Total DAP should be highlighted for the most recent study, and twice in the summary of studies in past two weeks
+        response_text = u'<strong style="color: red;">16.0</strong>'
+        self.assertContains(response, response_text, count=3)
+
+        # Total dose at RP dose should be highlighted for the latest study, and twice in the summary of studies in past two weeks
+        # The two entries in the summary table are rounded
+        response_text = u'<strong style="color: red;"><script>document.write(0.002520000000.toPrecision(3));</script></strong>'
+        self.assertContains(response, response_text, count=1)
+        response_text = u'<strong style="color: red;">0.0</strong>'
+        self.assertContains(response, response_text, count=2)
+
+        # Obtain the response from the RF summary list filter for the older study - this includes the html of the page
+        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 1}), follow=True)
+
+        # Cumulative DAP should be highlighted for the older study, together with total DAP and total DAP in summary over past two weeks
+        response_text = u'<strong style="color: red;">16.0</strong>'
+        self.assertContains(response, response_text, count=3)
+
+        # Cumulative RP dose should be highlighted for the older study, together with total dose at RP and total dose at RP in summary of past two weeks
+        # The two entries in the summary table are rounded
+        response_text = u'<strong style="color: red;"><script>document.write(0.002520000000.toPrecision(3));</script></strong>'
+        self.assertContains(response, response_text, count=2)
+        response_text = u'<strong style="color: red;">0.0</strong>'
+        self.assertContains(response, response_text, count=1)
