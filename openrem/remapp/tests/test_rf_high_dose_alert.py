@@ -51,6 +51,14 @@ class RFHighDoseAlert(TestCase):
         rdsr(os.path.join(root_tests, rf_siemens_zee_20160510))
         rdsr(os.path.join(root_tests, rf_siemens_zee_20160512))
 
+        self.dap_16_text = u'<strong style="color: red;">16.0</strong>'
+        self.dap_32_text = u'<strong style="color: red;">32.0</strong>'
+        self.rp_252_text = u'<strong style="color: red;">0.00252 </strong>'
+        self.rp_504_text = u'<strong style="color: red;">0.00504 </strong>'
+        self.rp_000_text = u'<strong style="color: red;">0.0</strong>'
+        self.one_exam_text = u'(1 exam)'
+        self.two_exams_text = u'(2 exams)'
+
     def test_cumulative_dap(self):
         """ Test that the calculated cumulative DAP over delta weeks is correct for the two studies
         """
@@ -105,20 +113,16 @@ class RFHighDoseAlert(TestCase):
         response = self.client.get(reverse_lazy('rf_summary_list_filter'), follow=True)
 
         # One study should be highlighted
-        response_text = u'<strong style="color: red;">32.0</strong>'
-        self.assertContains(response, response_text, count=1)
+        self.assertContains(response, self.dap_32_text, count=1)
 
         # The other should not
-        response_text = u'<strong style="color: red;">16.0</strong>'
-        self.assertNotContains(response, response_text)
+        self.assertNotContains(response, self.dap_16_text)
 
         # The string (2 exams) should appear twice for the more recent study (once in the DAP field, once in the RP field)
-        response_text = u'(2 exams)'
-        self.assertContains(response, response_text, count=2)
+        self.assertContains(response, self.two_exams_text, count=2)
 
         # The string (1 exam) should appear twice for the earlier study (once in the DAP field, once in the RP field)
-        response_text = u'(1 exam)'
-        self.assertContains(response, response_text, count=2)
+        self.assertContains(response, self.one_exam_text, count=2)
 
         # Second DAP alert level tests
         # Both studies should alert on total DAP; second should alert on cumulated DAP
@@ -133,13 +137,11 @@ class RFHighDoseAlert(TestCase):
         response = self.client.get(reverse_lazy('rf_summary_list_filter'), follow=True)
 
         # The latest study should have cumulative DAP highlighted
-        response_text = u'<strong style="color: red;">32.0</strong>'
-        self.assertContains(response, response_text, count=1)
+        self.assertContains(response, self.dap_32_text, count=1)
 
         # The latest study should have 16.0 cGy.cm^2 total DAP highlighted, and the earlier study should have
         # 16.0 cGy.cm^2 total DAP and cumulative DAP highlighted
-        response_text = u'<strong style="color: red;">16.0</strong>'
-        self.assertContains(response, response_text, count=3)
+        self.assertContains(response, self.dap_16_text, count=3)
 
     def test_rp_dose_alert(self):
         """Test that dose at RP alert highlights the value in red appropriately in the RF summary view
@@ -161,12 +163,10 @@ class RFHighDoseAlert(TestCase):
         response = self.client.get(reverse_lazy('rf_summary_list_filter'), follow=True)
 
         # Cumulative RP dose should be highlighted for the latest study
-        response_text = u'<strong style="color: red;">0.00504 </strong>'
-        self.assertContains(response, response_text, count=1)
+        self.assertContains(response, self.rp_504_text, count=1)
 
         # Cumulative RP dose should not be highlighted for the earlier study, and nor should the total dose at RP
-        response_text = u'<strong style="color: red;">0.00252 </strong>'
-        self.assertNotContains(response, response_text)
+        self.assertNotContains(response, self.rp_252_text)
 
         # Second dose at RP test
         # Both studies should alert on RP dose ; second should alert on cumulated RP dose
@@ -181,13 +181,11 @@ class RFHighDoseAlert(TestCase):
         response = self.client.get(reverse_lazy('rf_summary_list_filter'), follow=True)
 
         # Cumulative RP dose should be highlighted for the latest study
-        response_text = u'<strong style="color: red;">0.00504 </strong>'
-        self.assertContains(response, response_text, count=1)
+        self.assertContains(response, self.rp_504_text, count=1)
 
         # The latest study should have total RP dose highlighted, and the earlier study should have
         # total RP dose and cumulative RP dose highlighted
-        response_text = u'<strong style="color: red;">0.00252 </strong>'
-        self.assertContains(response, response_text, count=3)
+        self.assertContains(response, self.rp_252_text, count=3)
 
     def test_detail_view_alerts(self):
         """Test that DAP and RP dose alert highlights the value in red appropriately in the RF detail view
@@ -210,23 +208,19 @@ class RFHighDoseAlert(TestCase):
         response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 2}), follow=True)
 
         # Cumulative DAP should be highlighted for the most recent study
-        response_text = u'<strong style="color: red;">32.0</strong>'
-        self.assertContains(response, response_text, count=1)
+        self.assertContains(response, self.dap_32_text, count=1)
 
         # Cumulative RP dose should be highlighted for the latest study
-        response_text = u'<strong style="color: red;">0.00504 </strong>'
-        self.assertContains(response, response_text, count=1)
+        self.assertContains(response, self.rp_504_text, count=1)
 
         # Obtain the response from the RF summary list filter for the older study - this includes the html of the page
         response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 1}), follow=True)
 
         # Cumulative DAP should not be highlighted for the older study
-        response_text = u'<strong style="color: red;">16.0</strong>'
-        self.assertNotContains(response, response_text)
+        self.assertNotContains(response, self.dap_16_text)
 
         # Cumulative RP dose should not be highlighted for the earlier study
-        response_text = u'<strong style="color: red;">0.00252 </strong>'
-        self.assertNotContains(response, response_text)
+        self.assertNotContains(response, self.rp_252_text)
 
         # Second DAP and RP dose alert level tests
         # Second study should alert on cumulative DAP
@@ -243,34 +237,26 @@ class RFHighDoseAlert(TestCase):
         response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 2}), follow=True)
 
         # Cumulative DAP should be highlighted for the most recent study
-        response_text = u'<strong style="color: red;">32.0</strong>'
-        self.assertContains(response, response_text, count=1)
+        self.assertContains(response, self.dap_32_text, count=1)
 
         # Cumulative RP dose should be highlighted for the latest study
-        response_text = u'<strong style="color: red;">0.00504 </strong>'
-        self.assertContains(response, response_text, count=1)
+        self.assertContains(response, self.rp_504_text, count=1)
 
         # Total DAP should be highlighted for the most recent study, and twice in the summary of studies in past two weeks
-        response_text = u'<strong style="color: red;">16.0</strong>'
-        self.assertContains(response, response_text, count=3)
+        self.assertContains(response, self.dap_16_text, count=3)
 
         # Total dose at RP dose should be highlighted for the latest study, and twice in the summary of studies in past two weeks
         # The two entries in the summary table are rounded
-        response_text = u'<strong style="color: red;">0.00252 </strong>'
-        self.assertContains(response, response_text, count=1)
-        response_text = u'<strong style="color: red;">0.0</strong>'
-        self.assertContains(response, response_text, count=2)
+        self.assertContains(response, self.rp_252_text, count=1)
+        self.assertContains(response, self.rp_000_text, count=2)
 
         # Obtain the response from the RF summary list filter for the older study - this includes the html of the page
         response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 1}), follow=True)
 
         # Cumulative DAP should be highlighted for the older study, together with total DAP and total DAP in summary over past two weeks
-        response_text = u'<strong style="color: red;">16.0</strong>'
-        self.assertContains(response, response_text, count=3)
+        self.assertContains(response, self.dap_16_text, count=3)
 
         # Cumulative RP dose should be highlighted for the older study, together with total dose at RP and total dose at RP in summary of past two weeks
         # The two entries in the summary table are rounded
-        response_text = u'<strong style="color: red;">0.00252 </strong>'
-        self.assertContains(response, response_text, count=2)
-        response_text = u'<strong style="color: red;">0.0</strong>'
-        self.assertContains(response, response_text, count=1)
+        self.assertContains(response, self.rp_252_text, count=2)
+        self.assertContains(response, self.rp_000_text, count=1)
