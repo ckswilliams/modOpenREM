@@ -148,15 +148,18 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
     For each study level response, remove any series that we know can't be used.
     :param query: Current DicomQuery object
     :param all_mods: Ordered dict of dicts detailing modalities we are interested in
-    :param filters: Include and exclude lists for StationName (and StudyDescription)
+    :param filters: Include and exclude lists for StationName (StudyDescription not considered at series level)
     :param get_toshiba_images: Bool, whether to try to get Toshiba dose summary images
     :return Series level response database rows are deleted if not useful
     """
-    query.stage = u"Deleting series we can't use"
+    query.stage = u"Getting series and image level information and deleting series we can't use"
     query.save()
-    logger.info(u"Deleting series we can't use")
+    query_id = query.query_id
+    logger.info(u"{0} Getting series and image level information and deleting series we can't use".format(query_id))
 
     study_rsp = query.dicomqrrspstudy_set.all()
+    deleted_studies = {'RF': 0, 'CT': 0, 'SR': 0}
+    kept_ct = {'SR': 0, 'philips': 0, 'toshiba': 0, 'maybe_philips': 0}
 
     if filters['stationname_inc']:
         _filter(query, level='series', filter_name='station_name', filter_list=filters['stationname_inc'],
@@ -167,7 +170,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                 filter_type='exclude')
 
     for study in study_rsp:
-        logger.debug("at study in study_resp in series prune. modalities in study are: {0}".format(study.get_modalities_in_study()))
+        logger.debug("{0} Modalities in this study are: {1}".format(query_id, study.get_modalities_in_study()))
         if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
             # If _check_sr_type_in_study returns an RDSR, all other SR series will have been deleted and then all images
             # are deleted. If _check_sr_type_in_study returns an ESR or no_dose_report, everything else is kept.
@@ -176,7 +179,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
 
             if 'SR' in study.get_modalities_in_study() and _check_sr_type_in_study(assoc, study,
                                                                                    query.query_id) == 'RDSR':
-                logger.debug(u"Found RDSR in MG study, so keep SR and delete all other series")
+                logger.debug(u"{0} RDSR in MG study, keep SR, delete all other series".format(query_id))
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
             # ToDo: see if there is a mechanism to remove duplicate 'for processing' 'for presentation' images.
@@ -189,7 +192,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
 
             if 'SR' in study.get_modalities_in_study() and _check_sr_type_in_study(assoc, study,
                                                                                    query.query_id) == 'RDSR':
-                logger.debug(u"Found RDSR in DX study, so keep SR and delete all other series")
+                logger.debug(u"{0} RDSR in DX study, keep SR, delete all other series".format(query_id))
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
 
@@ -198,9 +201,14 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             study.modality = 'FL'
             study.save()
             sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
-            logger.debug(u"FL study, check_sr_type returned {0}".format(sr_type))
-            series = study.dicomqrrspseries_set.all()
-            series.exclude(modality__exact='SR').delete()
+            if sr_type == 'no_dose_report':
+                logger.debug(u"{0} No usable SR in RF study. Deleting from query.".format(query_id))
+                study.delete()
+                deleted_studies['RF'] += 1
+            else:
+                logger.debug(u"{0} {1} in RF study, keep SR, delete all other series".format(query_id, sr_type))
+                series = study.dicomqrrspseries_set.all()
+                series.exclude(modality__exact='SR').delete()
 
         elif all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
             # If _check_sr_type_in_study returns RDSR, all other SR series responses will have been deleted and then all
@@ -211,57 +219,77 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             # series and optionally get samples from each series for the Toshiba RDSR creation routine.
             study.modality = 'CT'
             study.save()
-            logger.debug("Filtering CT at series level")
             series = study.dicomqrrspseries_set.all()
+            sr_type = None
             if 'SR' in study.get_modalities_in_study():
                 sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
-                if sr_type == 'RDSR':
-                    logger.debug(u"Found RDSR in CT study, so keep SR and delete all other series")
-                    series.exclude(modality__exact='SR').delete()
-                elif sr_type == 'ESR':  # GE CT's with ESR instead of RDSR
-                    logger.debug(u"Found ESR in CT study, so keep SR and delete all other series")
-                    series.exclude(modality__exact='SR').delete()
-                else:
-                    _get_philips_dose_images(series, get_toshiba_images, assoc, query.query_id)
+            if 'SR' and sr_type in ('RDSR', 'ESR'):
+                logger.debug(u"{0} {1} in CT study, keep SR, delete all other series".format(query_id, sr_type))
+                series.exclude(modality__exact='SR').delete()
+                kept_ct['SR'] += 1
             else:
-                # if SR not present in study
-                _get_philips_dose_images(series, get_toshiba_images, assoc, query.query_id)
+                logger.debug(u"{0} No usable SR in CT study, checking for Philips dose images")
+                philips_desc, philips_found = _get_philips_dose_images(series, get_toshiba_images, query_id)
+                if philips_desc and philips_found:
+                    kept_ct['philips'] += 1
+                elif not philips_found and get_toshiba_images:
+                    logger.debug(u"{0} No usable CT SR, no Philips dose image found, preparing study for Toshiba "
+                                 u"option".format(query_id))
+                    _get_toshiba_dose_images(series, assoc, query_id)
+                    kept_ct['toshiba'] += 1
+                elif not philips_desc and philips_found:
+                    logger.debug(u"{0} No usable CT SR, series descriptions, retaining small series in case useful.")
+                    kept_ct['maybe_philips'] += 1
+                else:
+                    logger.debug(u"{0} No usable CT information available, deleting study from query".format(query_id))
+                    study.delete()
+                    deleted_studies['CT'] += 1
 
         elif all_mods['SR']['inc']:
             sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
             if sr_type == 'RDSR':
-                logger.debug(u"SR only query, found RDSR, deleted other SRs")
+                logger.debug(u"{0} SR only query, found RDSR, deleted other SRs".format(query_id))
             elif sr_type == 'ESR':
-                logger.debug(u"SR only query, found ESR, deleted other SRs")
+                logger.debug(u"{0} SR only query, found ESR, deleted other SRs".format(query_id))
             elif sr_type == 'no_dose_report':
-                logger.debug(u"No RDSR or ESR found. Study will be deleted.")
+                logger.debug(u"{0} No RDSR or ESR found. Study will be deleted.".format(query_id))
+                study.delete()
+                deleted_studies['SR'] += 1
 
         nr_series_remaining = study.dicomqrrspseries_set.all().count()
-        if (nr_series_remaining==0):
-            logger.debug(u"Deleting empty study with suid {0}".format(study.study_instance_uid))
+        if nr_series_remaining == 0:
+            logger.debug(u"{1} Deleting empty study with suid {0}".format(study.study_instance_uid, query_id))
             study.delete()
 
+    return deleted_studies, kept_ct
 
-def _get_philips_dose_images(series, get_toshiba_images, assoc, query_id):
+
+def _get_philips_dose_images(series, get_toshiba_images, query_id):
     """
     Remove series that are not likely to be Philips Dose Info series
     :param series: database set
     :param get_toshiba_images: Bool, whether to try to get Toshiba dose summary images
-    :return: None. Entries will be removed from database
+    :param query_id: UID for this query
+    :return: Bool, Bool representing if series_descriptions are available and if a Philips image was or might be found
     """
     series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
-    logger.debug("In _get_philips_dose_images. series_descriptions are {0}".format(series_descriptions))
+    logger.debug(u"{1} Get Philips:  series_descriptions are {0}".format(series_descriptions, query_id))
     if series_descriptions != {None}:
         if series.filter(series_description__iexact='dose info'):
+            logger.debug(u"{0} Get Philips: found likely Philips dose image, no SR, delete all other series".format(
+                query_id))
             series.exclude(series_description__iexact='dose info').delete()
-        elif get_toshiba_images:
-            _get_toshiba_dose_images(series, assoc, query_id)
+            return True, True
         else:
-            series.delete()
+            logger.debug(u"{0} Get Philips: not matched Philips dose image".format(query_id))
+            return True, False
     elif get_toshiba_images:
-        _get_toshiba_dose_images(series, assoc, query_id)
+        return False, False
     else:
+        logger.debug(u"{0} Get Philips: no series descriptions, keeping only series with < 6 images in case we might"
+                     u"get a Philips dose info image".format(query_id))
         series.filter(number_of_series_related_instances__gt=5).delete()
+        return False, True
 
 
 def _get_toshiba_dose_images(study_series, assoc, query_id):
@@ -274,27 +302,20 @@ def _get_toshiba_dose_images(study_series, assoc, query_id):
     for index, series in enumerate(study_series):
         _query_images(assoc, series, query_id, initial_image_only=True, msg_id=index+1)
         images = series.dicomqrrspimage_set.all()
-        logger.debug(u"Query_id {0}: Query for Toshiba images. Have {1} in this series.".format(
-            query_id, images.count()))
         if images.count() == 0:
-            logger.debug("Query_id {0}: No images in series! Deleting series.".format(query_id))
+            logger.debug("{0} Toshiba option: No images in series, deleting series.".format(query_id))
             series.delete()
-            continue
         if images[0].sop_class_uid != '1.2.840.10008.5.1.4.1.1.7':
-            logger.debug("Query_id {0}: In non secondary capture series, SOPClassUID {1}. "
-                         "Will delete all but first image.".format(query_id, images[0].sop_class_uid))
+            logger.debug("{0}: Toshiba option: Image series, SOPClassUID {1}, "
+                         " delete all but first image.".format(query_id, images[0].sop_class_uid))
             images.exclude(sop_instance_uid__exact=images[0].sop_instance_uid).delete()
-            logger.debug("Query_id {0}: Deleted other images, now {1} remaining (should be 1)".format(
+            logger.debug("{0}: Toshiba option: Deleted other images, now {1} remaining (should be 1)".format(
                 query_id, images.count()))
             series.image_level_move = True
             series.save()
         else:
-            logger.debug("Query_id {0}: In secondary capture series, SOPClassUID {1}. "
-                         "Will not delete any images.".format(query_id, images[0].sop_class_uid))
-            logger.debug("Query_id {0}: {1} images in this SC series".format(
+            logger.debug("{0}: Toshiba option: Secondary capture series, keep the {1} images in this series.".format(
                 query_id, images.count()))
-            # series.image_level_move = True
-            # series.save()
 
 
 def _prune_study_responses(query, filters):
@@ -331,7 +352,7 @@ def _check_sr_type_in_study(assoc, study, query_id):
 
     * If RDSR is found, all non-RDSR SR series responses are deleted
     * Otherwise, if an ESR is found, all non-ESR series responses are deleted
-    * Otherwise, all SR series responses are deleted
+    * Otherwise, all SR series responses are retained *(change in 0.9.0)*
 
     The function returns one of 'RDSR', 'ESR', 'no_dose_report'.
 
@@ -341,37 +362,35 @@ def _check_sr_type_in_study(assoc, study, query_id):
     :return: string indicating SR type remaining in study
     """
     series_sr = study.dicomqrrspseries_set.filter(modality__exact='SR')
-    logger.debug(u"Number of series with SR {0}".format(series_sr.count()))
+    logger.debug(u"{1} Check SR type: Number of series with SR {0}".format(series_sr.count(), query_id))
     sopclasses = set()
     for sr in series_sr:
         _query_images(assoc, sr, query_id)
         images = sr.dicomqrrspimage_set.all()
         if images.count() == 0:
-            logger.debug(u"Oops, series {0} of study instance UID {1} doesn't have any objects in!".format(
-                sr.series_number, study.study_instance_uid))
+            logger.debug(u"{2} Check SR type: Oops, series {0} of study instance UID {1} has zero objects in!".format(
+                sr.series_number, study.study_instance_uid, query_id))
             continue
         sopclasses.add(images[0].sop_class_uid)
         sr.sop_class_in_series = images[0].sop_class_uid
         sr.save()
-        logger.debug(u"studyuid: {0}   seriesuid: {1}   nrimages: {2}   sopclasses: {3}".format(
-            study.study_instance_uid, sr.series_instance_uid, images.count(), sopclasses))
-    logger.debug(u"sopclasses: {0}".format(sopclasses))
+        logger.debug(u"{4} Check SR type: studyuid: {0}   seriesuid: {1}   nrimages: {2}   sopclasses: {3}".format(
+            study.study_instance_uid, sr.series_instance_uid, images.count(), sopclasses, query_id))
+    logger.debug(u"{1} Check SR type: sopclasses: {0}".format(sopclasses, query_id))
     if '1.2.840.10008.5.1.4.1.1.88.67' in sopclasses:
         for sr in series_sr:
             if sr.sop_class_in_series != '1.2.840.10008.5.1.4.1.1.88.67':
-                logger.debug(u"Have RDSR, deleting non-RDSR SR")
+                logger.debug(u"{0} Chesk SR type: Have RDSR, deleting non-RDSR SR".format(query_id))
                 sr.delete()
         return 'RDSR'
     elif '1.2.840.10008.5.1.4.1.1.88.22' in sopclasses:
         for sr in series_sr:
             if sr.sop_class_in_series != '1.2.840.10008.5.1.4.1.1.88.22':
-                logger.debug(u"Have ESR, deleting non-RDSR, non-ESR SR")
+                logger.debug(u"{0} Check SR type: Have ESR, deleting non-RDSR, non-ESR SR".format(query_id))
                 sr.delete()
         return 'ESR'
     else:
-        for sr in series_sr:
-            logger.debug(u"Deleting non-RDSR, non-ESR SR")
-            sr.delete()
+        logger.debug(u"{0} Check SR type: {1} non-RDSR, non-ESR SR series remain".format(query_id, series_sr.count()))
         return 'no_dose_report'
 
 
@@ -838,6 +857,7 @@ def qrscu(
     logger.debug(u"{0} Series level query complete.".format(query_id))
 
     if not modality_matching:
+        before_not_modality_matching = study_numbers['current']
         mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
         logger.debug(u"{1} mods in study are: {0}".format(study_rsp.values('modalities_in_study'), query_id))
         query.stage = u"Deleting studies we didn't ask for"
@@ -859,19 +879,43 @@ def qrscu(
                             delete = False
             if delete:
                 study_rsp.filter(modalities_in_study__exact=mod_set).delete()
-        logger.info(u'{1} Removed studies of other modalities, now have {0} studies'.format(
-            study_rsp.count(), query_id))
+        study_numbers['current'] = study_rsp.count()
+        study_numbers['wrong_modality_removed'] = before_not_modality_matching - study_numbers['current']
+        logger.info(u'{0} Removing studies of modalities not asked for removed {1} studies, {2} studies remain'.format(
+            query_id, study_numbers['wrong_modality_removed'], study_numbers['current']))
 
     query.stage = u"Pruning series responses"
     query.save()
-    logger.debug(u"Pruning series responses")
-    _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
+    logger.debug(u"{0} Pruning series responses".format(query_id))
+    before_series_pruning = study_numbers['current']
+    deleted_studies, kept_ct = _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
+
+    series_pruning_log = u""
+    if all_mods['FL']['inc']:
+        series_pruning_log += u"{0} RF studies were deleted from query due to no suitable RDSR being found. ".format(
+            deleted_studies['RF'])
+    if all_mods['CT']['inc']:
+        series_pruning_log += u"{0} CT studies were deleted from query due to no suitable images or reports being " \
+                              u"found. Of the remaining studies, {1} have RDSR or ESR, {2} have Philips dose images, " \
+                              u"{3} have been prepared for the Toshiba import option and {4} have been prepared as " \
+                              u"possibly containing Philips dose images. ".format(
+                                deleted_studies['CT'], kept_ct['SR'], kept_ct['philips'], kept_ct['toshiba'],
+                                kept_ct['maybe_philips'])
+    if all_mods['SR']['inc']:
+        series_pruning_log += u"{0} SR studies were deleted from query due to no suitable SR being found. ".format(
+            deleted_studies['SR'])
+    logger.info(u"{0} ".format(query_id) + series_pruning_log)
 
     study_rsp = query.dicomqrrspstudy_set.all()
-    logger.info(u'Now have {0} studies'.format(study_rsp.count()))
+    study_numbers['current'] = study_rsp.count()
+    study_numbers['series_pruning_removed'] = before_series_pruning - study_numbers['current']
+    logger.info(u'{0} Pruning series responses removed {1} studies, leaving {2} studies'.format(
+        query_id, study_numbers['series_pruning_removed'], study_numbers['current']))
 
     if remove_duplicates:
+        before_remove_duplicates = study_numbers['current']
         query.stage = u"Removing any responses that match data we already have in the database"
+        logger.debug(u"{0} Removing any responses that match data we already have in the database".format(query_id))
         query.save()
         _remove_duplicates(query, study_rsp, assoc, query_id)
 
