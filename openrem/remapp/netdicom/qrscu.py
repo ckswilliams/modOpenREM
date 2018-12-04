@@ -177,11 +177,15 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             study.modality = u'MG'
             study.save()
 
-            if 'SR' in study.get_modalities_in_study() and _check_sr_type_in_study(assoc, study,
-                                                                                   query.query_id) == 'RDSR':
-                logger.debug(u"{0} RDSR in MG study, keep SR, delete all other series".format(query_id))
-                series = study.dicomqrrspseries_set.all()
-                series.exclude(modality__exact='SR').delete()
+            if 'SR' in study.get_modalities_in_study():
+                if _check_sr_type_in_study(assoc, study, query.query_id) == 'RDSR':
+                    logger.debug(u"{0} RDSR in MG study, keep SR, delete all other series".format(query_id))
+                    series = study.dicomqrrspseries_set.all()
+                    series.exclude(modality__exact='SR').delete()
+                else:
+                    logger.debug(u"{0} no RDSR in MG study, deleting other SR series".format(query_id))
+                    series = study.dicomqrrspseries_set.all()
+                    series.filter(modality__exact='SR').delete()
             # ToDo: see if there is a mechanism to remove duplicate 'for processing' 'for presentation' images.
 
         elif all_mods['DX']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('CR', 'DX')):
@@ -190,14 +194,18 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             study.modality = u'DX'
             study.save()
 
-            if 'SR' in study.get_modalities_in_study() and _check_sr_type_in_study(assoc, study,
-                                                                                   query.query_id) == 'RDSR':
-                logger.debug(u"{0} RDSR in DX study, keep SR, delete all other series".format(query_id))
-                series = study.dicomqrrspseries_set.all()
-                series.exclude(modality__exact='SR').delete()
+            if 'SR' in study.get_modalities_in_study():
+                if _check_sr_type_in_study(assoc, study, query.query_id) == 'RDSR':
+                    logger.debug(u"{0} RDSR in DX study, keep SR, delete all other series".format(query_id))
+                    series = study.dicomqrrspseries_set.all()
+                    series.exclude(modality__exact='SR').delete()
+                else:
+                    logger.debug(u"{0} no RDSR in DX study, deleting other SR series".format(query_id))
+                    series = study.dicomqrrspseries_set.all()
+                    series.filter(modality__exact='SR').delete()
 
         elif all_mods['FL']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('XA', 'RF')):
-            # _check_sr_type_in_study will delete any SR that is not RDSR or ESR. All other series are then deleted.
+            # Only RDSR or some ESR useful here
             study.modality = 'FL'
             study.save()
             sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
@@ -256,8 +264,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                 study.delete()
                 deleted_studies['SR'] += 1
 
-        nr_series_remaining = study.dicomqrrspseries_set.all().count()
-        if nr_series_remaining == 0:
+        if study.id is not None and study.dicomqrrspseries_set.all().count() == 0:
             logger.debug(u"{1} Deleting empty study with suid {0}".format(study.study_instance_uid, query_id))
             study.delete()
 
