@@ -53,47 +53,51 @@ def _remove_duplicates(query, study_rsp, assoc, query_id):
     """
     from remapp.models import GeneralStudyModuleAttr
 
-    logger.debug(u"About to remove any studies we already have in the database")
+    logger.debug(u"{0} About to remove any studies we already have in the database".format(query_id))
     query.stage = u'Checking to see if any response studies are already in the OpenREM database'
     try:
         query.save()
     except Exception as e:
-        logger.error(u"query.save in remove duplicates didn't work because of {0}".format(e))
+        logger.error(u"{1} query.save in remove duplicates didn't work because of {0}".format(e, query_id))
     logger.info(
-        u'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
+        u'{0} Checking to see if any of the {1} studies are already in the OpenREM database'.format(
+            query_id, study_rsp.count()))
     for study_number, study in enumerate(study_rsp):
         existing_studies = GeneralStudyModuleAttr.objects.filter(study_instance_uid=study.study_instance_uid)
         if existing_studies.exists():
-            logger.debug(u"Study {0} {1} exists in database already".format(study_number, study.study_instance_uid))
+            logger.debug(u"{2} Study {0} {1} exists in database already".format(
+                study_number, study.study_instance_uid, query_id))
             for existing_study in existing_studies:
                 existing_sop_instance_uids = set()
                 for previous_object in existing_study.objectuidsprocessed_set.all():
                     existing_sop_instance_uids.add(previous_object.sop_instance_uid)
-                logger.debug(u"Study {0} {1} has previously processed the following SOPInstanceUIDs: {2}".format(
-                    study_number, study.study_instance_uid, existing_sop_instance_uids))
+                logger.debug(u"{3} Study {0} {1} has previously processed the following SOPInstanceUIDs: {2}".format(
+                    study_number, study.study_instance_uid, existing_sop_instance_uids, query_id))
                 for series_rsp in study.dicomqrrspseries_set.all():
                     if series_rsp.modality == 'SR':
                         for image_rsp in series_rsp.dicomqrrspimage_set.all():
-                            logger.debug(u"Study {0} {1} Checking for SOPInstanceUID {2}".format(
-                                study_number, study.study_instance_uid, image_rsp.sop_instance_uid))
+                            logger.debug(u"{3} Study {0} {1} Checking for SOPInstanceUID {2}".format(
+                                study_number, study.study_instance_uid, image_rsp.sop_instance_uid, query_id))
                             if image_rsp.sop_instance_uid in existing_sop_instance_uids:
-                                logger.debug(u"Study {0} {1} Found SOPInstanceUID processed before, "
-                                             u"won't ask for this one".format(study_number, study.study_instance_uid))
+                                logger.debug(u"{2} Study {0} {1} Found SOPInstanceUID processed before, "
+                                             u"won't ask for this one".format(
+                                                study_number, study.study_instance_uid, query_id))
                                 image_rsp.delete()
                                 series_rsp.image_level_move = True  # If we have deleted images we need to set this flag
                                 series_rsp.save()
                         if not series_rsp.dicomqrrspimage_set.order_by('pk'):
                             series_rsp.delete()
                     elif series_rsp.modality in ['MG', 'DX', 'CR']:
-                        logger.debug(u"Study {0} {1} about to query at image level to get SOPInstanceUID".format(
-                            study_number, study.study_instance_uid))
+                        logger.debug(u"{2} Study {0} {1} about to query at image level to get SOPInstanceUID".format(
+                            study_number, study.study_instance_uid, query_id))
                         _query_images(assoc, series_rsp, query_id)
                         for image_rsp in series_rsp.dicomqrrspimage_set.all():
-                            logger.debug(u"Study {0} {1} Checking for SOPInstanceUID {2}".format(
-                                study_number, study.study_instance_uid, image_rsp.sop_instance_uid))
+                            logger.debug(u"{3} Study {0} {1} Checking for SOPInstanceUID {2}".format(
+                                study_number, study.study_instance_uid, image_rsp.sop_instance_uid, query_id))
                             if image_rsp.sop_instance_uid in existing_sop_instance_uids:
-                                logger.debug(u"Study {0} {1} Found SOPInstanceUID processed before, "
-                                             u"won't ask for this one".format(study_number, study.study_instance_uid))
+                                logger.debug(u"{2} Study {0} {1} Found SOPInstanceUID processed before, "
+                                             u"won't ask for this one".format(
+                                                study_number, study.study_instance_uid, query_id))
                                 image_rsp.delete()
                                 series_rsp.image_level_move = True  # If we have deleted images we need to set this flag
                                 series_rsp.save()
@@ -125,8 +129,10 @@ def _filter(query, level, filter_name, filter_list, filter_type):
         filtertype = False
 
     study_rsp = query.dicomqrrspstudy_set.all()
+    query_id = query.query_id
     query.stage = u"Filter at {0} level on {1} that {2} {3}".format(level, filter_name, filter_type, filter_list)
-    logger.info(u"Filter at {0} level on {1} that {2} {3}".format(level, filter_name, filter_type, filter_list))
+    logger.info(u"{4} Filter at {0} level on {1} that {2} {3}".format(
+        level, filter_name, filter_type, filter_list, query_id))
     for study in study_rsp:
         if level == 'study':
             if any(term in (getattr(study, filter_name) or '').lower() for term in filter_list) is filtertype:
@@ -134,13 +140,13 @@ def _filter(query, level, filter_name, filter_list, filter_type):
         elif level == 'series':
             series = study.dicomqrrspseries_set.all()
             for s in series:
-                if any(term in (getattr(s,filter_name) or '').lower() for term in filter_list) is filtertype:
+                if any(term in (getattr(s, filter_name) or '').lower() for term in filter_list) is filtertype:
                     s.delete()
             nr_series_remaining = study.dicomqrrspseries_set.all().count()
-            if (nr_series_remaining==0):
+            if nr_series_remaining == 0:
                 study.delete()
     study_rsp = query.dicomqrrspstudy_set.all()
-    logger.info(u'Now have {0} studies'.format(study_rsp.count()))
+    logger.info(u'{1} Now have {0} studies'.format(study_rsp.count(), query_id))
 
 
 def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images):
@@ -160,14 +166,27 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
     study_rsp = query.dicomqrrspstudy_set.all()
     deleted_studies = {'RF': 0, 'CT': 0, 'SR': 0}
     kept_ct = {'SR': 0, 'philips': 0, 'toshiba': 0, 'maybe_philips': 0}
+    deleted_studies_filters = {'stationname_inc': 0, 'stationname_exc': 0}
 
     if filters['stationname_inc']:
+        before_count = query.dicomqrrspstudy_set.all().count()
         _filter(query, level='series', filter_name='station_name', filter_list=filters['stationname_inc'],
                 filter_type='include')
+        after_count = query.dicomqrrspstudy_set.all().count()
+        if after_count < before_count:
+            deleted_studies_filters['stationname_inc'] = before_count - after_count
+            logger.debug(u"{0} stationname_inc removed {1} studies".format(
+                query.query_id, deleted_studies_filters['stationname_inc']))
 
     if filters['stationname_exc']:
+        before_count = query.dicomqrrspstudy_set.all().count()
         _filter(query, level='series', filter_name='station_name', filter_list=filters['stationname_exc'],
                 filter_type='exclude')
+        after_count = query.dicomqrrspstudy_set.all().count()
+        if after_count < before_count:
+            deleted_studies_filters['stationname_exc'] = before_count - after_count
+            logger.debug(u"{0} stationname_exc removed {1} studies".format(
+                query.query_id, deleted_studies_filters['stationname_exc']))
 
     for study in study_rsp:
         logger.debug("{0} Modalities in this study are: {1}".format(query_id, study.get_modalities_in_study()))
@@ -268,7 +287,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             logger.debug(u"{1} Deleting empty study with suid {0}".format(study.study_instance_uid, query_id))
             study.delete()
 
-    return deleted_studies, kept_ct
+    return deleted_studies, deleted_studies_filters, kept_ct
 
 
 def _get_philips_dose_images(series, get_toshiba_images, query_id):
@@ -327,30 +346,52 @@ def _get_toshiba_dose_images(study_series, assoc, query_id):
 
 def _prune_study_responses(query, filters):
 
+    deleted_studies_filters = {'study_desc_inc': 0, 'study_desc_exc': 0, 'stationname_inc': 0, 'stationname_exc': 0}
     if filters['study_desc_inc']:
-        logger.debug(u"About to filter on study_desc_inc: {0}, currently have {1} studies.".format(
-            filters['study_desc_inc'], query.dicomqrrspstudy_set.all().count()))
+        before_count = query.dicomqrrspstudy_set.all().count()
+        logger.debug(u"{2} About to filter on study_desc_inc: {0}, currently have {1} studies.".format(
+            filters['study_desc_inc'], query.dicomqrrspstudy_set.all().count(), query.query_id))
         _filter(query, level='study', filter_name='study_description',
                 filter_list=filters['study_desc_inc'], filter_type='include')
-        logger.debug(u"Filtering done. Now have {0} studies".format(query.dicomqrrspstudy_set.all().count()))
+        after_count = query.dicomqrrspstudy_set.all().count()
+        if after_count < before_count:
+            deleted_studies_filters['study_desc_inc'] = before_count - after_count
+            logger.debug(u"{0} study_desc_inc removed {1} studies".format(
+                query.query_id, deleted_studies_filters['study_desc_inc']))
     if filters['study_desc_exc']:
-        logger.debug(u"About to filter on study_desc_exc: {0}, currently have {1} studies.".format(
-            filters['study_desc_exc'], query.dicomqrrspstudy_set.all().count()))
+        before_count = query.dicomqrrspstudy_set.all().count()
+        logger.debug(u"{2} About to filter on study_desc_exc: {0}, currently have {1} studies.".format(
+            filters['study_desc_exc'], query.dicomqrrspstudy_set.all().count(), query.query_id))
         _filter(query, level='study', filter_name='study_description',
                 filter_list=filters['study_desc_exc'], filter_type='exclude')
-        logger.debug(u"Filtering done. Now have {0} studies".format(query.dicomqrrspstudy_set.all().count()))
+        after_count = query.dicomqrrspstudy_set.all().count()
+        if after_count < before_count:
+            deleted_studies_filters['study_desc_exc'] = before_count - after_count
+            logger.debug(u"{0} study_desc_exc removed {1} studies".format(
+                query.query_id, deleted_studies_filters['study_desc_exc']))
     if filters['stationname_inc']:
-        logger.debug(u"About to filter on stationname_inc: {0}, currently have {1} studies.".format(
-            filters['stationname_inc'], query.dicomqrrspstudy_set.all().count()))
+        before_count = query.dicomqrrspstudy_set.all().count()
+        logger.debug(u"{2} About to filter on stationname_inc: {0}, currently have {1} studies.".format(
+            filters['stationname_inc'], query.dicomqrrspstudy_set.all().count(), query.query_id))
         _filter(query, level='study', filter_name='station_name',
                 filter_list=filters['stationname_inc'], filter_type='include')
-        logger.debug(u"Filtering done. Now have {0} studies".format(query.dicomqrrspstudy_set.all().count()))
+        after_count = query.dicomqrrspstudy_set.all().count()
+        if after_count < before_count:
+            deleted_studies_filters['stationname_inc'] = before_count - after_count
+            logger.debug(u"{0} stationname_inc removed {1} studies".format(
+                query.query_id, deleted_studies_filters['stationname_inc']))
     if filters['stationname_exc']:
-        logger.debug(u"About to filter on stationname_exc: {0}, currently have {1} studies.".format(
-            filters['stationname_exc'], query.dicomqrrspstudy_set.all().count()))
+        before_count = query.dicomqrrspstudy_set.all().count()
+        logger.debug(u"{2} About to filter on stationname_exc: {0}, currently have {1} studies.".format(
+            filters['stationname_exc'], query.dicomqrrspstudy_set.all().count(), query.query_id))
         _filter(query, level='study', filter_name='station_name',
                 filter_list=filters['stationname_exc'], filter_type='exclude')
-        logger.debug(u"Filtering done. Now have {0} studies".format(query.dicomqrrspstudy_set.all().count()))
+        after_count = query.dicomqrrspstudy_set.all().count()
+        if after_count < before_count:
+            deleted_studies_filters['stationname_exc'] = before_count - after_count
+            logger.debug(u"{0} stationname_exc removed {1} studies".format(
+                query.query_id, deleted_studies_filters['stationname_exc']))
+    return deleted_studies_filters
 
 
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
@@ -844,7 +885,7 @@ def qrscu(
     query.save()
     logger.info(u"{1} Pruning study responses based on inc/exc options: {0}".format(u"".join(filter_logs), query_id))
     before_study_prune = study_numbers['current']
-    _prune_study_responses(query, filters)
+    deleted_studies_filters = _prune_study_responses(query, filters)
     study_rsp = query.dicomqrrspstudy_set.all()
     study_numbers['current'] = study_rsp.count()
     study_numbers['inc_exc_removed'] = before_study_prune - study_numbers['current']
@@ -895,7 +936,10 @@ def qrscu(
     query.save()
     logger.debug(u"{0} Pruning series responses".format(query_id))
     before_series_pruning = study_numbers['current']
-    deleted_studies, kept_ct = _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
+    deleted_studies, deleted_studies_filters_series, kept_ct = _prune_series_responses(
+        assoc, query, all_mods, filters, get_toshiba_images)
+    deleted_studies_filters['stationname_inc'] += deleted_studies_filters_series['stationname_inc']
+    deleted_studies_filters['stationname_exc'] += deleted_studies_filters_series['stationname_exc']
 
     series_pruning_log = u""
     if all_mods['FL']['inc']:
@@ -925,16 +969,39 @@ def qrscu(
         logger.debug(u"{0} Removing any responses that match data we already have in the database".format(query_id))
         query.save()
         _remove_duplicates(query, study_rsp, assoc, query_id)
+        study_numbers['current'] = study_rsp.count()
+        study_numbers['duplicates_removed'] = before_remove_duplicates - study_numbers['current']
+        logger.info(u"{0} Removing duplicates of previous objects removed {1}, leaving {2}".format(
+            query_id, study_numbers['duplicates_removed'], study_numbers['current']))
 
     # done
     my_ae.Quit()
     query.complete = True
     time_took = datetime.now() - debug_timer
-    query.stage = u"Query complete. Query took {0} seconds and we are left with {1} studies to move.".format(
+    query.stage = u"Query complete. Query took {0} seconds and we are left with {1} studies to move.<br>".format(
         time_took, study_rsp.count())
+    query.stage += series_pruning_log
+    filter_pruning_logs = u"Filtering for "
+    if filters['study_desc_inc']:
+        filter_pruning_logs += u"only studies with description that include {0} removed {1} studies, ".format(
+            u", ".join(filters['study_desc_inc']), deleted_studies_filters['study_desc_inc'])
+    if filters['study_desc_exc']:
+        filter_pruning_logs += u"studies with description that do not include {0} removed {1} studies, ".format(
+            u", ".join(filters['study_desc_exc']), deleted_studies_filters['study_desc_exc'])
+    if filters['stationname_inc']:
+        filter_pruning_logs += u"only studies with station names that include {0} removed {1} studies, ".format(
+            u", ".join(filters['stationname_inc']), deleted_studies_filters['stationname_inc'])
+    if filters['stationname_exc']:
+        filter_pruning_logs += u"studies with station names that do not include {0} removed {1} studies, ".format(
+            u", ".join(filters['stationname_exc']), deleted_studies_filters['stationname_exc'])
+    query.stage += filter_pruning_logs
+    if remove_duplicates:
+        query.stage += u"Removing duplicates of previous objects removed {0} studies.".format(
+            study_numbers['duplicates_removed'])
     query.save()
+    logger.info(u"{0} ".format(query_id) + query.stage)
 
-    logger.debug(u"Query {0} complete. Move is {1}. Query took {2}".format(
+    logger.debug(u"{0} Query complete. Move is {1}. Query took {2}".format(
         query.query_id, move, time_took))
 
     if logger.isEnabledFor(logging.DEBUG):
