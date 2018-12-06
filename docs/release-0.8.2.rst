@@ -10,6 +10,7 @@ Headline changes
 * Interface: added :doc:`i_fluoro_high_dose_alerts` feature
 * Administration: automatic e-mail alerts sent when fluoroscopy studies exceed a dose alert level
 * Query-retrieve: handle non-return of ModalitiesInStudy correctly
+* Query-retrieve: increased query logging and summary feedback
 * Imports: fix for empty NumericValues in RDSR
 * Imports: fix for Toshiba RDSR with incorrect multiple values in SD field for vHP
 * Imports: fix for Philips Azurion RDSR with incorrect AcquisitionDeviceType

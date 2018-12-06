@@ -2,7 +2,7 @@
 
 function retrieveProgress(json ) {
     $.ajax({
-        url: "/openrem/admin/moveupdate",
+        url: Urls.move_update(),
         data: {
             queryID: json.queryID
         },
@@ -29,7 +29,7 @@ function retrieveProgress(json ) {
 }
 function queryProgress(json ) {
     $.ajax({
-        url: "/openrem/admin/queryupdate",
+        url: Urls.query_update(),
         data: {
             queryID: json.queryID
         },
@@ -57,7 +57,7 @@ function queryProgress(json ) {
                     // console.log(queryID);
                     $( "#move-button").html( "" );
                     $.ajax({
-                        url: "/openrem/admin/queryretrieve",
+                        url: Urls.start_retrieve(),
                         data: {
                             queryID: queryID
                         },
