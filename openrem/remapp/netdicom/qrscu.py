@@ -30,13 +30,13 @@ django.setup()
 from remapp.netdicom.tools import create_ae
 
 
-def _generate_modalities_in_study(study_rsp):
+def _generate_modalities_in_study(study_rsp, query_id):
     """Generates modalities in study from series level Modality information
 
     :param study_rsp: study level C-Find response object in database
     :return: response updated with ModalitiesInStudy
     """
-    logger.debug(u"modalities_returned = False, so building from series info")
+    logger.debug(u"{0} modalities_returned = False, so building from series info".format(query_id))
     series_rsp = study_rsp.dicomqrrspseries_set.all()
     study_rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
     study_rsp.save()
@@ -109,7 +109,8 @@ def _remove_duplicates(query, study_rsp, assoc, query_id):
             study.delete()
 
     study_rsp = query.dicomqrrspstudy_set.all()
-    logger.info(u'After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
+    logger.info(u'{1} After removing studies we already have in the db, {0} studies are left'.format(
+        study_rsp.count(), query_id))
 
 
 def _filter(query, level, filter_name, filter_list, filter_type):
@@ -580,9 +581,9 @@ def _query_study(assoc, d, query, query_id):
     d.StationName = ''
     d.SpecificCharacterSet = ''
 
-    logger.debug(u'Query_id {0}: Study level association requested'.format(query_id))
+    logger.debug(u'{0}: Study level association requested'.format(query_id))
     st = assoc.StudyRootFindSOPClass.SCU(d, 1)
-    logger.debug(u'Query_id {0}: _query_study done with status {1}'.format(query_id, st))
+    logger.debug(u'{0}: _query_study done with status {1}'.format(query_id, st))
 
     # TODO: Replace the code below to deal with find failure
     # if not st:
@@ -606,12 +607,13 @@ def _query_study(assoc, d, query, query_id):
         # Unique key
         rsp.study_instance_uid = ss[1].StudyInstanceUID
         # Required keys - none of interest
-        logger.debug(u"Response {0}, StudyUID: {1}".format(rspno, rsp.study_instance_uid))
+        logger.debug(u"{2} Response {0}, StudyUID: {1}".format(rspno, rsp.study_instance_uid, query_id))
 
         # Optional and special keys
         rsp.study_description = get_value_kw(u"StudyDescription", ss[1])
         rsp.station_name = get_value_kw('StationName', ss[1])
-        logger.debug(u"Study Description: {0}; Station Name: {1}".format(rsp.study_description, rsp.station_name))
+        logger.debug(u"{2} Study Description: {0}; Station Name: {1}".format(
+            rsp.study_description, rsp.station_name, query_id))
 
         # Populate modalities_in_study, stored as JSON
         try:
@@ -619,10 +621,10 @@ def _query_study(assoc, d, query, query_id):
                 rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(u','))
             else:   # if multiple modalities, type = MultiValue (['XA', 'RF'])
                 rsp.set_modalities_in_study(ss[1].ModalitiesInStudy)
-            logger.debug(u"ModalitiesInStudy: {0}".format(rsp.get_modalities_in_study()))
+            logger.debug(u"{1} ModalitiesInStudy: {0}".format(rsp.get_modalities_in_study(), query_id))
         except AttributeError:
             rsp.set_modalities_in_study([u''])
-            logger.debug(u"ModalitiesInStudy was not in response")
+            logger.debug(u"{1} ModalitiesInStudy was not in response".format(query_id))
 
         rsp.modality = None  # Used later
         rsp.save()
@@ -630,25 +632,25 @@ def _query_study(assoc, d, query, query_id):
 
 def _create_association(my_ae, remote_host, remote_port, remote_ae, query):
     # create association with remote AE
-    logger.info(u"Query_id {0}: Request association with {1} ({2} {3} from {4})".format(
+    logger.info(u"{0}: Request association with {1} ({2} {3} from {4})".format(
         query.query_id, remote_ae, remote_host, remote_port, my_ae))
     assoc = my_ae.RequestAssociation(remote_ae)
     if assoc:
-        logger.debug(u"Query_id {0}: Association created: {1}".format(query.query_id, assoc))
+        logger.debug(u"{0}: Association created: {1}".format(query.query_id, assoc))
     else:
         query.failed = True
-        query.message = u"Query_id {0}: Association unsuccessful".format(query.query_id)
+        query.message = u"{0}: Association unsuccessful".format(query.query_id)
         query.complete = True
         query.save()
         my_ae.Quit()
-        logger.error(u"Query_id {0} to {1} failed as association was unsuccessful".format(query.query_id, remote_ae))
+        logger.error(u"{0} to {1} failed as association was unsuccessful".format(query.query_id, remote_ae))
         return
     return assoc
 
 
 def _echo(assoc, query_id):
     echo = assoc.VerificationSOPClass.SCU(1)
-    logger.debug(u"Query_id {0}: DICOM echo was returned with status {1}".format(query_id, echo.Type))
+    logger.debug(u"{0}: DICOM echo was returned with status {1}".format(query_id, echo.Type))
     return echo
 
 
@@ -667,6 +669,7 @@ def _query_for_each_modality(all_mods, query, d, assoc):
     # If not, 1 query is sufficient to retrieve all relevant studies
     modality_matching = True
     modalities_returned = False
+    query_id = query.query_id
 
     # query for all requested studies
     # if ModalitiesInStudy is not supported by the PACS set modality_matching to False and stop querying further
@@ -676,30 +679,34 @@ def _query_for_each_modality(all_mods, query, d, assoc):
                 if modality_matching:
                     query.stage = u'Currently querying for {0} studies...'.format(mod)
                     query.save()
-                    logger.info(u'Currently querying for {0} studies...'.format(mod))
+                    logger.info(u'{1} Currently querying for {0} studies...'.format(mod, query_id))
                     d.ModalitiesInStudy = mod
                     if query.qr_scp_fk.use_modality_tag:
-                        logger.debug(u'Using modality tag in study query.')
+                        logger.debug(u'{0} Using modality tag in study level query.'.format(query_id))
                         d.Modality = ''
                     query_id = uuid.uuid4()
                     _query_study(assoc, d, query, query_id)
                     study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-                    logger.debug(u"Queried for {0}, now have {1} study level responses".format(mod, study_rsp.count()))
+                    logger.debug(u"{2} Queried for {0}, now have {1} study level responses".format(
+                        mod, study_rsp.count(), query_id))
                     for rsp in study_rsp:  # First check if modalities in study has been populated
                         if rsp.get_modalities_in_study() and rsp.get_modalities_in_study()[0] != u'':
                             modalities_returned = True
                             # Then check for inappropriate responses
                             if mod not in rsp.get_modalities_in_study():
                                 modality_matching = False
-                                logger.debug(u"Remote node returns but doesn't match against ModalitiesInStudy")
+                                logger.debug(u"{0} Remote node returns but doesn't match against "
+                                             u"ModalitiesInStudy".format(query_id))
                                 break  # This indicates that there was no modality match, so we have everything already
                         else:  # modalities in study is empty
                             modalities_returned = False
                             # ModalitiesInStudy not supported, therefore assume not matched on key
                             modality_matching = False
-                            logger.debug(u"Remote node doesn't support ModalitiesInStudy, assume we have everything")
+                            logger.debug(u"{0} Remote node doesn't support ModalitiesInStudy, assume we have "
+                                         u"everything".format(query_id))
                             break
-    logger.debug(u"modalities_returned: {0}; modality_matching: {1}".format(modalities_returned, modality_matching))
+    logger.debug(u"{2} modalities_returned: {0}; modality_matching: {1}".format(
+        modalities_returned, modality_matching, query_id))
     return modalities_returned, modality_matching
 
 
@@ -747,17 +754,17 @@ def qrscu(
     from remapp.tools.dcmdatetime import make_dcm_date_range
 
     debug_timer = datetime.now()
-    logger.debug(u"qrscu args passed: qr_scp_pk={0}, store_scp_pk={1}, implicit={2}, explicit={3}, move={4}, "
-                 u"queryID={5}, date_from={6}, date_until={7}, modalities={8}, inc_sr={9}, remove_duplicates={10}, "
-                 u"filters={11}".format(qr_scp_pk, store_scp_pk, implicit, explicit, move, query_id,
-                                       date_from, date_until, modalities, inc_sr, remove_duplicates, filters))
-
     if not query_id:
         query_id = uuid.uuid4()
+    logger.debug(u"Query_id is {0}".format(query_id))
+    logger.debug(u"{12} qrscu args passed: qr_scp_pk={0}, store_scp_pk={1}, implicit={2}, explicit={3}, move={4}, "
+                 u"queryID={5}, date_from={6}, date_until={7}, modalities={8}, inc_sr={9}, remove_duplicates={10}, "
+                 u"filters={11}".format(qr_scp_pk, store_scp_pk, implicit, explicit, move, query_id,
+                                       date_from, date_until, modalities, inc_sr, remove_duplicates, filters, query_id))
+
     # Currently, if called from qrscu_script modalities will either be a list of modalities or it will be "SR".
     # Web interface hasn't changed, so will be a list of modalities and or the inc_sr flag
     # Need to normalise one way or the other.
-    logger.debug(u"Query_id is {0}".format(query_id))
     logger.debug(u"{0} Checking for modality selection and sr_only clash".format(query_id))
     if modalities is None and inc_sr is False:
         logger.error(u"{0} Query retrieve routine called with no modalities selected".format(query_id))
@@ -808,7 +815,7 @@ def qrscu(
 
     assoc = _create_association(my_ae, rh, rp, remote_ae, query)
     if not assoc:
-        logger.warning(u"{0} Query aborted as could not create initial association.")
+        logger.warning(u"{0} Query aborted as could not create initial association.".format(query_id))
         return
 
     # perform a DICOM ECHO
@@ -901,7 +908,7 @@ def qrscu(
         d2.StudyInstanceUID = rsp.study_instance_uid
         _query_series(assoc, d2, rsp, query_id)
         if not modalities_returned:
-            _generate_modalities_in_study(rsp)
+            _generate_modalities_in_study(rsp, query_id)
     logger.debug(u"{0} Series level query complete.".format(query_id))
 
     if not modality_matching:
@@ -1005,14 +1012,15 @@ def qrscu(
         query.query_id, move, time_took))
 
     if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(u"Query result contains the following studies / series:")
+        logger.debug(u"{0} Query result contains the following studies / series:".format(query_id))
         studies = query.dicomqrrspstudy_set.all()
         for study in studies:
             for series in study.dicomqrrspseries_set.all():
                 logger.debug(
-                    u"    Study: {0} ({1}) modalities: {2}, Series: {3}, modality: {4} containing {5} objects.".format(
-                        study.study_description, study.study_instance_uid, study.get_modalities_in_study(),
-                        series.series_instance_uid, series.modality, series.number_of_series_related_instances))
+                    u"{6}    Study: {0} ({1}) modalities: {2}, Series: {3}, modality: {4} containing {5} "
+                    u"objects.".format(study.study_description, study.study_instance_uid,
+                                       study.get_modalities_in_study(), series.series_instance_uid, series.modality,
+                                       series.number_of_series_related_instances, query_id))
 
     if move:
         movescu.delay(str(query.query_id))
