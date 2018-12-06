@@ -4,10 +4,12 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#702`_  Query-retrieve: fixed URLs in DICOM javascript files to allow virtual-directories
 * `#701`_  Interface: made the fluoroscopy exposure detail table sortable by clicking on headers
 * `#697`_  Testing: added tests for fluoroscopy high dose alerts (single-plane systems)
 * `#696`_  Interface: fixed broken Delete Studies and Entry button
 * `#695`_  Imports: added missing name attribute for size_abort url
+* `#694`_  Query-retrieve: added extensive logging and summary to interface
 * `#693`_  Interface: fixed display of numbers with significant places settings and comma localisation
 * `#691`_  Interface: fixed URL lookup error for Display Names page
 * `#690`_  Interface: added workload stats user option entry back into config menu
