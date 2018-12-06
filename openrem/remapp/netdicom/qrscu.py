@@ -754,6 +754,7 @@ def qrscu(
     from dicom.dataset import Dataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from remapp.models import DicomQuery, DicomRemoteQR, DicomStoreSCP
+    from remapp.templatetags.remappduration import naturalduration
     from remapp.tools.dcmdatetime import make_dcm_date_range
 
     debug_timer = datetime.now()
@@ -974,12 +975,13 @@ def qrscu(
         query_id, study_numbers['series_pruning_removed'], study_numbers['current']))
 
     if remove_duplicates:
-        before_remove_duplicates = study_numbers['current']
+        study_rsp = query.dicomqrrspstudy_set.all()
+        before_remove_duplicates = study_rsp.count()
         query.stage = u"Removing any responses that match data we already have in the database"
         logger.debug(u"{0} Removing any responses that match data we already have in the database".format(query_id))
         query.save()
         _remove_duplicates(query, study_rsp, assoc, query_id)
-        study_numbers['current'] = study_rsp.count()
+        study_numbers['current'] = query.dicomqrrspstudy_set.all().count()
         study_numbers['duplicates_removed'] = before_remove_duplicates - study_numbers['current']
         logger.info(u"{0} Removing duplicates of previous objects removed {1}, leaving {2}".format(
             query_id, study_numbers['duplicates_removed'], study_numbers['current']))
@@ -987,22 +989,24 @@ def qrscu(
     # done
     my_ae.Quit()
     query.complete = True
-    time_took = datetime.now() - debug_timer
-    query.stage = u"Query complete. Query took {0} seconds and we are left with {1} studies to move.<br>".format(
-        time_took, study_rsp.count())
+    time_took = (datetime.now() - debug_timer).total_seconds()
+    study_numbers['current'] = query.dicomqrrspstudy_set.all().count()
+    query.stage = u"Query complete. Query took {0} and we are left with {1} studies to move.<br>" \
+                  u"Of the original {2} study responses, ".format(
+                    naturalduration(time_took), study_numbers['current'], study_numbers['initial'])
     query.stage += series_pruning_log
     filter_pruning_logs = u"Filtering for "
     if filters['study_desc_inc']:
-        filter_pruning_logs += u"only studies with description that include {0} removed {1} studies, ".format(
+        filter_pruning_logs += u"only studies with description that include '{0}' removed {1} studies, ".format(
             u", ".join(filters['study_desc_inc']), deleted_studies_filters['study_desc_inc'])
     if filters['study_desc_exc']:
-        filter_pruning_logs += u"studies with description that do not include {0} removed {1} studies, ".format(
+        filter_pruning_logs += u"studies with description that do not include '{0}' removed {1} studies, ".format(
             u", ".join(filters['study_desc_exc']), deleted_studies_filters['study_desc_exc'])
     if filters['stationname_inc']:
-        filter_pruning_logs += u"only studies with station names that include {0} removed {1} studies, ".format(
+        filter_pruning_logs += u"only studies with station names that include '{0}' removed {1} studies, ".format(
             u", ".join(filters['stationname_inc']), deleted_studies_filters['stationname_inc'])
     if filters['stationname_exc']:
-        filter_pruning_logs += u"studies with station names that do not include {0} removed {1} studies, ".format(
+        filter_pruning_logs += u"studies with station names that do not include '{0}' removed {1} studies, ".format(
             u", ".join(filters['stationname_exc']), deleted_studies_filters['stationname_exc'])
     query.stage += filter_pruning_logs
     if remove_duplicates:
