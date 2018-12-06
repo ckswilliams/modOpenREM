@@ -124,13 +124,16 @@ def _filter(query, level, filter_name, filter_list, filter_type):
     :param filter_type: 'exclude', 'include'
     :return: None
     """
+    query_id = query.query_id
     if filter_type == 'exclude':
         filtertype = True
     elif filter_type == 'include':
         filtertype = False
+    else:
+        logger.error(u"{0} _filter called without filter_type. Cannot filter!".format(query_id))
+        return
 
     study_rsp = query.dicomqrrspstudy_set.all()
-    query_id = query.query_id
     query.stage = u"Filter at {0} level on {1} that {2} {3}".format(level, filter_name, filter_type, filter_list)
     logger.info(u"{4} Filter at {0} level on {1} that {2} {3}".format(
         level, filter_name, filter_type, filter_list, query_id))
@@ -596,7 +599,7 @@ def _query_study(assoc, d, query, query_id):
 
     rspno = 0
 
-    logger.debug(u'Processing the study level responses')
+    logger.debug(u'{0} Processing the study level responses'.format(query_id))
     for ss in st:
         if not ss[1]:
             continue
@@ -624,7 +627,7 @@ def _query_study(assoc, d, query, query_id):
             logger.debug(u"{1} ModalitiesInStudy: {0}".format(rsp.get_modalities_in_study(), query_id))
         except AttributeError:
             rsp.set_modalities_in_study([u''])
-            logger.debug(u"{1} ModalitiesInStudy was not in response".format(query_id))
+            logger.debug(u"{0} ModalitiesInStudy was not in response".format(query_id))
 
         rsp.modality = None  # Used later
         rsp.save()
@@ -860,8 +863,8 @@ def qrscu(
         study_rsp = query.dicomqrrspstudy_set.all()
     study_numbers = {'initial': study_rsp.count()}
     study_numbers['current'] = study_numbers['initial']
-    logger.info(u"{0} {1} studies returned, will now process to remove studies that are not useful.".format(query_id,
-        study_numbers['initial']))
+    logger.info(u"{0} {1} studies returned, will now process to remove studies that are not "
+                u"useful.".format(query_id, study_numbers['initial']))
 
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
     # We are assuming that if remote matches on modality it will populate ModalitiesInStudy and conversely
@@ -1032,8 +1035,7 @@ def _move_req(my_ae, assoc, d, study_no, series_no):
         for move_status in move_generator:
             if u'Pending' in move_status:
                 logger.info(u"Move of study {0}, series {1} status is {2} "
-                            u"(i.e. one object processed)".format(
-                    study_no, series_no, move_status))
+                            u"(i.e. one object processed)".format(study_no, series_no, move_status))
             else:
                 logger.warning(u"Move of study {0}, series {1} status is {2}".format(study_no, series_no, move_status))
     except KeyError as e:
@@ -1250,13 +1252,13 @@ def _process_args(parser_args, parser):
         stationname_inc = None
 
     filters = {
-                'stationname_inc' : stationname_inc,
-                'stationname_exc' : stationname_exc,
-                'study_desc_inc'  : study_desc_inc,
-                'study_desc_exc'  : study_desc_exc,
+                'stationname_inc': stationname_inc,
+                'stationname_exc': stationname_exc,
+                'study_desc_inc': study_desc_inc,
+                'study_desc_exc': study_desc_exc,
               }
 
-    remove_duplicates = not(parser_args.dup)  # if flag, duplicates will be retrieved.
+    remove_duplicates = not parser_args.dup  # if flag, duplicates will be retrieved.
 
     get_toshiba = parser_args.toshiba
 
