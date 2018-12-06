@@ -1,5 +1,5 @@
 ########################
-Upgrade to OpenREM 0.8.2
+Upgrade to OpenREM 0.9.0
 ########################
 
 ****************
@@ -27,9 +27,9 @@ Upgrading an OpenREM server with no internet access
 
 Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the database and configuration.
 
-*************************************
-Upgrading from version 0.7.4 or 0.8.x
-*************************************
+****************************
+Upgrading from version 0.8.x
+****************************
 
 Upgrade
 =======
@@ -50,7 +50,7 @@ Upgrade
 
 .. sourcecode:: bash
 
-    pip install openrem==0.8.2
+    pip install openrem==0.9.0b1
 
 
 Migrate the database
@@ -67,7 +67,6 @@ In a shell/command window, move into the ``openrem`` folder:
 .. sourcecode:: bash
 
     python manage.py makemigrations remapp
-    # if changes are detected (not expected between most beta versions)
     python manage.py migrate remapp
 
 
@@ -92,7 +91,7 @@ follow the instructions at :ref:`enableRabbitMQ`.
 
 E-mail server settings
 ======================
-If you want selected OpenREM users to be automatically sent fluroscopy high
+If you want selected OpenREM users to be automatically sent fluoroscopy high
 dose alerts then set the details of the e-mail server to be used in the
 `E-mail server settings` part of your ``local_settings.py`` file. Locate and
 edit your local_settings file
