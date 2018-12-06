@@ -4,6 +4,7 @@ from django import template
 
 register = template.Library()
 
+
 def naturalduration(seconds):
     if not seconds:
         return ''
@@ -31,5 +32,6 @@ def naturalduration(seconds):
         duration = u"{0:.1f} second{1}".format(s, splural)
 
     return duration
+
 
 register.filter('naturalduration', naturalduration)
