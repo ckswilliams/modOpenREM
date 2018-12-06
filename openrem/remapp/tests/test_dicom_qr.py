@@ -394,7 +394,7 @@ class QRPhilipsCT(TestCase):
         rst1.set_modalities_in_study(None)
         rst1.save()
 
-        _generate_modalities_in_study(rst1)
+        _generate_modalities_in_study(rst1, query.query_id)
 
         # reload study, else _generate_modalities_in_study appears to work without save. See #627
         rst2 = query.dicomqrrspstudy_set.all()[0]
