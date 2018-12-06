@@ -162,8 +162,43 @@ def q_update(request):
         table.append(u'</table>')
         tablestr = u''.join(table)
         resp['status'] = u'complete'
-        resp['message'] = u'<h4>Query complete - there are {1} studies we can move</h4> {0} <p> {2} </p>'.format(
-            tablestr, study_rsp.count(), query.stage)
+        query_details_text = u"<div class='panel-group' id='accordion'>" \
+                             u"<div class='panel panel-default'>" \
+                             u"<div class='panel-heading'>  "\
+                             u"<h4 class='panel-title'>" \
+                             u"<a data-toggle='collapse' data-parent='#accordion' href='#query-details'>" \
+                             u"Query details</h4>" \
+                             u"</a></h4></div>" \
+                             u"<div id='query-details' class='panel-collapse collapse'>" \
+                             u"<div class='panel-body'>" \
+                             u"<p>{0}</p></div></div></div></div>".format(query.stage)
+        not_as_expected_help_text = u"<div class='panel-group' id='accordion'>" \
+                                    u"<div class='panel panel-default'>" \
+                                    u"<div class='panel-heading'>  "\
+                                    u"<h4 class='panel-title'>" \
+                                    u"<a data-toggle='collapse' data-parent='#accordion' href='#not-expected'>" \
+                                    u"Not what you expected?</h4>" \
+                                    u"</a></h4></div>" \
+                                    u"<div id='not-expected' class='panel-collapse collapse'>" \
+                                    u"<div class='panel-body'>" \
+                                    u"<p>For DX and mammography, the query will look for Radiation Dose Structured " \
+                                    u"Reports, or images if the RDSR is not available. For Fluoroscopy, RDSRs are " \
+                                    u"required. For CT RDSRs are preferred, but Philips dose images can be used and " \
+                                    u"for some scanners, particularly older Toshiba scanners that can't create RDSR " \
+                                    u"OpenREM can process the data to create an RDSR to import.</p>" \
+                                    u"<p>If you haven't got the results you expect, it may be that the imaging system" \
+                                    u" is not creating RDSRs or not sending them to the PACS you are querying. In " \
+                                    u"either case you will need to have the system reconfigured to create and/or send" \
+                                    u" them. If it is a CT scanner that can't create an RDSR (it is too old), it is " \
+                                    u"worth trying the 'Toshiba' option, but you will need to be using Orthanc and " \
+                                    u"configure your scanner in the " \
+                                    u"<a href='https://docs.openrem.org/en/{0}/netdicom-orthanc-config.html" \
+                                    u"#guide-to-customising-orthanc-configuration' target='_blank'>" \
+                                    u"toshiba_extractor_systems</a> list" \
+                                    u". You will need to verify the resulting data to confirm accuracy.</p>" \
+                                    u"</div></div></div></div>".format(remapp.__docs_version__)
+        resp['message'] = u'<h4>Query complete - there are {1} studies we can move</h4> {0} {2} {3}'.format(
+            tablestr, study_rsp.count(), query_details_text, not_as_expected_help_text)
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
