@@ -15,7 +15,7 @@
         <tr>
         <td style="width: 25%">
           {% if admin.admingroup %}
-          <a href="{% url 'review_failed_imports' %}{{ modality|upper }}/">
+          <a href="{% url 'review_failed_imports' modality|upper %}">
             Failed import - review here
           </a>
           {% else %}
@@ -26,7 +26,7 @@
         </td>
         <td style="width:25%">
           {% if admin.admingroup %}
-            <a href="{% url 'review_failed_imports' %}{{ modality|upper }}/">
+            <a href="{% url 'review_failed_imports' modality|upper %}">
           {% else %}
             <a href="#">
           {% endif %}
@@ -35,7 +35,7 @@
         </td>
         <td style="width:25%">
           {% if admin.admingroup %}
-            <a href="{% url 'review_failed_imports' %}{{ modality|upper }}/">
+            <a href="{% url 'review_failed_imports' modality|upper %}">
           {% else %}
             <a href="#">
           {% endif %}
@@ -45,12 +45,12 @@
         {% if home_config.display_workload_stats %}
           <td style="width:12.5%">
           {% if admin.admingroup %}
-            <a href="{% url 'review_failed_imports' %}{{ modality|upper }}/">
+            <a href="{% url 'review_failed_imports' modality|upper %}">
           {% endif %}
           </td>
           <td style="width:12.5%">
           {% if admin.admingroup %}
-            <a href="{% url 'review_failed_imports' %}{{ modality|upper }}/">
+            <a href="{% url 'review_failed_imports' modality|upper %}">
           {% endif %}
           </td>
         {% endif %}
