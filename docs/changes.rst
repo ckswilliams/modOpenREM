@@ -4,12 +4,15 @@ OpenREM version history
 
 0.8.2 (2018-xx-xx)
 ------------------
+* `#701`_  Interface: made the fluoroscopy exposure detail table sortable by clicking on headers
+* `#697`_  Testing: added tests for fluoroscopy high dose alerts (single-plane systems)
 * `#696`_  Interface: fixed broken Delete Studies and Entry button
 * `#695`_  Imports: added missing name attribute for size_abort url
+* `#693`_  Interface: fixed display of numbers with significant places settings and comma localisation
 * `#691`_  Interface: fixed URL lookup error for Display Names page
 * `#690`_  Interface: added workload stats user option entry back into config menu
 * `#689`_  Interface: fixed URL lookup error for DICOM summary page
-* `#685`_  Charts: fixed link code that would otherwise cause DLP per acqusition protocol chart histogram links to fail
+* `#685`_  Charts: fixed link code that would otherwise cause DLP per acquisition protocol chart histogram links to fail
 * `#683`_  Installation: added VIRTUAL_DIRECTORY to the settings file to avoid updating local_settings file on upgrade
 * `#682`_  Charts: fixed problem where links from histogram bars didn't filter correctly when case-insensitive categories selected
 * `#681`_  Imports: modified RDSR import to work with Varian RDSRs
@@ -53,7 +56,7 @@ OpenREM version history
 * `#640`_  Exports: error in filter listing for NHSBSP csv exports corrected
 * `#639`_  Charts: fixed problem where a blank category name may not be displayed correctly
 * `#638`_  Skin dose maps: added a link to download data for stand-alone openSkin even when map displayed
-* `#627`_  DICOM Networking: Implemented workaround for query "bug" in Impax 6.6
+* `#627`_  DICOM Networking: implemented workaround for query "bug" in Impax 6.6
 * `#606`_  Interface: Made it possible for the user to change his/her password
 
 0.8.0 (2018-06-11)
