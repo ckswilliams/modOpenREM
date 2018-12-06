@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.0b1 (2018-12-06)
 --------------------
+* `#703`_  Interface: fixed URL lookup error for failed imports on homepage
 * `#702`_  Query-retrieve: fixed URLs in DICOM javascript files to allow virtual-directories
 * `#701`_  Interface: made the fluoroscopy exposure detail table sortable by clicking on headers
 * `#697`_  Testing: added tests for fluoroscopy high dose alerts (single-plane systems)
