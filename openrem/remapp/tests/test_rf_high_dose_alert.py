@@ -204,8 +204,14 @@ class RFHighDoseAlert(TestCase):
         # Recalculate the cumulative dose data because DAP alert changed
         self.client.get(reverse_lazy('rf_recalculate_accum_doses'), follow=True)
 
+        # Obtain the private keys of the two studies
+        filter_set = ''
+        f = RFSummaryListFilter(filter_set, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by().distinct())
+        pk_20160510 = f.qs.filter(study_date='2016-05-10').values_list('pk', flat=True)[0]
+        pk_20160512 = f.qs.filter(study_date='2016-05-12').values_list('pk', flat=True)[0]
+
         # Obtain the response from the RF summary list filter for the newest study - this includes the html of the page
-        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 2}), follow=True)
+        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': pk_20160512}), follow=True)
 
         # Cumulative DAP should be highlighted for the most recent study
         self.assertContains(response, self.dap_32_text, count=1)
@@ -214,7 +220,7 @@ class RFHighDoseAlert(TestCase):
         self.assertContains(response, self.rp_504_text, count=1)
 
         # Obtain the response from the RF summary list filter for the older study - this includes the html of the page
-        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 1}), follow=True)
+        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': pk_20160510}), follow=True)
 
         # Cumulative DAP should not be highlighted for the older study
         self.assertNotContains(response, self.dap_16_text)
@@ -234,7 +240,7 @@ class RFHighDoseAlert(TestCase):
         self.client.get(reverse_lazy('rf_recalculate_accum_doses'), follow=True)
 
         # Obtain the response from the RF summary list filter for the newest study - this includes the html of the page
-        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 2}), follow=True)
+        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': pk_20160512}), follow=True)
 
         # Cumulative DAP should be highlighted for the most recent study
         self.assertContains(response, self.dap_32_text, count=1)
@@ -251,7 +257,7 @@ class RFHighDoseAlert(TestCase):
         self.assertContains(response, self.rp_000_text, count=2)
 
         # Obtain the response from the RF summary list filter for the older study - this includes the html of the page
-        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': 1}), follow=True)
+        response = self.client.get(reverse_lazy('rf_detail_view', kwargs={'pk': pk_20160510}), follow=True)
 
         # Cumulative DAP should be highlighted for the older study, together with total DAP and total DAP in summary over past two weeks
         self.assertContains(response, self.dap_16_text, count=3)
