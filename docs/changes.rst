@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.9.0b1 (2018-12-06)
+0.9.0b2 (2018-12-07)
 --------------------
 * `#703`_  Interface: fixed URL lookup error for failed imports on homepage
 * `#702`_  Query-retrieve: fixed URLs in DICOM javascript files to allow virtual-directories
