@@ -291,6 +291,19 @@ def _irradiationeventxraymechanicaldata(dataset, event):  # TID 10003c
     mech.save()
 
 
+def _check_dap_units(dap_sequence):
+    """Check for non-conformant DAP units of dGycm2 before storing value
+
+    :param dap_sequence: ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product'
+    :return: dose_area_product
+    """
+    dap = test_numeric_value(dap_sequence.NumericValue)
+    if dap and dap_sequence.MeasurementUnitsCodeSequence[0].CodeValue == 'dGy.cm2':
+        return dap * 0.00001
+    else:
+        return dap
+
+
 def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
     # TODO: review model to convert to cid where appropriate, and add additional fields
     from django.core.exceptions import ObjectDoesNotExist
@@ -514,7 +527,7 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
             event.target_region = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product':
-            event.dose_area_product = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            event.dose_area_product = _check_dap_units(cont.MeasuredValueSequence[0])
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Half Value Layer':
             event.half_value_layer = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Entrance Exposure at RP':
@@ -613,15 +626,13 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
     for cont in dataset.ContentSequence:
         try:
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose Area Product Total':
-                accumproj.fluoro_dose_area_product_total = test_numeric_value(
-                    cont.MeasuredValueSequence[0].NumericValue)
+                accumproj.fluoro_dose_area_product_total = _check_dap_units(cont.MeasuredValueSequence[0])
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
                 accumproj.fluoro_dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Fluoro Time':
                 accumproj.total_fluoro_time = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose Area Product Total':
-                accumproj.acquisition_dose_area_product_total = test_numeric_value(
-                    cont.MeasuredValueSequence[0].NumericValue)
+                accumproj.acquisition_dose_area_product_total = _check_dap_units(cont.MeasuredValueSequence[0])
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose (RP) Total':
                 accumproj.acquisition_dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Acquisition Time':
@@ -629,7 +640,7 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
             # TODO: Remove the following four items, as they are also imported (correctly) into
             # _accumulatedtotalprojectionradiographydose
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
-                accumproj.dose_area_product_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+                accumproj.dose_area_product_total = _check_dap_units(cont.MeasuredValueSequence[0])
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
                 accumproj.dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
@@ -677,7 +688,7 @@ def _accumulatedtotalprojectionradiographydose(dataset, accum):  # TID 10007
     for cont in dataset.ContentSequence:
         try:
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
-                accumint.dose_area_product_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+                accumint.dose_area_product_total = _check_dap_units(cont.MeasuredValueSequence[0])
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
                 accumint.dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
