@@ -156,8 +156,8 @@ To correctly render characters in csv files with Excel, you will need to follow 
 #. Open Excel.
 #. On the ``Data`` tab of the ribbon interface, select ``From Text`` in the ``Get External Data`` section.
 #. Select your exported csv file and click ``Import``
-#. Ensure that Data Type ``Fixed width`` is selected.
-#. Change the ``File origin`` from ``Windows (ANSI)`` to ``65001 : Unicode (UTF-8)`` -- the easiest way to find it is to
+#. Ensure that Data Type ``Delimited`` is selected.
+#. Change the ``File origin`` from to ``65001 : Unicode (UTF-8)`` -- the easiest way to find it is to
    scroll right to the bottom of the list, then move up one.
 #. Click ``Next >``
 #. Change the delimiter to just ``Comma``
