@@ -3,7 +3,7 @@
 
 import os
 from django.contrib.auth.models import User, Group
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from remapp.extractors import rdsr
 from remapp.models import PatientIDSettings, GeneralStudyModuleAttr, HighDoseMetricAlertSettings
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,6 +12,7 @@ from remapp.interface.mod_filters import RFSummaryListFilter
 from decimal import Decimal
 
 
+@override_settings(LANGUAGE_CODE='en-us')
 class RFHighDoseAlert(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
