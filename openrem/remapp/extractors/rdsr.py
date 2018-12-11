@@ -298,9 +298,12 @@ def _check_dap_units(dap_sequence):
     :return: dose_area_product
     """
     dap = test_numeric_value(dap_sequence.NumericValue)
-    if dap and dap_sequence.MeasurementUnitsCodeSequence[0].CodeValue == 'dGy.cm2':
-        return dap * 0.00001
-    else:
+    try:
+        if dap and dap_sequence.MeasurementUnitsCodeSequence[0].CodeValue == 'dGy.cm2':
+            return dap * 0.00001
+        else:
+            return dap
+    except AttributeError:
         return dap
 
 
