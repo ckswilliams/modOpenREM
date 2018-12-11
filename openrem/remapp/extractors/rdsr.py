@@ -294,8 +294,8 @@ def _irradiationeventxraymechanicaldata(dataset, event):  # TID 10003c
 def _check_dap_units(dap_sequence):
     """Check for non-conformant DAP units of dGycm2 before storing value
 
-    :param dap_sequence: ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product'
-    :return: dose_area_product
+    :param dap_sequence: MeasuredValueSequence[0] from ConceptNameCodeSequence of any of the Dose Area Products
+    :return: dose_area_product in Gy.m2
     """
     dap = test_numeric_value(dap_sequence.NumericValue)
     try:

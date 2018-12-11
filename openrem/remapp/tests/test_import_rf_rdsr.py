@@ -77,6 +77,10 @@ class DAPUnitsTest(TestCase):
     """
 
     def test_dgycm2(self):
+        """
+        Initial test of sequence as presented in Ultimax RDSR
+        :return: None
+        """
         from dicom.dataset import Dataset
         from dicom.sequence import Sequence
         from remapp.extractors.rdsr import _check_dap_units
@@ -93,6 +97,10 @@ class DAPUnitsTest(TestCase):
         self.assertAlmostEqual(dap, 0.00001034)
 
     def test_gym2(self):
+        """
+        Test case of correct sequence as presented in conformant RDSR
+        :return: None
+        """
         from dicom.dataset import Dataset
         from dicom.sequence import Sequence
         from remapp.extractors.rdsr import _check_dap_units
@@ -109,6 +117,10 @@ class DAPUnitsTest(TestCase):
         self.assertAlmostEqual(dap, 0.000016)
 
     def test_no_units(self):
+        """
+        Test case of missing units sequence - not seen by the auther in the wild
+        :return: None
+        """
         from dicom.dataset import Dataset
         from remapp.extractors.rdsr import _check_dap_units
 
