@@ -125,6 +125,11 @@ simply the presence of one of the key words. Therefore a patient named
 Other fields will also help to confirm whether a study is for a real patient
 such as the lack of an Accession Number and an unusual patient age.
 
+..  Note::
+
+    For fluoroscopy the table showing details of each exposure can be sorted by
+    clicking on the table headings.
+
 A note on time data for fluoroscopy studies
 -------------------------------------------
 

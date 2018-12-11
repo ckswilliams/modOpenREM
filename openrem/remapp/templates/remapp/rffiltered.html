@@ -1,4 +1,5 @@
 {% extends "remapp/filteredbase.html" %}
+{% load sigdig %}
 
 {% block navrf %}<li class="active">{% endblock %}
 
@@ -105,7 +106,7 @@
 {% endblock %}
 
 {% block col1 %}
-
+{% load l10n %}
     {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
     {% paginate %}
 
@@ -211,9 +212,9 @@
                         {% endif %}
 
                         {% if accum_integrated.dose_rp_total >= alertLevels.alert_total_rp_dose_rf %}
-                            <strong style="color: red;"><script>document.write({{ accum_integrated.dose_rp_total }}.toPrecision(3));</script></strong>
+                            <strong style="color: red;">{{ accum_integrated.dose_rp_total | sigdig }} </strong>
                         {% else %}
-                            <script>document.write({{ accum_integrated.dose_rp_total }}.toPrecision(3));</script>
+                            {{ accum_integrated.dose_rp_total | sigdig }}
                         {% endif %}
 
                         <br>
@@ -242,9 +243,9 @@
                         <a href="/openrem/rf/{{ exam.id }}/">
                           {% with accum_integrated=first_accum_set.accumintegratedprojradiogdose_set.get %}
                             {% if accum_integrated.dose_rp_total_over_delta_weeks >= alertLevels.alert_total_rp_dose_rf %}
-                                <strong style="color: red;"><script>document.write({{ accum_integrated.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script></strong>
+                                <strong style="color: red;">{{ accum_integrated.dose_rp_total_over_delta_weeks | sigdig }} </strong>
                             {% else %}
-                                <script>document.write({{ accum_integrated.dose_rp_total_over_delta_weeks }}.toPrecision(3));</script>
+                                {{ accum_integrated.dose_rp_total_over_delta_weeks | sigdig }}
                             {% endif %}
 
                             {% with n_studies=study_delta_pk_set.count %}
