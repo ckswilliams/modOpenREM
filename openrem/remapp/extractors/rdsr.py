@@ -981,7 +981,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         proj.general_study_module_attributes.modality_type = None
 
     for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Procedure reported':
+        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'procedure reported':
             proj.procedure_reported = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                         cont.ConceptCodeSequence[0].CodeMeaning)
             if (
