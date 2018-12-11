@@ -1,0 +1,81 @@
+{% extends "remapp/base.html" %}
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block navhelp %}
+        <li>
+            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/celery_management.html"
+               target="_blank" data-toggle="tooltip" title="Celery management documentation - opens in a new tab">
+                Celery management documentation
+            </a>
+        </li>
+{% endblock %}
+
+{% block mainblock %}
+
+{% if admin.admingroup %}
+  <div class="row col-md-offset-2">
+    <h3>Celery administration </h3>
+  </div>
+
+  <div class="row">
+  <div class="col-md-8 col-md-offset-2">
+          <script>
+              $(document).ready(
+                      function tasks_update( json ){
+                          $.ajax({
+                              url: "{% url 'celery_tasks' %}",
+                              data: {
+                                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                              },
+                              type: "POST",
+                              success: function( data ){
+                                  $( '#tasks' ).html( data );
+                                  setTimeout(function(){
+                                      tasks_update();
+                                  }, 2000);
+                              }
+                          })
+                      }
+              )
+          </script>
+  <p>
+    Blurb about celery
+  </p>
+    <p>
+    Explanation of the table below
+  </p>
+  </div></div>
+    <div class="row">
+  <div class="col-md-8 col-md-offset-2">
+
+  <p id="tasks">
+    The list of tasks should appear here...
+  </p>
+  </div>
+  </div>
+
+
+{% else %}
+
+  <div class="row col-md-offset-2">
+    <h3>Celery administration </h3>
+  </div>
+
+  <div class="row">
+  <div class="col-md-8 col-md-offset-2">
+  <p>
+    This function can only be accessed if you are logged in to OpenREM with admin
+    permissions.
+  </p>
+  </div>
+  </div>
+
+{% endif %}
+
+
+
+
+{% endblock %}
+
+

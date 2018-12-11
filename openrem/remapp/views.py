@@ -3240,6 +3240,53 @@ def rabbitmq_purge(request, queue=None):
 
 
 @login_required
+def celery_admin(request):
+    """View to show Celery tasks. Content generated using AJAX"""
+
+    admin = _create_admin_dict(request)
+
+    template = 'remapp/celery_admin.html'
+    return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
+
+
+def celery_tasks(request):
+    """AJAX function to get current task details"""
+    import requests
+    from datetime import datetime
+
+    if request.is_ajax():
+        try:
+            flower = requests.get('http://localhost:5555/api/tasks')
+            if flower.status_code == 200:
+                tasks = []
+                task_dict_list = flower.json()
+                for task_uuid in task_dict_list.keys():
+                    tasks += [{'uuid': task_uuid,
+                               'name': task_dict_list[task_uuid]['name'],
+                               'received': datetime.fromtimestamp(task_dict_list[task_uuid]['received']),
+                               'started': datetime.fromtimestamp(task_dict_list[task_uuid]['started']),
+                               'state': task_dict_list[task_uuid]['state']
+                               }]
+        except requests.ConnectionError:
+            admin = _create_admin_dict(request)
+            template = 'remapp/celery_connection_error.html'
+            return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
+        template = 'remapp/celery_tasks.html'
+        return render_to_response(template, {'tasks': tasks}, context_instance=RequestContext(request))
+
+
+def celery_abort(request, task=None):
+    """Function to abort one of the Celery tasks"""
+    import requests
+
+    if task:
+        queue_url = 'http://localhost:5555/api/task/abort/{0}'.format(task)
+        abort = requests.post(queue_url)
+        messages.info(request, abort)
+        return redirect(reverse_lazy('celery_admin'))
+
+
+@login_required
 def dicom_summary(request):
     """Displays current DICOM configuration
     """

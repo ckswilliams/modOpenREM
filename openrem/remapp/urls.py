@@ -136,6 +136,9 @@ urlpatterns = patterns('remapp.views',
                        url('^admin/rabbitmq/queues/$', 'rabbitmq_queues', name='rabbitmq_queues'),
                        url('^admin/rabbitmq/purge_queue/(?P<queue>[0-9a-zA-Z.@-]+)$', 'rabbitmq_purge',
                            name='rabbitmq_purge'),
+                       url('^admin/celery/$', 'celery_admin', name='celery_admin'),
+                       url('^admin/celery/tasks/$', 'celery_tasks', name='celery_tasks'),
+                       url('^admin/celery/abort_task/(?P<task>[0-9a-zA-Z.@-]+)$', 'celery_abort', name='celery_abort'),
                        )
 
 urlpatterns += patterns('remapp.exports.exportviews',
