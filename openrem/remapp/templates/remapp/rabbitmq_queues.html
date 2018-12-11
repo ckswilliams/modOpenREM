@@ -21,7 +21,7 @@
         <td>{{ queue.messages_unacknowledged }}</td>
     {% endif %}
       <td>
-        {% if queue.messages > 0 %}
+        {% if queue.messages_ready > 0 %}
           <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge</a>
         {% else %}
           <a class="btn btn-default" disabled="disabled">Purge</a>
