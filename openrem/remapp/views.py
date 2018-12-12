@@ -36,7 +36,6 @@ import os
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
-
 import csv
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -2000,13 +1999,13 @@ def size_abort(request, pk):
     :param request: Contains the task primary key
     :type request: POST
     """
-    from celery.task.control import revoke
+    from openremproject.celeryapp import app
     from remapp.models import SizeUpload
 
     size_import = get_object_or_404(SizeUpload, pk=pk)
 
     if request.user.groups.filter(name="importsizegroup") or request.users.groups.filter(name="admingroup"):
-        revoke(size_import.task_id, terminate=True)
+        app.control.revoke(size_import.task_id, terminate=True)
         size_import.logfile.delete()
         size_import.sizefile.delete()
         size_import.delete()
@@ -3588,7 +3587,7 @@ def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable
 
     if not request.user.groups.filter(name="admingroup"):
         # Send the user to the home page
-        return HttpResponseRedirect(reverse('home'))
+        return HttpResponseRedirect(reverse_lazy('home'))
     else:
         # Empty the PKsForSummedRFDoseStudiesInDeltaWeeks table
         from remapp.models import PKsForSummedRFDoseStudiesInDeltaWeeks
