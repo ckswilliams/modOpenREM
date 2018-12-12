@@ -45,6 +45,9 @@ class ImportRFRDSRPhilips(TestCase):
 class ImportRFRDSRPhilipsAzurion(TestCase):
     """
     Test importing Azurion RDSR with empty calibration data and incorrect Acquisition Device Type
+
+    *** Currently disabled as RDSR too big - import adds 15 seconds to tests! ***
+    To enable, remove '_disable_' from the function name
     """
 
     def _disable_test_azurion_import(self):
@@ -66,3 +69,64 @@ class ImportRFRDSRPhilipsAzurion(TestCase):
         fluoro_totals = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
 
         self.assertAlmostEqual(fluoro_totals.fluoro_dose_area_product_total, Decimal(0.00101567))
+
+
+class DAPUnitsTest(TestCase):
+    """
+    Test handling of incorrect DAP units found in Toshiba/Canon RF Ultimax
+    """
+
+    def test_dgycm2(self):
+        """
+        Initial test of sequence as presented in Ultimax RDSR
+        :return: None
+        """
+        from dicom.dataset import Dataset
+        from dicom.sequence import Sequence
+        from remapp.extractors.rdsr import _check_dap_units
+
+        units_sequence = Dataset()
+        units_sequence.CodeValue = u'dGy.cm2'
+        units_sequence.CodingSchemeDesignator = u'UCUM'
+        units_sequence.CodeMeaning = u'dGy.cm2'
+        measured_values_sequence = Dataset()
+        measured_values_sequence.NumericValue = 1.034
+        measured_values_sequence.MeasurementUnitsCodeSequence = Sequence([units_sequence])
+
+        dap = _check_dap_units(measured_values_sequence)
+        self.assertAlmostEqual(dap, 0.00001034)
+
+    def test_gym2(self):
+        """
+        Test case of correct sequence as presented in conformant RDSR
+        :return: None
+        """
+        from dicom.dataset import Dataset
+        from dicom.sequence import Sequence
+        from remapp.extractors.rdsr import _check_dap_units
+
+        units_sequence = Dataset()
+        units_sequence.CodeValue = u'Gym2'
+        units_sequence.CodingSchemeDesignator = u'UCUM'
+        units_sequence.CodeMeaning = u'Gym2'
+        measured_values_sequence = Dataset()
+        measured_values_sequence.NumericValue = 1.6e-005
+        measured_values_sequence.MeasurementUnitsCodeSequence = Sequence([units_sequence])
+
+        dap = _check_dap_units(measured_values_sequence)
+        self.assertAlmostEqual(dap, 0.000016)
+
+    def test_no_units(self):
+        """
+        Test case of missing units sequence - not seen by the auther in the wild
+        :return: None
+        """
+        from dicom.dataset import Dataset
+        from remapp.extractors.rdsr import _check_dap_units
+
+        measured_values_sequence = Dataset()
+        measured_values_sequence.NumericValue = 1.6e-005
+
+        dap = _check_dap_units(measured_values_sequence)
+        self.assertAlmostEqual(dap, 0.000016)
+
