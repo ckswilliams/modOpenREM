@@ -3269,13 +3269,13 @@ def celery_tasks(request):
                         this_task['received'] = datetime.fromtimestamp(task_dict_list[task_uuid]['received'])
                     if isinstance(task_dict_list[task_uuid]['started'], float):
                         this_task['started'] = datetime.fromtimestamp(task_dict_list[task_uuid]['started'])
-                    tasks += [this_task,]
+                    tasks += [this_task, ]
+                template = 'remapp/celery_tasks.html'
+                return render_to_response(template, {'tasks': tasks}, context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/celery_connection_error.html'
             return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
-        template = 'remapp/celery_tasks.html'
-        return render_to_response(template, {'tasks': tasks}, context_instance=RequestContext(request))
 
 
 def celery_abort(request, task=None):
