@@ -20,7 +20,7 @@
             {% if admin.exportgroup %}
                 <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
                 <p>
-                    <a href="{% url 'dxcsv1' 0 0 %}"
+                    <a href="{% url 'dxcsv1' 0 0 %}?{{ request.GET.urlencode }}"
                        class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
                     {% if admin.pidgroup %}
                         <a href="{% url 'dxcsv1' 1 0 %}"
@@ -32,7 +32,7 @@
                         </p>
                         <p>
                     {% endif %}
-                    <a href="{% url 'dxxlsx1' 0 0 %}"
+                    <a href="{% url 'dxxlsx1' 0 0 %}?{{ request.GET.urlencode }}"
                        class="btn btn-default btn-sm" role="button">Export to XLSX</a>
                     {% if admin.pidgroup %}
                         <a href="{% url 'dxxlsx1' 1 0 %}"

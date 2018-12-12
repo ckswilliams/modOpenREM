@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.0b2 (2018-12-07)
 --------------------
+* `#706`_  Exports: fixed problem where filters were not respected for radiographic exports
 * `#703`_  Interface: fixed URL lookup error for failed imports on homepage
 * `#702`_  Query-retrieve: fixed URLs in DICOM javascript files to allow virtual-directories
 * `#701`_  Interface: made the fluoroscopy exposure detail table sortable by clicking on headers
