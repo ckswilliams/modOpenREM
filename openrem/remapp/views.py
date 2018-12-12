@@ -3261,12 +3261,15 @@ def celery_tasks(request):
                 tasks = []
                 task_dict_list = flower.json()
                 for task_uuid in task_dict_list.keys():
-                    tasks += [{'uuid': task_uuid,
+                    this_task = {'uuid': task_uuid,
                                'name': task_dict_list[task_uuid]['name'],
-                               'received': datetime.fromtimestamp(task_dict_list[task_uuid]['received']),
-                               'started': datetime.fromtimestamp(task_dict_list[task_uuid]['started']),
                                'state': task_dict_list[task_uuid]['state']
-                               }]
+                               }
+                    if isinstance(task_dict_list[task_uuid]['received'], float):
+                        this_task['received'] = datetime.fromtimestamp(task_dict_list[task_uuid]['received'])
+                    if isinstance(task_dict_list[task_uuid]['started'], float):
+                        this_task['started'] = datetime.fromtimestamp(task_dict_list[task_uuid]['started'])
+                    tasks += [this_task,]
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/celery_connection_error.html'
@@ -3280,9 +3283,13 @@ def celery_abort(request, task=None):
     import requests
 
     if task:
-        queue_url = 'http://localhost:5555/api/task/abort/{0}'.format(task)
-        abort = requests.post(queue_url)
-        messages.info(request, abort)
+        queue_url = 'http://localhost:5555/api/task/revoke/{0}'.format(task)
+        payload = {"terminate": "true"}
+        abort = requests.post(queue_url, data=payload)
+        if abort.status_code == 200:
+            messages.info(request, u"Success! Task {0} terminated.".format(task))
+        else:
+            messages.error(request, u"Terminating task {0} failed!".format(task))
         return redirect(reverse_lazy('celery_admin'))
 
 
