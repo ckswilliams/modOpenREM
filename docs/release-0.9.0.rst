@@ -89,6 +89,11 @@ Enable the RabbitMQ management interface
 To make use of the RabbitMQ queue display and purge control, the management interface needs to be enabled. To do so,
 follow the instructions at :ref:`enableRabbitMQ`.
 
+Enable the Celery management interface, Flower
+==============================================
+
+To make use of the Celery task management, Flower needs to be running. To do so, follow the instructions in
+:doc:`startservices`. For 'one-page Ubuntu' installs, see *link to section*.
 
 E-mail server settings
 ======================
