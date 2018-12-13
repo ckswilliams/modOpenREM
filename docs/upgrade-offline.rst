@@ -16,13 +16,13 @@ download them all:
 .. sourcecode:: console
 
     mkdir openremfiles
-    pip download -d openremfiles openrem==0.9.0b2
+    pip download -d openremfiles openrem==0.9.0b3
 
 .. note::
 
     Older versions of pip may need to use the following command instead:
 
-    ``pip install -d openremfiles openrem==0.9.0b2``
+    ``pip install -d openremfiles openrem==0.9.0b3``
 
 Copy everything to the OpenREM server
 -------------------------------------
@@ -42,6 +42,6 @@ On the OpenREM server without internet access
 
 .. sourcecode:: console
 
-    pip install --no-index --find-links=openremfiles openrem==0.9.0b2
+    pip install --no-index --find-links=openremfiles openrem==0.9.0b3
 
 Now go back to :ref:`upgradefrom074` and update the configuration.

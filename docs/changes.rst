@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.9.0b2 (2018-12-07)
+0.9.0b3 (2018-12-13)
 --------------------
 * `#706`_  Exports: fixed problem where filters were not respected for radiographic exports
 * `#704`_  Imports: caters for illegal use of dGy.cm2 units in RDSR for DAP values

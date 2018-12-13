@@ -51,7 +51,7 @@ Upgrade
 
 .. sourcecode:: bash
 
-    pip install openrem==0.9.0b2
+    pip install openrem==0.9.0b3
 
 
 Migrate the database
