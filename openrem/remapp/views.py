@@ -3216,7 +3216,7 @@ def rabbitmq_queues(request):
     """AJAX function to get current queue details"""
     import requests
 
-    if request.is_ajax():
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
             queues = requests.get(
                 'http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
@@ -3232,7 +3232,7 @@ def rabbitmq_purge(request, queue=None):
     """Function to purge one of the RabbitMQ queues"""
     import requests
 
-    if queue:
+    if queue and request.user.groups.filter(name="admingroup"):
         queue_url = 'http://localhost:15672/api/queues/%2f/{0}/contents'.format(queue)
         requests.delete(queue_url, auth=('guest', 'guest'))
         return redirect(reverse_lazy('rabbitmq_admin'))
@@ -3253,7 +3253,7 @@ def celery_tasks(request):
     import requests
     from datetime import datetime
 
-    if request.is_ajax():
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
             flower = requests.get('http://localhost:5555/api/tasks')
             if flower.status_code == 200:
@@ -3261,13 +3261,22 @@ def celery_tasks(request):
                 task_dict_list = flower.json()
                 for task_uuid in task_dict_list.keys():
                     this_task = {'uuid': task_uuid,
-                               'name': task_dict_list[task_uuid]['name'],
-                               'state': task_dict_list[task_uuid]['state']
-                               }
+                                 'name': task_dict_list[task_uuid]['name'],
+                                 'state': task_dict_list[task_uuid]['state']
+                                 }
                     if isinstance(task_dict_list[task_uuid]['received'], float):
                         this_task['received'] = datetime.fromtimestamp(task_dict_list[task_uuid]['received'])
                     if isinstance(task_dict_list[task_uuid]['started'], float):
                         this_task['started'] = datetime.fromtimestamp(task_dict_list[task_uuid]['started'])
+                    try:
+                        if u"exports" in this_task['name'].split('.'):
+                            this_task['type'] = u'export'
+                        elif u"websizeimport" in this_task['name'].split('.'):
+                            this_task['type'] = u'size'
+                        else:
+                            this_task['type'] = None
+                    except AttributeError:
+                        this_task['type'] = None
                     tasks += [this_task, ]
                 template = 'remapp/celery_tasks.html'
                 return render_to_response(template, {'tasks': tasks}, context_instance=RequestContext(request))
@@ -3277,16 +3286,36 @@ def celery_tasks(request):
             return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
 
 
-def celery_abort(request, task=None):
+def celery_abort(request, task=None, name=None):
     """Function to abort one of the Celery tasks"""
     import requests
+    from remapp.models import Exports, SizeUpload
 
-    if task:
+    if task and request.user.groups.filter(name="admingroup"):
         queue_url = 'http://localhost:5555/api/task/revoke/{0}'.format(task)
         payload = {"terminate": "true"}
         abort = requests.post(queue_url, data=payload)
         if abort.status_code == 200:
-            messages.info(request, u"Success! Task {0} terminated.".format(task))
+            if name == u"export":
+                try:
+                    export_task = Exports.objects.get(task_id__exact=task)
+                    export_task.delete()
+                    messages.success(request, u"Task {0} terminated, and matching export job in database "
+                                              u"deleted".format(task))
+                except ObjectDoesNotExist:
+                    messages.warning(request, u"Task {0} terminated, but matching export job not found in "
+                                              u"database!".format(task))
+            elif name == u"size":
+                try:
+                    size_task = SizeUpload.objects.get(task_id__exact=task)
+                    size_task.delete()
+                    messages.success(request, u"Task {0} terminated, and matching size import job in database "
+                                              u"deleted".format(task))
+                except ObjectDoesNotExist:
+                    messages.warning(request, u"Task {0} terminated, but matching size import job not found in "
+                                              u"database!".format(task))
+            else:
+                messages.success(request, u"Success! Task {0} terminated.".format(task))
         else:
             messages.error(request, u"Terminating task {0} failed!".format(task))
         return redirect(reverse_lazy('celery_admin'))
