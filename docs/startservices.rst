@@ -130,6 +130,13 @@ For Windows, just press ``Ctrl+c``
 
 You will need to do this twice if there are running tasks you wish to kill.
 
+.. _start_flower
+
+Celery task management: Flower
+==============================
+
+Instructions for Flower to go here
+
 
 .. _celery-beat:
 

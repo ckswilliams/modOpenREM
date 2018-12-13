@@ -4,7 +4,7 @@
   <tr>
     <th>Queue Name</th>
     <th>Messages waiting</th>
-    <th>Purge queue</th>
+    <th>Purge  or delete queue</th>
     <th>Tasks being processed</th>
     <th>Auto-delete</th>
   </tr>
@@ -20,7 +20,9 @@
     {% endif %}
       <td>
         {% if queue.messages_ready > 0 %}
-          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge</a>
+          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge queue</a>
+        {% elif queue.messages == 0 %}
+          <a class="btn btn-warning" href="{%  url 'rabbitmq_delete' queue=queue.name %}" role=button">Delete queue</a>
         {% else %}
           <a class="btn btn-default" disabled="disabled">Purge</a>
         {% endif %}

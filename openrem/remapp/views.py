@@ -3212,6 +3212,7 @@ def rabbitmq_admin(request):
     return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
 
 
+@login_required
 def rabbitmq_queues(request):
     """AJAX function to get current queue details"""
     import requests
@@ -3228,6 +3229,7 @@ def rabbitmq_queues(request):
         return render_to_response(template, {'queues': queues}, context_instance=RequestContext(request))
 
 
+@login_required
 def rabbitmq_purge(request, queue=None):
     """Function to purge one of the RabbitMQ queues"""
     import requests
@@ -3235,6 +3237,17 @@ def rabbitmq_purge(request, queue=None):
     if queue and request.user.groups.filter(name="admingroup"):
         queue_url = 'http://localhost:15672/api/queues/%2f/{0}/contents'.format(queue)
         requests.delete(queue_url, auth=('guest', 'guest'))
+        return redirect(reverse_lazy('rabbitmq_admin'))
+
+
+@login_required
+def rabbitmq_delete(request, queue=None):
+    """Function to delete one of the RabbitMQ queues"""
+    import requests
+
+    if queue and request.user.groups.filter(name="admingroup"):
+        queue_url = 'http://localhost:15672/api/queues/%2f/{0}'.format(queue)
+        requests.delete(queue_url, auth=('guest', 'guest'), data={'if_empty': 'true'})
         return redirect(reverse_lazy('rabbitmq_admin'))
 
 
