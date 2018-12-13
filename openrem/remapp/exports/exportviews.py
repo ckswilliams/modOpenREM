@@ -183,7 +183,7 @@ def flcsv1(request, name=None, pat_id=None):
 
     :param request: Contains the database filtering parameters. Also used to get user group.
     :param name: string, 0 or 1 from URL indicating if names should be exported
-    :param patid: string, 0 or 1 from URL indicating if patient ID should be exported
+    :param pat_id: string, 0 or 1 from URL indicating if patient ID should be exported
     :type request: GET
     """
     from django.shortcuts import redirect
@@ -206,7 +206,7 @@ def rfxlsx1(request, name=None, pat_id=None):
 
     :param request: Contains the database filtering parameters. Also used to get user group.
     :param name: string, 0 or 1 from URL indicating if names should be exported
-    :param patid: string, 0 or 1 from URL indicating if patient ID should be exported
+    :param pat_id: string, 0 or 1 from URL indicating if patient ID should be exported
     :type request: GET
     """
     from django.shortcuts import redirect
@@ -250,7 +250,7 @@ def mgcsv1(request, name=None, pat_id=None):
     Launches export of mammo data to CSV
     :param request: Contains the database filtering parameters. Also used to get user group.
     :param name: string, 0 or 1 from URL indicating if names should be exported
-    :param patid: string, 0 or 1 from URL indicating if patient ID should be exported
+    :param pat_id: string, 0 or 1 from URL indicating if patient ID should be exported
     :return:
     """
     from django.shortcuts import redirect
@@ -273,7 +273,7 @@ def mgxlsx1(request, name=None, pat_id=None):
     Launches export of mammo data to xlsx
     :param request: Contains the database filtering parameters. Also used to get user group.
     :param name: string, 0 or 1 from URL indicating if names should be exported
-    :param patid: string, 0 or 1 from URL indicating if patient ID should be exported
+    :param pat_id: string, 0 or 1 from URL indicating if patient ID should be exported
     :return:
     """
     from django.shortcuts import redirect
@@ -320,6 +320,7 @@ def export(request):
         complete = Exports.objects.filter(status__contains=u'COMPLETE').order_by('-export_date')
         latest_complete_pk = complete[0].pk
     except IndexError:
+        complete = None
         latest_complete_pk = 0
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
@@ -394,7 +395,6 @@ def deletefile(request):
     from django.core.urlresolvers import reverse
     from django.contrib import messages
     from remapp.models import Exports
-    from remapp.exports import exportviews
 
     for task in request.POST:
         exports = Exports.objects.filter(task_id__exact=request.POST[task])
@@ -411,7 +411,7 @@ def deletefile(request):
                 messages.error(request,
                                u"Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
-    return HttpResponseRedirect(reverse(exportviews.export))
+    return HttpResponseRedirect(reverse(export))
 
 
 @login_required
@@ -421,15 +421,15 @@ def export_abort(request, pk):
     :param request: Contains the task primary key
     :type request: POST
     """
-    from celery.task.control import revoke
     from django.http import HttpResponseRedirect
     from django.shortcuts import get_object_or_404
     from remapp.models import Exports
+    from openremproject.celeryapp import app
 
     export_task = get_object_or_404(Exports, pk=pk)
 
     if request.user.groups.filter(name="exportgroup"):
-        revoke(export_task.task_id, terminate=True)
+        app.control.revoke(export_task.task_id, terminate=True)
         export_task.delete()
 
     return HttpResponseRedirect(reverse_lazy('export'))

@@ -121,7 +121,8 @@
                         <li><a href="{% url 'skin_dose_map_settings_update' 1 %}">Skin dose map</a> </li>
                         <li><a href="{% url 'rf_alert_settings_update' 1 %}">Fluoro alert levels</a> </li>
                         <li><a href="{% url 'rf_alert_notifications_view' %}">Fluoro alert notification</a> </li>
-                        <li><a href="{% url 'rabbitmq_admin' %}">RabbitMQ</a></li>
+                        <li><a href="{% url 'celery_admin' %}">Celery tasks</a></li>
+                        <li><a href="{% url 'rabbitmq_admin' %}">RabbitMQ queue</a></li>
                       {% endif %}
                     </ul>
                 </li>

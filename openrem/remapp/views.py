@@ -36,7 +36,6 @@ import os
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
-
 import csv
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -2000,13 +1999,13 @@ def size_abort(request, pk):
     :param request: Contains the task primary key
     :type request: POST
     """
-    from celery.task.control import revoke
+    from openremproject.celeryapp import app
     from remapp.models import SizeUpload
 
     size_import = get_object_or_404(SizeUpload, pk=pk)
 
     if request.user.groups.filter(name="importsizegroup") or request.users.groups.filter(name="admingroup"):
-        revoke(size_import.task_id, terminate=True)
+        app.control.revoke(size_import.task_id, terminate=True)
         size_import.logfile.delete()
         size_import.sizefile.delete()
         size_import.delete()
@@ -3213,11 +3212,12 @@ def rabbitmq_admin(request):
     return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
 
 
+@login_required
 def rabbitmq_queues(request):
     """AJAX function to get current queue details"""
     import requests
 
-    if request.is_ajax():
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
             queues = requests.get(
                 'http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
@@ -3229,14 +3229,109 @@ def rabbitmq_queues(request):
         return render_to_response(template, {'queues': queues}, context_instance=RequestContext(request))
 
 
+@login_required
 def rabbitmq_purge(request, queue=None):
     """Function to purge one of the RabbitMQ queues"""
     import requests
 
-    if queue:
+    if queue and request.user.groups.filter(name="admingroup"):
         queue_url = 'http://localhost:15672/api/queues/%2f/{0}/contents'.format(queue)
         requests.delete(queue_url, auth=('guest', 'guest'))
         return redirect(reverse_lazy('rabbitmq_admin'))
+
+
+@login_required
+def rabbitmq_delete(request, queue=None):
+    """Function to delete one of the RabbitMQ queues"""
+    import requests
+
+    if queue and request.user.groups.filter(name="admingroup"):
+        queue_url = 'http://localhost:15672/api/queues/%2f/{0}'.format(queue)
+        requests.delete(queue_url, auth=('guest', 'guest'), data={'if_empty': 'true'})
+        return redirect(reverse_lazy('rabbitmq_admin'))
+
+
+@login_required
+def celery_admin(request):
+    """View to show Celery tasks. Content generated using AJAX"""
+
+    admin = _create_admin_dict(request)
+
+    template = 'remapp/celery_admin.html'
+    return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
+
+
+def celery_tasks(request):
+    """AJAX function to get current task details"""
+    import requests
+    from datetime import datetime
+
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
+        try:
+            flower = requests.get('http://localhost:5555/api/tasks')
+            if flower.status_code == 200:
+                tasks = []
+                task_dict_list = flower.json()
+                for task_uuid in task_dict_list.keys():
+                    this_task = {'uuid': task_uuid,
+                                 'name': task_dict_list[task_uuid]['name'],
+                                 'state': task_dict_list[task_uuid]['state']
+                                 }
+                    if isinstance(task_dict_list[task_uuid]['received'], float):
+                        this_task['received'] = datetime.fromtimestamp(task_dict_list[task_uuid]['received'])
+                    if isinstance(task_dict_list[task_uuid]['started'], float):
+                        this_task['started'] = datetime.fromtimestamp(task_dict_list[task_uuid]['started'])
+                    try:
+                        if u"exports" in this_task['name'].split('.'):
+                            this_task['type'] = u'export'
+                        elif u"websizeimport" in this_task['name'].split('.'):
+                            this_task['type'] = u'size'
+                        else:
+                            this_task['type'] = None
+                    except AttributeError:
+                        this_task['type'] = None
+                    tasks += [this_task, ]
+                template = 'remapp/celery_tasks.html'
+                return render_to_response(template, {'tasks': tasks}, context_instance=RequestContext(request))
+        except requests.ConnectionError:
+            admin = _create_admin_dict(request)
+            template = 'remapp/celery_connection_error.html'
+            return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
+
+
+def celery_abort(request, task=None, name=None):
+    """Function to abort one of the Celery tasks"""
+    import requests
+    from remapp.models import Exports, SizeUpload
+
+    if task and request.user.groups.filter(name="admingroup"):
+        queue_url = 'http://localhost:5555/api/task/revoke/{0}'.format(task)
+        payload = {"terminate": "true"}
+        abort = requests.post(queue_url, data=payload)
+        if abort.status_code == 200:
+            if name == u"export":
+                try:
+                    export_task = Exports.objects.get(task_id__exact=task)
+                    export_task.delete()
+                    messages.success(request, u"Task {0} terminated, and matching export job in database "
+                                              u"deleted".format(task))
+                except ObjectDoesNotExist:
+                    messages.warning(request, u"Task {0} terminated, but matching export job not found in "
+                                              u"database!".format(task))
+            elif name == u"size":
+                try:
+                    size_task = SizeUpload.objects.get(task_id__exact=task)
+                    size_task.delete()
+                    messages.success(request, u"Task {0} terminated, and matching size import job in database "
+                                              u"deleted".format(task))
+                except ObjectDoesNotExist:
+                    messages.warning(request, u"Task {0} terminated, but matching size import job not found in "
+                                              u"database!".format(task))
+            else:
+                messages.success(request, u"Success! Task {0} terminated.".format(task))
+        else:
+            messages.error(request, u"Terminating task {0} failed!".format(task))
+        return redirect(reverse_lazy('celery_admin'))
 
 
 @login_required
@@ -3534,7 +3629,7 @@ def rf_recalculate_accum_doses(request):  # pylint: disable=unused-variable
 
     if not request.user.groups.filter(name="admingroup"):
         # Send the user to the home page
-        return HttpResponseRedirect(reverse('home'))
+        return HttpResponseRedirect(reverse_lazy('home'))
     else:
         # Empty the PKsForSummedRFDoseStudiesInDeltaWeeks table
         from remapp.models import PKsForSummedRFDoseStudiesInDeltaWeeks

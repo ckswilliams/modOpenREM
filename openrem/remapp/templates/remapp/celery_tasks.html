@@ -1,0 +1,32 @@
+
+
+<table class="table">
+  <tr>
+    <th>UUID</th>
+    <th>Task</th>
+    <th>Received</th>
+    <th>Started</th>
+    <th>Current state</th>
+    <th>Terminate</th>
+  </tr>
+  {% for task in tasks %}
+  <tr>
+  <td>{{ task.uuid }}</td>
+      <td>{{ task.name }}</td>
+  <td>{{ task.received }}</td>
+  <td>{{ task.started }}</td>
+  <td>{{  task.state }}</td>
+      <td>
+        {% if task.state == 'STARTED' %}
+          <a class="btn btn-danger" href="{% url 'celery_abort' task=task.uuid name=task.type %}" role="button">
+            Terminate task
+          </a>
+        {% else %}
+          <a class="btn btn-default" disabled="disabled">Terminate task</a>
+        {% endif %}
+      </td>
+
+
+</tr>
+{% endfor %}
+</table>

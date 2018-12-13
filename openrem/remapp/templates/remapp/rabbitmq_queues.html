@@ -3,9 +3,9 @@
 <table class="table">
   <tr>
     <th>Queue Name</th>
-    <th>Messages waiting to be passed to Celery</th>
-    <th>Messages waiting for acknowledgment the task is complete</th>
-    <th>Purge queue</th>
+    <th>Messages waiting</th>
+    <th>Purge  or delete queue</th>
+    <th>Tasks being processed</th>
     <th>Auto-delete</th>
   </tr>
   {% for queue in queues %}
@@ -13,20 +13,26 @@
     <tr class="success">
         <td><b>{{ queue.name }}</b></td>
         <td><b>{{ queue.messages_ready }}</b></td>
-        <td><b>{{ queue.messages_unacknowledged }}</b></td>
     {% else %}
     <tr>
         <td>{{ queue.name }}</td>
         <td>{{ queue.messages_ready }}</td>
-        <td>{{ queue.messages_unacknowledged }}</td>
     {% endif %}
       <td>
-        {% if queue.messages > 0 %}
-          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge</a>
+        {% if queue.messages_ready > 0 %}
+          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge queue</a>
+        {% elif queue.messages == 0 %}
+          <a class="btn btn-warning" href="{%  url 'rabbitmq_delete' queue=queue.name %}" role=button">Delete queue</a>
         {% else %}
           <a class="btn btn-default" disabled="disabled">Purge</a>
         {% endif %}
       </td>
+    {% if queue.name == "default" and queue.messages_unacknowledged > 0 %}
+      <td><b> <a class="btn btn-info" href="{% url 'celery_admin' %}" role="button">
+        {{ queue.messages_unacknowledged }} task(s) - view in Celery manager</a></b></td>
+    {% else %}
+      <td>{{ queue.messages_unacknowledged }}</td>
+    {% endif %}
       <td>{{ queue.auto_delete }}</td>
     </tr>
   {% endfor %}

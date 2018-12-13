@@ -17,6 +17,7 @@ Headline changes
 * Imports: fix for Varian RDSRs
 * Administration: added facility to list and delete failed import studies
 * Administration: added interface to RabbitMQ queues
+* Administration: added interface to Celery tasks
 * Documentation: further refinement of the linux one-page install
 * Web server: :doc:`virtual_directory`
 
@@ -88,6 +89,11 @@ Enable the RabbitMQ management interface
 To make use of the RabbitMQ queue display and purge control, the management interface needs to be enabled. To do so,
 follow the instructions at :ref:`enableRabbitMQ`.
 
+Enable the Celery management interface, Flower
+==============================================
+
+To make use of the Celery task management, Flower needs to be running. To do so, follow the instructions in
+:doc:`startservices`. For 'one-page Ubuntu' installs, see *link to section*.
 
 E-mail server settings
 ======================
