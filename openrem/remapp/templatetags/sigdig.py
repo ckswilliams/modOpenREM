@@ -23,7 +23,7 @@ def sigdig(value, digits=3):
     :return: number to specified number of significant figures
     """
 
-    if value is None:
+    if value is None or value is '':
         return ''
     if value != Decimal(0):
         order = int(math.floor(math.log10(math.fabs(value))))
