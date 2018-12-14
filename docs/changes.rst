@@ -2,6 +2,8 @@
 OpenREM version history
 =======================
 
+* `#707`_  Query-retrieve: Fixed problem for empty Series Number
+
 0.9.0b3 (2018-12-13)
 --------------------
 * `#706`_  Exports: fixed problem where filters were not respected for radiographic exports
