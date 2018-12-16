@@ -23,15 +23,16 @@ def sigdig(value, digits=3):
     :return: number to specified number of significant figures
     """
 
-    if value is None:
+    try:
+        if value != Decimal(0):
+            order = int(math.floor(math.log10(math.fabs(value))))
+            places = digits - order - 1
+        else:
+            places = 2
+        if places > 0:
+            fmtstr = "%%.%df" % (places)
+        else:
+            fmtstr = "%.0f"
+        return Decimal(fmtstr % (round(value, places)))
+    except TypeError:
         return ''
-    if value != Decimal(0):
-        order = int(math.floor(math.log10(math.fabs(value))))
-        places = digits - order - 1
-    else:
-        places = 2
-    if places > 0:
-        fmtstr = "%%.%df" % (places)
-    else:
-        fmtstr = "%.0f"
-    return Decimal(fmtstr % (round(value, places)))
