@@ -18,7 +18,7 @@
   <td>{{  task.state }}</td>
       <td>
         {% if task.state == 'STARTED' %}
-          <a class="btn btn-danger" href="{% url 'celery_abort' task=task.uuid name=task.type %}" role="button">
+          <a class="btn btn-danger" href="{% url 'celery_abort' task_id=task.uuid type=task.type %}" role="button">
             Terminate task
           </a>
         {% else %}

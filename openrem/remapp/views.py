@@ -2000,7 +2000,6 @@ def size_abort(request, pk):
     :type request: POST
     """
     from openremproject.celeryapp import app
-    from remapp.models import SizeUpload
 
     size_import = get_object_or_404(SizeUpload, pk=pk)
 
@@ -3219,8 +3218,7 @@ def rabbitmq_queues(request):
 
     if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
-            queues = requests.get(
-                'http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
+            queues = requests.get('http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/rabbitmq_connection_error.html'
@@ -3286,6 +3284,10 @@ def celery_tasks(request):
                             this_task['type'] = u'export'
                         elif u"websizeimport" in this_task['name'].split('.'):
                             this_task['type'] = u'size'
+                            if u"netdicom" in this_task['name'].split('.'):
+                                this_task['type'] = u'netdicom'
+                            if u"make_skin_map" in this_task['name'].split('.'):
+                                this_task['type'] = u'skin_map'
                         else:
                             this_task['type'] = None
                     except AttributeError:
@@ -3299,39 +3301,36 @@ def celery_tasks(request):
             return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
 
 
-def celery_abort(request, task=None, name=None):
+def celery_abort(request, task_id=None, type=None):
     """Function to abort one of the Celery tasks"""
     import requests
-    from remapp.models import Exports, SizeUpload
+    from remapp.models import Exports, DicomQuery
 
-    if task and request.user.groups.filter(name="admingroup"):
-        queue_url = 'http://localhost:5555/api/task/revoke/{0}'.format(task)
+    if task_id and request.user.groups.filter(name="admingroup"):
+        queue_url = 'http://localhost:5555/api/task/revoke/{0}'.format(task_id)
         payload = {"terminate": "true"}
         abort = requests.post(queue_url, data=payload)
         if abort.status_code == 200:
-            if name == u"export":
-                try:
-                    export_task = Exports.objects.get(task_id__exact=task)
-                    export_task.delete()
-                    messages.success(request, u"Task {0} terminated, and matching export job in database "
-                                              u"deleted".format(task))
-                except ObjectDoesNotExist:
-                    messages.warning(request, u"Task {0} terminated, but matching export job not found in "
-                                              u"database!".format(task))
-            elif name == u"size":
-                try:
-                    size_task = SizeUpload.objects.get(task_id__exact=task)
-                    size_task.delete()
-                    messages.success(request, u"Task {0} terminated, and matching size import job in database "
-                                              u"deleted".format(task))
-                except ObjectDoesNotExist:
-                    messages.warning(request, u"Task {0} terminated, but matching size import job not found in "
-                                              u"database!".format(task))
-            else:
-                messages.success(request, u"Success! Task {0} terminated.".format(task))
-        else:
-            messages.error(request, u"Terminating task {0} failed!".format(task))
-        return redirect(reverse_lazy('celery_admin'))
+            try:
+                if type in u'netdicom':
+                    description = u'query or move'
+                    task = DicomQuery.objects.get(query_id__exact=task_id)
+                elif type in u'export':
+                    description = u'export'
+                    task = Exports.objects.get(task_id__exact=task_id)
+                elif type in u'size':
+                    description = u'size import'
+                    task = SizeUpload.objects.get(task_id__exact=task_id)
+                else:
+                    messages.success(request, u"Success! Task {0} terminated. Type was '{1}' which didn't match".format(task_id, type))
+                    return redirect(reverse_lazy('celery_admin'))
+                task.delete()
+                messages.success(request, u"Task {0} terminated, and matching {1} job in database deleted.".format(
+                    task_id, description))
+            except ObjectDoesNotExist:
+                messages.warning(request, u"Task {0} terminated, but matching {1} job not found in database!".format(
+                    task_id, description))
+            return redirect(reverse_lazy('celery_admin'))
 
 
 @login_required

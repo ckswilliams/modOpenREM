@@ -140,7 +140,7 @@ urlpatterns = patterns('remapp.views',
                            name='rabbitmq_delete'),
                        url('^admin/celery/$', 'celery_admin', name='celery_admin'),
                        url('^admin/celery/tasks/$', 'celery_tasks', name='celery_tasks'),
-                       url('^admin/celery/abort_task/(?P<task>[0-9a-zA-Z.@-]+)/(?P<name>\w+)$', 'celery_abort',
+                       url('^admin/celery/abort_task/(?P<task_id>[0-9a-zA-Z.@-]+)/(?P<type>\w+)$', 'celery_abort',
                            name='celery_abort'),
                        )
 
