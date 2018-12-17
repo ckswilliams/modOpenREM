@@ -2,10 +2,9 @@
 OpenREM version history
 =======================
 
-* `#707`_  Query-retrieve: Fixed problem for empty Series Number
-
 0.9.0b3 (2018-12-13)
 --------------------
+* `#708`_  Query-retrieve: fixed problem for empty Series Number
 * `#706`_  Exports: fixed problem where filters were not respected for radiographic exports
 * `#704`_  Imports: caters for illegal use of dGy.cm2 units in RDSR for DAP values
 * `#703`_  Interface: fixed URL lookup error for failed imports on homepage
