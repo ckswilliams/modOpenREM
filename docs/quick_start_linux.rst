@@ -378,7 +378,7 @@ First, create a Celery configuration file:
     CELERYD_PID_FILE="/var/dose/celery/%n.pid"
     CELERYD_LOG_FILE="/var/dose/log/%n%I.log"
     CELERYD_LOG_LEVEL="INFO"
-    FLOWER_LOG_PREFIX="/var/dose/log/
+    FLOWER_LOG_PREFIX="/var/dose/log/flower.log
     FLOWER_LOG_LEVEL="INFO"
 
 Now create the systemd service files:
@@ -423,7 +423,7 @@ Now create the systemd service files:
     Group=www-data
     WorkingDirectory=/var/dose/veopenrem/lib/python2.7/site-packages/openrem
     ExecStart=/bin/sh -c '${CELERY_BIN} flower -A ${CELERY_APP} --port=5555 --log-file-prefix=${FLOWER_LOG_PREFIX} \
-      --loglevel=${FLOWER_LOG_LEVEL} --address=127.0.0.1
+      --loglevel=${FLOWER_LOG_LEVEL} --address=127.0.0.1'
     Restart=on-failure
     Type=simple
 
