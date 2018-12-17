@@ -1,5 +1,9 @@
 {% extends "remapp/base.html" %}
 
+{% block headextras %}
+  <script src="{{ STATIC_URL }}js/sorttable.js"></script>
+{% endblock %}
+
 {% block confnav %}<li class="dropdown active">{% endblock %}
 
 {% block navhelp %}
@@ -21,6 +25,12 @@
   <div class="row">
   <div class="col-md-8 col-md-offset-2">
           <script>
+              function updateSort(heading) {
+                  if(heading === sort_heading) sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                  sort_heading = heading;
+              }
+              sort_heading = "queue_name";
+
               $(document).ready(
                       function queues_update( json ){
                           $.ajax({
