@@ -347,6 +347,8 @@ You can check that NGINX and Gunicorn are running with the following two command
     sudo systemctl status nginx.service
 
 
+.. _one_page_linux_celery:
+
 Celery and Flower
 ^^^^^^^^^^^^^^^^^
 

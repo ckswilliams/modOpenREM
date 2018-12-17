@@ -93,7 +93,8 @@ Enable the Celery management interface, Flower
 ==============================================
 
 To make use of the Celery task management, Flower needs to be running. To do so, follow the instructions in
-:doc:`startservices`. For 'one-page Ubuntu' installs, see *link to section*.
+:doc:`startservices`. For 'one-page Ubuntu' installs, add the Flower related config and create, register and start the
+systemd service files as described in :ref:`one_page_linux_celery`.
 
 E-mail server settings
 ======================
