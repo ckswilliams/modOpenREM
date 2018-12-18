@@ -548,9 +548,11 @@ def _query_series(assoc, d2, studyrsp, query_id):
             seriesrsp.modality = u"OT"  # not sure why a series is returned without, assume we don't want it.
             logger.warning(u"{0} Illegal response with no modality at series level".format(query_id))
         try:
-            seriesrsp.series_number = series[1].SeriesNumber
-        except AttributeError:
-            seriesrsp.series_number = None  # integer so can't be ''
+            seriesrsp.series_number = int(series[1].SeriesNumber)
+        except (ValueError, TypeError, AttributeError):
+            seriesrsp.series_number = None
+            # integer so can't be '' (ValueError). If missing will be (AttributeError).
+            # None would be ok, but now gives (TypeError)
         # Optional useful tags
         seriesrsp.series_description = get_value_kw(u'SeriesDescription', series[1])
         if seriesrsp.series_description:
