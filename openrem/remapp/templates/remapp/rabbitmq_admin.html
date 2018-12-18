@@ -1,5 +1,9 @@
 {% extends "remapp/base.html" %}
 
+{% block headextras %}
+  <script src="{{ STATIC_URL }}js/sorttable.js"></script>
+{% endblock %}
+
 {% block confnav %}<li class="dropdown active">{% endblock %}
 
 {% block navhelp %}
@@ -21,6 +25,31 @@
   <div class="row">
   <div class="col-md-8 col-md-offset-2">
           <script>
+              function updateSort(heading, source) {
+                  if (typeof source === "undefined") {source = null;}
+
+                  sort_info.heading = heading;
+
+                  if (source === 'user_click') {
+                      // It's a user-generated call and the headings already match
+                      // so reverse the sorting direction
+                      sort_info.direction = sort_info.direction === "ascending" ? "descending" : "ascending";
+                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                  }
+
+                  if (sort_info.direction === "ascending") {
+                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                  } else {
+                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                  }
+              }
+
+              sort_info = {
+                  heading:"queue_name",
+                  direction:"ascending"
+              };
+
               $(document).ready(
                       function queues_update( json ){
                           $.ajax({

@@ -1,12 +1,12 @@
 
 
-<table class="table">
+<table class="table sortable" id="celeryTaskTable">
   <tr>
-    <th>UUID</th>
-    <th>Task</th>
-    <th>Received</th>
-    <th>Started</th>
-    <th>Current state</th>
+    <th id="uuid" onclick="updateSort(this.id, 'user_click');">UUID</th>
+    <th id="task" onclick="updateSort(this.id, 'user_click');">Task</th>
+    <th id="received" onclick="updateSort(this.id, 'user_click');">Received</th>
+    <th id="started" onclick="updateSort(this.id, 'user_click');">Started</th>
+    <th id="state" onclick="updateSort(this.id, 'user_click');">Current state</th>
     <th>Terminate</th>
   </tr>
   {% for task in tasks %}
@@ -30,3 +30,11 @@
 </tr>
 {% endfor %}
 </table>
+
+<script>
+  $(document).ready(function () {
+      var taskTable = document.getElementById("celeryTaskTable");
+      sorttable.makeSortable(taskTable);
+      updateSort(sort_info.heading);
+  });
+</script>
