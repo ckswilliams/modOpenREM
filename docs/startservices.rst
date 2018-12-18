@@ -109,7 +109,7 @@ Set the number of workers (concurrency, ``-c``) as you see fit. The more you hav
 query-retrieve operations etc) can take place simultaneously. However, each extra worker uses extra memory and if you
 have too many they will be competing for CPU resources too.
 
-.. note:: Problems with Celery 4 on Windows
+.. admonition:: Problems with Celery 4 on Windows
 
     Full support for Celery on Windows was dropped with version 4 due to lack of Windows based developers. However,
     using the settings above (and as suggested in :doc:`celery-windows`) have been shown to work well in production.
@@ -147,6 +147,9 @@ Move into the openrem folder:
 
 If you need to change the default port from 5555 then you need to make the same change in
 ``openremproject\local_settings.py`` to add/modify the line ``FLOWER_PORT = 5555``
+
+If you wish to be able to use the Flower management interface independently of OpenREM, then omit the ``--address``
+part of the command. Flower will then be available from any PC on the network at http://yourdoseservernameorIP:5555/
 
 Linux - ``\`` is the line continuation character:
 
