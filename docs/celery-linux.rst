@@ -16,7 +16,8 @@ In this example, the following folders have been created:
 
 OpenREM is installed in a virtualenv in ``/var/dose/veopenrem/``.
 
-Adjust all the paths as appropriate.
+Adjust all the paths as appropriate. If you change the default port from 5555 then you need to make the same change in
+``openremproject\local_settings.py`` to add/modify the line ``FLOWER_PORT = 5555``
 
 First, create a Celery configuration file:
 
