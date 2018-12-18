@@ -116,18 +116,9 @@ OpenREM tasks present.
    Figure 1: An overview of Windows Task Scheduler
 
 To create a new task for celery click on ``Create Task...`` in the ``Actions`` menu in the
-right-hand pane. Give the task a name and description. You may wish to use something similar
-to the following::
-
-    Attempts to gracefully shutdown any existing celery instances, then kills any remaining
-    celery instances after 10 seconds. Deletes the celery pid file and then starts a new
-    instance of celery. This is used to queue tasks for the OpenREM patient dose management
-    system. Celery can fail after running a long task and does not automtically restart.
-    This task is therefore also set to run 15 minutes before each scheduled OpenREM PACS
-    query to ensure that celery is up and running for these.
-
-Next, click on the ``Change User or Group`` button and type ``system`` in to the box, then
-click ``Check Names``, then click ``OK``. This sets the server's ``SYSTEM`` user to run the
+right-hand pane. Give the task a name and description. Next, click on the
+``Change User or Group`` button and type ``system`` in to the box, then click
+``Check Names``, then click ``OK``. This sets the server's ``SYSTEM`` user to run the
 task. Also check the ``Run with highest prilileges`` box. Your task should now look similar
 to figure 2.
 
