@@ -52,7 +52,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 import json
 import logging
 import remapp
-from openremproject.settings import MEDIA_ROOT
+from openremproject.settings import MEDIA_ROOT, FLOWER_PORT
 from remapp.forms import SizeUploadForm
 from remapp.models import GeneralStudyModuleAttr, create_user_profile
 from remapp.models import SizeUpload
@@ -3266,7 +3266,7 @@ def celery_tasks(request):
 
     if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
-            flower = requests.get('http://localhost:5555/api/tasks')
+            flower = requests.get('http://localhost:{0}/api/tasks'.format(FLOWER_PORT))
             if flower.status_code == 200:
                 tasks = []
                 task_dict_list = flower.json()
@@ -3307,7 +3307,7 @@ def celery_abort(request, task_id=None, type=None):
     from remapp.models import Exports, DicomQuery
 
     if task_id and request.user.groups.filter(name="admingroup"):
-        queue_url = 'http://localhost:5555/api/task/revoke/{0}'.format(task_id)
+        queue_url = 'http://localhost:{0}/api/task/revoke/{1}'.format(FLOWER_PORT, task_id)
         payload = {"terminate": "true"}
         abort = requests.post(queue_url, data=payload)
         if abort.status_code == 200:

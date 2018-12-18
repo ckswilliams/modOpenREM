@@ -109,9 +109,7 @@ Set the number of workers (concurrency, ``-c``) as you see fit. The more you hav
 query-retrieve operations etc) can take place simultaneously. However, each extra worker uses extra memory and if you
 have too many they will be competing for CPU resources too.
 
-.. note::
-
-    Problems with Celery 4 on Windows
+.. note:: Problems with Celery 4 on Windows
 
     Full support for Celery on Windows was dropped with version 4 due to lack of Windows based developers. However,
     using the settings above (and as suggested in :doc:`celery-windows`) have been shown to work well in production.
@@ -130,13 +128,39 @@ For Windows, just press ``Ctrl+c``
 
 You will need to do this twice if there are running tasks you wish to kill.
 
-.. _start_flower
+.. _start_flower:
 
 Celery task management: Flower
 ==============================
 
-Instructions for Flower to go here
+Flower will have been automatically installed with OpenREM and enables monitoring and management of Celery tasks.
 
+You should start Flower with the same user that you started Celery with, and put the log file in the same place too.
+
+Move into the openrem folder:
+
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``vitualenvfolder/lib/python2.7/site-packages/openrem/`` (remember to activate the virtualenv)
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\`` (remember to activate the virtualenv)
+
+If you need to change the default port from 5555 then you need to make the same change in
+``openremproject\local_settings.py`` to add/modify the line ``FLOWER_PORT = 5555``
+
+Linux - ``\`` is the line continuation character:
+
+.. sourcecode:: console
+
+    celery flower -A openremproject --port=5555 --address=127.0.0.1  --loglevel=INFO \
+    ---log-file-prefix=/path/to/media/celery/flower.log
+
+Windows - ``^`` is the line continuation character:
+
+.. sourcecode:: console
+
+    celery flower -A openremproject --port=5555 --address=127.0.0.1  --loglevel=INFO \
+    ---log-file-prefix=C:\path\to\media\celery\flower.log
 
 .. _celery-beat:
 
