@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.0b3 (2018-12-13)
 --------------------
+* `#710`_  Interface: Celery and RabbitMQ tables can now be sorted by clicking on column headings
 * `#708`_  Query-retrieve: fixed problem for empty Series Number
 * `#707`_  Interface: fixed issue where sigdig returned an error if it was passed an empty string
 * `#706`_  Exports: fixed problem where filters were not respected for radiographic exports

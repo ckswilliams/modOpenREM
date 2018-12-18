@@ -2,11 +2,11 @@
 
 <table class="table sortable" id="celeryTaskTable">
   <tr>
-    <th id="uuid" onclick="updateSort(this.id);">UUID</th>
-    <th id="task" onclick="updateSort(this.id);">Task</th>
-    <th id="received" onclick="updateSort(this.id);">Received</th>
-    <th id="started" onclick="updateSort(this.id);">Started</th>
-    <th id="state" onclick="updateSort(this.id);">Current state</th>
+    <th id="uuid" onclick="updateSort(this.id, 'user_click');">UUID</th>
+    <th id="task" onclick="updateSort(this.id, 'user_click');">Task</th>
+    <th id="received" onclick="updateSort(this.id, 'user_click');">Received</th>
+    <th id="started" onclick="updateSort(this.id, 'user_click');">Started</th>
+    <th id="state" onclick="updateSort(this.id, 'user_click');">Current state</th>
     <th>Terminate</th>
   </tr>
   {% for task in tasks %}
@@ -35,6 +35,6 @@
   $(document).ready(function () {
       var taskTable = document.getElementById("celeryTaskTable");
       sorttable.makeSortable(taskTable);
-      updateSort(sort_heading)
+      updateSort(sort_info.heading);
   });
 </script>

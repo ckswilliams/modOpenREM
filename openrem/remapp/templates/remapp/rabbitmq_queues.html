@@ -2,11 +2,11 @@
 
 <table class="table sortable" id="rabbitQueueTable">
   <tr>
-    <th id="queue_name" onclick="updateSort(this.id);">Queue Name</th>
-    <th id="num_waiting" onclick="updateSort(this.id);" >Messages waiting</th>
-    <th id="purge_or_del" onclick="updateSort(this.id);">Purge  or delete queue</th>
-    <th id="num_tasks" onclick="updateSort(this.id);">Tasks being processed</th>
-    <th id="auto_del" onclick="updateSort(this.id);">Auto-delete</th>
+    <th id="queue_name" onclick="updateSort(this.id, 'user_click');">Queue Name</th>
+    <th id="num_waiting" onclick="updateSort(this.id, 'user_click');" >Messages waiting</th>
+    <th id="purge_or_del" onclick="updateSort(this.id, 'user_click');">Purge  or delete queue</th>
+    <th id="num_tasks" onclick="updateSort(this.id, 'user_click');">Tasks being processed</th>
+    <th id="auto_del" onclick="updateSort(this.id, 'user_click');">Auto-delete</th>
   </tr>
   {% for queue in queues %}
     {% if queue.name == "default" %}
@@ -42,6 +42,6 @@
   $(document).ready(function () {
       var queueTable = document.getElementById("rabbitQueueTable");
       sorttable.makeSortable(queueTable);
-      updateSort(sort_heading)
+      updateSort(sort_info.heading)
   });
 </script>
