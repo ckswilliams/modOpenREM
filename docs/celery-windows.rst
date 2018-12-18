@@ -92,7 +92,7 @@ Flower log files. Make sure these are changed to match your own
 OpenREM installation. Line 5 sets the port number Flower will use. If you change the default port from 5555 then you
 need to make the same change in
 ``openremproject\local_settings.py`` to add/modify the line ``FLOWER_PORT = 5555``.
- Lines 9 and 10 navigate to the OpenREM drive and folder.
+Lines 9 and 10 navigate to the OpenREM drive and folder.
 Finally, line 13 starts Flower using the parameters that are supplied at the
 top of the batch file.
 
