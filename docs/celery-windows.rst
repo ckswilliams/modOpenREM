@@ -1,6 +1,6 @@
-#############################
-Daemonising Celery on Windows
-#############################
+########################################
+Daemonising Celery and Flower on Windows
+########################################
 
 To ensure that the Celery task queue is started at system start-up it is
 advisable to launch Celery using a batch file and configure Windows Task

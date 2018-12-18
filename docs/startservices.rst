@@ -103,7 +103,7 @@ Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuatio
     celery worker -n default -P solo -Ofair -A openremproject -c 4 -Q default ^
     --pidfile=C:\path\to\media\celery\default.pid --logfile=C:\path\to\media\celery\default.log
 
-For production use, see `Daemonising Celery`_ below
+For production use, see `Daemonising Celery`_ below.
 
 Set the number of workers (concurrency, ``-c``) as you see fit. The more you have, the more processes (imports, exports,
 query-retrieve operations etc) can take place simultaneously. However, each extra worker uses extra memory and if you
@@ -164,6 +164,8 @@ Windows - ``^`` is the line continuation character:
 
     celery flower -A openremproject --port=5555 --address=127.0.0.1  --loglevel=INFO \
     ---log-file-prefix=C:\path\to\media\celery\flower.log
+
+For production use, see `Daemonising Celery`_ below.
 
 .. _celery-beat:
 

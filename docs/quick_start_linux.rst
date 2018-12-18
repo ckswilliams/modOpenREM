@@ -433,7 +433,7 @@ Now create the systemd service files:
     [Install]
     WantedBy=multi-user.target
 
-Now register, set to start on boot, and start the service:
+Now register, set to start on boot, and start the services:
 
 .. code-block:: console
 

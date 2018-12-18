@@ -1,6 +1,6 @@
-###########################
-Daemonising Celery on Linux
-###########################
+######################################
+Daemonising Celery and Flower on Linux
+######################################
 
 Guides to daemonising Celery can be found in the Celery documentation at
 http://docs.celeryproject.org/en/latest/userguide/daemonizing.html.
@@ -46,6 +46,9 @@ First, create a Celery configuration file:
     CELERYD_PID_FILE="/var/dose/celery/%n.pid"
     CELERYD_LOG_FILE="/var/dose/log/%n%I.log"
     CELERYD_LOG_LEVEL="INFO"
+    FLOWER_PORT=5555
+    FLOWER_LOG_PREFIX="/var/dose/log/flower.log"
+    FLOWER_LOG_LEVEL="INFO"
 
 Now create the systemd service file:
 
@@ -76,10 +79,32 @@ Now create the systemd service file:
     [Install]
     WantedBy=multi-user.target
 
-Now register, set to start on boot, and start the service:
+``sudo nano /etc/systemd/system/flower-openrem.service``:
+
+.. code-block:: bash
+
+    [Unit]
+    Description=Flower Celery Service
+    After=network.target
+
+    [Service]
+    User=www-data
+    Group=www-data
+    WorkingDirectory=/var/dose/veopenrem/lib/python2.7/site-packages/openrem
+    ExecStart=/bin/sh -c '${CELERY_BIN} flower -A ${CELERY_APP} --port=${FLOWER_PORT} \
+      --address=127.0.0.1 --log-file-prefix=${FLOWER_LOG_PREFIX} --loglevel=${FLOWER_LOG_LEVEL}'
+    Restart=on-failure
+    Type=simple
+
+    [Install]
+    WantedBy=multi-user.target
+
+Now register, set to start on boot, and start the services:
 
 .. code-block:: console
 
     sudo systemctl daemon-reload
     sudo systemctl enable celery-openrem.service
     sudo systemctl start celery-openrem.service
+    sudo systemctl enable flower-openrem.service
+    sudo systemctl start flower-openrem.service
