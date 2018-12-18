@@ -3,15 +3,15 @@ Daemonising Celery and Flower on Windows
 ########################################
 
 To ensure that the Celery task queue and Flower are started at system start-up
-it is advisable to launch Celery and Flower using batch files and configure
-Windows Task Scheduler to run each of these at system start-up.
+it is advisable to launch them using batch files and configure Windows Task
+Scheduler to run each of these at system start-up.
 
 Celery will sometimes fall over during the execution of a long task. In this
 situation it will not restart on its own. Windows Task Scheduler can be used to
 restart Celery on a regular basis. In addition it can be used to ensure celery
 is running a few minutes prior to a scheduled PACS query.
 
-An example batch file is shown below for Celery:
+An example batch file is shown below for running and restarting Celery:
 
 .. sourcecode:: bat
    :linenos:
@@ -55,17 +55,19 @@ An example batch file is shown below for Celery:
 
 
 Lines 3 to 5 set variables with the locations of your OpenREM installation and
-Celery log and pid file locations. Make sure you change these to match your own
-OpenREM installation. Lines 9 and 10 navigate to the OpenREM drive and folder.
-Line 13 attempts to gracefully shutdown celery. In case the graceful shutdown
-didn't work, line 29 kills the celery.exe process with a pid matching the pid
-contained in the ``default.pid`` file (we don't want to kill all celery
-processes as this would also kill the Celery process that is running Flower).
-Line 32 deletes the ``default.pid`` process ID file - Celery won't restart if
-this pid file exists. Finally, line 36 runs a new instance of Celery.
+Celery log and pid file locations. Make sure these are changed to match your
+own OpenREM installation. Lines 9 and 10 navigate to the OpenREM drive and
+folder. Ensure that the drive (``D:`` on line 9 in the above example) matches
+the drive that contains your OpenREM installation. Line 13 attempts to
+gracefully shutdown celery. If the graceful shutdown doesn't work line 29 kills
+the celery.exe process that has a pid matching that contained in the
+``default.pid`` file (we don't want to kill all Celery processes as this would
+also kill the Celery process that is running Flower). Line 32 deletes the
+``default.pid`` process ID file: Celery won't restart if this pid file exists.
+Finally, line 36 runs a new instance of Celery.
 
 
-An example batch file is shown below for Flower:
+An example batch file is shown below for running Flower:
 
 .. sourcecode:: bat
    :linenos:
@@ -86,10 +88,10 @@ An example batch file is shown below for Flower:
 
 
 Lines 3 to 5 set variables with the locations of your OpenREM installation, the
-Flower log files and port number. Make sure you change these to match your own
+Flower log files and port number. Make sure these are changed to match your own
 OpenREM installation. Lines 9 and 10 navigate to the OpenREM drive and folder.
-Line 13 starts Flower using the parameters that are supplied at the top of the
-batch file.
+Finally, line 13 starts Flower using the parameters that are supplied at the
+top of the batch file.
 
 
 Setting up a scheduled task
