@@ -3219,12 +3219,30 @@ def rabbitmq_queues(request):
     if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
             queues = requests.get('http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
+            default_queue = {}
+            celery_queue = {}
+            flower_queues = []
+            other_queues = []
+            for queue in queues:
+                if u'default' in queue['name']:
+                    default_queue = queue
+                elif u'celery.pidbox' in queue['name']:
+                    celery_queue = queue
+                elif u'celeryev' in queue['name']:
+                    flower_queues += queue
+                else:
+                    other_queues += queue
+            template = 'remapp/rabbitmq_queues.html'
+            return render_to_response(template,
+                                      {'default_queue': default_queue,
+                                       'celery_queue': celery_queue,
+                                       'flower_queues': flower_queues,
+                                       'other_queues': other_queues},
+                                      context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/rabbitmq_connection_error.html'
             return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
-        template = 'remapp/rabbitmq_queues.html'
-        return render_to_response(template, {'queues': queues}, context_instance=RequestContext(request))
 
 
 @login_required

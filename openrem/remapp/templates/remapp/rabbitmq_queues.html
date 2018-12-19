@@ -1,4 +1,76 @@
 
+<h4>Default queue</h4>
+<table class="table">
+  <tr>
+    <th>Messages waiting</th>
+    <th>Purge or delete queue</th>
+    <th>Tasks being processed</th>
+  </tr>
+  <tr class="success">
+    <td>{{ default_queue.messages_ready }}</td>
+    <td>
+        {% if default_queue.messages_ready > 0 %}
+          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=default_queue.name %}" role="button">Purge queue</a>
+        {% elif default_queue.messages == 0 %}
+          <a class="btn btn-warning" href="{%  url 'rabbitmq_delete' queue=default_queue.name %}" role=button">Delete queue</a>
+        {% else %}
+          <a class="btn btn-default" disabled="disabled">Purge</a>
+        {% endif %}
+    </td>
+  </tr>
+</table>
+
+<h4>Celery queue</h4>
+{% if celery_queue %}
+<table class="table">
+  <tr>
+    <th>Messages waiting</th>
+    <th>Purge or delete queue</th>
+    <th>Tasks being processed</th>
+  </tr>
+  <tr>
+    <td>{{ celery_queue.messages_ready }}</td>
+    <td>
+        {% if celery_queue.messages_ready > 0 %}
+          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=celery_queue.name %}" role="button">Purge queue</a>
+        {% elif celery_queue.messages == 0 %}
+          <a class="btn btn-warning" href="{%  url 'rabbitmq_delete' queue=celery_queue.name %}" role=button">Delete queue</a>
+        {% else %}
+          <a class="btn btn-default" disabled="disabled">Purge</a>
+        {% endif %}
+    </td>
+  </tr>
+</table>
+{% else %}
+<p>Celery is not running! No tasks will be processed!</p>
+{% endif %}
+
+<h4>Flower queues</h4>
+{% if flower_queues %}
+<table class="table">
+  <tr>
+    <th>Messages waiting</th>
+    <th>Purge or delete queue</th>
+    <th>Tasks being processed</th>
+  </tr>
+{% for queue in flower_queue %}
+  <tr>
+    <td>{{ queue.messages_ready }}</td>
+    <td>
+        {% if queue.messages_ready > 0 %}
+          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge queue</a>
+        {% elif queue.messages == 0 %}
+          <a class="btn btn-warning" href="{%  url 'rabbitmq_delete' queue=queue.name %}" role=button">Delete queue</a>
+        {% else %}
+          <a class="btn btn-default" disabled="disabled">Purge</a>
+        {% endif %}
+    </td>
+  </tr>
+</table>
+{% else %}
+<p>There are no Flower queues - has it been installed and started?</p>
+{% endif %}
+
 
 <table class="table sortable" id="rabbitQueueTable">
   <tr>
@@ -8,7 +80,7 @@
     <th id="num_tasks" onclick="updateSort(this.id, 'user_click');">Tasks being processed</th>
     <th id="auto_del" onclick="updateSort(this.id, 'user_click');">Auto-delete</th>
   </tr>
-  {% for queue in queues %}
+  {% for queue in other_queues %}
     {% if queue.name == "default" %}
     <tr class="success">
         <td><b>{{ queue.name }}</b></td>
