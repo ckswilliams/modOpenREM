@@ -3259,7 +3259,7 @@ def celery_admin(request):
     return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
 
 
-def celery_tasks(request):
+def celery_tasks(request, stage=None):
     """AJAX function to get current task details"""
     import requests
     from datetime import datetime
@@ -3269,6 +3269,9 @@ def celery_tasks(request):
             flower = requests.get('http://localhost:{0}/api/tasks'.format(FLOWER_PORT))
             if flower.status_code == 200:
                 tasks = []
+                recent_tasks = []
+                active_tasks = []
+                older_tasks = []
                 task_dict_list = flower.json()
                 for task_uuid in task_dict_list.keys():
                     this_task = {'uuid': task_uuid,
@@ -3293,8 +3296,25 @@ def celery_tasks(request):
                     except AttributeError:
                         this_task['type'] = None
                     tasks += [this_task, ]
+                    datetime_now = datetime.now()
+                    recent_time_delta = 60*60*1  # six hours
+                    if u'STARTED' in this_task['state']:
+                        active_tasks += [this_task, ]
+                    elif this_task['started'] and (
+                            datetime_now - this_task['started']).total_seconds() < recent_time_delta:
+                        recent_tasks += [this_task, ]
+                    else:
+                        older_tasks += [this_task, ]
                 template = 'remapp/celery_tasks.html'
-                return render_to_response(template, {'tasks': tasks}, context_instance=RequestContext(request))
+                if u"recent" in stage:
+
+                return render_to_response(
+                    template,
+                    {'tasks': tasks,
+                     'recent_tasks': recent_tasks,
+                     'active_tasks': active_tasks,
+                     'older_tasks': older_tasks},
+                    context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/celery_connection_error.html'
