@@ -36,7 +36,7 @@
     <th>Current state</th>
     <th>Terminate</th>
   </tr>
-  {% for task in active_tasks %}
+  {% for task in tasks %}
     <tr>
       <td>{{ task.uuid }}</td>
       <td>{{ task.name }}</td>
@@ -56,10 +56,10 @@
   {% endfor %}
   </table>
 
-<script>
-    $(document).ready(function () {
-        var taskTableRecent = document.getElementById("celeryTaskTableRecent");
-        sorttable.makeSortable(taskTableRecent);
-        updateSort(sort_info.heading);
-    });
-</script>
+{#<script>#}
+{#    $(document).ready(function () {#}
+{#        var taskTableRecent = document.getElementById("celeryTaskTableRecent");#}
+{#        sorttable.makeSortable(taskTableRecent);#}
+{#        updateSort(sort_info.heading);#}
+{#    });#}
+{#</script>#}

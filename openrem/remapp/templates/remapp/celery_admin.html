@@ -79,7 +79,24 @@
                                   $( '#recenttasks' ).html( data );
                                   setTimeout(function(){
                                       tasks_update_recent();
-                                  }, 3000);
+                                  }, 5000);
+                              }
+                          })
+                      }
+              )
+              $(document).ready(
+                      function tasks_update_recent( json ){
+                          $.ajax({
+                              url: "{% url 'celery_tasks' stage='older' %}",
+                              data: {
+                                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                              },
+                              type: "POST",
+                              success: function( data ){
+                                  $( '#oldertasks' ).html( data );
+                                  setTimeout(function(){
+                                      tasks_update_recent();
+                                  }, 11000);
                               }
                           })
                       }

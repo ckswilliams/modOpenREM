@@ -3282,6 +3282,8 @@ def celery_tasks(request, stage=None):
                         this_task['received'] = datetime.fromtimestamp(task_dict_list[task_uuid]['received'])
                     if isinstance(task_dict_list[task_uuid]['started'], float):
                         this_task['started'] = datetime.fromtimestamp(task_dict_list[task_uuid]['started'])
+                    else:
+                        this_task['started'] = ''
                     try:
                         if u"exports" in this_task['name'].split('.'):
                             this_task['type'] = u'export'
@@ -3297,7 +3299,7 @@ def celery_tasks(request, stage=None):
                         this_task['type'] = None
                     tasks += [this_task, ]
                     datetime_now = datetime.now()
-                    recent_time_delta = 60*60*1  # six hours
+                    recent_time_delta = 60*5  # six hours
                     if u'STARTED' in this_task['state']:
                         active_tasks += [this_task, ]
                     elif this_task['started'] and (
@@ -3306,15 +3308,16 @@ def celery_tasks(request, stage=None):
                     else:
                         older_tasks += [this_task, ]
                 template = 'remapp/celery_tasks.html'
-                if u"recent" in stage:
-
-                return render_to_response(
-                    template,
-                    {'tasks': tasks,
-                     'recent_tasks': recent_tasks,
-                     'active_tasks': active_tasks,
-                     'older_tasks': older_tasks},
-                    context_instance=RequestContext(request))
+                print(u"stage is {0}".format(stage))
+                if u"active" in stage:
+                    return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks},
+                                              context_instance=RequestContext(request))
+                elif u"recent" in stage:
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': recent_tasks},
+                                              context_instance=RequestContext(request))
+                elif u"older" in stage:
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': older_tasks},
+                                              context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/celery_connection_error.html'
