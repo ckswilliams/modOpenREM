@@ -335,17 +335,18 @@ def _get_toshiba_dose_images(study_series, assoc, query_id):
         if images.count() == 0:
             logger.debug("{0} Toshiba option: No images in series, deleting series.".format(query_id))
             series.delete()
-        if images[0].sop_class_uid != '1.2.840.10008.5.1.4.1.1.7':
-            logger.debug("{0}: Toshiba option: Image series, SOPClassUID {1}, "
-                         " delete all but first image.".format(query_id, images[0].sop_class_uid))
-            images.exclude(sop_instance_uid__exact=images[0].sop_instance_uid).delete()
-            logger.debug("{0}: Toshiba option: Deleted other images, now {1} remaining (should be 1)".format(
-                query_id, images.count()))
-            series.image_level_move = True
-            series.save()
         else:
-            logger.debug("{0}: Toshiba option: Secondary capture series, keep the {1} images in this series.".format(
-                query_id, images.count()))
+            if images[0].sop_class_uid != '1.2.840.10008.5.1.4.1.1.7':
+                logger.debug("{0}: Toshiba option: Image series, SOPClassUID {1}, "
+                             " delete all but first image.".format(query_id, images[0].sop_class_uid))
+                images.exclude(sop_instance_uid__exact=images[0].sop_instance_uid).delete()
+                logger.debug("{0}: Toshiba option: Deleted other images, now {1} remaining (should be 1)".format(
+                    query_id, images.count()))
+                series.image_level_move = True
+                series.save()
+            else:
+                logger.debug("{0}: Toshiba option: Secondary capture series, keep the {1} images in this series.".format(
+                    query_id, images.count()))
 
 
 def _prune_study_responses(query, filters):
