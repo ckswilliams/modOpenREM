@@ -3224,20 +3224,21 @@ def rabbitmq_queues(request):
             flower_queues = []
             other_queues = []
             for queue in queues:
-                if u'default' in queue['name']:
+                if queue['name'] == u'default':
                     default_queue = queue
                 elif u'celery.pidbox' in queue['name']:
                     celery_queue = queue
                 elif u'celeryev' in queue['name']:
-                    flower_queues += queue
+                    flower_queues += [queue, ]
                 else:
-                    other_queues += queue
+                    other_queues += [queue, ]
             template = 'remapp/rabbitmq_queues.html'
             return render_to_response(template,
                                       {'default_queue': default_queue,
                                        'celery_queue': celery_queue,
                                        'flower_queues': flower_queues,
-                                       'other_queues': other_queues},
+                                       'other_queues': other_queues,
+                                       'all_queues': queues},
                                       context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
@@ -3325,7 +3326,6 @@ def celery_tasks(request, stage=None):
                         recent_tasks += [this_task, ]
                     else:
                         older_tasks += [this_task, ]
-                print(u"stage is {0}".format(stage))
                 if u"active" in stage:
                     return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks},
                                               context_instance=RequestContext(request))

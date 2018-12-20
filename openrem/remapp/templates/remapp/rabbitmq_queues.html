@@ -1,12 +1,59 @@
+<div class="panel panel-info">
+  <div class="panel-heading">
+    <h3 class="panel-title">Task processing status</h3>
+  </div>
+  <div class="panel-body">
+    <table class="table table-bordered">
+      <tr>
+        <th style="width: 30%">RabbitMQ</th>
+        <td class="success">
+          <span class="glyphicon glyphicon-ok"></span>
+          Running
+        </td>
+      </tr>
+      <tr>
+        <th>Celery task manager</th>
+          {% if celery_queue %}
+        <td class="success">
+          <span class="glyphicon glyphicon-ok"></span>
+          Running
+          {% else %}
+            <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+          Not running! No tasks will be processed!
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Celery management: Flower
+        </th>
+          {% if flower_queues %}
+        <td class="success">
+          <span class="glyphicon glyphicon-ok"></span>
+          Running
+          {% else %}
+            <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+          Not running! Has it been installed and started?
+          {% endif %}
+        </td>
+      </tr>
 
-<h4>Default queue</h4>
+    </table>
+
+  </div>
+</div>
+
+
+<h4>Default queue - this is where the OpenREM tasks are processed</h4>
 <table class="table">
   <tr>
-    <th>Messages waiting</th>
-    <th>Purge or delete queue</th>
+    <th style="width: 33%">Messages waiting</th>
+    <th style="width: 33%">Purge or delete queue</th>
     <th>Tasks being processed</th>
   </tr>
-  <tr class="success">
+  <tr>
     <td>{{ default_queue.messages_ready }}</td>
     <td>
         {% if default_queue.messages_ready > 0 %}
@@ -17,68 +64,78 @@
           <a class="btn btn-default" disabled="disabled">Purge</a>
         {% endif %}
     </td>
+    {% if default_queue.messages_unacknowledged > 0 %}
+      <td><b> <a class="btn btn-info" href="{% url 'celery_admin' %}" role="button">
+        {{ default_queue.messages_unacknowledged }} task(s) - view in Celery manager</a></b></td>
+    {% else %}
+      <td>{{ default_queue.messages_unacknowledged }}</td>
+    {% endif %}
   </tr>
 </table>
 
-<h4>Celery queue</h4>
-{% if celery_queue %}
-<table class="table">
-  <tr>
-    <th>Messages waiting</th>
-    <th>Purge or delete queue</th>
-    <th>Tasks being processed</th>
-  </tr>
-  <tr>
-    <td>{{ celery_queue.messages_ready }}</td>
-    <td>
-        {% if celery_queue.messages_ready > 0 %}
-          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=celery_queue.name %}" role="button">Purge queue</a>
-        {% elif celery_queue.messages == 0 %}
-          <a class="btn btn-warning" href="{%  url 'rabbitmq_delete' queue=celery_queue.name %}" role=button">Delete queue</a>
-        {% else %}
-          <a class="btn btn-default" disabled="disabled">Purge</a>
-        {% endif %}
-    </td>
-  </tr>
-</table>
-{% else %}
-<p>Celery is not running! No tasks will be processed!</p>
-{% endif %}
+{#<h4>Celery queue</h4>#}
+{#{% if celery_queue %}#}
+{#<table class="table">#}
+{#  <tr>#}
+{#    <th style="width: 33%">Messages waiting</th>#}
+{#    <th style="width: 33%">Purge or delete queue</th>#}
+{#    <th>Tasks being processed</th>#}
+{#  </tr>#}
+{#  <tr>#}
+{#    <td>{{ celery_queue.messages_ready }}</td>#}
+{#    <td>#}
+{#        {% if celery_queue.messages_ready > 0 %}#}
+{#          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=celery_queue.name %}" role="button">Purge queue</a>#}
+{#        {% elif celery_queue.messages == 0 %}#}
+{#          <a class="btn btn-warning" href="{%  url 'rabbitmq_delete' queue=celery_queue.name %}" role=button">Delete queue</a>#}
+{#        {% else %}#}
+{#          <a class="btn btn-default" disabled="disabled">Purge</a>#}
+{#        {% endif %}#}
+{#    </td>#}
+{#      <td>{{ celery_queue.messages_unacknowledged }}</td>#}
+{#  </tr>#}
+{#</table>#}
+{#{% else %}#}
+{#<p>Celery is not running! No tasks will be processed!</p>#}
+{#{% endif %}#}
+{##}
+{#<h4>Flower queues</h4>#}
+{#{% if flower_queues %}#}
+{#  <table class="table table-striped">#}
+{#    <tr>#}
+{#      <th style="width: 40%">Queue name</th>#}
+{#      <th style="width: 20%">Messages waiting</th>#}
+{#      <th style="width: 20%">Purge or delete queue</th>#}
+{#      <th>Tasks being processed</th>#}
+{#    </tr>#}
+{#  {% for queue in flower_queues %}#}
+{#    <tr>#}
+{#      <td>{{ queue.name }}</td>#}
+{#      <td>{{ queue.messages_ready }}</td>#}
+{#      <td>#}
+{#          {% if queue.messages_ready > 0 %}#}
+{#            <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge queue</a>#}
+{#          {% elif queue.messages == 0 %}#}
+{#            <a class="btn btn-warning" href="{%  url 'rabbitmq_delete' queue=queue.name %}" role=button">Delete queue</a>#}
+{#          {% else %}#}
+{#            <a class="btn btn-default" disabled="disabled">Purge</a>#}
+{#          {% endif %}#}
+{#      </td>#}
+{#      <td>{{ queue.messages_unacknowledged }}</td>#}
+{#    </tr>#}
+{#  {% endfor %}#}
+{#  </table>#}
+{#{% else %}#}
+{#<p>There are no Flower queues - has it been installed and started?</p>#}
+{#{% endif %}#}
 
-<h4>Flower queues</h4>
-{% if flower_queues %}
-<table class="table">
+<h4>Other queues</h4>
+<table class="table sortable table-striped" id="rabbitQueueTable">
   <tr>
-    <th>Messages waiting</th>
-    <th>Purge or delete queue</th>
-    <th>Tasks being processed</th>
-  </tr>
-{% for queue in flower_queue %}
-  <tr>
-    <td>{{ queue.messages_ready }}</td>
-    <td>
-        {% if queue.messages_ready > 0 %}
-          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge queue</a>
-        {% elif queue.messages == 0 %}
-          <a class="btn btn-warning" href="{%  url 'rabbitmq_delete' queue=queue.name %}" role=button">Delete queue</a>
-        {% else %}
-          <a class="btn btn-default" disabled="disabled">Purge</a>
-        {% endif %}
-    </td>
-  </tr>
-</table>
-{% else %}
-<p>There are no Flower queues - has it been installed and started?</p>
-{% endif %}
-
-
-<table class="table sortable" id="rabbitQueueTable">
-  <tr>
-    <th id="queue_name" onclick="updateSort(this.id, 'user_click');">Queue Name</th>
-    <th id="num_waiting" onclick="updateSort(this.id, 'user_click');" >Messages waiting</th>
-    <th id="purge_or_del" onclick="updateSort(this.id, 'user_click');">Purge  or delete queue</th>
+    <th id="queue_name" style="width: 40%" onclick="updateSort(this.id, 'user_click');">Queue Name</th>
+    <th id="num_waiting" style="width: 20%" onclick="updateSort(this.id, 'user_click');" >Messages waiting</th>
+    <th id="purge_or_del" style="width: 20%" onclick="updateSort(this.id, 'user_click');">Purge  or delete queue</th>
     <th id="num_tasks" onclick="updateSort(this.id, 'user_click');">Tasks being processed</th>
-    <th id="auto_del" onclick="updateSort(this.id, 'user_click');">Auto-delete</th>
   </tr>
   {% for queue in other_queues %}
     {% if queue.name == "default" %}
@@ -99,13 +156,7 @@
           <a class="btn btn-default" disabled="disabled">Purge</a>
         {% endif %}
       </td>
-    {% if queue.name == "default" and queue.messages_unacknowledged > 0 %}
-      <td><b> <a class="btn btn-info" href="{% url 'celery_admin' %}" role="button">
-        {{ queue.messages_unacknowledged }} task(s) - view in Celery manager</a></b></td>
-    {% else %}
       <td>{{ queue.messages_unacknowledged }}</td>
-    {% endif %}
-      <td>{{ queue.auto_delete }}</td>
     </tr>
   {% endfor %}
 </table>
