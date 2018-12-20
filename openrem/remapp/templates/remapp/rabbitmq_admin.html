@@ -4,103 +4,110 @@
   <script src="{{ STATIC_URL }}js/sorttable.js"></script>
 {% endblock %}
 
-{% block confnav %}<li class="dropdown active">{% endblock %}
+{% block confnav %}
+  <li class="dropdown active">{% endblock %}
 
 {% block navhelp %}
-        <li>
-            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/rabbitmq_management.html"
-               target="_blank" data-toggle="tooltip" title="RabbitMQ management documentation - opens in a new tab">
-                RabbitMQ management documentation
-            </a>
-        </li>
+  <li>
+    <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/rabbitmq_management.html"
+       target="_blank" data-toggle="tooltip" title="RabbitMQ management documentation - opens in a new tab">
+      RabbitMQ management documentation
+    </a>
+  </li>
 {% endblock %}
 
 {% block mainblock %}
 
-{% if admin.admingroup %}
-  <div class="row col-md-offset-2">
-    <h3>RabbitMQ administration </h3>
-  </div>
+  {% if admin.admingroup %}
+    <div class="row col-md-offset-2">
+      <h3>RabbitMQ administration </h3>
+    </div>
 
-  <div class="row">
-  <div class="col-md-8 col-md-offset-2">
-          <script>
-              function updateSort(heading, source) {
-                  if (typeof source === "undefined") {source = null;}
-
-                  sort_info.heading = heading;
-
-                  if (source === 'user_click') {
-                      // It's a user-generated call and the headings already match
-                      // so reverse the sorting direction
-                      sort_info.direction = sort_info.direction === "ascending" ? "descending" : "ascending";
-                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                  }
-
-                  if (sort_info.direction === "ascending") {
-                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                  } else {
-                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                  }
-              }
-
-              sort_info = {
-                  heading:"queue_name",
-                  direction:"ascending"
-              };
-
-              $(document).ready(
-                      function queues_update( json ){
-                          $.ajax({
-                              url: "{% url 'rabbitmq_queues' %}",
-                              data: {
-                                  csrfmiddlewaretoken: '{{ csrf_token }}'
-                              },
-                              type: "POST",
-                              success: function( data ){
-                                  $( '#queues' ).html( data );
-                                  setTimeout(function(){
-                                      queues_update();
-                                  }, 2000);
-                              }
-                          })
-                      }
-              )
-          </script>
-  <p>
-    RabbitMQ is used to queue up tasks until Celery is ready to process them. If Celery is not running RabbitMQ will
-    hold onto the tasks until Celery is ready to process them. If Celery fails to complete a task then RabbitMQ will
-    resend the job to Celery to be tried again. Sometimes it is necessary to remove (purge) tasks from the RabbitMQ
-    queue; this can be done by clicking on the corresponding "Purge queue" button in the table below.
-  </p>
-  </div></div>
     <div class="row">
-  <div class="col-md-8 col-md-offset-2">
+      <div class="col-md-8 col-md-offset-2">
+        <script>
+            function updateSort(heading, source) {
+                if (typeof source === "undefined") {
+                    source = null;
+                }
 
-  <p id="queues">
-    The list of queues should appear here...
-  </p>
-  </div>
-  </div>
+                sort_info.heading = heading;
+
+                if (source === 'user_click') {
+                    // It's a user-generated call and the headings already match
+                    // so reverse the sorting direction
+                    sort_info.direction = sort_info.direction === "ascending" ? "descending" : "ascending";
+                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                }
+
+                if (sort_info.direction === "ascending") {
+                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                } else {
+                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                }
+            }
+
+            sort_info = {
+                heading: "queue_name",
+                direction: "ascending"
+            };
+
+            $(document).ready(
+                function queues_update(json) {
+                    $.ajax({
+                        url: "{% url 'rabbitmq_queues' %}",
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        type: "POST",
+                        success: function (data) {
+                            $('#queues').html(data);
+                            setTimeout(function () {
+                                queues_update();
+                            }, 2000);
+                        }
+                    })
+                }
+            )
+        </script>
+        <p>
+          RabbitMQ is used to queue up tasks until Celery is ready to process them. If Celery is not running RabbitMQ
+          will
+          hold onto the tasks until Celery is ready to process them. If Celery fails to complete a task then RabbitMQ
+          will
+          resend the job to Celery to be tried again. Sometimes it is necessary to remove (purge) tasks from the
+          RabbitMQ
+          queue; this can be done by clicking on the corresponding "Purge queue" button in the table below.
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+
+        <p id="queues">
+          The list of queues should appear here...
+        </p>
+      </div>
+    </div>
 
 
-{% else %}
+  {% else %}
 
-  <div class="row col-md-offset-2">
-    <h3>RabbitMQ administration </h3>
-  </div>
+    <div class="row col-md-offset-2">
+      <h3>RabbitMQ administration </h3>
+    </div>
 
-  <div class="row">
-  <div class="col-md-8 col-md-offset-2">
-  <p>
-    This function can only be accessed if you are logged in to OpenREM with admin
-    permissions.
-  </p>
-  </div>
-  </div>
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <p>
+          This function can only be accessed if you are logged in to OpenREM with admin
+          permissions.
+        </p>
+      </div>
+    </div>
 
-{% endif %}
+  {% endif %}
 
 
 
