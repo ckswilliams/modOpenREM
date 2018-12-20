@@ -41,7 +41,7 @@ An example batch file is shown below for running and restarting Celery:
     :: the above graceful shutdown did not work.
     IF EXIST %celeryPidFile% (
         :: Read the pid values in from the file
-        SET /P CeleryPid=<%celeryPidFile%
+        SET /P celeryPid=<%celeryPidFile%
 
         :: Kill the process with that pid value
         TASKKILL /F /PID %celeryPid%
