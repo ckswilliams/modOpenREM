@@ -39,6 +39,7 @@ OpenREM version history
 * `#666`_  Query-retrieve: handle non-return of ModalitiesInStudy correctly
 * `#665`_  Interface: added fluoroscopy high dose highlighting and e-mail alerts
 * `#662`_  Administration: added facility to list and purge RabbitMQ queues
+* `#659`_  Interface: made the latest study field in summary tables on the home page sort correctly
 * `#658`_  Interface: added display of workload stats in home page modality tables
 * `#637`_  Administration: added facility to list and purge RabbitMQ queues
 * `#479`_  Administration: added facility to list and delete failed import studies

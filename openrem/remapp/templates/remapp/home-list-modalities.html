@@ -33,7 +33,7 @@
             {{ details.total }}
           </a>
         </td>
-        <td style="width:25%">
+        <td style="width:25%" sorttable_customkey="{{ details.deltaseconds }}">
           {% if admin.admingroup %}
             <a href="{% url 'review_failed_imports' modality|upper %}">
           {% else %}
@@ -67,7 +67,7 @@
             {{ details.total }}
           </a>
         </td>
-        <td style="width:25%">
+        <td style="width:25%" sorttable_customkey="{{ details.deltaseconds }}">
           <a href="{% url url_name %}?display_name={{ display_name }}&o=-study_date">
             {{ details.latest|naturaltime }}
           </a>
