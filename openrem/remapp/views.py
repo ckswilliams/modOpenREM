@@ -1701,6 +1701,7 @@ def update_latest_studies(request):
             latestdate = display_name_studies.latest('study_date').study_date
             latestuid = display_name_studies.filter(study_date__exact=latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
+            deltaseconds = int((datetime.now() - latestdatetime).total_seconds())
 
             try:
                 displayname = display_name.encode('utf-8')
@@ -1710,6 +1711,7 @@ def update_latest_studies(request):
             modalitydata[display_name] = {
                 'total': display_name_studies.count(),
                 'latest': latestdatetime,
+                'deltaseconds': deltaseconds,
                 'displayname': displayname,
                 'displayname_pk': modality.lower() + str(pk)
             }
