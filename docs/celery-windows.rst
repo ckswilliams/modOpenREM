@@ -11,90 +11,120 @@ situation it will not restart on its own. Windows Task Scheduler can be used to
 restart Celery on a regular basis. In addition it can be used to ensure celery
 is running a few minutes prior to a scheduled PACS query.
 
-An example batch file is shown below for running and restarting Celery:
+An example batch file is shown below for running and restarting Celery. This
+calls separate batch files to shutdown and start Celery, and start Flower if
+needed.
+
+Celery control batch file
+=========================
+
+`celery_task.bat`, to be run as a scheduled task.
+
+.. sourcecode:: bat
+
+    :: Create variables containing the name and path of the Celery pid file and the
+    :: names and paths to the batch files used to shutdown and run Celery and run
+    :: Flower.
+    SET celeryPidFile=E:\media_root\celery\default.pid
+    SET celeryShutdownFile=D:\Server_Apps\celery\celery_shutdown.bat
+    SET celeryStartFile=D:\Server_Apps\celery\celery_start.bat
+    SET flowerStartFile=D:\Server_Apps\flower\flower_start.bat
+
+    :: Attempt to shutdown Celery gracefully.
+    START /B CMD /C CALL "%celeryShutdownFile%"
+
+    :: Pause this file for 60 s to ensure that the above has time to work (you may
+    :: need to check that the 'timeout' command is available on your Windows
+    :: system. Some systems may have 'sleep' instead, in which case replace the
+    :: line below with:
+    :: SLEEP 60
+    TIMEOUT /T 60
+
+    :: Kill any remaining Celery instances (ungraceful) and delete the pid file in
+    :: case the above graceful shutdown did not work. If the default.pid file
+    :: exists then the graceful shutdown didn't work.
+    IF EXIST "%celeryPidFile%" (
+        :: Kill all processes with the name celery.exe and any associated
+        :: python.exe processes. This will also kill Flower.
+        TASKKILL /IM celery.exe /T /F
+
+        :: Force the deletion of the pid file.
+        DEL /F "%celeryPidFile%"
+        
+        :: Start Flower.
+        START /B CMD /C CALL "%flowerStartFile%"
+    )
+
+    :: Start Celery.
+    START /B CMD /C CALL "%celeryStartFile%"
+
+
+Celery shutdown batch file
+==========================
+
+`celery_shutdown.bat`, called by `celery_task.bat`.
+
+.. sourcecode:: bat
+
+    :: Create variable containing the drive and path to OpenREM.
+    SET openremDrive=D:
+    SET openremPath=D:\Server_Apps\python27\Lib\site-packages\openrem
+
+    :: Change to the drive on which OpenREM is installed and navigate to the
+    :: OpenREM folder.
+    %openremDrive%
+    CD "%openremPath%"
+
+    :: Attempt to shutdown Celery gracefully.
+    celery -A openremproject control shutdown --timeout=30
+
+
+
+Celery start batch file
+=======================
+
+`celery_start.bat`, called by `celery_task.bat`.
 
 .. sourcecode:: bat
    :linenos:
 
-    :: Create variables containing the path to OpenREM and the name and path of the
-    :: celery pid  and log files
+    :: Create variables containing the drive and path to OpenREM and the name and
+    :: path of the Celery pid and log files.
+    SET openremDrive=D:
     SET openremPath=D:\Server_Apps\python27\Lib\site-packages\openrem
     SET celeryPidFile=E:\media_root\celery\default.pid
     SET celeryLogFile=E:\media_root\celery\default.log
 
     :: Change to the drive on which OpenREM is installed and navigate to the
-    :: OpenREM folder
-    D:
-    CD %openremPath%
+    :: OpenREM folder.
+    %openremDrive%
+    CD "%openremPath%"
 
-    :: Attempt to shutdown celery gracefully
-    celery -A openremproject control shutdown --timeout=10
-
-    :: Pause this file for 10 s to ensure that the above has time to work (you may
-    :: need to check that the 'timeout' command is available on your Windows
-    :: system. Some systems may have 'sleep' instead, in which case replace the
-    :: line below with:
-    :: SLEEP 10
-    TIMEOUT /T 10
-
-    :: Kill any remaining celery tasks (ungraceful) and delete the pid file in case
-    :: the above graceful shutdown did not work.
-    IF EXIST %celeryPidFile% (
-        :: Read the pid values in from the file
-        SET /P celeryPid=<%celeryPidFile%
-
-        :: Kill the process with that pid value
-        TASKKILL /F /PID %celeryPid%
-
-        :: Force the deletion of the pid file
-        DEL /F %celeryPidFile%
-    )
-
-    :: Restart a new instance of celery 
-    celery worker -n default -P solo -Ofair -A openremproject -c 4 -Q default --pidfile=%celeryPidFile% --logfile=%celeryLogFile%
+    :: Start Celery.
+    celery worker -n default -P solo -Ofair -A openremproject -c 1 -Q default --pidfile=%celeryPidFile% --logfile=%celeryLogFile%
 
 
-Lines 3 to 5 set variables with the locations of your OpenREM installation and
-Celery log and pid file locations. Make sure these are changed to match your
-own OpenREM installation. Lines 9 and 10 navigate to the OpenREM drive and
-folder. Ensure that the drive (``D:`` on line 9 in the above example) matches
-the drive that contains your OpenREM installation. Line 13 attempts to
-gracefully shutdown celery. If the graceful shutdown doesn't work line 29 kills
-the celery.exe process that has a pid matching that contained in the
-``default.pid`` file (we don't want to kill all Celery processes as this would
-also kill the Celery process that is running Flower). Line 32 deletes the
-``default.pid`` process ID file: Celery won't restart if this pid file exists.
-Finally, line 36 runs a new instance of Celery.
+Flower start batch file
+=======================
 
-
-An example batch file is shown below for running Flower:
+`flower_start.bat`, called by `celery_task.bat` and also used to start Flower at system start-up.
 
 .. sourcecode:: bat
-   :linenos:
 
-    :: Create variables containing the path to OpenREM and the name and path of the
-    :: celery pid  and log files
+    :: Create variables containing the drive and path to OpenREM and the name and
+    :: path of the Flower log file and the Flower port.
+    SET openremDrive=D:
     SET openremPath=D:\Server_Apps\python27\Lib\site-packages\openrem
     SET flowerLogFile=E:\media_root\celery\flower.log
     SET flowerPort=5555
 
     :: Change to the drive on which OpenREM is installed and navigate to the
-    :: OpenREM folder
-    D:
-    CD %openremPath%
+    :: OpenREM folder.
+    %openremDrive%
+    CD "%openremPath%"
 
-    :: Run flower
-    celery -A openremproject flower --port=%flowerPort% --loglevel=info --log-file-prefix=%flowerLogFile%
-
-
-Lines 3 and 4 set variables with the locations of your OpenREM installation and the
-Flower log files. Make sure these are changed to match your own
-OpenREM installation. Line 5 sets the port number Flower will use. If you change the default port from 5555 then you
-need to make the same change in
-``openremproject\local_settings.py`` to add/modify the line ``FLOWER_PORT = 5555``.
-Lines 9 and 10 navigate to the OpenREM drive and folder.
-Finally, line 13 starts Flower using the parameters that are supplied at the
-top of the batch file.
+    :: Start Flower using Celery.
+    celery -A openremproject flower --port="%flowerPort%" --loglevel=info --log-file-prefix="%flowerLogFile%"
 
 
 Setting up a scheduled task
