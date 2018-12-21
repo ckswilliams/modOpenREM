@@ -76,7 +76,7 @@ be added to the ``openrem`` group, and the 'sticky' group setting below will ena
     mkdir veopenrem
     sudo chown -R $USER:openrem /var/dose/*
     sudo chmod -R g+s /var/dose/*
-    sudo setfacl -dm u::rwx,g::rwx,o::r orthanc
+    sudo setfacl -R -dm u::rwx,g::rwx,o::r /var/dose/
 
 
 Install apt packages and direct downloads
@@ -119,7 +119,7 @@ Install Python packages
 .. code-block:: console
 
     pip install numpy psycopg2-binary gunicorn
-    pip install openrem==0.9.0b3
+    pip install openrem==0.9.0b4
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 .. note::
