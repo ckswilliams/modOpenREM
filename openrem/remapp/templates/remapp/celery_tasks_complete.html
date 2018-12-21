@@ -1,0 +1,19 @@
+<table class="table">
+  <tr>
+    <th style="width: 30%">UUID</th>
+    <th style="width: 24%">Task</th>
+    <th style="width: 18%">Received</th>
+    <th style="width: 18%">Started</th>
+    <th>State</th>
+  </tr>
+  {% for task in tasks %}
+    <tr>
+      <td>{{ task.uuid }}</td>
+      <td>{{ task.name }}</td>
+      <td>{{ task.received }}</td>
+      <td>{{ task.started }}</td>
+      <td>{{ task.state }}</td>
+    </tr>
+  {% endfor %}
+</table>
+

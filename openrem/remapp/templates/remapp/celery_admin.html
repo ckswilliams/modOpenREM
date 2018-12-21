@@ -4,106 +4,190 @@
   <script src="{{ STATIC_URL }}js/sorttable.js"></script>
 {% endblock %}
 
-{% block confnav %}<li class="dropdown active">{% endblock %}
+{% block confnav %}
+  <li class="dropdown active">{% endblock %}
 
 {% block navhelp %}
-        <li>
-            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/celery_management.html"
-               target="_blank" data-toggle="tooltip" title="Celery management documentation - opens in a new tab">
-                Celery management documentation
-            </a>
-        </li>
+  <li>
+    <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/celery_management.html"
+       target="_blank" data-toggle="tooltip" title="Celery management documentation - opens in a new tab">
+      Celery management documentation
+    </a>
+  </li>
 {% endblock %}
 
 {% block mainblock %}
 
-{% if admin.admingroup %}
-  <div class="row col-md-offset-2">
-    <h3>Celery administration </h3>
-  </div>
+  {% if admin.admingroup %}
+    <div class="row col-md-offset-2">
+      <h3>Celery administration </h3>
+    </div>
 
-  <div class="row">
-  <div class="col-md-8 col-md-offset-2">
-          <script>
-              function updateSort(heading, source) {
-                  if (typeof source === "undefined") {source = null;}
-
-                  sort_info.heading = heading;
-
-                  if (source === 'user_click') {
-                      // It's a user-generated call and the headings already match
-                      // so reverse the sorting direction
-                      sort_info.direction = sort_info.direction === "ascending" ? "descending" : "ascending";
-                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                  }
-
-                  if (sort_info.direction === "ascending") {
-                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                  } else {
-                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                      sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                  }
-              }
-
-              sort_info = {
-                  heading:"uuid",
-                  direction:"ascending"
-              };
-
-              $(document).ready(
-                      function tasks_update( json ){
-                          $.ajax({
-                              url: "{% url 'celery_tasks' %}",
-                              data: {
-                                  csrfmiddlewaretoken: '{{ csrf_token }}'
-                              },
-                              type: "POST",
-                              success: function( data ){
-                                  $( '#tasks' ).html( data );
-                                  setTimeout(function(){
-                                      tasks_update();
-                                  }, 2000);
-                              }
-                          })
-                      }
-              )
-          </script>
-  <p>
-    Celery is the task manager that runs background tasks. A table of current active tasks can be found below along with
-    tasks that have finished. This interface relies on Flower being installed and running, so look at the docs to find
-    out more: link to docs.
-  </p>
-  <p>
-    If Flower was started after a task was started then that task will not appear in the table until it either finishes
-    or is aborted somewhere else.
-  </p>
-  </div></div>
     <div class="row">
-  <div class="col-md-8 col-md-offset-2">
+      <div class="col-md-8 col-md-offset-2">
+        <script>
+            function updateSort(heading, source) {
+                if (typeof source === "undefined") {
+                    source = null;
+                }
 
-  <p id="tasks">
-    The list of tasks should appear here...
-  </p>
-  </div>
-  </div>
+                sort_info.heading = heading;
+
+                if (source === 'user_click') {
+                    // It's a user-generated call and the headings already match
+                    // so reverse the sorting direction
+                    sort_info.direction = sort_info.direction === "ascending" ? "descending" : "ascending";
+                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                }
+
+                if (sort_info.direction === "ascending") {
+                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                } else {
+                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                }
+            }
+
+            sort_info = {
+                heading: "uuid",
+                direction: "ascending"
+            };
+
+            $(document).ready(
+                function tasks_update_active(json) {
+                    $.ajax({
+                        url: "{% url 'celery_tasks' stage='active' %}",
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        type: "POST",
+                        success: function (data) {
+                            $('#activetasks').html(data);
+                            setTimeout(function () {
+                                tasks_update_active();
+                            }, 2000);
+                        }
+                    })
+                }
+            )
+            $(document).ready(
+                function tasks_update_recent(json) {
+                    $.ajax({
+                        url: "{% url 'celery_tasks' stage='recent' %}",
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        type: "POST",
+                        success: function (data) {
+                            $('#recenttasks').html(data);
+                            setTimeout(function () {
+                                tasks_update_recent();
+                            }, 5000);
+                        }
+                    })
+                }
+            )
+            $(document).ready(
+                function tasks_update_recent(json) {
+                    $.ajax({
+                        url: "{% url 'celery_tasks' stage='older' %}",
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        type: "POST",
+                        success: function (data) {
+                            $('#oldertasks').html(data);
+                            setTimeout(function () {
+                                tasks_update_recent();
+                            }, 11000);
+                        }
+                    })
+                }
+            )
+        </script>
+        <p>
+          Celery is the task manager that runs background tasks. A table of current active tasks can be found below
+          along with
+          tasks that have finished. This interface relies on Flower being installed and running, so look at the docs to
+          find
+          out more: link to docs.
+        </p>
+        <p>
+          If Flower was started after a task was started then that task will not appear in the table until it either
+          finishes
+          or is aborted somewhere else.
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+
+        <h3>Active tasks</h3>
 
 
-{% else %}
+        <p id="activetasks">
+          The list of tasks should appear here...
+        </p>
 
-  <div class="row col-md-offset-2">
-    <h3>Celery administration </h3>
-  </div>
 
-  <div class="row">
-  <div class="col-md-8 col-md-offset-2">
-  <p>
-    This function can only be accessed if you are logged in to OpenREM with admin
-    permissions.
-  </p>
-  </div>
-  </div>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="recentTasksHeading">
+              <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" href="#recentTasks" aria-expanded="true"
+                   aria-controls="recentTasks">
+                  Recent tasks
+                </a>
+              </h4>
+            </div>
+            <div id="recentTasks" class="panel-collapse collapse in" role="tabpanel"
+                 aria-labelledby="recentTasksHeading">
+              <div class="panel-body">
 
-{% endif %}
+                <span id="recenttasks"></span>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="olderTasksHeading">
+              <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" href="#olderTasks" aria-expanded="true"
+                   aria-controls="olderTasks">
+                  Older tasks
+                </a>
+              </h4>
+            </div>
+            <div id="olderTasks" class="panel-collapse collapse" role="tabpanel" aria-labelledby="olderTasksHeading">
+              <div class="panel-body">
+
+                <span id="oldertasks"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+  {% else %}
+
+    <div class="row col-md-offset-2">
+      <h3>Celery administration </h3>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <p>
+          This function can only be accessed if you are logged in to OpenREM with admin
+          permissions.
+        </p>
+      </div>
+    </div>
+
+  {% endif %}
 
 
 

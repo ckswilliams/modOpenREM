@@ -3218,13 +3218,40 @@ def rabbitmq_queues(request):
 
     if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
+            flower = requests.get('http://localhost:{0}/api/tasks'.format(FLOWER_PORT))
+            if flower.status_code == 200:
+                flower_status = 200
+            else:
+                flower_status = 401
+        except requests.ConnectionError:
+            flower_status = 500
+        try:
             queues = requests.get('http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
+            default_queue = {}
+            celery_queue = {}
+            flower_queues = []
+            other_queues = []
+            for queue in queues:
+                if queue['name'] == u'default':
+                    default_queue = queue
+                elif u'celery.pidbox' in queue['name']:
+                    celery_queue = queue
+                elif u'celeryev' in queue['name']:
+                    flower_queues += [queue, ]
+                    print(queue['name'])
+                else:
+                    other_queues += [queue, ]
+            template = 'remapp/rabbitmq_queues.html'
+            return render_to_response(template,
+                                      {'default_queue': default_queue,
+                                       'celery_queue': celery_queue,
+                                       'other_queues': other_queues,
+                                       'flower_status': flower_status},
+                                      context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/rabbitmq_connection_error.html'
             return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
-        template = 'remapp/rabbitmq_queues.html'
-        return render_to_response(template, {'queues': queues}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -3259,7 +3286,7 @@ def celery_admin(request):
     return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
 
 
-def celery_tasks(request):
+def celery_tasks(request, stage=None):
     """AJAX function to get current task details"""
     import requests
     from datetime import datetime
@@ -3269,6 +3296,9 @@ def celery_tasks(request):
             flower = requests.get('http://localhost:{0}/api/tasks'.format(FLOWER_PORT))
             if flower.status_code == 200:
                 tasks = []
+                recent_tasks = []
+                active_tasks = []
+                older_tasks = []
                 task_dict_list = flower.json()
                 for task_uuid in task_dict_list.keys():
                     this_task = {'uuid': task_uuid,
@@ -3279,6 +3309,8 @@ def celery_tasks(request):
                         this_task['received'] = datetime.fromtimestamp(task_dict_list[task_uuid]['received'])
                     if isinstance(task_dict_list[task_uuid]['started'], float):
                         this_task['started'] = datetime.fromtimestamp(task_dict_list[task_uuid]['started'])
+                    else:
+                        this_task['started'] = ''
                     try:
                         if u"exports" in this_task['name'].split('.'):
                             this_task['type'] = u'export'
@@ -3293,8 +3325,24 @@ def celery_tasks(request):
                     except AttributeError:
                         this_task['type'] = None
                     tasks += [this_task, ]
-                template = 'remapp/celery_tasks.html'
-                return render_to_response(template, {'tasks': tasks}, context_instance=RequestContext(request))
+                    datetime_now = datetime.now()
+                    recent_time_delta = 60*60*6  # six hours
+                    if u'STARTED' in this_task['state']:
+                        active_tasks += [this_task, ]
+                    elif this_task['started'] and (
+                            datetime_now - this_task['started']).total_seconds() < recent_time_delta:
+                        recent_tasks += [this_task, ]
+                    else:
+                        older_tasks += [this_task, ]
+                if u"active" in stage:
+                    return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks},
+                                              context_instance=RequestContext(request))
+                elif u"recent" in stage:
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': recent_tasks},
+                                              context_instance=RequestContext(request))
+                elif u"older" in stage:
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': older_tasks},
+                                              context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/celery_connection_error.html'
