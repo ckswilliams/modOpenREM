@@ -76,7 +76,7 @@ be added to the ``openrem`` group, and the 'sticky' group setting below will ena
     mkdir veopenrem
     sudo chown -R $USER:openrem /var/dose/*
     sudo chmod -R g+s /var/dose/*
-    sudo setfacl -dm u::rwx,g::rwx,o::r orthanc
+    sudo setfacl -R -dm u::rwx,g::rwx,o::r /var/dose/
 
 
 Install apt packages and direct downloads
