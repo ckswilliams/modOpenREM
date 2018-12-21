@@ -93,7 +93,10 @@ Enable the Celery management interface, Flower
 ==============================================
 
 To make use of the Celery task management, Flower needs to be running. To do so, follow the instructions in
-:doc:`startservices`. For 'one-page Ubuntu' installs, see *link to section*.
+:ref:`start_flower`. For 'one-page Ubuntu' installs, add the Flower related config and create, register and start the
+systemd service files as described in :ref:`one_page_linux_celery`. If you need to change the default Flower port of
+5555 then make sure you do so in ``openremproject\local_settings.py`` to add/modify the line ``FLOWER_PORT = 5555`` as
+well as when you start Flower.
 
 E-mail server settings
 ======================

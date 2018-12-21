@@ -52,7 +52,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 import json
 import logging
 import remapp
-from openremproject.settings import MEDIA_ROOT
+from openremproject.settings import MEDIA_ROOT, FLOWER_PORT
 from remapp.forms import SizeUploadForm
 from remapp.models import GeneralStudyModuleAttr, create_user_profile
 from remapp.models import SizeUpload
@@ -2002,7 +2002,6 @@ def size_abort(request, pk):
     :type request: POST
     """
     from openremproject.celeryapp import app
-    from remapp.models import SizeUpload
 
     size_import = get_object_or_404(SizeUpload, pk=pk)
 
@@ -3221,14 +3220,40 @@ def rabbitmq_queues(request):
 
     if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
-            queues = requests.get(
-                'http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
+            flower = requests.get('http://localhost:{0}/api/tasks'.format(FLOWER_PORT))
+            if flower.status_code == 200:
+                flower_status = 200
+            else:
+                flower_status = 401
+        except requests.ConnectionError:
+            flower_status = 500
+        try:
+            queues = requests.get('http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
+            default_queue = {}
+            celery_queue = {}
+            flower_queues = []
+            other_queues = []
+            for queue in queues:
+                if queue['name'] == u'default':
+                    default_queue = queue
+                elif u'celery.pidbox' in queue['name']:
+                    celery_queue = queue
+                elif u'celeryev' in queue['name']:
+                    flower_queues += [queue, ]
+                    print(queue['name'])
+                else:
+                    other_queues += [queue, ]
+            template = 'remapp/rabbitmq_queues.html'
+            return render_to_response(template,
+                                      {'default_queue': default_queue,
+                                       'celery_queue': celery_queue,
+                                       'other_queues': other_queues,
+                                       'flower_status': flower_status},
+                                      context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/rabbitmq_connection_error.html'
             return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
-        template = 'remapp/rabbitmq_queues.html'
-        return render_to_response(template, {'queues': queues}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -3263,16 +3288,19 @@ def celery_admin(request):
     return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
 
 
-def celery_tasks(request):
+def celery_tasks(request, stage=None):
     """AJAX function to get current task details"""
     import requests
     from datetime import datetime
 
     if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
-            flower = requests.get('http://localhost:5555/api/tasks')
+            flower = requests.get('http://localhost:{0}/api/tasks'.format(FLOWER_PORT))
             if flower.status_code == 200:
                 tasks = []
+                recent_tasks = []
+                active_tasks = []
+                older_tasks = []
                 task_dict_list = flower.json()
                 for task_uuid in task_dict_list.keys():
                     this_task = {'uuid': task_uuid,
@@ -3283,57 +3311,76 @@ def celery_tasks(request):
                         this_task['received'] = datetime.fromtimestamp(task_dict_list[task_uuid]['received'])
                     if isinstance(task_dict_list[task_uuid]['started'], float):
                         this_task['started'] = datetime.fromtimestamp(task_dict_list[task_uuid]['started'])
+                    else:
+                        this_task['started'] = ''
                     try:
                         if u"exports" in this_task['name'].split('.'):
                             this_task['type'] = u'export'
                         elif u"websizeimport" in this_task['name'].split('.'):
                             this_task['type'] = u'size'
+                            if u"netdicom" in this_task['name'].split('.'):
+                                this_task['type'] = u'netdicom'
+                            if u"make_skin_map" in this_task['name'].split('.'):
+                                this_task['type'] = u'skin_map'
                         else:
                             this_task['type'] = None
                     except AttributeError:
                         this_task['type'] = None
                     tasks += [this_task, ]
-                template = 'remapp/celery_tasks.html'
-                return render_to_response(template, {'tasks': tasks}, context_instance=RequestContext(request))
+                    datetime_now = datetime.now()
+                    recent_time_delta = 60*60*6  # six hours
+                    if u'STARTED' in this_task['state']:
+                        active_tasks += [this_task, ]
+                    elif this_task['started'] and (
+                            datetime_now - this_task['started']).total_seconds() < recent_time_delta:
+                        recent_tasks += [this_task, ]
+                    else:
+                        older_tasks += [this_task, ]
+                if u"active" in stage:
+                    return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks},
+                                              context_instance=RequestContext(request))
+                elif u"recent" in stage:
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': recent_tasks},
+                                              context_instance=RequestContext(request))
+                elif u"older" in stage:
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': older_tasks},
+                                              context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
             template = 'remapp/celery_connection_error.html'
             return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
 
 
-def celery_abort(request, task=None, name=None):
+def celery_abort(request, task_id=None, type=None):
     """Function to abort one of the Celery tasks"""
     import requests
-    from remapp.models import Exports, SizeUpload
+    from remapp.models import Exports, DicomQuery
 
-    if task and request.user.groups.filter(name="admingroup"):
-        queue_url = 'http://localhost:5555/api/task/revoke/{0}'.format(task)
+    if task_id and request.user.groups.filter(name="admingroup"):
+        queue_url = 'http://localhost:{0}/api/task/revoke/{1}'.format(FLOWER_PORT, task_id)
         payload = {"terminate": "true"}
         abort = requests.post(queue_url, data=payload)
         if abort.status_code == 200:
-            if name == u"export":
-                try:
-                    export_task = Exports.objects.get(task_id__exact=task)
-                    export_task.delete()
-                    messages.success(request, u"Task {0} terminated, and matching export job in database "
-                                              u"deleted".format(task))
-                except ObjectDoesNotExist:
-                    messages.warning(request, u"Task {0} terminated, but matching export job not found in "
-                                              u"database!".format(task))
-            elif name == u"size":
-                try:
-                    size_task = SizeUpload.objects.get(task_id__exact=task)
-                    size_task.delete()
-                    messages.success(request, u"Task {0} terminated, and matching size import job in database "
-                                              u"deleted".format(task))
-                except ObjectDoesNotExist:
-                    messages.warning(request, u"Task {0} terminated, but matching size import job not found in "
-                                              u"database!".format(task))
-            else:
-                messages.success(request, u"Success! Task {0} terminated.".format(task))
-        else:
-            messages.error(request, u"Terminating task {0} failed!".format(task))
-        return redirect(reverse_lazy('celery_admin'))
+            try:
+                if type in u'netdicom':
+                    description = u'query or move'
+                    task = DicomQuery.objects.get(query_id__exact=task_id)
+                elif type in u'export':
+                    description = u'export'
+                    task = Exports.objects.get(task_id__exact=task_id)
+                elif type in u'size':
+                    description = u'size import'
+                    task = SizeUpload.objects.get(task_id__exact=task_id)
+                else:
+                    messages.success(request, u"Success! Task {0} terminated. Type was '{1}' which didn't match".format(task_id, type))
+                    return redirect(reverse_lazy('celery_admin'))
+                task.delete()
+                messages.success(request, u"Task {0} terminated, and matching {1} job in database deleted.".format(
+                    task_id, description))
+            except ObjectDoesNotExist:
+                messages.warning(request, u"Task {0} terminated, but matching {1} job not found in database!".format(
+                    task_id, description))
+            return redirect(reverse_lazy('celery_admin'))
 
 
 @login_required

@@ -130,3 +130,7 @@ EMAIL_OPENREM_URL = 'http://your.openrem.server'
 
 # The following line can run on your OpenREM server to set up a dummy smtp server for testing:
 # python -m smtpd -n -c DebuggingServer localhost:25
+
+# Port that the Celery management software Flower runs on. Change if necessary to match how Flower is started.
+# See https://docs.openrem.org/en/latest/startservices.html#celery-task-management-flower
+FLOWER_PORT = 5555
