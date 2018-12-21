@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.9.0b3 (2018-12-13)
+0.9.0b4 (2018-12-21)
 --------------------
 * `#711`_  Query-retrieve: fixed problem for zero image series when using -toshiba flag
 * `#710`_  Interface: Celery and RabbitMQ tables can now be sorted by clicking on column headings
