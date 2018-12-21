@@ -1,4 +1,5 @@
-Change the version number in 
+Make sure develop is up to date, branch as release-version, eg release-0.9.0b5
+Change the version number in
 	openrem/remapp/version.py - append '-docs' to version tag name for docs branch
 	install instructions in the release notes where applicable
     	quick_start_linux.rst - set to version for beta or versionless for release
