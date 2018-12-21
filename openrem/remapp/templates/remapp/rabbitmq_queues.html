@@ -28,14 +28,22 @@
         <th>
           Celery management: Flower
         </th>
-        {% if flower_queues %}
+        {% if flower_status == 200 %}
           <td class="success">
             <span class="glyphicon glyphicon-ok"></span>
             Running
-            {% else %}
+            {% elif flower_status == 401 %}
+          <td class="danger">
+          <span class="glyphicon glyphicon-remove"></span>
+          Connection error - unauthorised!
+          {% elif flower_status == 500 %}
           <td class="danger">
           <span class="glyphicon glyphicon-remove"></span>
           Not running! Has it been installed and started?
+          {% else %}
+          <td class="danger">
+          <span class="glyphicon glyphicon-remove"></span>
+          Flower status unknown!
         {% endif %}
         </td>
       </tr>

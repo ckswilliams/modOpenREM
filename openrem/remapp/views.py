@@ -3218,6 +3218,14 @@ def rabbitmq_queues(request):
 
     if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
+            flower = requests.get('http://localhost:{0}/api/tasks'.format(FLOWER_PORT))
+            if flower.status_code == 200:
+                flower_status = 200
+            else:
+                flower_status = 401
+        except requests.ConnectionError:
+            flower_status = 500
+        try:
             queues = requests.get('http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
             default_queue = {}
             celery_queue = {}
@@ -3230,15 +3238,15 @@ def rabbitmq_queues(request):
                     celery_queue = queue
                 elif u'celeryev' in queue['name']:
                     flower_queues += [queue, ]
+                    print(queue['name'])
                 else:
                     other_queues += [queue, ]
             template = 'remapp/rabbitmq_queues.html'
             return render_to_response(template,
                                       {'default_queue': default_queue,
                                        'celery_queue': celery_queue,
-                                       'flower_queues': flower_queues,
                                        'other_queues': other_queues,
-                                       'all_queues': queues},
+                                       'flower_status': flower_status},
                                       context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
