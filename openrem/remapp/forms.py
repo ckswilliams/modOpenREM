@@ -307,6 +307,8 @@ class HomepageOptionsForm(forms.Form):
     dayDeltaB = forms.IntegerField(label='Secondary time period to sum studies (days)', required=False)
     enable_workload_stats = forms.BooleanField(label='Enable calculation and display of workload stats on home page?',
                                                required=False)
+    match_on_device_observer_uid = forms.BooleanField(label='Set display name automatically based on device UID?',
+                                                      required=False)
 
 
 class DicomQueryForm(forms.Form):

@@ -1059,7 +1059,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
 
 
 def _generalequipmentmoduleattributes(dataset, study, ch):
-    from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames
+    from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames,HomePageAdminSettings
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.hash_id import hash_id
@@ -1076,41 +1076,56 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip.spatial_resolution = get_value_kw("SpatialResolution", dataset)
     equip.date_of_last_calibration = get_date("DateOfLastCalibration", dataset)
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration", dataset)
+    try:
+        device_observer_uid = [content.UID for content in dataset.ContentSequence if (
+                content.ConceptNameCodeSequence[0].CodeValue == '121012' and
+                content.ConceptNameCodeSequence[0].CodingSchemeDesignator == 'DCM')][0]  # 121012 = DeviceObserverUID
+    except IndexError:
+        device_observer_uid = None
 
-    equip_display_name, created = UniqueEquipmentNames.objects.get_or_create(manufacturer=equip.manufacturer,
-                                                                             manufacturer_hash=hash_id(
-                                                                                 equip.manufacturer),
-                                                                             institution_name=equip.institution_name,
-                                                                             institution_name_hash=hash_id(
-                                                                                 equip.institution_name),
-                                                                             station_name=equip.station_name,
-                                                                             station_name_hash=hash_id(
-                                                                                 equip.station_name),
-                                                                             institutional_department_name=equip.institutional_department_name,
-                                                                             institutional_department_name_hash=hash_id(
-                                                                                 equip.institutional_department_name),
-                                                                             manufacturer_model_name=equip.manufacturer_model_name,
-                                                                             manufacturer_model_name_hash=hash_id(
-                                                                                 equip.manufacturer_model_name),
-                                                                             device_serial_number=equip.device_serial_number,
-                                                                             device_serial_number_hash=hash_id(
-                                                                                 equip.device_serial_number),
-                                                                             software_versions=equip.software_versions,
-                                                                             software_versions_hash=hash_id(
-                                                                                 equip.software_versions),
-                                                                             gantry_id=equip.gantry_id,
-                                                                             gantry_id_hash=hash_id(equip.gantry_id),
-                                                                             hash_generated=True
-                                                                             )
+    equip_display_name, created = UniqueEquipmentNames.objects.get_or_create(
+        manufacturer=equip.manufacturer,
+        manufacturer_hash=hash_id(equip.manufacturer),
+        institution_name=equip.institution_name,
+        institution_name_hash=hash_id(equip.institution_name),
+        station_name=equip.station_name,
+        station_name_hash=hash_id(equip.station_name),
+        institutional_department_name=equip.institutional_department_name,
+        institutional_department_name_hash=hash_id(equip.institutional_department_name),
+        manufacturer_model_name=equip.manufacturer_model_name,
+        manufacturer_model_name_hash=hash_id(equip.manufacturer_model_name),
+        device_serial_number=equip.device_serial_number,
+        device_serial_number_hash=hash_id(equip.device_serial_number),
+        software_versions=equip.software_versions,
+        software_versions_hash=hash_id(equip.software_versions),
+        gantry_id=equip.gantry_id,
+        gantry_id_hash=hash_id(equip.gantry_id),
+        hash_generated=True,
+        device_observer_uid=device_observer_uid
+    )
+
     if created:
-        if equip.institution_name and equip.station_name:
-            equip_display_name.display_name = equip.institution_name + ' ' + equip.station_name
-        elif equip.institution_name:
-            equip_display_name.display_name = equip.institution_name
-        elif equip.station_name:
-            equip_display_name.display_name = equip.station_name
-        else:
-            equip_display_name.display_name = u'Blank'
+        # If we have a device_observer_uid and it is desired, merge this "new" device with an existing one based on the
+        # device observer uid.
+        match_on_device_observer_uid = HomePageAdminSettings.objects.values_list(
+            'match_on_device_observer_uid', flat=True)[0]
+        if match_on_device_observer_uid and device_observer_uid:
+            matched_equip_display_name = UniqueEquipmentNames.objects.filter(
+                device_observer_uid=device_observer_uid).order_by('id')
+            # we don't want the just inserted UniqueEquipmentName, so there should be more than 1 UniqueEquipmentName
+            if len(matched_equip_display_name) > 1:
+                # As we sorted on ID, we do want the first (and not the last as that is the just inserted one)
+                equip_display_name.display_name = matched_equip_display_name[0].display_name
+                equip_display_name.user_defined_modality = matched_equip_display_name[0].user_defined_modality
+        if equip_display_name.display_name is None:
+            if equip.institution_name and equip.station_name:
+                equip_display_name.display_name = equip.institution_name + ' ' + equip.station_name
+            elif equip.institution_name:
+                equip_display_name.display_name = equip.institution_name
+            elif equip.station_name:
+                equip_display_name.display_name = equip.station_name
+            else:
+                equip_display_name.display_name = u'Blank'
         equip_display_name.save()
 
     equip.unique_equipment_name = UniqueEquipmentNames(pk=equip_display_name.pk)
