@@ -3062,9 +3062,19 @@ def homepage_options_view(request):
     display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
     if not display_workload_stats:
         if not request.user.groups.filter(name="admingroup"):
-            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; only a member of the admin group can change this setting')) # nosec
+            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; only a member of the admin group can change this setting'))  # nosec
+
+    try:
+        match_on_device_observer_uid = HomePageAdminSettings.objects.values_list(
+            'match_on_device_observer_uid', flat=True)[0]
+    except IndexError:
+        match_on_device_observer_uid = False
+    if not match_on_device_observer_uid:
+        if not request.user.groups.filter(name="admingroup"):
+            messages.info(request, mark_safe(u'The setting of automatic merging is disabled; only a member of the admin group can change this setting'))  # nosec
 
     if request.method == 'POST':
+        message = ""
         homepage_options_form = HomepageOptionsForm(request.POST)
         if homepage_options_form.is_valid():
             try:
@@ -3075,22 +3085,31 @@ def homepage_options_view(request):
                 create_user_profile(sender=request.user, instance=request.user, created=True)
                 user_profile = request.user.userprofile
 
-            user_profile.summaryWorkloadDaysA = homepage_options_form.cleaned_data['dayDeltaA']
-            user_profile.summaryWorkloadDaysB = homepage_options_form.cleaned_data['dayDeltaB']
+            if (user_profile.summaryWorkloadDaysA != homepage_options_form.cleaned_data['dayDeltaA']) or \
+               (user_profile.summaryWorkloadDaysB != homepage_options_form.cleaned_data['dayDeltaB']):
+                user_profile.summaryWorkloadDaysA = homepage_options_form.cleaned_data['dayDeltaA']
+                user_profile.summaryWorkloadDaysB = homepage_options_form.cleaned_data['dayDeltaB']
 
-            user_profile.save()
+                user_profile.save()
+                message = message + "Home page user options have been updated.<br />"
+            else:
+                message = message + "Home page user options were not changed.<br />"
 
             if request.user.groups.filter(name="admingroup"):
-                if homepage_options_form.cleaned_data['enable_workload_stats'] != display_workload_stats:
+                if (homepage_options_form.cleaned_data['enable_workload_stats'] != display_workload_stats) or \
+                   (homepage_options_form.cleaned_data['match_on_device_observer_uid'] != match_on_device_observer_uid):
                     homepage_admin_settings = HomePageAdminSettings.objects.all()[0]
-                    homepage_admin_settings.enable_workload_stats = homepage_options_form.cleaned_data['enable_workload_stats']
+                    homepage_admin_settings.enable_workload_stats = \
+                        homepage_options_form.cleaned_data['enable_workload_stats']
+                    homepage_admin_settings.match_on_device_observer_uid = \
+                        homepage_options_form.cleaned_data['match_on_device_observer_uid']
                     homepage_admin_settings.save()
-                    if homepage_options_form.cleaned_data['enable_workload_stats']:
-                        messages.info(request, "Display of workload stats enabled")
-                    else:
-                        messages.info(request, "Display of workload stats disabled")
+                    message = message + "Home page general options have been updated."
+                else:
+                    message = message + "Home page general options were not changed."
 
-        messages.success(request, "Home page options have been updated")
+        messages.success(request, mark_safe(message))
+
         return HttpResponseRedirect(reverse_lazy('homepage_options_view'))
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
@@ -3108,7 +3127,8 @@ def homepage_options_view(request):
 
     homepage_form_data = {'dayDeltaA': user_profile.summaryWorkloadDaysA,
                           'dayDeltaB': user_profile.summaryWorkloadDaysB,
-                          'enable_workload_stats': display_workload_stats}
+                          'enable_workload_stats': display_workload_stats,
+                          'match_on_device_observer_uid': match_on_device_observer_uid}
 
     homepage_options_form = HomepageOptionsForm(homepage_form_data)
 
