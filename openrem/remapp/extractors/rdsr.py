@@ -1107,8 +1107,11 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     if created:
         # If we have a device_observer_uid and it is desired, merge this "new" device with an existing one based on the
         # device observer uid.
-        match_on_device_observer_uid = HomePageAdminSettings.objects.values_list(
-            'match_on_device_observer_uid', flat=True)[0]
+        try:
+            match_on_device_observer_uid = HomePageAdminSettings.objects.values_list(
+                'match_on_device_observer_uid', flat=True)[0]
+        except IndexError:
+            match_on_device_observer_uid = False
         if match_on_device_observer_uid and device_observer_uid:
             matched_equip_display_name = UniqueEquipmentNames.objects.filter(
                 device_observer_uid=device_observer_uid).order_by('id')
