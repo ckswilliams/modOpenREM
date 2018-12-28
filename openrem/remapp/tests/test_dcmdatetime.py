@@ -161,6 +161,7 @@ class DCMDateTimeConversionTests(TestCase):
         date2_bad = make_dcm_date_range(older_date, invalid_date_2)
         both_bad = make_dcm_date_range(invalid_date_1, invalid_date_2)
         single_bad = make_dcm_date(invalid_date_3)
+        date1_only = make_dcm_date_range(older_date, None)
 
         date_today = make_dcm_date(datetime.date.today())
 
@@ -172,5 +173,6 @@ class DCMDateTimeConversionTests(TestCase):
         self.assertEqual(date2_bad, "20120314-{0}".format(date_today))
         self.assertIsNone(both_bad)
         self.assertIsNone(single_bad)
+        self.assertEqual(date1_only, "20120314-{0}".format(date_today))
 
 
