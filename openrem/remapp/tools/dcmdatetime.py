@@ -144,15 +144,16 @@ def make_dcm_date(pythondate):
         return None
 
 
-def make_dcm_date_range(date1=None, date2=None):
-    """Given one or two dates of the form yyyy-mm-dd, return a DICOM date range
-    :param: date1, date2:   One or two yyyy-mm-dd dates
-    :type date1, date2:     String
-    :returns:               DICOM date range as string
+def make_dcm_date_range(date1=None, date2=None, date_single=False):
+    """Given one or two dates of the form yyyy-mm-dd, return a DICOM date range.
+
+    :param date1: Date from, string, yyyy-mm-dd, 1900-01-01 if None or badly formatted
+    :param date2: Date until, string, yyyy-mm-dd, today if None or badly formatted
+    :param date_single: Single date range, bool, default False
+    :return: DICOM formatted date range or single date
     """
     import datetime
 
-    date_single = bool(date2 is None)
     date1_python = None
     date2_python = None
 

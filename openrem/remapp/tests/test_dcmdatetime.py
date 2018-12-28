@@ -155,13 +155,14 @@ class DCMDateTimeConversionTests(TestCase):
 
         standard = make_dcm_date_range(older_date, newer_date)
         reversed_standard = make_dcm_date_range(newer_date, older_date)
-        single = make_dcm_date_range(older_date)
+        single = make_dcm_date_range(date1=older_date, date_single=True)
         equal = make_dcm_date_range(newer_date, newer_date)
         date1_bad = make_dcm_date_range(invalid_date_1, newer_date)
         date2_bad = make_dcm_date_range(older_date, invalid_date_2)
         both_bad = make_dcm_date_range(invalid_date_1, invalid_date_2)
         single_bad = make_dcm_date(invalid_date_3)
         date1_only = make_dcm_date_range(older_date, None)
+        date2_only = make_dcm_date_range(None, newer_date)
 
         date_today = make_dcm_date(datetime.date.today())
 
@@ -174,5 +175,6 @@ class DCMDateTimeConversionTests(TestCase):
         self.assertIsNone(both_bad)
         self.assertIsNone(single_bad)
         self.assertEqual(date1_only, "20120314-{0}".format(date_today))
+        self.assertEqual(date2_only, "19000101-20140523")
 
 
