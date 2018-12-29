@@ -155,7 +155,7 @@ class DCMDateTimeConversionTests(TestCase):
 
         standard = make_dcm_date_range(older_date, newer_date)
         reversed_standard = make_dcm_date_range(newer_date, older_date)
-        single = make_dcm_date_range(date1=older_date, date_single=True)
+        single = make_dcm_date_range(date1=older_date, single_date=True)
         equal = make_dcm_date_range(newer_date, newer_date)
         date1_bad = make_dcm_date_range(invalid_date_1, newer_date)
         date2_bad = make_dcm_date_range(older_date, invalid_date_2)

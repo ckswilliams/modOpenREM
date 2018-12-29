@@ -29,6 +29,7 @@
 
 """
 
+import datetime
 
 def get_date(tag, dataset):
     """Get DICOM date string and return Python date.
@@ -79,7 +80,6 @@ def make_date(dicomdate):
     :type dicomdate:    str.
     :returns:           Python date value
     """
-    import datetime
     try:
         return datetime.datetime.strptime(dicomdate, "%Y%m%d")
     except ValueError:
@@ -93,14 +93,13 @@ def make_time(dicomtime):
     :type dicomdate:    str.
     :returns:           Python time value
     """
-    import datetime
     if '+' in dicomtime or '-' in dicomtime:
         import re
         dicomtime = re.split('\+|-', dicomtime)[0]
     try:
         if '.' in dicomtime:
-            return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
-        return datetime.datetime.strptime(dicomtime, "%H%M%S")
+            return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")  # should be .time()
+        return datetime.datetime.strptime(dicomtime, "%H%M%S")  # should be .time()
     except ValueError:
         return None
 
@@ -134,7 +133,6 @@ def make_dcm_date(pythondate):
     :type pythondate:   Python date object
     :returns:           DICOM date as string
     """
-    import datetime
     if not isinstance(pythondate, datetime.date):
         return None
 
@@ -144,15 +142,14 @@ def make_dcm_date(pythondate):
         return None
 
 
-def make_dcm_date_range(date1=None, date2=None, date_single=False):
+def make_dcm_date_range(date1=None, date2=None, single_date=False):
     """Given one or two dates of the form yyyy-mm-dd, return a DICOM date range.
 
     :param date1: Date from, string, yyyy-mm-dd, 1900-01-01 if None or badly formatted
     :param date2: Date until, string, yyyy-mm-dd, today if None or badly formatted
-    :param date_single: Single date range, bool, default False
+    :param single_date: Single date range, bool, default False
     :return: DICOM formatted date range or single date
     """
-    import datetime
 
     date1_python = None
     date2_python = None
@@ -169,9 +166,9 @@ def make_dcm_date_range(date1=None, date2=None, date_single=False):
             date2_python = None
 
     if date1_python == date2_python:
-        date_single = True
+        single_date = True
 
-    if date_single and date1_python:
+    if single_date and date1_python:
         return make_dcm_date(date1_python)
 
     if date1_python and date2_python:
@@ -181,7 +178,7 @@ def make_dcm_date_range(date1=None, date2=None, date_single=False):
         elif date1_python > date2_python:
             date_until = make_dcm_date(date1_python)
             date_from = make_dcm_date(date2_python)
-    elif date1_python and not date_single:
+    elif date1_python and not single_date:
         date_from = make_dcm_date(date1_python)
         date_until = make_dcm_date(datetime.date.today())
     elif date2_python:
@@ -191,3 +188,51 @@ def make_dcm_date_range(date1=None, date2=None, date_single=False):
         return None
 
     return '{0}-{1}'.format(date_from, date_until)
+
+
+def make_dcm_time(python_time):
+    """Return DICOM formatted time without seconds from python time
+
+    :param python_time: Python datetime.time object
+    :return: string, %H%M
+    """
+    if not isinstance(python_time, datetime.time):
+        return None
+
+    try:
+        return python_time.strftime("%H%M")
+    except ValueError:
+        return None
+
+
+def make_dcm_time_range(time1=None, time2=None):
+    """Given one or two times of the format 0123, return DICOM formatted time range (without seconds)
+
+    :param time1: time, format 0123, 0000 if None
+    :param time2: time, format 0123, 2359 if None
+    :return: time range, string, format 0123-1234
+    """
+
+    time1_python = None
+    time2_python = None
+
+    if time1:
+        try:
+            time1_python = datetime.datetime.strptime(time1, '%H%M').time()
+        except ValueError:
+            time1_python = None
+    if time2:
+        try:
+            time2_python = datetime.datetime.strptime(time2, '%H%M').time()
+        except ValueError:
+            time2_python = None
+
+    if time1_python and time2_python:
+        if time1_python < time2_python:
+            return "{0}-{1}".format(make_dcm_time(time1_python), make_dcm_time(time2_python))
+        else:
+            return "{1}-{0}".format(make_dcm_time(time1_python), make_dcm_time(time2_python))
+    elif time1_python:
+        return "{0}-2359".format(make_dcm_time(time1_python))
+    elif time2_python:
+        return "0000-{0}".format(make_dcm_time(time2_python))
