@@ -580,7 +580,7 @@ def _query_study(assoc, d, query, query_id):
     d.StudyDescription = ''
     d.StudyID = ''
     d.StudyInstanceUID = ''
-    d.StudyTime = ''
+    # d.StudyTime = ''
     d.PatientAge = ''
     d.PatientBirthDate = ''
     d.NumberOfStudyRelatedSeries = ''
@@ -588,6 +588,7 @@ def _query_study(assoc, d, query, query_id):
     d.SpecificCharacterSet = ''
 
     logger.debug(u'{0}: Study level association requested'.format(query_id))
+    logger.debug(u'{0}: Study level query is {1}'.format(query_id, d))
     st = assoc.StudyRootFindSOPClass.SCU(d, 1)
     logger.debug(u'{0}: _query_study done with status {1}'.format(query_id, st))
 
@@ -607,6 +608,8 @@ def _query_study(assoc, d, query, query_id):
         if not ss[1]:
             continue
         ss[1].decode()
+        # Line below commented out as it will print patient information to the log file
+        # logger.debug(u'{0}: study level response is {1}'.format(query_id, ss[1]))
         rspno += 1
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
         rsp.query_id = query_id
