@@ -148,26 +148,20 @@
     <th id="num_tasks" onclick="updateSort(this.id, 'user_click');">Tasks being processed</th>
   </tr>
   {% for queue in other_queues %}
-    {% if queue.name == "default" %}
-      <tr class="success">
-        <td><b>{{ queue.name }}</b></td>
-        <td><b>{{ queue.messages_ready }}</b></td>
-        {% else %}
-      <tr>
+    <tr>
       <td>{{ queue.name }}</td>
       <td>{{ queue.messages_ready }}</td>
-    {% endif %}
-  <td>
-    {% if queue.messages_ready > 0 %}
-      <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge queue</a>
-    {% elif queue.messages == 0 %}
-      <a class="btn btn-warning" href="{% url 'rabbitmq_delete' queue=queue.name %}" role=button">Delete queue</a>
-    {% else %}
-      <a class="btn btn-default" disabled="disabled">Purge</a>
-    {% endif %}
-  </td>
-  <td>{{ queue.messages_unacknowledged }}</td>
-  </tr>
+      <td>
+        {% if queue.messages_ready > 0 %}
+          <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=queue.name %}" role="button">Purge queue</a>
+        {% elif queue.messages == 0 %}
+          <a class="btn btn-warning" href="{% url 'rabbitmq_delete' queue=queue.name %}" role=button">Delete queue</a>
+        {% else %}
+         <a class="btn btn-default" disabled="disabled">Purge</a>
+        {% endif %}
+      </td>
+      <td>{{ queue.messages_unacknowledged }}</td>
+    </tr>
   {% endfor %}
 </table>
 
