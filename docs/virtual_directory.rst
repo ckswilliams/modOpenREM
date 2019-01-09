@@ -19,6 +19,26 @@ Django should know in what virtual directory you are running OpenREM. Perform th
     - In the Openrem ``local_settings.py`` file, located in the openremproject directory
       (e.g. ``C:\Python27\Lib\site-packages\openrem\oprenremproject\local_settings.py``) find the ``VIRTUAL_DIRECTORY`` variable
     - Set this variable to the desired virtual directory
+    - Add under this line the following code to set the ``STATIC_URL`` variable
+
+      .. code:: python
+
+        STATIC_URL = '/' + os.path.join(VIRTUAL_DIRECTORY, STATIC_URL.lstrip('/'))
+
+    - In order to make this command work ``os`` has to be imported, add in ``local_settings.py`` as third line
+
+      .. code:: python
+
+        import os
+
+    - Instead of the above two changes, you can also put a hard-coded STATIC_URL as follows
+
+      .. code:: python
+
+        STATIC_URL = '/VIRTUAL_DIRECTORY/static/'
+
+     (replace ``VIRTUAL_DIRECTORY`` by the actual value):
+
 
    ..  Note::
      - Take care the virtual directory name ends with a slash (/)
@@ -42,10 +62,7 @@ The static reverse.py file should be updated in order to change the URLs in the 
 
         .. code:: python
 
-          try:
-              urlconf = settings.ROOT_URLCONF
-          except AttributeError:
-              urlconf = None
+          urlconf = getattr(settings, 'ROOT_URLCONF', None)
           default_urlresolver = get_resolver(urlconf)
 
       - Save the file

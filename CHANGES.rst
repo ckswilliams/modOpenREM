@@ -2,6 +2,10 @@
 OpenREM version history
 =======================
 
+0.9.0b6??
+--------------------
+* `#714`_  Documentation: Add missing documentation about changing STATIC_URL if serving OpenREM in a virtual directory
+
 0.9.0b5 (2018-12-21)
 --------------------
 * `#711`_  Query-retrieve: fixed problem for zero image series when using -toshiba flag
