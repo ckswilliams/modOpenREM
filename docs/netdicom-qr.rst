@@ -21,10 +21,10 @@ Query-retrieve using the web interface
 
    Figure 1: Import Query-Retrieve menu
 
-* On the Imports menu, select ``Query remote server`` - see figure 1. If the menu isn't there, you need to check your user permissions
-  - see :ref:`user-settings` for details.
+* On the Imports menu, select ``Query remote server`` - see figure 1. If the menu isn't there, you need to check your
+  user permissions -- see :ref:`user-settings` for details.
 * Each configured query-retrieve node and each local store node is automatically tested to make sure they respond to a
-  DICOM echo - the results are presented at the top of the page. See fingure 2 for an example.
+  DICOM echo - the results are presented at the top of the page. See figure 2 for an example.
 
 .. figure:: img/QRstatuses.png
    :figwidth: 50%
@@ -87,56 +87,56 @@ In a command window/shell, ``python openrem_qr.py -h`` should present you with t
 
 .. sourcecode:: console
 
-   usage: openrem_qr.py [-h] [-ct] [-mg] [-fl] [-dx] [-f yyyy-mm-dd]
-                        [-t yyyy-mm-dd] [-e string] [-i string] [-sne string]
-                        [-sni string] [-toshiba] [-sr] [-dup]
-                        qr_id store_id
+    usage: openrem_qr.py [-h] [-ct] [-mg] [-fl] [-dx] [-f yyyy-mm-dd]
+                         [-t yyyy-mm-dd] [-sd yyyy-mm-dd] [-tf hhmm] [-tt hhmm]
+                         [-e string] [-i string] [-sne string] [-sni string]
+                         [-toshiba] [-sr] [-dup]
+                         qr_id store_id
 
-   Query remote server and retrieve to OpenREM
+    Query remote server and retrieve to OpenREM
 
-   positional arguments:
-     qr_id                 Database ID of the remote QR node
-     store_id              Database ID of the local store node
+    positional arguments:
+      qr_id                 Database ID of the remote QR node
+      store_id              Database ID of the local store node
 
-   optional arguments:
-     -h, --help            show this help message and exit
-     -ct                   Query for CT studies. Do not use with -sr
-     -mg                   Query for mammography studies. Do not use with -sr
-     -fl                   Query for fluoroscopy studies. Do not use with -sr
-     -dx                   Query for planar X-ray studies. Do not use with -sr
-     -f yyyy-mm-dd, --dfrom yyyy-mm-dd
-                           Date from, format yyyy-mm-dd
-     -t yyyy-mm-dd, --duntil yyyy-mm-dd
-                           Date until, format yyyy-mm-dd
-     -e string, --desc_exclude string
-                           Terms to exclude in study description, comma
-                           separated, quote whole string
-     -i string, --desc_include string
-                           Terms that must be included in study description,
-                           comma separated, quote whole string
-     -sne string, --stationname_exclude string
-                           Terms to exclude in station name, comma separated,
-                           quote whole string
-     -sni string, --stationname_include string
-                           Terms to include in station name, comma separated,
-                           quote whole string
-     -toshiba              Advanced: Attempt to retrieve CT dose summary objects
-                           and one image from each series
-     -sr                   Advanced: Query for structured report only studies.
-                           Cannot be used with -ct, -mg, -fl, -dx
-     -dup                  Advanced: Retrieve duplicates (studies that are
-                           already in database)
+    optional arguments:
+      -h, --help            show this help message and exit
+      -ct                   Query for CT studies. Cannot be used with with -sr
+      -mg                   Query for mammography studies. Cannot be used with with -sr
+      -fl                   Query for fluoroscopy studies. Cannot be used with with -sr
+      -dx                   Query for planar X-ray studies. Cannot be used with with -sr
+      -f yyyy-mm-dd, --dfrom yyyy-mm-dd
+                            Date from, format yyyy-mm-dd. Cannot be used with --single_date
+      -t yyyy-mm-dd, --duntil yyyy-mm-dd
+                            Date until, format yyyy-mm-dd. Cannot be used with --single_date
+      -sd yyyy-mm-dd, --single_date yyyy-mm-dd
+                            Date, format yyy-mm-dd. Cannot be used with --dfrom or --duntil
+      -tf hhmm, --tfrom hhmm
+                            Time from, format hhmm. Requires --single_date.
+      -tt hhmm, --tuntil hhmm
+                            Time until, format hhmm. Requires --single_date.
+      -e string, --desc_exclude string
+                            Terms to exclude in study description, comma separated, quote whole string
+      -i string, --desc_include string
+                            Terms that must be included in study description, comma separated, quote whole string
+      -sne string, --stationname_exclude string
+                            Terms to exclude in station name, comma separated, quote whole string
+      -sni string, --stationname_include string
+                            Terms to include in station name, comma separated, quote whole string
+      -toshiba              Advanced: Attempt to retrieve CT dose summary objects and one image from each series
+      -sr                   Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx
+      -dup                  Advanced: Retrieve duplicates (objects that have been processed before)
 
-As an example, if you wanted to query the PACS for DX images on the 5th April 2010 with any study descriptions including
-``imported`` excluded, first you need to know the database IDs of the remote node and the local node you want the images
-sent to. To find these, go to the :doc:`netdicom-nodes` page where the database ID is listed among the other details for
-each node.
+As an example, if you wanted to query the PACS for DX images on the 5th and 6th April 2010 with any study descriptions
+including ``imported`` excluded, first you need to know the database IDs of the remote node and the local node you want
+the images sent to. To find these, go to the :doc:`netdicom-nodes` page where the database ID is listed among the other
+details for each node.
 
 Assuming the PACS database ID is 2, and the store node ID is 1, the command would look something like:
 
 .. sourcecode:: console
 
-    python openrem_qr.py 2 1 -dx -f 2010-04-05 -t 2010-04-05 -e "imported"
+    python openrem_qr.py 2 1 -dx -f 2010-04-05 -t 2010-04-06 -e "imported"
 
 If you want to do this regularly to catch new studies, you might like to use a script something like this on linux:
 
@@ -144,7 +144,7 @@ If you want to do this regularly to catch new studies, you might like to use a s
 
     #!/bin/bash
 
-    . /var/openrem/bin/activate  # activate virtualenv if you are using one, modify or delete this line
+    . /var/dose/veopenrem/bin/activate  # activate virtualenv if you are using one, modify or delete this line
 
     ONEHOURAGO=$(date -d "1 hour ago" "+%Y-%m-%d")
 
@@ -168,6 +168,31 @@ example PowerShell script is shown below:
 
 The above PowerShell script could be run on a regular basis by adding a task to the Windows ``Task Scheduler`` that
 executes the ``powershell`` program with an argument of ``-file C:\\path\\to\\script.ps1``.
+
+Querying with time range
+========================
+
+*New to OpenREM 0.9.0*
+
+It is now possible to query for studies in a time window when using query-retrieve from the command line (web interface
+version will be introduced later). This can be particularly useful where PACS query responses are limited or null if the
+query matches too many studies.
+
+Using the ``--tfrom``/``-tf`` and/or the ``--tuntil``/``tt`` arguments are only allowed if ``--single_date``/``-sd``
+argument is used.
+
+Note: ``-sd 2018-03-19`` is the same as using ``-f 2018-03-19 -t 2018-03-19``, and can be used without the time
+arguments.
+
+``-tf`` used without ``-tt`` will search from ``tf`` until 23.59 that day. ``-tt`` used without ``-tf`` will search
+from 00.00 to ``tt`` that day. ``-tf`` and ``-tt`` used together will search from ``tf`` to ``tt``. For example, to
+search for CT from 12 noon to 3pm on 19th March 2018, using remote QR node database ID 2 and local store database ID 1:
+
+.. sourcecode:: bash
+
+    python openrem_qr.py 2 1 -ct -sd 2018-03-19 -tf 1200 -tt 1500
+
+
 
 *********************
 Query filtering logic
