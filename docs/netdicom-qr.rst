@@ -116,15 +116,19 @@ In a command window/shell, ``python openrem_qr.py -h`` should present you with t
       -tt hhmm, --tuntil hhmm
                             Time until, format hhmm. Requires --single_date.
       -e string, --desc_exclude string
-                            Terms to exclude in study description, comma separated, quote whole string
+                            Terms to exclude in study description, comma separated, quote whole
+                            string
       -i string, --desc_include string
-                            Terms that must be included in study description, comma separated, quote whole string
+                            Terms that must be included in study description, comma separated,
+                            quote whole string
       -sne string, --stationname_exclude string
                             Terms to exclude in station name, comma separated, quote whole string
       -sni string, --stationname_include string
                             Terms to include in station name, comma separated, quote whole string
-      -toshiba              Advanced: Attempt to retrieve CT dose summary objects and one image from each series
-      -sr                   Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx
+      -toshiba              Advanced: Attempt to retrieve CT dose summary objects and one image
+                            from each series
+      -sr                   Advanced: Use if store has RDSRs only, no images. Cannot be used with
+                            -ct, -mg, -fl, -dx
       -dup                  Advanced: Retrieve duplicates (objects that have been processed before)
 
 As an example, if you wanted to query the PACS for DX images on the 5th and 6th April 2010 with any study descriptions
@@ -178,7 +182,7 @@ It is now possible to query for studies in a time window when using query-retrie
 version will be introduced later). This can be particularly useful where PACS query responses are limited or null if the
 query matches too many studies.
 
-Using the ``--tfrom``/``-tf`` and/or the ``--tuntil``/``tt`` arguments are only allowed if ``--single_date``/``-sd``
+Using the ``--tfrom``/``-tf`` and/or the ``--tuntil``/``-tt`` arguments are only allowed if ``--single_date``/``-sd``
 argument is used.
 
 Note: ``-sd 2018-03-19`` is the same as using ``-f 2018-03-19 -t 2018-03-19``, and can be used without the time
