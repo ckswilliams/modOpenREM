@@ -188,9 +188,12 @@ argument is used.
 Note: ``-sd 2018-03-19`` is the same as using ``-f 2018-03-19 -t 2018-03-19``, and can be used without the time
 arguments.
 
-``-tf`` used without ``-tt`` will search from ``tf`` until 23.59 that day. ``-tt`` used without ``-tf`` will search
-from 00.00 to ``tt`` that day. ``-tf`` and ``-tt`` used together will search from ``tf`` to ``tt``. For example, to
-search for CT from 12 noon to 3pm on 19th March 2018, using remote QR node database ID 2 and local store database ID 1:
+* ``-tf`` used without ``-tt`` will search from ``tf`` until 23.59 that day.
+* ``-tt`` used without ``-tf`` will search from 00.00 to ``tt`` that day.
+* ``-tf`` and ``-tt`` used together will search from ``tf`` to ``tt``.
+
+For example, to search for CT from 12 noon to 3pm on 19th March 2018, using remote QR node database ID 2 and local store
+database ID 1:
 
 .. sourcecode:: bash
 
