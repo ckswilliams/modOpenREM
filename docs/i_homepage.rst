@@ -40,3 +40,16 @@ disables the display of workload data on the home page (figure 3).
    :alt: The home page options admin form
 
    Figure 3: The home page options admin form
+
+Automatic setting of display name for the same system
+=====================================================
+
+On the home page options page it is also possible to set if a system that is
+recognised by its uniquely defined ``Device Observer UID`` should be set to the
+same Display Name as is already set by the user. This option is only available
+for an OpenREM administrator. This setting will set the display name also if a
+change is observered in one of the properties that OpenREM normally looks at.
+So in this way the same device with new properties is automatically merged on
+the home page. This is especially convenient if one or more properties
+change regulary. If you want to observe if systems got an update (Software
+Version change), don't tick this option.

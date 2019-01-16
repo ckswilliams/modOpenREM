@@ -133,8 +133,10 @@ class HomePageAdminSettings(SingletonModel):
     """
     Table to store home page settings
     """
-    enable_workload_stats = models.BooleanField(default=False, verbose_name="Enable calculation and display of workload stats on home page?")
-    match_on_device_observer_uid = models.BooleanField(default=False, verbose_name="Set display name automatically based on device UID?")
+    enable_workload_stats = models.BooleanField(
+        default=False, verbose_name="Enable calculation and display of workload stats on home page?")
+    match_on_device_observer_uid = models.BooleanField(
+        default=False, verbose_name="Set display name automatically based on device UID?")
 
     def get_absolute_url(self):
         return '/admin/homepagesettings/1/'
