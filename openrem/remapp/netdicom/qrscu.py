@@ -1157,8 +1157,11 @@ def movescu(query_id):
     logger.info(u"Move complete")
 
     logger.debug(u"Query_id {0}: Releasing move association".format(query_id))
-    assoc.Release(0)
-    logger.info(u"Query_id {0}: Move association released".format(query_id))
+    try:
+        assoc.Release(0)
+        logger.info(u"Query_id {0}: Move association released".format(query_id))
+    except AttributeError:
+        logger.info(u"Query_id {0}: Could not release Move association due to an AttributeError: perhaps no studies were present".format(query_id))
 
     my_ae.Quit()
     logger.debug(u"Query_id {0}: Move AE my_ae quit".format(query_id))
