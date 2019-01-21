@@ -1173,10 +1173,10 @@ def _create_parser():
     parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
     parser.add_argument('qr_id', type=int, help='Database ID of the remote QR node')
     parser.add_argument('store_id', type=int, help='Database ID of the local store node')
-    parser.add_argument('-ct', action="store_true", help='Query for CT studies. Cannot be used with with -sr')
-    parser.add_argument('-mg', action="store_true", help='Query for mammography studies. Cannot be used with with -sr')
-    parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies. Cannot be used with with -sr')
-    parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies. Cannot be used with with -sr')
+    parser.add_argument('-ct', action="store_true", help='Query for CT studies. Cannot be used with -sr')
+    parser.add_argument('-mg', action="store_true", help='Query for mammography studies. Cannot be used with -sr')
+    parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies. Cannot be used with -sr')
+    parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies. Cannot be used with -sr')
     parser.add_argument('-f', '--dfrom', help='Date from, format yyyy-mm-dd. Cannot be used with --single_date',
                         metavar='yyyy-mm-dd')
     parser.add_argument('-t', '--duntil', help='Date until, format yyyy-mm-dd. Cannot be used with --single_date',

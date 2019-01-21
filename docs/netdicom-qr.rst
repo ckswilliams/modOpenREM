@@ -101,10 +101,10 @@ In a command window/shell, ``python openrem_qr.py -h`` should present you with t
 
     optional arguments:
       -h, --help            show this help message and exit
-      -ct                   Query for CT studies. Cannot be used with with -sr
-      -mg                   Query for mammography studies. Cannot be used with with -sr
-      -fl                   Query for fluoroscopy studies. Cannot be used with with -sr
-      -dx                   Query for planar X-ray studies. Cannot be used with with -sr
+      -ct                   Query for CT studies. Cannot be used with -sr
+      -mg                   Query for mammography studies. Cannot be used with -sr
+      -fl                   Query for fluoroscopy studies. Cannot be used with -sr
+      -dx                   Query for planar X-ray studies. Cannot be used with -sr
       -f yyyy-mm-dd, --dfrom yyyy-mm-dd
                             Date from, format yyyy-mm-dd. Cannot be used with --single_date
       -t yyyy-mm-dd, --duntil yyyy-mm-dd
