@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.0b6 (2019-01-xx)
 --------------------
+* `#719`_  Interface: Fixed hardcoded link in template rffiltered.html
 * `#716`_  Task manager: removed assumption of queue name from RabbitMQ management interface
 * `#714`_  Documentation: add missing documentation about changing STATIC_URL if serving OpenREM in a virtual directory
 * `#711`_  Query-retrieve: fixed problem for zero image series when using -toshiba flag
