@@ -2,13 +2,12 @@
 OpenREM version history
 =======================
 
-0.9.0b6??
+0.9.0b6 (2019-01-xx)
 --------------------
+* `#719`_  Interface: Fixed hardcoded link in template rffiltered.html
 * `#717`_  Query-retrieve: fixed problem where an error was thrown if association is None
-* `#714`_  Documentation: Add missing documentation about changing STATIC_URL if serving OpenREM in a virtual directory
-
-0.9.0b5 (2018-12-21)
---------------------
+* `#716`_  Task manager: removed assumption of queue name from RabbitMQ management interface
+* `#714`_  Documentation: add missing documentation about changing STATIC_URL if serving OpenREM in a virtual directory
 * `#711`_  Query-retrieve: fixed problem for zero image series when using -toshiba flag
 * `#710`_  Interface: Celery and RabbitMQ tables can now be sorted by clicking on column headings
 * `#708`_  Query-retrieve: fixed problem for empty Series Number
@@ -47,6 +46,7 @@ OpenREM version history
 * `#659`_  Interface: made the latest study field in summary tables on the home page sort correctly
 * `#658`_  Interface: added display of workload stats in home page modality tables
 * `#637`_  Administration: added facility to list and purge RabbitMQ queues
+* `#554`_  Query-retrieve: added time as matching argument for command line use
 * `#479`_  Administration: added facility to list and delete failed import studies
 
 0.8.1 (2018-09-16)

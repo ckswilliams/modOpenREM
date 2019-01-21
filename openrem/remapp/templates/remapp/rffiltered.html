@@ -225,7 +225,7 @@
             {% if alertLevels.show_accum_dose_over_delta_weeks %}
                 {% with accum_set|first as first_accum_set %}
                     <td>
-                        <a href="/openrem/rf/{{ exam.id }}/">
+                        <a href="{% url 'rf_detail_view' pk=exam.id %}">
                           {% with accum_integrated=first_accum_set.accumintegratedprojradiogdose_set.get %}
                             {% if accum_integrated.total_dap_delta_gym2_to_cgycm2 >= alertLevels.alert_total_dap_rf %}
                                 <strong style="color: red;">{{ accum_integrated.total_dap_delta_gym2_to_cgycm2|floatformat:1 }}</strong>
@@ -240,7 +240,7 @@
                         </a>
                     </td>
                     <td>
-                        <a href="/openrem/rf/{{ exam.id }}/">
+                        <a href="{% url 'rf_detail_view' pk=exam.id %}">
                           {% with accum_integrated=first_accum_set.accumintegratedprojradiogdose_set.get %}
                             {% if accum_integrated.dose_rp_total_over_delta_weeks >= alertLevels.alert_total_rp_dose_rf %}
                                 <strong style="color: red;">{{ accum_integrated.dose_rp_total_over_delta_weeks | sigdig }} </strong>
