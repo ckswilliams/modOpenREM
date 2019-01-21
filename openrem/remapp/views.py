@@ -3217,6 +3217,7 @@ def rabbitmq_admin(request):
 def rabbitmq_queues(request):
     """AJAX function to get current queue details"""
     import requests
+    from openremproject import settings
 
     if request.is_ajax() and request.user.groups.filter(name="admingroup"):
         try:
@@ -3234,7 +3235,7 @@ def rabbitmq_queues(request):
             flower_queues = []
             other_queues = []
             for queue in queues:
-                if queue['name'] == u'default':
+                if queue['name'] == settings.CELERY_DEFAULT_QUEUE:
                     default_queue = queue
                 elif u'celery.pidbox' in queue['name']:
                     celery_queue = queue
