@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.0b6 (2019-01-xx)
 --------------------
+* `#716`_  Task manager: removed assumption of queue name from RabbitMQ management interface
 * `#714`_  Documentation: add missing documentation about changing STATIC_URL if serving OpenREM in a virtual directory
 * `#711`_  Query-retrieve: fixed problem for zero image series when using -toshiba flag
 * `#710`_  Interface: Celery and RabbitMQ tables can now be sorted by clicking on column headings
