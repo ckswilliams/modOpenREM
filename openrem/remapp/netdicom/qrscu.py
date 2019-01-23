@@ -707,7 +707,7 @@ def _query_for_each_modality(all_mods, query, d, assoc):
                         else:  # modalities in study is empty
                             modalities_returned = False
                             if query.qr_scp_fk.use_modality_tag:
-                                logger.debug(u"{0} Remote node doesn't support ModalitiesInStudy, but is configured to"
+                                logger.debug(u"{0} Remote node doesn't support ModalitiesInStudy, but is configured to "
                                              u"'use_modality_tags' so assume it has filtered and query again with next "
                                              u"modality".format(query_id))
                                 break
