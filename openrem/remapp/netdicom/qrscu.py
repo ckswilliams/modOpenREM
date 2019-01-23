@@ -707,7 +707,6 @@ def _query_for_each_modality(all_mods, query, d, assoc):
                         else:  # modalities in study is empty
                             modalities_returned = False
                             if query.qr_scp_fk.use_modality_tag:
-                                # Non-conformant system doesn't return ModalitiesInStudy but does filter!
                                 logger.debug(u"{)} Remote node doesn't support ModalitiesInStudy, but is configured to"
                                              u"'use_modality_tags' so assume has filtered and query again with next "
                                              u"modality").format(query_id)
