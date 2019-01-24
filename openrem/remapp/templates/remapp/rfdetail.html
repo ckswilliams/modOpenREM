@@ -62,7 +62,7 @@
                 <li>Operator(s): {{ study.operator_name }}</li>
                 <li>Test patient indicators? {{ study.patientmoduleattr_set.get.not_patient_indicator }}</li>
                 <li style="list-style-type: none;">
-                    <table class="table table-condensed table-bordered small table-indent">
+                    <table class="table table-condensed table-bordered small">
                         <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th><th>Total duration (s)</th>
                         {% for irr_type in study_totals %}
                             <tr>
