@@ -709,6 +709,11 @@ def _query_for_each_modality(all_mods, query, d, assoc):
                                 break  # This indicates that there was no modality match, so we have everything already
                         else:  # modalities in study is empty
                             modalities_returned = False
+                            if query.qr_scp_fk.use_modality_tag:
+                                logger.debug(u"{0} Remote node doesn't support ModalitiesInStudy, but is configured to "
+                                             u"'use_modality_tags' so assume it has filtered and query again with next "
+                                             u"modality".format(query_id))
+                                break
                             # ModalitiesInStudy not supported, therefore assume not matched on key
                             modality_matching = False
                             logger.debug(u"{0} Remote node doesn't support ModalitiesInStudy, assume we have "
@@ -927,7 +932,7 @@ def qrscu(
             _generate_modalities_in_study(rsp, query_id)
     logger.debug(u"{0} Series level query complete.".format(query_id))
 
-    if not modality_matching:
+    if (not modality_matching) or qr_scp.use_modality_tag:
         before_not_modality_matching = study_numbers['current']
         mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
         logger.debug(u"{1} mods in study are: {0}".format(study_rsp.values('modalities_in_study'), query_id))
