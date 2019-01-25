@@ -4,13 +4,14 @@ OpenREM version history
 
 0.9.0b6 (2019-01-xx)
 --------------------
-* `#720`_  Interface: Fixed small overlap between skin dose map and irradiation type table
-* `#719`_  Interface: Fixed hardcoded link in template rffiltered.html
+* `#720`_  Interface: fixed small overlap between skin dose map and irradiation type table
+* `#719`_  Interface: fixed hardcoded link in template rffiltered.html
 * `#717`_  Query-retrieve: fixed problem where an error was thrown if association is None
 * `#716`_  Task manager: removed assumption of queue name from RabbitMQ management interface
 * `#714`_  Documentation: add missing documentation about changing STATIC_URL if serving OpenREM in a virtual directory
 * `#711`_  Query-retrieve: fixed problem for zero image series when using -toshiba flag
 * `#710`_  Interface: Celery and RabbitMQ tables can now be sorted by clicking on column headings
+* `#709`_  Query-retrieve: corrected query logic for multiple modalities using `#627`_ Modality tag at study level fix
 * `#708`_  Query-retrieve: fixed problem for empty Series Number
 * `#707`_  Interface: fixed issue where sigdig returned an error if it was passed an empty string
 * `#706`_  Exports: fixed problem where filters were not respected for radiographic exports
