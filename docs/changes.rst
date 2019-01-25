@@ -49,6 +49,7 @@ OpenREM version history
 * `#658`_  Interface: added display of workload stats in home page modality tables
 * `#637`_  Administration: added facility to list and purge RabbitMQ queues
 * `#554`_  Query-retrieve: added time as matching argument for command line use
+* `#461`_  Web server: enable OpenREM to be hosted from a non-root folder/virtual-directory (via `#667`_)
 * `#479`_  Administration: added facility to list and delete failed import studies
 
 0.8.1 (2018-09-16)
