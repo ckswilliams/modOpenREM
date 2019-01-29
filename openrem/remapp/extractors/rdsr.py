@@ -1114,12 +1114,15 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
             match_on_device_observer_uid = False
         if match_on_device_observer_uid and device_observer_uid:
             matched_equip_display_name = UniqueEquipmentNames.objects.filter(
-                device_observer_uid=device_observer_uid).order_by('id')
-            # we don't want the just inserted UniqueEquipmentName, so there should be more than 1 UniqueEquipmentName
+                device_observer_uid=device_observer_uid)
+            # We just inserted UniqueEquipmentName, so there should be more than one to match on another
             if len(matched_equip_display_name) > 1:
-                # As we sorted on ID, we do want the first (and not the last as that is the just inserted one)
-                equip_display_name.display_name = matched_equip_display_name[0].display_name
-                equip_display_name.user_defined_modality = matched_equip_display_name[0].user_defined_modality
+                # check if the first is the same as the just inserted. If it is, take the second object
+                object_nr = 0
+                if equip_display_name == matched_equip_display_name[object_nr]:
+                    object_nr = 1
+                equip_display_name.display_name = matched_equip_display_name[object_nr].display_name
+                equip_display_name.user_defined_modality = matched_equip_display_name[object_nr].user_defined_modality
         if equip_display_name.display_name is None:
             if equip.institution_name and equip.station_name:
                 equip_display_name.display_name = equip.institution_name + ' ' + equip.station_name
