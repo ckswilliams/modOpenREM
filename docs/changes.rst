@@ -2,15 +2,16 @@
 OpenREM version history
 =======================
 
-0.9.0b6??
+0.9.0b6 (2019-01-xx)
 --------------------
-* `#714`_  Documentation: Add missing documentation about changing STATIC_URL if serving OpenREM in a virtual directory
-* `#688`_  Interface: Add possibility to apply known display name based on Device Observer UID (default: disabled)
-
-0.9.0b5 (2018-12-21)
---------------------
+* `#720`_  Interface: fixed small overlap between skin dose map and irradiation type table
+* `#719`_  Interface: fixed hardcoded link in template rffiltered.html
+* `#717`_  Query-retrieve: fixed problem where an error was thrown if association is None
+* `#716`_  Task manager: removed assumption of queue name from RabbitMQ management interface
+* `#714`_  Documentation: add missing documentation about changing STATIC_URL if serving OpenREM in a virtual directory
 * `#711`_  Query-retrieve: fixed problem for zero image series when using -toshiba flag
 * `#710`_  Interface: Celery and RabbitMQ tables can now be sorted by clicking on column headings
+* `#709`_  Query-retrieve: corrected query logic for multiple modalities using `#627`_ Modality tag at study level fix
 * `#708`_  Query-retrieve: fixed problem for empty Series Number
 * `#707`_  Interface: fixed issue where sigdig returned an error if it was passed an empty string
 * `#706`_  Exports: fixed problem where filters were not respected for radiographic exports
@@ -27,6 +28,7 @@ OpenREM version history
 * `#691`_  Interface: fixed URL lookup error for Display Names page
 * `#690`_  Interface: added workload stats user option entry back into config menu
 * `#689`_  Interface: fixed URL lookup error for DICOM summary page
+* `#688`_  Interface: add possibility to apply known display name based on Device Observer UID (default: disabled)
 * `#685`_  Charts: fixed link code that would otherwise cause DLP per acquisition protocol chart histogram links to fail
 * `#683`_  Installation: added VIRTUAL_DIRECTORY to the settings file to avoid updating local_settings file on upgrade
 * `#682`_  Charts: fixed problem where links from histogram bars didn't filter correctly when case-insensitive categories selected
@@ -47,6 +49,8 @@ OpenREM version history
 * `#659`_  Interface: made the latest study field in summary tables on the home page sort correctly
 * `#658`_  Interface: added display of workload stats in home page modality tables
 * `#637`_  Administration: added facility to list and purge RabbitMQ queues
+* `#554`_  Query-retrieve: added time as matching argument for command line use
+* `#461`_  Web server: enable OpenREM to be hosted from a non-root folder/virtual-directory (via `#667`_)
 * `#479`_  Administration: added facility to list and delete failed import studies
 
 0.8.1 (2018-09-16)

@@ -61,31 +61,32 @@
                 <li>Performing physician(s): {{ study.performing_physician_name }}</li>
                 <li>Operator(s): {{ study.operator_name }}</li>
                 <li>Test patient indicators? {{ study.patientmoduleattr_set.get.not_patient_indicator }}</li>
+                <li style="list-style-type: none;">
+                    <table class="table table-condensed table-bordered small">
+                        <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th><th>Total duration (s)</th>
+                        {% for irr_type in study_totals %}
+                            <tr>
+                            {% if '- ' in irr_type.0 %}
+                                <td><i>{{ irr_type.0 }}</i></td>
+                                <td style="text-align:right"><i>{% if irr_type.1 %}{{ irr_type.1 | floatformat:2 }} {% endif %}</i></td>
+                                <td style="text-align:right"><i>{% if irr_type.2 %}{{ irr_type.2 | sigdig }} {% endif %}</i></td>
+                                <td style="text-align:right"><i>{% if irr_type.3 %}{{ irr_type.3 | floatformat:2 }} {% endif %}</i></td>
+                            {% elif 'Total' in irr_type.0 %}
+                                <td><strong>{{ irr_type.0 }}</strong></td>
+                                <td><strong>{% if irr_type.1 %}{{ irr_type.1 | floatformat:2 }} {% endif %}</strong></td>
+                                <td><strong>{% if irr_type.2 %}{{ irr_type.2 | sigdig }} {% endif %}</strong></td>
+                                <td><strong>{% if irr_type.3 %}{{ irr_type.3 | floatformat:2 }} {% endif %}</strong></td>
+                            {% else %}
+                                <td>{{ irr_type.0 }}</td>
+                                <td>{% if irr_type.1 %}{{ irr_type.1 | floatformat:2 }} {% endif %}</td>
+                                <td>{% if irr_type.2 %}{{ irr_type.2 | sigdig }} {% endif %}</td>
+                                <td>{% if irr_type.3 %}{{ irr_type.3 | floatformat:2 }} {% endif %}</td>
+                            {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </li>
             </ul>
-
-            <table class="table table-condensed table-bordered small table-indent">
-                <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th><th>Total duration (s)</th>
-                {% for irr_type in study_totals %}
-                    <tr>
-                    {% if '- ' in irr_type.0 %}
-                        <td><i>{{ irr_type.0 }}</i></td>
-                        <td style="text-align:right"><i>{% if irr_type.1 %}{{ irr_type.1 | floatformat:2 }} {% endif %}</i></td>
-                        <td style="text-align:right"><i>{% if irr_type.2 %}{{ irr_type.2 | sigdig }} {% endif %}</i></td>
-                        <td style="text-align:right"><i>{% if irr_type.3 %}{{ irr_type.3 | floatformat:2 }} {% endif %}</i></td>
-                    {% elif 'Total' in irr_type.0 %}
-                        <td><strong>{{ irr_type.0 }}</strong></td>
-                        <td><strong>{% if irr_type.1 %}{{ irr_type.1 | floatformat:2 }} {% endif %}</strong></td>
-                        <td><strong>{% if irr_type.2 %}{{ irr_type.2 | sigdig }} {% endif %}</strong></td>
-                        <td><strong>{% if irr_type.3 %}{{ irr_type.3 | floatformat:2 }} {% endif %}</strong></td>
-                    {% else %}
-                        <td>{{ irr_type.0 }}</td>
-                        <td>{% if irr_type.1 %}{{ irr_type.1 | floatformat:2 }} {% endif %}</td>
-                        <td>{% if irr_type.2 %}{{ irr_type.2 | sigdig }} {% endif %}</td>
-                        <td>{% if irr_type.3 %}{{ irr_type.3 | floatformat:2 }} {% endif %}</td>
-                    {% endif %}
-                    </tr>
-                {% endfor %}
-            </table>
 
                 {% if alert_levels.show_accum_dose_over_delta_weeks %}
                     {% if study.patientmoduleattr_set.get.patient_id %}
