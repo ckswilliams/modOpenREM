@@ -3060,18 +3060,15 @@ def homepage_options_view(request):
         HomePageAdminSettings.objects.create()
 
     display_workload_stats = HomePageAdminSettings.objects.values_list('enable_workload_stats', flat=True)[0]
-    if not display_workload_stats:
-        if not request.user.groups.filter(name="admingroup"):
-            messages.info(request, mark_safe(u'The display of homepage workload stats is disabled; only a member of the admin group can change this setting'))  # nosec
-
     try:
         match_on_device_observer_uid = HomePageAdminSettings.objects.values_list(
             'match_on_device_observer_uid', flat=True)[0]
     except IndexError:
         match_on_device_observer_uid = False
-    if not match_on_device_observer_uid:
-        if not request.user.groups.filter(name="admingroup"):
-            messages.info(request, mark_safe(u'The setting of automatic merging is disabled; only a member of the admin group can change this setting'))  # nosec
+    if not request.user.groups.filter(name="admingroup"):
+        messages.info(request, mark_safe(  # nosec
+            u"The display of homepage workload stats and automatic device merging is disabled; "
+            u"only a member of the admin group can change these settings"))
 
     if request.method == 'POST':
         message = ""
@@ -3080,7 +3077,7 @@ def homepage_options_view(request):
             try:
                 # See if the user has a userprofile
                 user_profile = request.user.userprofile
-            except:
+            except AttributeError:
                 # Create a default userprofile for the user if one doesn't exist
                 create_user_profile(sender=request.user, instance=request.user, created=True)
                 user_profile = request.user.userprofile
@@ -3108,7 +3105,7 @@ def homepage_options_view(request):
                 else:
                     message = message + "Home page general options were not changed."
 
-        messages.success(request, mark_safe(message))
+        messages.success(request, mark_safe(message))  # nosec
 
         return HttpResponseRedirect(reverse_lazy('homepage_options_view'))
 
@@ -3120,7 +3117,7 @@ def homepage_options_view(request):
     try:
         # See if the user has a userprofile
         user_profile = request.user.userprofile
-    except:
+    except AttributeError:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
