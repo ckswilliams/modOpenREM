@@ -26,7 +26,7 @@
         <table>
           {% csrf_token %}
             {% for field in HomepageOptionsForm %}
-                {% if field.name == "enable_workload_stats" or field.name == "match_on_device_observer_uid" %}
+                {% if field.name == "enable_workload_stats" %}
                     {% if admin.admingroup %}
                         <tr>
                             <th>{{ field.label_tag }}</th>
