@@ -1059,7 +1059,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
 
 
 def _generalequipmentmoduleattributes(dataset, study, ch):
-    from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames,HomePageAdminSettings
+    from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames, MergeOnDeviceObserverUIDSettings
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.hash_id import hash_id
@@ -1108,7 +1108,7 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
         # If we have a device_observer_uid and it is desired, merge this "new" device with an existing one based on the
         # device observer uid.
         try:
-            match_on_device_observer_uid = HomePageAdminSettings.objects.values_list(
+            match_on_device_observer_uid = MergeOnDeviceObserverUIDSettings.objects.values_list(
                 'match_on_device_observer_uid', flat=True)[0]
         except IndexError:
             match_on_device_observer_uid = False
