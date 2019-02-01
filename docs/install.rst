@@ -2,6 +2,17 @@
 Installing OpenREM
 ******************
 
+Windows only - install Celery
+=============================
+For Linux users, Celery will be install automatically with OpenREM.
+
+*Activate virtualenv if you are using one*
+
+.. sourcecode:: bash
+
+    pip install celery==3.1.25
+
+
 Install OpenREM 0.9.0b5
 =======================
 
