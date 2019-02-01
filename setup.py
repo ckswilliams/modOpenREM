@@ -30,6 +30,7 @@ requires = [
     'django-js-reverse',
     'requests',
     'flower',
+    'numpy',
     ]
 
 setup(
