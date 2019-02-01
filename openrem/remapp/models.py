@@ -138,15 +138,17 @@ class HomePageAdminSettings(SingletonModel):
     def get_absolute_url(self):
         return '/admin/homepagesettings/1/'
 
+
 class MergeOnDeviceObserverUIDSettings(SingletonModel):
     """
     Table to store setting(s) for autmoatic setting of Display Name and Modality type based on same Device observer UID
     """
     match_on_device_observer_uid = models.BooleanField(
         default=False,
-        verbose_name="Give the same Display Name and Modality to a (new) device if a known device shares the "
+        verbose_name="Give the same Display Name and Modality type to a (new) device if a known device shares the "
                       "Device Observer UID."
     )
+
 
 class DicomDeleteSettings(SingletonModel):
     """
@@ -464,6 +466,7 @@ class UniqueEquipmentNames(models.Model):
     display_name = models.TextField(blank=True, null=True)
     user_defined_modality = models.CharField(max_length=16, blank=True, null=True)
     hash_generated = models.BooleanField(default=False)
+    device_observer_uid = models.TextField(blank=True, null=True)
 
     class Meta:
         unique_together = ('manufacturer_hash', 'institution_name_hash', 'station_name_hash',

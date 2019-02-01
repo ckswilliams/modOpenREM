@@ -309,6 +309,16 @@ class HomepageOptionsForm(forms.Form):
                                                required=False)
 
 
+class MergeOnDeviceObserverUIDForm(forms.Form):
+    """Form for displaying and chaning the option for merging on Device Observer UID
+    """
+    match_on_device_observer_uid = forms.BooleanField(
+        label="Give the same Display Name and Modality type to a (new) device if a known device shares the "
+              "Device Observer UID.",
+        required=False
+    )
+
+
 class DicomQueryForm(forms.Form):
     """Form for launching DICOM Query
     """

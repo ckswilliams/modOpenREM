@@ -38,6 +38,37 @@
 
 {% block mainblock %}
 
+  {% if admin.admingroup %}
+    <form action="" method="post" class="form-horizontal" role="form">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Setting display name automatically for known devices</h3>
+      </div>
+      <div class="panel-body">
+        A device can send its Device Observer UID (especially in rdsr-objects). This is a unique ID for the device.
+        If this UID is received by OpenREM it can set the display name and modality type the same as an already known
+        device with the same Device Observer UID. This option can be useful if other parameters that OpenREM looks at
+        frequently change. If you want to see if one of the other parameters changed (like software version), don't
+        tick this option.
+        <br />
+        {% csrf_token %}
+        {% for field in MergeOptionsForm %}
+          <tr>
+            <td>
+              {{ field.errors }}
+              {{ field }} {{ field.label_tag }}
+              {{ field.help_text }}
+            </td>
+          </tr>
+        {% endfor %}
+        <br />
+        <input class="btn btn-default" name="submit" type="submit" />
+      </div>
+    </div>
+    </form>
+  {% endif %}
+
+
   {% paginate %}
 
   {% if admin.admingroup %}
