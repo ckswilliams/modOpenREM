@@ -19,8 +19,13 @@
 {% block mainblock %}
 
   {% if admin.admingroup %}
-    <div class="row col-md-offset-2">
-      <h3>Celery administration </h3>
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <h3>Task Administration</h3>
+        <span id="service_status"></span>
+
+        <h3>Celery administration </h3>
+      </div>
     </div>
 
     <div class="row">
@@ -69,7 +74,7 @@
                         }
                     })
                 }
-            )
+            );
             $(document).ready(
                 function tasks_update_recent(json) {
                     $.ajax({
@@ -86,7 +91,7 @@
                         }
                     })
                 }
-            )
+            );
             $(document).ready(
                 function tasks_update_recent(json) {
                     $.ajax({
@@ -100,6 +105,23 @@
                             setTimeout(function () {
                                 tasks_update_recent();
                             }, 11000);
+                        }
+                    })
+                }
+            );
+            $(document).ready(
+                function tasks_update_recent(json) {
+                    $.ajax({
+                        url: "{% url 'task_service_status' %}",
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        type: "POST",
+                        success: function (data) {
+                            $('#service_status').html(data);
+                            setTimeout(function () {
+                                tasks_update_recent();
+                            }, 2000);
                         }
                     })
                 }

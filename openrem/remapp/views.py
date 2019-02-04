@@ -3214,6 +3214,45 @@ def rabbitmq_admin(request):
 
 
 @login_required
+def task_service_status(request):
+    """AJAX function to get task services statuses and RabbitMQ queued tasks"""
+    import requests
+    from openremproject import settings
+
+    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
+        try:
+            flower = requests.get('http://localhost:{0}/api/tasks'.format(FLOWER_PORT))
+            if flower.status_code == 200:
+                flower_status = 200
+            else:
+                flower_status = 401
+        except requests.ConnectionError:
+            flower_status = 500
+        default_queue = {}
+        celery_queue = {}
+        try:
+            queues = requests.get('http://localhost:15672/api/queues', auth=('guest', 'guest'))
+            if queues.status_code == 200:
+                rabbitmq_status = 200
+            else:
+                rabbitmq_status = queues.status_code
+            for queue in queues.json():
+                if queue['name'] == settings.CELERY_DEFAULT_QUEUE:
+                    default_queue = queue
+                elif u'celery.pidbox' in queue['name']:
+                    celery_queue = queue
+        except requests.ConnectionError:
+            rabbitmq_status = 500
+        template = 'remapp/task_service_status.html'
+        return render_to_response(template,
+                                  {'default_queue': default_queue,
+                                   'celery_queue': celery_queue,
+                                   'flower_status': flower_status,
+                                   'rabbitmq_status': rabbitmq_status},
+                                  context_instance=RequestContext(request))
+
+
+@login_required
 def rabbitmq_queues(request):
     """AJAX function to get current queue details"""
     import requests

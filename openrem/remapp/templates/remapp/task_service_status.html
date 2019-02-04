@@ -1,0 +1,60 @@
+<div class="panel panel-info">
+  <div class="panel-heading">
+    <h3 class="panel-title">Task processing status</h3>
+  </div>
+  <div class="panel-body">
+    <table class="table table-bordered">
+      <tr>
+        <th style="width: 33%">RabbitMQ</th>
+        <th style="width: 33%">Celery task manager</th>
+        <th>Celery management: Flower</th>
+      </tr>
+      <tr>
+        {% if rabbitmq_status == 200 %}
+          <td class="success">
+            <span class="glyphicon glyphicon-ok"></span>
+            Running, {{ default_queue.messages_ready }} tasks waiting in queue
+        {% else %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            Not running!
+        {% endif %}
+          </td>
+        {% if celery_queue %}
+          <td class="success">
+            <span class="glyphicon glyphicon-ok"></span>
+            Running
+        {% else %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            {% if rabbitmq_status == 200 %}
+              Not running! No tasks will be processed!
+            {% else %}
+              Celery status not available if RabbitMQ is not running!
+            {% endif %}
+        {% endif %}
+          </td>
+        {% if flower_status == 200 %}
+          <td class="success">
+            <span class="glyphicon glyphicon-ok"></span>
+            Running
+        {% elif flower_status == 401 %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            Connection error - unauthorised!
+        {% elif flower_status == 500 %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            Not running! Has it been installed and started?
+        {% else %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            Flower status unknown!
+        {% endif %}
+          </td>
+
+      </tr>
+    </table>
+
+  </div>
+</div>
