@@ -3204,16 +3204,6 @@ def _create_admin_dict(request):
 
 
 @login_required
-def rabbitmq_admin(request):
-    """View to show RabbitMQ queues. Content generated using AJAX"""
-
-    admin = _create_admin_dict(request)
-
-    template = 'remapp/rabbitmq_admin.html'
-    return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
-
-
-@login_required
 def task_service_status(request):
     """AJAX function to get task services statuses and RabbitMQ queued tasks"""
     import requests
@@ -3253,50 +3243,6 @@ def task_service_status(request):
 
 
 @login_required
-def rabbitmq_queues(request):
-    """AJAX function to get current queue details"""
-    import requests
-    from openremproject import settings
-
-    if request.is_ajax() and request.user.groups.filter(name="admingroup"):
-        try:
-            flower = requests.get('http://localhost:{0}/api/tasks'.format(FLOWER_PORT))
-            if flower.status_code == 200:
-                flower_status = 200
-            else:
-                flower_status = 401
-        except requests.ConnectionError:
-            flower_status = 500
-        try:
-            queues = requests.get('http://localhost:15672/api/queues', auth=('guest', 'guest')).json()
-            default_queue = {}
-            celery_queue = {}
-            flower_queues = []
-            other_queues = []
-            for queue in queues:
-                if queue['name'] == settings.CELERY_DEFAULT_QUEUE:
-                    default_queue = queue
-                elif u'celery.pidbox' in queue['name']:
-                    celery_queue = queue
-                elif u'celeryev' in queue['name']:
-                    flower_queues += [queue, ]
-                    print(queue['name'])
-                else:
-                    other_queues += [queue, ]
-            template = 'remapp/rabbitmq_queues.html'
-            return render_to_response(template,
-                                      {'default_queue': default_queue,
-                                       'celery_queue': celery_queue,
-                                       'other_queues': other_queues,
-                                       'flower_status': flower_status},
-                                      context_instance=RequestContext(request))
-        except requests.ConnectionError:
-            admin = _create_admin_dict(request)
-            template = 'remapp/rabbitmq_connection_error.html'
-            return render_to_response(template, {'admin': admin}, context_instance=RequestContext(request))
-
-
-@login_required
 def rabbitmq_purge(request, queue=None):
     """Function to purge one of the RabbitMQ queues"""
     import requests
@@ -3305,17 +3251,6 @@ def rabbitmq_purge(request, queue=None):
         queue_url = 'http://localhost:15672/api/queues/%2f/{0}/contents'.format(queue)
         requests.delete(queue_url, auth=('guest', 'guest'))
         return redirect(reverse_lazy('celery_admin'))
-
-
-@login_required
-def rabbitmq_delete(request, queue=None):
-    """Function to delete one of the RabbitMQ queues"""
-    import requests
-
-    if queue and request.user.groups.filter(name="admingroup"):
-        queue_url = 'http://localhost:15672/api/queues/%2f/{0}'.format(queue)
-        requests.delete(queue_url, auth=('guest', 'guest'), data={'if_empty': 'true'})
-        return redirect(reverse_lazy('rabbitmq_admin'))
 
 
 @login_required
