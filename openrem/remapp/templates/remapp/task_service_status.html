@@ -13,7 +13,18 @@
         {% if rabbitmq_status == 200 %}
           <td class="success">
             <span class="glyphicon glyphicon-ok"></span>
-            Running, {{ default_queue.messages_ready }} tasks waiting in queue
+            {% if default_queue.messages_ready == 0 %}
+              Running, no tasks waiting to be processed
+            {% elif default_queue.messages_ready > 0 %}
+              {% if default_queue.messages_ready == 1 %}
+                Running, no tasks waiting to be processed
+              {% else %}
+                Running, {{ default_queue.messages_ready }} tasks waiting in queue
+              {% endif %}
+              <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=default_queue.name %}" role="button">
+                Purge queue
+              </a>
+            {% endif %}
         {% else %}
           <td class="danger">
             <span class="glyphicon glyphicon-remove"></span>

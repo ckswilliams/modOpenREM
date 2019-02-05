@@ -3304,7 +3304,7 @@ def rabbitmq_purge(request, queue=None):
     if queue and request.user.groups.filter(name="admingroup"):
         queue_url = 'http://localhost:15672/api/queues/%2f/{0}/contents'.format(queue)
         requests.delete(queue_url, auth=('guest', 'guest'))
-        return redirect(reverse_lazy('rabbitmq_admin'))
+        return redirect(reverse_lazy('celery_admin'))
 
 
 @login_required
