@@ -21,10 +21,8 @@
   {% if admin.admingroup %}
     <div class="row">
       <div class="col-md-8 col-md-offset-2">
-        <h3>Task Administration</h3>
+        <h3>Task administration</h3>
         <span id="service_status"></span>
-
-        <h3>Celery administration </h3>
       </div>
     </div>
 
@@ -127,18 +125,6 @@
                 }
             )
         </script>
-        <p>
-          Celery is the task manager that runs background tasks. A table of current active tasks can be found below
-          along with
-          tasks that have finished. This interface relies on Flower being installed and running, so look at the docs to
-          find
-          out more: link to docs.
-        </p>
-        <p>
-          If Flower was started after a task was started then that task will not appear in the table until it either
-          finishes
-          or is aborted somewhere else.
-        </p>
       </div>
     </div>
     <div class="row">

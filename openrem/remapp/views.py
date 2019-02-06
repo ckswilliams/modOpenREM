@@ -3234,11 +3234,13 @@ def task_service_status(request):
         except requests.ConnectionError:
             rabbitmq_status = 500
         template = 'remapp/task_service_status.html'
+        admin = _create_admin_dict(request)
         return render_to_response(template,
                                   {'default_queue': default_queue,
                                    'celery_queue': celery_queue,
                                    'flower_status': flower_status,
-                                   'rabbitmq_status': rabbitmq_status},
+                                   'rabbitmq_status': rabbitmq_status,
+                                   'admin': admin},
                                   context_instance=RequestContext(request))
 
 
