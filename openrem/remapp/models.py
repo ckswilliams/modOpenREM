@@ -145,8 +145,7 @@ class MergeOnDeviceObserverUIDSettings(SingletonModel):
     """
     match_on_device_observer_uid = models.BooleanField(
         default=False,
-        verbose_name="Give the same Display Name and Modality type to a (new) device if a known device shares the "
-                      "Device Observer UID."
+        verbose_name="Set Display Name and Modality type if Device Observer UID is matching."
     )
 
 
