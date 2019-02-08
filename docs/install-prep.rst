@@ -150,16 +150,6 @@ Windows
 
     Before continuing, `consider virtualenv`_
 
-Install NumPy
-=============
-
-Numpy is required for charts.
-
-For Linux and Windows - activate virtualenv first::
-
-    pip install numpy
-
-
 .. _installpreppostgres:
 
 Install PostgreSQL database

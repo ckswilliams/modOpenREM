@@ -51,6 +51,7 @@ download them all:
 .. sourcecode:: console
 
     mkdir openremfiles
+    pip download -d openremfiles celery==3.1.25  # this line not required for Linux
     pip download -d openremfiles openrem==0.9.0b5
     pip download -d openremfiles psycopg2-binary
     pip download --no-deps -d openremfiles https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
