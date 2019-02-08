@@ -365,6 +365,10 @@ Chart types - fluoroscopy
 
 * Pie chart of the frequency of each study description
 
+* Bar chart of average DAP for each requested procedure
+
+* Pie chart of the frequency of each requested procedure
+
 * Pie chart showing the number of studies carried out per weekday
 
 *************************
