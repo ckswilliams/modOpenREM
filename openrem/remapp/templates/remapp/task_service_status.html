@@ -1,0 +1,84 @@
+<div class="panel panel-info">
+  <div class="panel-heading">
+    <h3 class="panel-title">Service status</h3>
+  </div>
+  <div class="panel-body">
+    <table class="table table-bordered">
+      <tr>
+        <th style="width: 33%">RabbitMQ message broker</th>
+        <th style="width: 33%">Celery asynchronous task queue</th>
+        <th>Flower &ndash; Celery monitoring tool</th>
+      </tr>
+      <tr>
+        {% if rabbitmq_status == 200 %}
+          <td class="success">
+            <span class="glyphicon glyphicon-ok"></span>
+            {% if default_queue.messages_ready == 0 %}
+              Running, no tasks waiting to be processed
+            {% elif default_queue.messages_ready > 0 %}
+              {% if default_queue.messages_ready == 1 %}
+                Running, no tasks waiting to be processed
+              {% else %}
+                Running, {{ default_queue.messages_ready }} tasks waiting in queue
+              {% endif %}
+              <a class="btn btn-danger" href="{% url 'rabbitmq_purge' queue=default_queue.name %}" role="button">
+                Purge queue
+              </a>
+            {% endif %}
+        {% else %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            Not running! Has the RabbitMQ management interface been enabled? (See
+            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/install-prep.html#enable-rabbitmq-queue-management-interface"
+               target="_blank" data-toggle="tooltip" title="Enable RabbitMQ docs - opens in a new tab">
+            the docs
+            </a>)
+        {% endif %}
+          </td>
+        {% if celery_queue %}
+          <td class="success">
+            <span class="glyphicon glyphicon-ok"></span>
+            Running
+        {% else %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            {% if rabbitmq_status == 200 %}
+              Not running! No tasks will be processed! (See
+              <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/startservices.html#celery-task-queue"
+                 target="_blank" data-toggle="tooltip" title="Start services docs for Celery - opens in  a new tab">
+                the docs
+              </a>)
+            {% else %}
+              Celery status not available if RabbitMQ is not running!
+            {% endif %}
+        {% endif %}
+          </td>
+        {% if flower_status == 200 %}
+          <td class="success">
+            <span class="glyphicon glyphicon-ok"></span>
+            Running
+        {% elif flower_status == 401 %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            Connection error - unauthorised!
+        {% elif flower_status == 500 %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            Not running! Has it been started? (See
+            <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/startservices.html#celery-task-management-flower"
+               target="_blank" data-toggle="tooltip" title="Start services docs for Flower - opens in  a new tab">
+              the docs
+            </a>
+            )
+        {% else %}
+          <td class="danger">
+            <span class="glyphicon glyphicon-remove"></span>
+            Flower status unknown!
+        {% endif %}
+          </td>
+
+      </tr>
+    </table>
+
+  </div>
+</div>

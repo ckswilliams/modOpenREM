@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.0b6 (2019-01-xx)
 --------------------
+* `#723`_  Task management: fixed issue with latest version of kombu and amqp on Windows
 * `#720`_  Interface: fixed small overlap between skin dose map and irradiation type table
 * `#719`_  Interface: fixed hardcoded link in template rffiltered.html
 * `#717`_  Query-retrieve: fixed problem where an error was thrown if association is None
@@ -15,6 +16,7 @@ OpenREM version history
 * `#708`_  Query-retrieve: fixed problem for empty Series Number
 * `#707`_  Interface: fixed issue where sigdig returned an error if it was passed an empty string
 * `#706`_  Exports: fixed problem where filters were not respected for radiographic exports
+* `#705`_  Task manager: added Flower to install and integrated to interface
 * `#704`_  Imports: caters for illegal use of dGy.cm2 units in RDSR for DAP values
 * `#703`_  Interface: fixed URL lookup error for failed imports on homepage
 * `#702`_  Query-retrieve: fixed URLs in DICOM javascript files to allow virtual-directories
@@ -52,6 +54,7 @@ OpenREM version history
 * `#554`_  Query-retrieve: added time as matching argument for command line use
 * `#461`_  Web server: enable OpenREM to be hosted from a non-root folder/virtual-directory (via `#667`_)
 * `#479`_  Administration: added facility to list and delete failed import studies
+* `#349`_  Task management: fixed issue with Windows tasks not being killed on request
 
 0.8.1 (2018-09-16)
 ------------------

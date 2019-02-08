@@ -98,6 +98,20 @@ systemd service files as described in :ref:`one_page_linux_celery`. If you need 
 5555 then make sure you do so in ``openremproject\local_settings.py`` to add/modify the line ``FLOWER_PORT = 5555`` as
 well as when you start Flower.
 
+Changes to Celery for Windows
+=============================
+
+For best performance and reliability when using Celery on Windows, it is recommended to do the following from the
+openrem folder (activate virtualenv if using one):
+
+.. soursecode:: bash
+
+    pip install celery==3.1.25
+
+If your command for starting Celery specifies a pool option, for example ``-P solo``, remove it so that Celery reverts
+to using the default ``prefork`` pool. This will enable multiple tasks to run concurrently and it will be possible to
+terminate tasks.
+
 E-mail server settings
 ======================
 If you want selected OpenREM users to be automatically sent fluoroscopy high

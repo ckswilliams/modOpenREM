@@ -101,7 +101,7 @@ Celery start batch file
     CD "%openremPath%"
 
     :: Start Celery.
-    celery worker -n default -P solo -Ofair -A openremproject -c 1 -Q default --pidfile=%celeryPidFile% --logfile=%celeryLogFile%
+    celery worker -n default -Ofair -A openremproject -c 4 -Q default --pidfile=%celeryPidFile% --logfile=%celeryLogFile%
 
 
 Flower start batch file
