@@ -400,6 +400,8 @@ class UserProfile(models.Model):
     plotRFStudyPerDayAndHour = models.BooleanField(default=False)
     plotRFStudyFreq = models.BooleanField(default=False)
     plotRFStudyDAP = models.BooleanField(default=True)
+    plotRFRequestDAP = models.BooleanField(default=True)
+    plotRFRequestFreq = models.BooleanField(default=True)
     plotRFInitialSortingChoice = models.CharField(max_length=4,
                                                   choices=SORTING_CHOICES_DX,
                                                   default=FREQ)

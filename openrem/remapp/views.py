@@ -526,6 +526,8 @@ def rf_summary_list_filter(request):
             user_profile.plotRFStudyPerDayAndHour = chart_options_form.cleaned_data['plotRFStudyPerDayAndHour']
             user_profile.plotRFStudyFreq = chart_options_form.cleaned_data['plotRFStudyFreq']
             user_profile.plotRFStudyDAP = chart_options_form.cleaned_data['plotRFStudyDAP']
+            user_profile.plotRFRequestFreq = chart_options_form.cleaned_data['plotRFRequestFreq']
+            user_profile.plotRFRequestDAP = chart_options_form.cleaned_data['plotRFRequestDAP']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.plotSeriesPerSystem = chart_options_form.cleaned_data['plotSeriesPerSystem']
@@ -537,6 +539,8 @@ def rf_summary_list_filter(request):
                          'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
                          'plotRFStudyFreq': user_profile.plotRFStudyFreq,
                          'plotRFStudyDAP': user_profile.plotRFStudyDAP,
+                         'plotRFRequestFreq': user_profile.plotRFRequestFreq,
+                         'plotRFRequestDAP': user_profile.plotRFRequestDAP,
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
                          'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
                          'plotHistograms': user_profile.plotHistograms}
@@ -649,32 +653,36 @@ def rf_summary_chart_data(request):
     return_structure =\
         rf_plot_calculations(f, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotRFStudyPerDayAndHour, user_profile.plotRFStudyFreq,
-                             user_profile.plotRFStudyDAP, user_profile.plotHistograms,
-                             user_profile.plotCaseInsensitiveCategories)
+                             user_profile.plotRFStudyPerDayAndHour,
+                             user_profile.plotRFStudyFreq, user_profile.plotRFStudyDAP,
+                             user_profile.plotRFRequestFreq, user_profile.plotRFRequestDAP,
+                             user_profile.plotHistograms, user_profile.plotCaseInsensitiveCategories)
 
     return JsonResponse(return_structure, safe=False)
 
 
-def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_per_systems,
-                         plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_study_dap,
+def rf_plot_calculations(f, median_available, plot_average_choice,
+                         plot_series_per_systems, plot_histogram_bins,
+                         plot_study_per_day_and_hour,
+                         plot_study_freq, plot_study_dap,
+                         plot_request_freq, plot_request_dap,
                          plot_histograms, plot_case_insensitive_categories):
     from interface.chart_functions import average_chart_inc_histogram_data, workload_chart_data
 
     return_structure = {}
 
-    if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap:
+    if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap or plot_request_freq or plot_request_dap:
         # No acquisition-level filters, so can use f.qs for all charts at the moment.
         #exp_include = f.qs.values_list('study_instance_uid')
         #study_events = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=exp_include)
-        study_events = f.qs
+        study_and_request_events = f.qs
 
     if plot_study_per_day_and_hour:
-        result = workload_chart_data(study_events)
+        result = workload_chart_data(study_and_request_events)
         return_structure['studiesPerHourInWeekdays'] = result['workload']
 
     if plot_study_freq or plot_study_dap:
-        result = average_chart_inc_histogram_data(study_events,
+        result = average_chart_inc_histogram_data(study_and_request_events,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'study_description',
                                                   'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
@@ -690,6 +698,24 @@ def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_p
         return_structure['studySummary'] = result['summary']
         if plot_study_dap and plot_histograms:
             return_structure['studyHistogramData'] = result['histogram_data']
+
+    if plot_request_freq or plot_request_dap:
+        result = average_chart_inc_histogram_data(study_and_request_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'requested_procedure_code_meaning',
+                                                  'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
+                                                  1000000,
+                                                  plot_request_dap, plot_request_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
+
+        return_structure['requestSystemList'] = result['system_list']
+        return_structure['requestNameList'] = result['series_names']
+        return_structure['requestSummary'] = result['summary']
+        if plot_request_dap and plot_histograms:
+            return_structure['requestHistogramData'] = result['histogram_data']
 
     return return_structure
 
@@ -2950,6 +2976,8 @@ def chart_options_view(request):
             user_profile.plotRFStudyPerDayAndHour = rf_form.cleaned_data['plotRFStudyPerDayAndHour']
             user_profile.plotRFStudyFreq = rf_form.cleaned_data['plotRFStudyFreq']
             user_profile.plotRFStudyDAP = rf_form.cleaned_data['plotRFStudyDAP']
+            user_profile.plotRFRequestFreq = rf_form.cleaned_data['plotRFRequestFreq']
+            user_profile.plotRFRequestDAP = rf_form.cleaned_data['plotRFRequestDAP']
             user_profile.plotRFInitialSortingChoice = rf_form.cleaned_data['plotRFInitialSortingChoice']
 
             user_profile.plotMGStudyPerDayAndHour = mg_form.cleaned_data['plotMGStudyPerDayAndHour']
@@ -3015,6 +3043,8 @@ def chart_options_view(request):
     rf_form_data = {'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
                     'plotRFStudyFreq': user_profile.plotRFStudyFreq,
                     'plotRFStudyDAP': user_profile.plotRFStudyDAP,
+                    'plotRFRequestFreq': user_profile.plotRFRequestFreq,
+                    'plotRFRequestDAP': user_profile.plotRFRequestDAP,
                     'plotRFInitialSortingChoice': user_profile.plotRFInitialSortingChoice}
 
     mg_form_data = {'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour,

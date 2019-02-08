@@ -426,6 +426,104 @@
             </script>
         {% endif %}
 
+        {% if request.user.userprofile.plotRFRequestDAP %}
+            <!-- HTML to include div container for request plot -->
+            <div class="panel-group" id="plotRFRequestDAPAccordion">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#plotRFRequestDAPAccordion" href="#collapsePlotRFRequestDAPAccordion" onclick="setTimeout(function() {fitChartToDiv('plotRFRequestDAPContainer');}, 0);">
+                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                                    Plot of mean DAP for each requested procedure name.
+                                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                                    Plot of median DAP for each requested procedure name.
+                                {% else %}
+                                    Plot of mean and median DAP for each requested procedure name.
+                                {% endif %}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapsePlotRFRequestDAPAccordion" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="plotRFRequestDAPContainer" style="height: auto; margin: 0 0"></div>
+
+                            <div class="req-instructions">
+                                <table style="border:none">
+                                    <tr>
+                                        <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that requested procedure.<br>
+                                            Click on a histogram bin tooltip to see the studies that contain the requested procedure names in the bin. Note that
+                                            this will include studies at the upper bin boundary, so in some cases may display more data than
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFRequestDAPContainer', 'avgValue', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFRequestDAPContainer', 'totalCounts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotRFRequestDAPContainer', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFRequestDAPContainer', 'avgValue', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFRequestDAPContainer', 'totalCounts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotRFRequestDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <a onclick="$('#plotRFRequestDAPContainer').highcharts().viewData(false, false, true); enterFullScreen('collapsePlotRFRequestDAPAccordion','plotRFRequestDAPContainer'); $('#toggle_request_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#plotRFRequestDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_request_data_btn">Toggle data table</a>
+                            <a onclick="$('#plotRFRequestDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('plotRFRequestDAPContainer', 'hide', 'request_dap_series_')" class="btn btn-default btn-sm" role="button" id="request_dap_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('plotRFRequestDAPContainer', 'show', 'request_dap_series_')" class="btn btn-default btn-sm" role="button" id="request_dap_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('plotRFRequestDAPContainer')" class="btn btn-default btn-sm" role="button" id="request_dap_series_toggle">Toggle all series</a>
+                            <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#plotRFRequestDAPContainer'); $('#plotRFRequestDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div for request plot -->
+
+            <script>
+                $('#request_dap_series_show').hide();
+
+                var plotRFRequestDAP = true;
+                $(window).resize(function() {
+                    chartSetExportSize('plotRFRequestDAPContainer');
+                    fitChartToDiv('plotRFRequestDAPContainer');
+                });
+                var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.req-hist-norm-btn';
+                instr_class = '.req-instructions';
+                render_div = 'plotRFRequestDAPContainer';
+                val_label = 'DAP';
+                val_units = 'cGy.cm<sup>2</sup>';
+                cat_label = 'Request description';
+                cat_counter = 'studies';
+                field_name_min = 'request_dap_min';
+                field_name_max = 'request_dap_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'request_description';
+                tooltip_filters = tooltipFiltersRequest;
+                href_start = '{% url 'rf_summary_list_filter' %}?';
+                hide_series_btn_stub = 'request_dap_series_';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
+            </script>
+        {% endif %}
+
         {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
             <!-- HTML to include div container for study workload -->
             <div class="panel-group" id="accordion5">
@@ -491,6 +589,40 @@
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');
             </script>
         {% endif %}
+
+        {% if request.user.userprofile.plotRFRequestFreq %}
+            <!-- HTML to include div container for requested procedure name pie chart -->
+            <div class="panel-group" id="accordionPiechartRequest">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionPiechartRequest" href="#collapseRequestPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartRequestDIV');}, 0);">
+                                Pie chart showing a breakdown of requested procedure frequency.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseRequestPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartRequestDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="$('#piechartRequestDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseRequestPieChart', 'piechartRequestDIV'); $('#toggle_requestf_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartRequestDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_requestf_data_btn">Toggle data table</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for requested procedure name pie chart -->
+
+            <script>
+                var plotRFRequestFreq = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartRequestDIV');
+                    fitChartToDiv('piechartRequestDIV');
+                });
+                var urlStartRequest = '{% url 'rf_summary_list_filter' %}?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
+                result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');
+            </script>
+        {% endif %}
+
 
     {% endif %}
 {% endblock %}
