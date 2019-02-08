@@ -1276,7 +1276,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
             g.save()
 
 
-def _rsdr2db(dataset):
+def _rdsr2db(dataset):
     import openrem_settings
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
@@ -1539,7 +1539,7 @@ def rdsr(rdsr_file):
     if dataset.SOPClassUID in ('1.2.840.10008.5.1.4.1.1.88.67', '1.2.840.10008.5.1.4.1.1.88.22') and \
             dataset.ConceptNameCodeSequence[0].CodeValue == '113701':
         logger.debug(u'rdsr.py extracting from {0}'.format(rdsr_file))
-        _rsdr2db(dataset)
+        _rdsr2db(dataset)
     else:
         logger.warning(u'rdsr.py not attempting to extract from {0}, not a radiation dose structured report'.format(
             rdsr_file))
