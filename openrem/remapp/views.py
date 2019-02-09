@@ -98,6 +98,8 @@ def logout_page(request):
 
 @login_required
 def dx_summary_list_filter(request):
+    """Obtain data for radiographic summary view
+    """
     from remapp.interface.mod_filters import dx_acq_filter
     from remapp.forms import DXChartOptionsForm, itemsPerPageForm
     from openremproject import settings
@@ -207,6 +209,8 @@ def dx_summary_list_filter(request):
 
 @login_required
 def dx_summary_chart_data(request):
+    """Obtain data for Ajax chart call
+    """
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q
     from openremproject import settings
@@ -259,6 +263,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                          plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems,
                          plot_histogram_bins, plot_histograms, plot_case_insensitive_categories):
+    """Calculations for radiographic charts
+    """
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
     from django.utils.datastructures import MultiValueDictKeyError
 
@@ -482,6 +488,8 @@ def dx_detail_view(request, pk=None):
 
 @login_required
 def rf_summary_list_filter(request):
+    """Obtain data for radiographic summary view
+    """
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
     from remapp.forms import RFChartOptionsForm, itemsPerPageForm
@@ -620,6 +628,8 @@ def rf_summary_list_filter(request):
 
 @login_required
 def rf_summary_chart_data(request):
+    """Obtain data for Ajax chart call
+    """
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
     from django.http import JsonResponse
@@ -667,6 +677,8 @@ def rf_plot_calculations(f, median_available, plot_average_choice,
                          plot_study_freq, plot_study_dap,
                          plot_request_freq, plot_request_dap,
                          plot_histograms, plot_case_insensitive_categories):
+    """Calculations for fluoroscopy charts
+    """
     from interface.chart_functions import average_chart_inc_histogram_data, workload_chart_data
 
     return_structure = {}
@@ -924,6 +936,8 @@ def rf_detail_view_skin_map(request, pk=None):
 
 @login_required
 def ct_summary_list_filter(request):
+    """Obtain data for CT summary view
+    """
     from remapp.interface.mod_filters import ct_acq_filter
     from remapp.forms import CTChartOptionsForm, itemsPerPageForm
     from openremproject import settings
@@ -1029,6 +1043,8 @@ def ct_summary_list_filter(request):
 
 @login_required
 def ct_summary_chart_data(request):
+    """Obtain data for CT charts Ajax call
+    """
     from remapp.interface.mod_filters import ct_acq_filter
     from openremproject import settings
     from django.http import JsonResponse
@@ -1072,6 +1088,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                          plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
                          plot_histograms, plot_case_insensitive_categories):
+    """CT chart data calculations
+    """
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
     return_structure = {}
@@ -1314,6 +1332,8 @@ def ct_detail_view(request, pk=None):
 
 @login_required
 def mg_summary_list_filter(request):
+    """Mammography data for summary view
+    """
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from openremproject import settings
     from remapp.forms import MGChartOptionsForm, itemsPerPageForm
@@ -1405,6 +1425,8 @@ def mg_summary_list_filter(request):
 
 @login_required
 def mg_summary_chart_data(request):
+    """Obtain data for mammography chart data Ajax view
+    """
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from openremproject import settings
     from django.http import JsonResponse
@@ -1447,6 +1469,8 @@ def mg_summary_chart_data(request):
 def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_per_systems,
                          plot_histogram_bins, plot_study_per_day_and_hour, plot_agd_vs_thickness,
                          plot_kvp_vs_thickness, plot_mas_vs_thickness):
+    """Calculations for mammography charts
+    """
     from interface.chart_functions import workload_chart_data, scatter_plot_data
 
     return_structure = {}
