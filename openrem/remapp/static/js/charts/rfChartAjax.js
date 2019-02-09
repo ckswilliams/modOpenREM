@@ -35,14 +35,18 @@ $(document).ready(function() {
             // DAP per study description data
             if( typeof plotRFStudyDAP !== "undefined") {
                 updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, "plotRFStudyDAPContainer", colourScale);
+                /*eslint-disable no-undef*/
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "plotRFStudyDAPContainer");
+                /*eslint-enable no-undef*/
                 hideButtonsIfOneSeries("plotRFStudyDAPContainer", "study_dap_series_");
             }
 
             // DAP per requested procedure data
             if( typeof plotRFRequestDAP !== "undefined") {
                 updateAverageChart(json.requestNameList, json.requestSystemList, json.requestSummary, json.requestHistogramData, plotAverageChoice, "plotRFRequestDAPContainer", colourScale);
+                /*eslint-disable no-undef*/
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "plotRFRequestDAPContainer");
+                /*eslint-enable no-undef*/
                 hideButtonsIfOneSeries("plotRFRequestDAPContainer", "request_dap_series_");
             }
 
