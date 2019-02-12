@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.9.0b6 (2019-01-xx)
+0.9.0b6 (2019-02-12)
 --------------------
 * `#725`_  Charts: added fluoroscopy charts of DAP and frequency per requested procedure
 * `#723`_  Task management: fixed issue with latest version of kombu and amqp on Windows
