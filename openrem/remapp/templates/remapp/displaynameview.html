@@ -25,18 +25,67 @@
 {% block toprow %}
   {% load pagination_tags %}
   <a name="#top"></a>
-  <p>{% if admin.admingroup %}Check one or more boxes and click an Update button to be taken to a page where you can
-    update all of the selected systems to the same display name and / or set a user defined modality type.</p>
-    <p>The boxes can be checked or unchecked by clicking anywhere on the row. Tables can be sorted by clicking on
-    column headers.{% endif %}</p>
-  <p>
-    Jump to <a href="#ct">CT</a> | <a href="#fluoro">Fluoroscopy</a> |<a href="#mammo">Mammography</a> |
-    <a href="#dx">DX and CR</a> | <a href="#others">Others</a> | <a href="#failed">Failed imports</a> |
-  </p>
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Unit display name and modality type configuration</h3>
+      {% if admin.admingroup %}
+        <p>
+          Check one or more boxes and click an Update button to be taken to a page where you can
+          update all of the selected systems to the same display name and / or set a user defined modality type.
+        </p>
+        <p>The boxes can be checked or unchecked by clicking anywhere on the row. Tables can be sorted by clicking on
+          column headers.
+        </p>
+      {% endif %}
+      <p>
+        Jump to <a href="#ct">CT</a> | <a href="#fluoro">Fluoroscopy</a> |<a href="#mammo">Mammography</a> |
+        <a href="#dx">DX and CR</a> | <a href="#others">Others</a> | <a href="#failed">Failed imports</a> |
+      </p>
+
+    </div>
+    <div class="col-md-6">
+      {% if admin.admingroup %}
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3 class="panel-title">Setting display name automatically for known devices</h3>
+          </div>
+          <div class="panel-body">
+            <form action="" method="post" class="form-inline" role="form">
+              {% csrf_token %}
+              {% for field in MergeOptionsForm %}
+                <div class="checkbox">
+                  <label>
+                    {{ field.errors }}
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.help_text }}
+                  </label>
+                </div>
+              {% endfor %}
+              <button class="btn btn-default" type="submit">Submit</button>
+            </form>
+            <p>
+              RDSRs include a Device Observer UID that is unique to that device. If this option is ticked, when one of
+              the other variables (e.g. software version) changes, OpenREM will automatically set the display name to
+              be the same as the one already configured for that device.
+            </p>
+            <p>
+              Do not tick this option if you want to spot when software changes or the station name changes because a
+              new
+              unit will appear in the summary tables.
+            </p>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
 {% endblock %}
 
 
 {% block mainblock %}
+
+
 
   {% paginate %}
 

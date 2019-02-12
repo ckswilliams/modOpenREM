@@ -2081,12 +2081,37 @@ def charts_off(request):
 @login_required
 def display_names_view(request):
     from django.db.models import Q
-    from remapp.models import UniqueEquipmentNames
+    from remapp.models import UniqueEquipmentNames, MergeOnDeviceObserverUIDSettings
+    from forms import MergeOnDeviceObserverUIDForm
+
+    try:
+        match_on_device_observer_uid = MergeOnDeviceObserverUIDSettings.objects.values_list(
+            'match_on_device_observer_uid', flat=True)[0]
+    except IndexError:
+        match_on_device_observer_uid = False
+        m = MergeOnDeviceObserverUIDSettings(match_on_device_observer_uid=False)
+        m.save()
+
+    if request.method == 'POST':
+        merge_options_form = MergeOnDeviceObserverUIDForm(request.POST)
+        if merge_options_form.is_valid():
+            if merge_options_form.cleaned_data['match_on_device_observer_uid'] != match_on_device_observer_uid:
+                merge_options_settings = MergeOnDeviceObserverUIDSettings.objects.all()[0]
+                merge_options_settings.match_on_device_observer_uid = \
+                    merge_options_form.cleaned_data['match_on_device_observer_uid']
+                merge_options_settings.save()
+                if merge_options_form.cleaned_data['match_on_device_observer_uid']:
+                    messages.info(request, "Display name and Modality type are set automatically based on "
+                                           "Device Observer UID")
+                else:
+                    messages.info(request, "Display name and Modality type are NOT set automatically")
+        return HttpResponseRedirect(reverse_lazy('display_names_view'))
 
     f = UniqueEquipmentNames.objects.order_by('display_name')
 
-    # if user_defined_modality is filled, we should use this value, otherwise the value of modality type in the general_study module
-    # so we look if the concatenation of the user_defined_modality (empty if not used) and modality_type starts with a specific modality type
+    # if user_defined_modality is filled, we should use this value, otherwise the value of modality type in the
+    # general_study module. So we look if the concatenation of the user_defined_modality (empty if not used) and
+    # modality_type starts with a specific modality type
     ct_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT").distinct()
     mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
     dx_names = f.filter(Q(user_defined_modality="DX") | Q(user_defined_modality="dual") | (
@@ -2105,10 +2130,12 @@ def display_names_view(request):
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
+    merge_options_form = MergeOnDeviceObserverUIDForm({'match_on_device_observer_uid': match_on_device_observer_uid})
+
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'name_list': f, 'admin': admin,
+    return_structure = {'name_list': f, 'admin': admin, 'MergeOptionsForm': merge_options_form,
                         'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'rf_names': rf_names,
                         'ot_names': ot_names, 'modalities': ['CT', 'RF', 'MG', 'DX', 'OT']}
 

@@ -72,6 +72,19 @@ fluoroscopy; and other.
 
 .. _changing_display_names:
 
+Setting display name automatically for known devices
+====================================================
+
+If you are a member of the ``admingroup`` you can set an option to
+automatically set the display name of already known devices even if one of
+the above mentioned ``fields`` changed.
+A device can send its Device Observer UID (especially in rdsr-objects). This
+is a unique ID for the device. If this UID is received by OpenREM it can set
+the display name and modality type the same as an already known device with
+the same Device Observer UID. This option can be useful if other parameters
+that OpenREM looks at frequently change. If you want to see if one of the
+other parameters changed (like software version), don't tick this option.
+
 Changing X-ray system display names and user defined modality
 =============================================================
 
