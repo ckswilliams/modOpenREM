@@ -1,5 +1,4 @@
-/*global arrayToURL, urlToArray, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries,
-updateFrequencyChart, plotAverageChoice, updateWorkloadChart, urlStartStudy*/
+/* global arrayToURL, urlToArray, chroma, updateAverageChart, sortChartDataToDefault, hideButtonsIfOneSeries, updateFrequencyChart, plotAverageChoice, updateWorkloadChart, urlStartStudy, urlStartRequest, chartSortingDirection */
 /*eslint no-undef: "error"*/
 /*eslint object-shorthand: "off" */
 
@@ -28,11 +27,27 @@ $(document).ready(function() {
                 updateFrequencyChart(json.studyNameList, json.studySystemList, json.studySummary, urlStartStudy, "piechartStudyDIV", colourScale);
             }
 
+            // Requested procedure frequency chart data start
+            if(typeof plotRFRequestFreq !== "undefined") {
+                updateFrequencyChart(json.requestNameList, json.requestSystemList, json.requestSummary, urlStartRequest, "piechartRequestDIV", colourScale);
+            }
+
             // DAP per study description data
             if( typeof plotRFStudyDAP !== "undefined") {
                 updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, "plotRFStudyDAPContainer", colourScale);
+                /*eslint-disable no-undef*/
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "plotRFStudyDAPContainer");
+                /*eslint-enable no-undef*/
                 hideButtonsIfOneSeries("plotRFStudyDAPContainer", "study_dap_series_");
+            }
+
+            // DAP per requested procedure data
+            if( typeof plotRFRequestDAP !== "undefined") {
+                updateAverageChart(json.requestNameList, json.requestSystemList, json.requestSummary, json.requestHistogramData, plotAverageChoice, "plotRFRequestDAPContainer", colourScale);
+                /*eslint-disable no-undef*/
+                sortChartDataToDefault(chartSorting, chartSortingDirection, "plotRFRequestDAPContainer");
+                /*eslint-enable no-undef*/
+                hideButtonsIfOneSeries("plotRFRequestDAPContainer", "request_dap_series_");
             }
 
             $(".ajax-progress").hide();

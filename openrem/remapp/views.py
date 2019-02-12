@@ -98,6 +98,8 @@ def logout_page(request):
 
 @login_required
 def dx_summary_list_filter(request):
+    """Obtain data for radiographic summary view
+    """
     from remapp.interface.mod_filters import dx_acq_filter
     from remapp.forms import DXChartOptionsForm, itemsPerPageForm
     from openremproject import settings
@@ -207,6 +209,8 @@ def dx_summary_list_filter(request):
 
 @login_required
 def dx_summary_chart_data(request):
+    """Obtain data for Ajax chart call
+    """
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q
     from openremproject import settings
@@ -259,6 +263,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                          plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems,
                          plot_histogram_bins, plot_histograms, plot_case_insensitive_categories):
+    """Calculations for radiographic charts
+    """
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
     from django.utils.datastructures import MultiValueDictKeyError
 
@@ -482,6 +488,8 @@ def dx_detail_view(request, pk=None):
 
 @login_required
 def rf_summary_list_filter(request):
+    """Obtain data for radiographic summary view
+    """
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
     from remapp.forms import RFChartOptionsForm, itemsPerPageForm
@@ -526,6 +534,8 @@ def rf_summary_list_filter(request):
             user_profile.plotRFStudyPerDayAndHour = chart_options_form.cleaned_data['plotRFStudyPerDayAndHour']
             user_profile.plotRFStudyFreq = chart_options_form.cleaned_data['plotRFStudyFreq']
             user_profile.plotRFStudyDAP = chart_options_form.cleaned_data['plotRFStudyDAP']
+            user_profile.plotRFRequestFreq = chart_options_form.cleaned_data['plotRFRequestFreq']
+            user_profile.plotRFRequestDAP = chart_options_form.cleaned_data['plotRFRequestDAP']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.plotSeriesPerSystem = chart_options_form.cleaned_data['plotSeriesPerSystem']
@@ -537,6 +547,8 @@ def rf_summary_list_filter(request):
                          'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
                          'plotRFStudyFreq': user_profile.plotRFStudyFreq,
                          'plotRFStudyDAP': user_profile.plotRFStudyDAP,
+                         'plotRFRequestFreq': user_profile.plotRFRequestFreq,
+                         'plotRFRequestDAP': user_profile.plotRFRequestDAP,
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
                          'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
                          'plotHistograms': user_profile.plotHistograms}
@@ -616,6 +628,8 @@ def rf_summary_list_filter(request):
 
 @login_required
 def rf_summary_chart_data(request):
+    """Obtain data for Ajax chart call
+    """
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from openremproject import settings
     from django.http import JsonResponse
@@ -649,32 +663,38 @@ def rf_summary_chart_data(request):
     return_structure =\
         rf_plot_calculations(f, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotRFStudyPerDayAndHour, user_profile.plotRFStudyFreq,
-                             user_profile.plotRFStudyDAP, user_profile.plotHistograms,
-                             user_profile.plotCaseInsensitiveCategories)
+                             user_profile.plotRFStudyPerDayAndHour,
+                             user_profile.plotRFStudyFreq, user_profile.plotRFStudyDAP,
+                             user_profile.plotRFRequestFreq, user_profile.plotRFRequestDAP,
+                             user_profile.plotHistograms, user_profile.plotCaseInsensitiveCategories)
 
     return JsonResponse(return_structure, safe=False)
 
 
-def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_per_systems,
-                         plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_study_dap,
+def rf_plot_calculations(f, median_available, plot_average_choice,
+                         plot_series_per_systems, plot_histogram_bins,
+                         plot_study_per_day_and_hour,
+                         plot_study_freq, plot_study_dap,
+                         plot_request_freq, plot_request_dap,
                          plot_histograms, plot_case_insensitive_categories):
+    """Calculations for fluoroscopy charts
+    """
     from interface.chart_functions import average_chart_inc_histogram_data, workload_chart_data
 
     return_structure = {}
 
-    if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap:
+    if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap or plot_request_freq or plot_request_dap:
         # No acquisition-level filters, so can use f.qs for all charts at the moment.
         #exp_include = f.qs.values_list('study_instance_uid')
         #study_events = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=exp_include)
-        study_events = f.qs
+        study_and_request_events = f.qs
 
     if plot_study_per_day_and_hour:
-        result = workload_chart_data(study_events)
+        result = workload_chart_data(study_and_request_events)
         return_structure['studiesPerHourInWeekdays'] = result['workload']
 
     if plot_study_freq or plot_study_dap:
-        result = average_chart_inc_histogram_data(study_events,
+        result = average_chart_inc_histogram_data(study_and_request_events,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'study_description',
                                                   'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
@@ -690,6 +710,24 @@ def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_p
         return_structure['studySummary'] = result['summary']
         if plot_study_dap and plot_histograms:
             return_structure['studyHistogramData'] = result['histogram_data']
+
+    if plot_request_freq or plot_request_dap:
+        result = average_chart_inc_histogram_data(study_and_request_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'requested_procedure_code_meaning',
+                                                  'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
+                                                  1000000,
+                                                  plot_request_dap, plot_request_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
+
+        return_structure['requestSystemList'] = result['system_list']
+        return_structure['requestNameList'] = result['series_names']
+        return_structure['requestSummary'] = result['summary']
+        if plot_request_dap and plot_histograms:
+            return_structure['requestHistogramData'] = result['histogram_data']
 
     return return_structure
 
@@ -898,6 +936,8 @@ def rf_detail_view_skin_map(request, pk=None):
 
 @login_required
 def ct_summary_list_filter(request):
+    """Obtain data for CT summary view
+    """
     from remapp.interface.mod_filters import ct_acq_filter
     from remapp.forms import CTChartOptionsForm, itemsPerPageForm
     from openremproject import settings
@@ -1003,6 +1043,8 @@ def ct_summary_list_filter(request):
 
 @login_required
 def ct_summary_chart_data(request):
+    """Obtain data for CT charts Ajax call
+    """
     from remapp.interface.mod_filters import ct_acq_filter
     from openremproject import settings
     from django.http import JsonResponse
@@ -1046,6 +1088,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                          plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
                          plot_histograms, plot_case_insensitive_categories):
+    """CT chart data calculations
+    """
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
     return_structure = {}
@@ -1288,6 +1332,8 @@ def ct_detail_view(request, pk=None):
 
 @login_required
 def mg_summary_list_filter(request):
+    """Mammography data for summary view
+    """
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from openremproject import settings
     from remapp.forms import MGChartOptionsForm, itemsPerPageForm
@@ -1379,6 +1425,8 @@ def mg_summary_list_filter(request):
 
 @login_required
 def mg_summary_chart_data(request):
+    """Obtain data for mammography chart data Ajax view
+    """
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from openremproject import settings
     from django.http import JsonResponse
@@ -1421,6 +1469,8 @@ def mg_summary_chart_data(request):
 def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_per_systems,
                          plot_histogram_bins, plot_study_per_day_and_hour, plot_agd_vs_thickness,
                          plot_kvp_vs_thickness, plot_mas_vs_thickness):
+    """Calculations for mammography charts
+    """
     from interface.chart_functions import workload_chart_data, scatter_plot_data
 
     return_structure = {}
@@ -2977,6 +3027,8 @@ def chart_options_view(request):
             user_profile.plotRFStudyPerDayAndHour = rf_form.cleaned_data['plotRFStudyPerDayAndHour']
             user_profile.plotRFStudyFreq = rf_form.cleaned_data['plotRFStudyFreq']
             user_profile.plotRFStudyDAP = rf_form.cleaned_data['plotRFStudyDAP']
+            user_profile.plotRFRequestFreq = rf_form.cleaned_data['plotRFRequestFreq']
+            user_profile.plotRFRequestDAP = rf_form.cleaned_data['plotRFRequestDAP']
             user_profile.plotRFInitialSortingChoice = rf_form.cleaned_data['plotRFInitialSortingChoice']
 
             user_profile.plotMGStudyPerDayAndHour = mg_form.cleaned_data['plotMGStudyPerDayAndHour']
@@ -3042,6 +3094,8 @@ def chart_options_view(request):
     rf_form_data = {'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
                     'plotRFStudyFreq': user_profile.plotRFStudyFreq,
                     'plotRFStudyDAP': user_profile.plotRFStudyDAP,
+                    'plotRFRequestFreq': user_profile.plotRFRequestFreq,
+                    'plotRFRequestDAP': user_profile.plotRFRequestDAP,
                     'plotRFInitialSortingChoice': user_profile.plotRFInitialSortingChoice}
 
     mg_form_data = {'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour,
