@@ -139,6 +139,16 @@ class HomePageAdminSettings(SingletonModel):
         return '/admin/homepagesettings/1/'
 
 
+class MergeOnDeviceObserverUIDSettings(SingletonModel):
+    """
+    Table to store setting(s) for autmoatic setting of Display Name and Modality type based on same Device observer UID
+    """
+    match_on_device_observer_uid = models.BooleanField(
+        default=False,
+        verbose_name="Set Display Name and Modality type if Device Observer UID is matching."
+    )
+
+
 class DicomDeleteSettings(SingletonModel):
     """
     Table to store DICOM deletion settings
@@ -457,6 +467,7 @@ class UniqueEquipmentNames(models.Model):
     display_name = models.TextField(blank=True, null=True)
     user_defined_modality = models.CharField(max_length=16, blank=True, null=True)
     hash_generated = models.BooleanField(default=False)
+    device_observer_uid = models.TextField(blank=True, null=True)
 
     class Meta:
         unique_together = ('manufacturer_hash', 'institution_name_hash', 'station_name_hash',
