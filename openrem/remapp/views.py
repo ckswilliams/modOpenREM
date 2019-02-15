@@ -476,12 +476,13 @@ def dx_detail_view(request, pk=None):
     events_all = projection_set.irradeventxraydata_set.select_related(
         'anatomical_structure', 'laterality', 'target_region', 'image_view',
         'patient_orientation_modifier_cid', 'acquisition_plane').all()
-    accum_integrated = projection_set.accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+    accum_set = projection_set.accumxraydose_set.all()
+    # accum_integrated = projection_set.accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
 
     return render_to_response(
         'remapp/dxdetail.html',
         {'generalstudymoduleattr': study, 'admin': admin,
-         'projection_set': projection_set, 'events_all': events_all, 'accum_integrated': accum_integrated},
+         'projection_set': projection_set, 'events_all': events_all, 'accum_set': accum_set},
         context_instance=RequestContext(request)
     )
 

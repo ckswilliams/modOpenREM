@@ -22,7 +22,10 @@
     <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
     <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
     <li>Patient age: {{ patientstudy.patient_age_decimal|floatformat:1 }} years</li>
-    <li>Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m, {{ patientstudy.patient_weight|floatformat:1 }} kg</li>
+    <li>
+      Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m,
+      {{ patientstudy.patient_weight|floatformat:1 }} kg
+    </li>
     <li>Hospital: {{ equipment.institution_name }}</li>
     <li>
         X-ray system:
@@ -40,11 +43,37 @@
     <table class="table table-condensed table-bordered small">
       <tr>
         <th>Total number of events</th>
-        <td>{{ accum_integrated.total_number_of_radiographic_frames }}</td>
+      <td>
+        {% for record in accum_set %}
+          {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
+                      {% if accum_set.count > 1 %}
+                        {{ record.acquisition_plane }}:
+                      {% endif %}
+                      {% if accum_integrated.total_number_of_radiographic_frames %}
+                        {{ accum_integrated.total_number_of_radiographic_frames }}
+                      {% else %}
+                        {{ projection_set.irradeventxraydata_set.all.count }}
+                      {% endif %}
+                      <br>
+            {% endwith %}
+      {% endfor %}
+        </td>
       </tr>
       <tr>
         <th>Total DAP </th>
-        <td>{{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }} cGy&middot;cm<sup>2</sup></td>
+        <td>
+                            {% for record in accum_set %}
+                    {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
+                      {% if accum_set.count > 1 %}
+                        {{ record.acquisition_plane }}:
+                      {% endif %}
+
+                      {{ accum_integrated.convert_gym2_to_cgycm2 | floatformat:1 }} cGy&middot;cm<sup>2</sup>
+                      <br>
+                    {% endwith %}
+                  {% endfor %}
+
+        </td>
       </tr>
     </table>
   </div>
