@@ -468,11 +468,13 @@ class UniqueEquipmentNames(models.Model):
     user_defined_modality = models.CharField(max_length=16, blank=True, null=True)
     hash_generated = models.BooleanField(default=False)
     device_observer_uid = models.TextField(blank=True, null=True)
+    device_observer_uid_hash = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         unique_together = ('manufacturer_hash', 'institution_name_hash', 'station_name_hash',
                            'institutional_department_name_hash', 'manufacturer_model_name_hash',
-                           'device_serial_number_hash', 'software_versions_hash', 'gantry_id_hash')
+                           'device_serial_number_hash', 'software_versions_hash', 'gantry_id_hash',
+                           'device_observer_uid_hash')
 
     def __unicode__(self):
         return self.display_name

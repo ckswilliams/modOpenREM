@@ -1101,7 +1101,8 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
         gantry_id=equip.gantry_id,
         gantry_id_hash=hash_id(equip.gantry_id),
         hash_generated=True,
-        device_observer_uid=device_observer_uid
+        device_observer_uid=device_observer_uid,
+        device_observer_uid_hash=hash_id(device_observer_uid)
     )
 
     if created:
@@ -1123,6 +1124,21 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
                     object_nr = 1
                 equip_display_name.display_name = matched_equip_display_name[object_nr].display_name
                 equip_display_name.user_defined_modality = matched_equip_display_name[object_nr].user_defined_modality
+        if not equip_display_name.display_name:
+            # if no display name, either new unit, existing unit with changes and match on UID False, or existing and
+            # first import since match_on_uid added. Code below should then apply name from last version of unit.
+            match_without_observer_uid = UniqueEquipmentNames.objects.filter(
+                manufacturer_hash=hash_id(equip.manufacturer),
+                institution_name_hash=hash_id(equip.institution_name),
+                station_name_hash=hash_id(equip.station_name),
+                institutional_department_name_hash=hash_id(equip.institutional_department_name),
+                manufacturer_model_name_hash=hash_id(equip.manufacturer_model_name),
+                device_serial_number_hash=hash_id(equip.device_serial_number),
+                software_versions_hash=hash_id(equip.software_versions),
+                gantry_id_hash=hash_id(equip.gantry_id),
+            ).order_by('-pk')
+            if match_without_observer_uid > 0:
+                equip_display_name.display_name = match_without_observer_uid[0].display_name
         if equip_display_name.display_name is None:
             if equip.institution_name and equip.station_name:
                 equip_display_name.display_name = equip.institution_name + ' ' + equip.station_name
