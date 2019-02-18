@@ -2,6 +2,8 @@
 OpenREM version history
 =======================
 
+* `#729`_  Interface: replaced hard coded URLs in Displaynameview.html and review_failed_imports.html with url names
+
 0.9.0b6 (2019-02-12)
 --------------------
 * `#725`_  Charts: added fluoroscopy charts of DAP and frequency per requested procedure

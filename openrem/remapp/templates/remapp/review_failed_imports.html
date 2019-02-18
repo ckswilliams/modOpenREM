@@ -31,7 +31,7 @@
       function studiesDeleteButton() {
           $.ajax(
               {
-                  url: "/admin/review/studiesdeletefailed",
+                  url: "{% url 'review_failed_studies_delete' %}",
                   data: {
                       csrfmiddlewaretoken: '{{ csrf_token }}',
                       modality: '{{ modality }}'
@@ -122,7 +122,7 @@
               function get_review_data(json) {
                   $.ajax(
                       {
-                          url: "/admin/review/failed/study",
+                          url: "{% url 'review_failed_study_details' %}",
                           data: {
                               study_pk: '{{ study.pk }}',
                               csrfmiddlewaretoken: '{{ csrf_token }}'
