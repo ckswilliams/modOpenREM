@@ -89,6 +89,63 @@ class DislayNamesAndMatchOnObsUID(TestCase):
         display_name_4 = study_4.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
         self.assertEqual(display_name_4, u'Custom Display Name')
 
+    def test_0_9_0_upgrade(self):
+        """
+        Import RDSR and set device_observer_uid to None (existing studies on upgrade condition), then import again
+        to test if display name is matched
+        """
+
+        PatientIDSettings.objects.create()
+
+        dicom_file_1 = "test_files/DX-RDSR-Canon_CXDI.dcm"
+        dicom_file_2 = "test_files/DX-RDSR-Carestream_DRXEvolution.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path_1 = os.path.join(root_tests, dicom_file_1)
+        dicom_path_2 = os.path.join(root_tests, dicom_file_2)
+
+        dataset_1 = dicom.read_file(dicom_path_1)
+        dataset_1.decode()
+        _rdsr2db(dataset_1)
+        dataset_2 = dicom.read_file(dicom_path_2)
+        dataset_2.decode()
+        _rdsr2db(dataset_2)
+
+        display_name_0 = UniqueEquipmentNames.objects.order_by('pk')[0]
+        display_name_0.device_observer_uid = None
+        display_name_0.device_observer_uid_hash = None
+        display_name_0.display_name = u"System One"
+        display_name_0.save()
+
+        display_name_1 = UniqueEquipmentNames.objects.order_by('pk')[1]
+        display_name_1.device_observer_uid = None
+        display_name_1.device_observer_uid_hash = None
+        display_name_1.display_name = u"System Two"
+        display_name_1.save()
+
+        dataset_1_a = dataset_1
+        dataset_1_a.SOPInstanceUID = "1.1.1.1"
+        dataset_1_a.StudyInstanceUID = "1.1.1.1"
+        _rdsr2db(dataset_1_a)
+
+        study_1_a = GeneralStudyModuleAttr.objects.order_by('id')[2]
+        display_name_1_a = study_1_a.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
+        self.assertEqual(display_name_1_a, u"System One")
+
+        # Set match on device observer UID as True and import second study
+        device_uid_settings = MergeOnDeviceObserverUIDSettings.get_solo()
+        device_uid_settings.match_on_device_observer_uid = True
+        device_uid_settings.save()
+        self.assertEqual(MergeOnDeviceObserverUIDSettings.get_solo().match_on_device_observer_uid, True)
+
+        dataset_2_a = dataset_2
+        dataset_2_a.SOPInstanceUID = "1.1.1.2"
+        dataset_2_a.StudyInstanceUID = "1.1.1.2"
+        _rdsr2db(dataset_2_a)
+
+        study_2_a = GeneralStudyModuleAttr.objects.order_by('id')[3]
+        display_name_2_a = study_2_a.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
+        self.assertEqual(display_name_2_a, u"System Two")
+
 
 
 

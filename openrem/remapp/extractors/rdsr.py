@@ -1137,9 +1137,10 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
                 software_versions_hash=hash_id(equip.software_versions),
                 gantry_id_hash=hash_id(equip.gantry_id),
             ).order_by('-pk')
-            if match_without_observer_uid > 0:
-                equip_display_name.display_name = match_without_observer_uid[0].display_name
-        if equip_display_name.display_name is None:
+            if match_without_observer_uid.count() > 1:
+                # ordered by -pk; 0 is the new entry, 1 will be the last one before that
+                equip_display_name.display_name = match_without_observer_uid[1].display_name
+        if not equip_display_name.display_name:
             if equip.institution_name and equip.station_name:
                 equip_display_name.display_name = equip.institution_name + ' ' + equip.station_name
             elif equip.institution_name:
