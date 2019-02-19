@@ -147,39 +147,63 @@ class DislayNamesAndMatchOnObsUID(TestCase):
         display_name_2_a = study_2_a.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
         self.assertEqual(display_name_2_a, u"System Two")
 
-    def test_0_9_0_upgrade_images(self):
+    def test_0_9_0_rdsr_images(self):
         """
-        Import image and set device_observer_uid to None (existing studies on upgrade condition), then import again
-        to test if display name is matched
+        Import image and import rdsr of the same system. There should be no errors (but won't be assumed to be same
+        system)
         """
 
         PatientIDSettings.objects.create()
 
-        dicom_file = "test_files/DX-Im-GE_XR220-1.dcm"
+        img_file = "test_files/DX-Im-GE_XR220-1.dcm"
+        rdsr_file = "test_files/DX-RDSR-Canon_CXDI.dcm"
         root_tests = os.path.dirname(os.path.abspath(__file__))
-        dicom_path = os.path.join(root_tests, dicom_file)
+        img_path = os.path.join(root_tests, img_file)
+        rdsr_path = os.path.join(root_tests, rdsr_file)
 
-        dataset = dicom.read_file(dicom_path)
-        dataset.decode()
-        _dx2db(dataset)
+        img = dicom.read_file(img_path)
+        rdsr = dicom.read_file(rdsr_path)
+        img.decode()
+        rdsr.decode()
 
-        display_name_0 = UniqueEquipmentNames.objects.order_by('pk')[0]
-        display_name_0.device_observer_uid = None
-        display_name_0.device_observer_uid_hash = None
-        display_name_0.display_name = u"System One"
-        display_name_0.save()
+        # Reset all matching values to match between image and RDSR from two different systems!
+        img.Manufacturer = u"Manufacturer"
+        img.InstitutionName = u"Institution"
+        img.StationName = u"Station Name"
+        img.InstitutionalDepartmentName = u"Institutional Department Name"
+        img.ManufacturerModelName = u"Manufacturer Model Name"
+        img.DeviceSerialNumber = u"Device Serial Number"
+        img.SoftwareVersions = u"Software Versions"
+        img.GantryID = u"GantryID"
 
-        dataset_2 = dataset
-        dataset_2.SOPInstanceUID = "1.1.1.2"
-        dataset_2.StudyInstanceUID = "1.1.1.2"
-        _dx2db(dataset_2)
+        rdsr.Manufacturer = u"Manufacturer"
+        rdsr.InstitutionName = u"Institution"
+        rdsr.StationName = u"Station Name"
+        rdsr.InstitutionalDepartmentName = u"Institutional Department Name"
+        rdsr.ManufacturerModelName = u"Manufacturer Model Name"
+        rdsr.DeviceSerialNumber = u"Device Serial Number"
+        rdsr.SoftwareVersions = u"Software Versions"
+        rdsr.GantryID = u"GantryID"
+
+        _dx2db(img)
+
+        display_name_img = UniqueEquipmentNames.objects.order_by('pk')[0]
+        display_name_img.display_name = u"Custom name for img"
+        display_name_img.save()
+
+        _rdsr2db(rdsr)
 
         # Check both studies have imported ok
         studies = GeneralStudyModuleAttr.objects.order_by('pk')
         self.assertEqual(studies.count(), 2)
 
-        # Check second study has customised display name
-        study_2 = GeneralStudyModuleAttr.objects.order_by('pk')[1]
-        display_name_2 = study_2.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
-        self.assertEqual(display_name_2, u"System One")
+        for study in studies:
+            print("Display name is {0}".format(study.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name))
 
+        img_2 = img
+        img_2.SOPInstanceUID = "1.1.1.2"
+        img_2.StudyInstanceUID = "1.1.1.2"
+        _dx2db(img_2)
+
+        studies = GeneralStudyModuleAttr.objects.order_by('pk')
+        self.assertEqual(studies.count(), 3)
