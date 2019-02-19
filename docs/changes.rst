@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.0b6 (2019-02-12)
 --------------------
+* `#727`_  Imports: fixed issue with display names on upgrade to 0.9
 * `#725`_  Charts: added fluoroscopy charts of DAP and frequency per requested procedure
 * `#723`_  Task management: fixed issue with latest version of kombu and amqp on Windows
 * `#720`_  Interface: fixed small overlap between skin dose map and irradiation type table
