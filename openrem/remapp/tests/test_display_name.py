@@ -197,9 +197,6 @@ class DislayNamesAndMatchOnObsUID(TestCase):
         studies = GeneralStudyModuleAttr.objects.order_by('pk')
         self.assertEqual(studies.count(), 2)
 
-        for study in studies:
-            print("Display name is {0}".format(study.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name))
-
         img_2 = img
         img_2.SOPInstanceUID = "1.1.1.2"
         img_2.StudyInstanceUID = "1.1.1.2"
@@ -207,3 +204,47 @@ class DislayNamesAndMatchOnObsUID(TestCase):
 
         studies = GeneralStudyModuleAttr.objects.order_by('pk')
         self.assertEqual(studies.count(), 3)
+
+        # Should be just two rows in UniqueEquipmentNames table
+        self.assertEqual(UniqueEquipmentNames.objects.all().count(), 2)
+
+        # RDSR import won't know the difference between img entry and pre-0.9.0 RDSR entry, so will adopt same name
+        name_1 = UniqueEquipmentNames.objects.order_by('pk')[0].display_name
+        name_2 = UniqueEquipmentNames.objects.order_by('pk')[1].display_name
+        self.assertEqual(name_1, u"Custom name for img")
+        self.assertEqual(name_2, u"Custom name for img")
+
+        # Now do the same, but RDSR first, expect two different names
+        rdsr_2 = rdsr
+        rdsr_2.DeviceSerialNumber = u"0003"
+        rdsr_2.SOPInstanceUID = "1.1.2.1"
+        rdsr_2.StudyInstanceUID = "1.1.2.1"
+        img_3 = img
+        img_3.DeviceSerialNumber = u"0003"
+        img_3.SOPInstanceUID = "1.1.3.2"
+        img_3.StudyInstanceUID = "1.1.3.2"
+        img_4 = img
+        img_4.DeviceSerialNumber = u"0003"
+        img_4.SOPInstanceUID = "1.1.3.3"
+        img_4.StudyInstanceUID = "1.1.3.3"
+
+        _rdsr2db(rdsr_2)
+
+        self.assertEqual(UniqueEquipmentNames.objects.all().count(), 3)
+        display_name_3 = UniqueEquipmentNames.objects.order_by('pk')[2]
+        self.assertEqual(display_name_3.display_name, u"Institution Station Name")
+        display_name_3.display_name = u"Custom RDSR name"
+        display_name_3.save()
+
+        _dx2db(img_3)
+        _dx2db(img_4)
+
+        self.assertEqual(UniqueEquipmentNames.objects.all().count(), 4)
+        display_name_3 = UniqueEquipmentNames.objects.order_by('pk')[2]
+        display_name_4 = UniqueEquipmentNames.objects.order_by('pk')[3]
+        self.assertEqual(display_name_3.display_name, u"Custom RDSR name")
+        self.assertEqual(display_name_4.display_name, u"Institution Station Name")
+
+
+
+
