@@ -196,10 +196,10 @@
 aborted early in the process. Members of the admingroup can click through to review and delete these studies.</p>
 <span id="failed-list">
 <ul>
-  <li><a href="/admin/review/failed/CT/">CT</a></li>
-  <li><a href="/admin/review/failed/MG/">Mammography</a></li>
-  <li><a href="/admin/review/failed/DX/">Radiography</a></li>
-  <li><a href="/admin/review/failed/RF/">Fluoro</a></li>
+  <li><a href="{% url 'review_failed_imports' 'CT' %}">CT</a></li>
+  <li><a href="{% url 'review_failed_imports' 'MG' %}">Mammography</a></li>
+  <li><a href="{% url 'review_failed_imports' 'DX' %}">Radiography</a></li>
+  <li><a href="{% url 'review_failed_imports' 'RF' %}">Fluoro</a></li>
 </ul>
 </span>
 
