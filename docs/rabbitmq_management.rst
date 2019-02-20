@@ -45,21 +45,21 @@ RabbitMQ message broker
 -----------------------
 
 .. figure:: img/tasksrabbitfail.png
-   :figwidth: 30%
+   :figwidth: 51%
    :align: right
    :alt: RabbitMQ status - failed
 
    Figure 3: RabbitMQ status failed
 
 .. figure:: img/tasksrabbitnotasks.png
-   :figwidth: 30%
+   :figwidth: 51%
    :align: right
    :alt: RabbitMQ status - running, no tasks waiting
 
    Figure 4: RabbitMQ status running, no tasks waiting
 
 .. figure:: img/tasksrabbit2tasks.png
-   :figwidth: 30%
+   :figwidth: 51%
    :align: right
    :alt: RabbitMQ status - running, two tasks waiting
 
