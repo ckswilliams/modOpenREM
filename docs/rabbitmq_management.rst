@@ -1,5 +1,5 @@
-RabbitMQ & Celery management
-****************************
+Task management
+***************
 *New in 0.9*
 
 .. contents::
@@ -9,6 +9,80 @@ Enabling RabbitMQ management
 
 Installation instructions were added in 0.9.0. Users upgrading from previous versions should review
 :ref:`enableRabbitMQ`.
+
+
+Viewing task and service statuses
+=================================
+
+.. figure:: img/ConfigMenu.png
+   :figwidth: 30%
+   :align: right
+   :alt: Config options
+
+   Figure 1: The ``Config`` menu (user and admin)
+
+Users who are logged in with admin rights can use the **Config** menu and choose **Tasks** to see the following:
+
+* The status of the task message broker, RabbitMQ
+* The status of the asynchronous task queue, Celery
+* The status of the Celery monitoring tool, Flower
+* How many tasks are waiting in RabbitMQ for a Celery worker to be available
+* A list of the tasks currently being managed by Celery
+* A list of previous tasks and their final status
+
+.. figure:: img/tasks3waiting4inprogress.png
+   :figwidth: 100%
+   :align: center
+   :alt: Task and service status
+
+   Figure 2: The task administration page
+
+Service statuses
+================
+The current status of the services necessary to execute and monitor tasks is displayed in the first section of the page.
+
+RabbitMQ message broker
+-----------------------
+
+.. figure:: img/tasksrabbitfail.png
+   :figwidth: 30%
+   :align: right
+   :alt: RabbitMQ status - failed
+
+   Figure 3: RabbitMQ status failed
+
+.. figure:: img/tasksrabbitnotasks.png
+   :figwidth: 30%
+   :align: right
+   :alt: RabbitMQ status - running, no tasks waiting
+
+   Figure 4: RabbitMQ status running, no tasks waiting
+
+.. figure:: img/tasksrabbit2tasks.png
+   :figwidth: 30%
+   :align: right
+   :alt: RabbitMQ status - running, two tasks waiting
+
+   Figure 5: RabbitMQ status running, two tasks waiting
+
+
+
+
+
+When tasks are created, they are sent to Celery to be processed via a message broker, RabbitMQ. Therefore this service
+must be running for any of the asynchronous tasks to execute - for example query-retrieve operations and exports.
+Normal function is indicated with a green status and a tick.
+
+
+
+
+
+
+
+
+
+
+
 
 Viewing and managing RabbitMQ queues
 ====================================
