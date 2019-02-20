@@ -44,26 +44,12 @@ The current status of the services necessary to execute and monitor tasks is dis
 RabbitMQ message broker
 -----------------------
 
-.. figure:: img/tasksrabbitfail.png
-   :figwidth: 51%
+.. figure:: img/tasksrabbitstatuses.png
+   :figwidth: 40%
    :align: right
-   :alt: RabbitMQ status - failed
+   :alt: RabbitMQ status
 
-   Figure 3: RabbitMQ status failed
-
-.. figure:: img/tasksrabbitnotasks.png
-   :figwidth: 51%
-   :align: right
-   :alt: RabbitMQ status - running, no tasks waiting
-
-   Figure 4: RabbitMQ status running, no tasks waiting
-
-.. figure:: img/tasksrabbit2tasks.png
-   :figwidth: 51%
-   :align: right
-   :alt: RabbitMQ status - running, two tasks waiting
-
-   Figure 5: RabbitMQ status running, two tasks waiting
+   Figure 3: RabbitMQ statuses: failed; running, no tasks waiting; running, two tasks waiting
 
 
 
