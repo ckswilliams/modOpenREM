@@ -59,7 +59,15 @@ When tasks are created, they are sent to Celery to be processed via a message br
 must be running for any of the asynchronous tasks to execute - for example query-retrieve operations and exports.
 Normal function is indicated with a green status and a tick.
 
+When there are Celery workers available to take tasks, they will be passed through immediately and the service status
+be green as seen in the middle image of Figure 3. When all the Celery workers are busy any additional tasks will be held
+with the RabbitMQ broker, and an option to purge the queue is made available as in the bottom image in Figure 3.
 
+Celery asynchronous task queue
+------------------------------
+
+Flower - Celery monitoring tool
+-------------------------------
 
 
 
