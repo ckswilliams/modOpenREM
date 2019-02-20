@@ -45,7 +45,7 @@ RabbitMQ message broker
 -----------------------
 
 .. figure:: img/tasksrabbitstatuses.png
-   :figwidth: 40%
+   :figwidth: 50%
    :align: right
    :alt: RabbitMQ status
 
