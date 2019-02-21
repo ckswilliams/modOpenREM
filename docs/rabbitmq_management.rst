@@ -69,16 +69,30 @@ Celery asynchronous task queue
 
    Figure 4: Celery statuses: no RabbitMQ; not running; running
 
+Celery is used to manage the tasks that need to be carried out asynchronously. In OpenREM, these tend to be long running
+tasks such as exports and query-retrieve.
+
 If RabbitMQ is not running, we can't tell if Celery is running; this is indicated by the first panel in Figure 4. If
-RabbitMQ is running but Celery isn't, this is indicated by the middle panel in Figure 4. Finally, when Celery is running
-a green panel with a tick is presented.
+RabbitMQ is running but Celery isn't, this is indicated by the middle panel in Figure 4.
+
+Finally, when Celery is running a green panel with a tick is presented.
 
 
 Flower - Celery monitoring tool
 -------------------------------
 
+.. figure:: img/tasksflowerstatuses.png
+   :figwidth: 50%
+   :align: right
+   :alt: Flower status
 
+   Figure 5: Flower statuses: not running; running
 
+Flower enables monitoring of the Celery queues so we can see what is currently running, terminated if necessary, and
+maintain a log of previous tasks and how they finished. Flower logs are reset on restart of the service.
+
+If Flower is not running, the Flower status panel will look like the top half of Figure 5. If it is running, the panel
+will look like the bottom half of Figure 5.
 
 
 
