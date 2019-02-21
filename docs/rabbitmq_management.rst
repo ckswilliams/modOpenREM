@@ -51,10 +51,6 @@ RabbitMQ message broker
 
    Figure 3: RabbitMQ statuses: failed; running, no tasks waiting; running, two tasks waiting
 
-
-
-
-
 When tasks are created, they are sent to Celery to be processed via a message broker, RabbitMQ. Therefore this service
 must be running for any of the asynchronous tasks to execute - for example query-retrieve operations and exports.
 Normal function is indicated with a green status and a tick.
@@ -65,6 +61,18 @@ with the RabbitMQ broker, and an option to purge the queue is made available as 
 
 Celery asynchronous task queue
 ------------------------------
+
+.. figure:: img/taskscelerystatuses.png
+   :figwidth: 50%
+   :align: right
+   :alt: Celery status
+
+   Figure 4: Celery statuses: no RabbitMQ; not running; running
+
+If RabbitMQ is not running, we can't tell if Celery is running; this is indicated by the first panel in Figure 4. If
+RabbitMQ is running but Celery isn't, this is indicated by the middle panel in Figure 4. Finally, when Celery is running
+a green panel with a tick is presented.
+
 
 Flower - Celery monitoring tool
 -------------------------------
