@@ -102,3 +102,4 @@ Active tasks are listed after the service status section, as seen in Figure 2. T
 the number of workers you have configured - see :ref:`celery_concurrency` for details.
 
 It is possible to terminate any running tasks by clicking the red button. There is no confirmation step.
+
