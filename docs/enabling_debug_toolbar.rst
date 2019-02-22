@@ -22,8 +22,7 @@ Configuration
 -------------
 
 * Copy the tuple ``MIDDLEWARE_CLASSES`` from ``openremproject/settings.py`` to ``openremproject/local_settings.py``
-* In ``openremproject/local_settings.py``, add ``'pagination.middleware.PaginationMiddleware',``, before the
-  ``pagination`` middleware works well:
+* In ``openremproject/local_settings.py``, add ``'pagination.middleware.PaginationMiddleware',``:
 
 ..  code-block:: console
 
@@ -45,23 +44,23 @@ Configuration
 
 ..  code-block:: console
 
-INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.admin',
-    'remapp',
-    'django_filters',
-    'pagination',
-    'django.contrib.humanize',
-    'solo',
-    'crispy_forms',
-    'django_js_reverse',
-    'debug_toolbar',
-)
+    INSTALLED_APPS = (
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.sites',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'django.contrib.admin',
+        'remapp',
+        'django_filters',
+        'pagination',
+        'django.contrib.humanize',
+        'solo',
+        'crispy_forms',
+        'django_js_reverse',
+        'debug_toolbar',
+    )
 
 Add the following line to ``openremproject/local_settings.py``:
 
