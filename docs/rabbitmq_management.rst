@@ -88,14 +88,20 @@ Flower - Celery monitoring tool
 
    Figure 5: Flower statuses: not running; running
 
-Flower enables monitoring of the Celery queues so we can see what is currently running, terminated if necessary, and
+Flower enables monitoring of the Celery queues so we can see what is currently running, terminate if necessary, and
 maintain a log of previous tasks and how they finished. Flower logs are reset on restart of the service.
 
 If Flower is not running, the Flower status panel will look like the top half of Figure 5. If it is running, the panel
 will look like the bottom half of Figure 5.
 
 
+Terminating running tasks
+=========================
 
+Active tasks are listed after the service status section, as seen in Figure 2. The number of active tasks is limited by
+the number of workers you have configured - see :ref:`celery_concurrency` for details.
+
+It is possible to terminate any running tasks by clicking the red button. There is no confirmation step.
 
 
 

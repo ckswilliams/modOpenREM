@@ -103,6 +103,11 @@ Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuatio
     celery worker -n default -Ofair -A openremproject -c 4 -Q default ^
     --pidfile=C:\path\to\media\celery\default.pid --logfile=C:\path\to\media\celery\default.log
 
+.. _celery_concurrency:
+
+Celery concurrency
+^^^^^^^^^^^^^^^^^^
+
 Set the number of workers (concurrency, ``-c``) according to how many processor cores you have available. The more you
 have, the more processes (imports, exports, query-retrieve operations etc) can take place simultaneously. However, each
 extra worker uses extra memory and if you have too many they will be competing for CPU resources too.
