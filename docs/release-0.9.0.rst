@@ -8,6 +8,7 @@ Headline changes
 
 * Interface: added feature to display workload stats in the home page modality tables
 * Interface: added :doc:`i_fluoro_high_dose_alerts` feature
+* Interface: dual-plane DX studies can now be handled in summary list and study detail pages
 * Administration: automatic e-mail alerts sent when fluoroscopy studies exceed a dose alert level
 * Query-retrieve: handle non-return of ModalitiesInStudy correctly
 * Query-retrieve: increased query logging and summary feedback

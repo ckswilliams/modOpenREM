@@ -1,123 +1,154 @@
 {% extends "remapp/base.html" %}
-{% block navdx %}<li class="active">{% endblock %}
+{% block navdx %}
+  <li class="active">{% endblock %}
 
 
 {% block mainblock %}
-{% with patientstudy=generalstudymoduleattr.patientstudymoduleattr_set.get %}
-{% with equipment=generalstudymoduleattr.generalequipmentmoduleattr_set.get %}
-<h1>Detail list of events</h1>
+  {% with patientstudy=generalstudymoduleattr.patientstudymoduleattr_set.get %}
+    {% with equipment=generalstudymoduleattr.generalequipmentmoduleattr_set.get %}
+      <h1>Detail list of events</h1>
 
-<ul>
-    <li>
-        Accession number:
-        {% if not generalstudymoduleattr.accession_hashed %}
+      <ul>
+        <li>
+          Accession number:
+          {% if not generalstudymoduleattr.accession_hashed %}
             {{ generalstudymoduleattr.accession_number }}
-        {% else %}
+          {% else %}
             <i>hidden</i>
-        {% endif %}
-    </li>
-    <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
-    <li>Study time: {{ generalstudymoduleattr.study_time|date:"H:i" }}</li>
-    <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
-    <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
-    <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
-    <li>Patient age: {{ patientstudy.patient_age_decimal|floatformat:1 }} years</li>
-    <li>Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m, {{ patientstudy.patient_weight|floatformat:1 }} kg</li>
-    <li>Hospital: {{ equipment.institution_name }}</li>
-    <li>
-        X-ray system:
-        {{ equipment.manufacturer }} |
-        {{ equipment.manufacturer_model_name }} |
-        {{ equipment.station_name }}
-    </li>
-    <li>Display name: {{ equipment.unique_equipment_name.display_name }}</li>
-    <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
-    <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
-    <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
-</ul>
-<div class="row">
-  <div class="col-md-3">
-    <table class="table table-condensed table-bordered small">
-      <tr>
-        <th>Total number of events</th>
-        <td>{{ accum_integrated.total_number_of_radiographic_frames }}</td>
-      </tr>
-      <tr>
-        <th>Total DAP </th>
-        <td>{{ accum_integrated.convert_gym2_to_cgycm2|floatformat:1 }} cGy&middot;cm<sup>2</sup></td>
-      </tr>
-    </table>
-  </div>
-</div>
+          {% endif %}
+        </li>
+        <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
+        <li>Study time: {{ generalstudymoduleattr.study_time|date:"H:i" }}</li>
+        <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
+        <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
+        <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
+        <li>Patient age: {{ patientstudy.patient_age_decimal|floatformat:1 }} years</li>
+        <li>
+          Patient height and weight: {{ patientstudy.patient_size|floatformat:2 }} m,
+          {{ patientstudy.patient_weight|floatformat:1 }} kg
+        </li>
+        <li>Hospital: {{ equipment.institution_name }}</li>
+        <li>
+          X-ray system:
+          {{ equipment.manufacturer }} |
+          {{ equipment.manufacturer_model_name }} |
+          {{ equipment.station_name }}
+        </li>
+        <li>Display name: {{ equipment.unique_equipment_name.display_name }}</li>
+        <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
+        <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
+        <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
+      </ul>
+      <div class="row">
+        <div class="col-md-3">
+          <table class="table table-condensed table-bordered small">
+            <tr>
+              <th>Total number of events</th>
+              <td>
+                {% for record in accum_set %}
+                  {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
+                    {% if accum_set.count > 1 %}
+                      {{ record.acquisition_plane }}:
+                    {% endif %}
+                    {% if accum_integrated.total_number_of_radiographic_frames %}
+                      {{ accum_integrated.total_number_of_radiographic_frames }}
+                    {% else %}
+                      {{ projection_set.irradeventxraydata_set.all.count }}
+                    {% endif %}
+                    <br>
+                  {% endwith %}
+                {% endfor %}
+              </td>
+            </tr>
+            <tr>
+              <th>Total DAP</th>
+              <td>
+                {% for record in accum_set %}
+                  {% with accum_integrated=record.accumintegratedprojradiogdose_set.get %}
+                    {% if accum_set.count > 1 %}
+                      {{ record.acquisition_plane }}:
+                    {% endif %}
 
-<table class="table table-striped table-bordered small">
-    <th>Time</th>
-    <th>Acquisition protocol</th>
-    <th>
-      Anatomy, laterality <br>
-      Targe region <br>
-      View
-    </th>
-    <th>kVp</th>
-    <th>mAs</th>
-    <th>mA</th>
-    <th>Time<br>(ms)</th>
-    <th>Filters<br>(mm)</th>
-    <th>SID<br>(mm)</th>
-    <th>Grid FD<br>(mm)</th>
-    <th>Exposure Index<br>IEC</th>
-    <th>Exposure Index<br>vendor</th>
-    <th>DAP<br>(cGy.cm<sup>2</sup>)</th>
-    <th>Control mode</th>
-    <th>Comment</th>
-    {% for event in events_all %}
-      {% with sourcedata=event.irradeventxraysourcedata_set.get %}
-      {% with detector_data=event.irradeventxraydetectordata_set.get %}
-      <tr>
-        <td>{{ event.date_time_started|time:"H:i.s" }}</td>
-        <td>{{ event.acquisition_protocol }}</td>
-        <td>
-          {% if event.anatomical_structure %} {{ event.anatomical_structure }} {% endif %}
-          {% if event.laterality %}{{ event.laterality }} {% endif %}<br>
-          {% if event.target_region %}{{ event.target_region }} {% endif %}<br>
-          {% if event.image_view %}{{ event.image_view }} {% endif %}
-        </td>
-        <td>
-          {% for kvp_value in sourcedata.kvp_set.all %}
-            {{ kvp_value.kvp|floatformat:0 }}
-          {% endfor %}
-        </td>
-        <td>
-          {% for exposure_value in sourcedata.exposure_set.all %}
-           {{ exposure_value.convert_uAs_to_mAs|floatformat:1 }}
-          {% endfor %}
-        </td>
-        <td>{{ sourcedata.average_xray_tube_current|floatformat:1 }}</td>
-        <td>{{ sourcedata.exposure_time|floatformat:0 }}</td>
-        <td>
-          {%  include 'remapp/list_filters.html' %}
-        </td>
-        <td>{{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
-        <td>
-            {{ sourcedata.grid_focal_distance|floatformat:0 }}
-        </td>
-        <td>
-            EI: {{ detector_data.exposure_index|floatformat:1 }} <br>
-            EI<sub>T</sub>: {{ detector_data.target_exposure_index|floatformat:1 }} <br>
-            DI: {{ detector_data.deviation_index|floatformat:1 }}
-        </td>
-        <td>
-            {{ detector_data.relative_xray_exposure|floatformat:0 }}
-            {{ detector_data.relative_exposure_unit }}
-        </td>
-        <td>{{ event.convert_gym2_to_cgycm2|floatformat:1 }}</td>
-        <td>{{ sourcedata.exposure_control_mode }}</td>
-        <td>{{ event.comment }}</td>
-    </tr>
+                    {{ accum_integrated.convert_gym2_to_cgycm2 | floatformat:1 }} cGy&middot;cm<sup>2</sup>
+                    <br>
+                  {% endwith %}
+                {% endfor %}
+
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <table class="table table-striped table-bordered small">
+        <th>Time</th>
+        <th>Acquisition protocol</th>
+        <th>
+          Anatomy, laterality <br>
+          Targe region <br>
+          View
+        </th>
+        <th>kVp</th>
+        <th>mAs</th>
+        <th>mA</th>
+        <th>Time<br>(ms)</th>
+        <th>Filters<br>(mm)</th>
+        <th>SID<br>(mm)</th>
+        <th>Grid FD<br>(mm)</th>
+        <th>Exposure Index<br>IEC</th>
+        <th>Exposure Index<br>vendor</th>
+        <th>DAP<br>(cGy.cm<sup>2</sup>)</th>
+        <th>Control mode</th>
+        <th>Comment</th>
+        {% for event in events_all %}
+          {% with sourcedata=event.irradeventxraysourcedata_set.get %}
+            {% with detector_data=event.irradeventxraydetectordata_set.get %}
+              <tr>
+                <td>{{ event.date_time_started|time:"H:i.s" }}</td>
+                <td>{{ event.acquisition_protocol }}</td>
+                <td>
+                  {% if event.anatomical_structure %} {{ event.anatomical_structure }} {% endif %}
+                  {% if event.laterality %}{{ event.laterality }} {% endif %}<br>
+                  {% if event.target_region %}{{ event.target_region }} {% endif %}<br>
+                  {% if event.image_view %}{{ event.image_view }} {% endif %}
+                </td>
+                <td>
+                  {% for kvp_value in sourcedata.kvp_set.all %}
+                    {{ kvp_value.kvp|floatformat:0 }}
+                  {% endfor %}
+                </td>
+                <td>
+                  {% for exposure_value in sourcedata.exposure_set.all %}
+                    {{ exposure_value.convert_uAs_to_mAs|floatformat:1 }}
+                  {% endfor %}
+                </td>
+                <td>{{ sourcedata.average_xray_tube_current|floatformat:1 }}</td>
+                <td>{{ sourcedata.exposure_time|floatformat:0 }}</td>
+                <td>
+                  {% include 'remapp/list_filters.html' %}
+                </td>
+                <td>
+                  {{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
+                <td>
+                  {{ sourcedata.grid_focal_distance|floatformat:0 }}
+                </td>
+                <td>
+                  EI: {{ detector_data.exposure_index|floatformat:1 }} <br>
+                  EI<sub>T</sub>: {{ detector_data.target_exposure_index|floatformat:1 }} <br>
+                  DI: {{ detector_data.deviation_index|floatformat:1 }}
+                </td>
+                <td>
+                  {{ detector_data.relative_xray_exposure|floatformat:0 }}
+                  {{ detector_data.relative_exposure_unit }}
+                </td>
+                <td>{{ event.convert_gym2_to_cgycm2|floatformat:1 }}</td>
+                <td>{{ sourcedata.exposure_control_mode }}</td>
+                <td>{{ event.comment }}</td>
+              </tr>
+            {% endwith %}{% endwith %}
+        {% endfor %}
+      </table>
+
+
     {% endwith %}{% endwith %}
-    {% endfor %}
-</table>
-
-
-{% endwith %}{% endwith %}
 {% endblock %}
