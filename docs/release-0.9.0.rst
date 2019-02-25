@@ -9,18 +9,18 @@ Headline changes
 * Interface: added feature to display workload stats in the home page modality tables
 * Interface: added :doc:`i_fluoro_high_dose_alerts` feature
 * Interface: dual-plane DX studies can now be handled in summary list and study detail pages
-* Administration: automatic e-mail alerts sent when fluoroscopy studies exceed a dose alert level
 * Query-retrieve: handle non-return of ModalitiesInStudy correctly
 * Query-retrieve: increased query logging and summary feedback
 * Imports: fix for empty NumericValues in RDSR
 * Imports: fix for Toshiba RDSR with incorrect multiple values in SD field for vHP
 * Imports: fix for Philips Azurion RDSR with incorrect AcquisitionDeviceType
 * Imports: fix for Varian RDSRs
-* Administration: added facility to list and delete failed import studies
-* Administration: added interface to RabbitMQ queues
-* Administration: added interface to Celery tasks
+* Administration: automatic e-mail alerts sent when fluoroscopy studies exceed a dose alert level
+* Administration: added facility to list and delete studies where the import failed
+* Administration: added interface to RabbitMQ queues and Celery tasks
+* Administration: short-term fix for task performance and control on Windows
 * Documentation: further refinement of the linux one-page install
-* Web server: :doc:`virtual_directory`
+* Installation: :doc:`virtual_directory`
 
 
 ***************************************************
