@@ -6,6 +6,8 @@ Contents:
 ..  toctree::
     :maxdepth: 2
    
+    code_running_tests
+    enabling_debug_toolbar
     code_dicomimport
     code_nondicomimport
     code_export
@@ -17,7 +19,6 @@ Contents:
     code_forms
     code_netdicom
     code_adding_charts
-    code_running_tests
 
 
 
