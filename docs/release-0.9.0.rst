@@ -9,12 +9,15 @@ Headline changes
 * Interface: added feature to display workload stats in the home page modality tables
 * Interface: added :doc:`i_fluoro_high_dose_alerts` feature
 * Interface: dual-plane DX studies can now be handled in summary list and study detail pages
+* Interface: new option to set display name when unique fields change based on device observer UID in RDSR
+* Charts: added fluoroscopy charts of DAP and frequency per requested procedure, fixed bugs in links for others
 * Query-retrieve: handle non-return of ModalitiesInStudy correctly
 * Query-retrieve: increased query logging and summary feedback
 * Imports: fix for empty NumericValues in RDSR
 * Imports: fix for Toshiba RDSR with incorrect multiple values in SD field for vHP
 * Imports: fix for Philips Azurion RDSR with incorrect AcquisitionDeviceType
 * Imports: fix for Varian RDSRs
+* Exports: made more robust for exporting malformed studies, fixed filtering bugs
 * Administration: automatic e-mail alerts sent when fluoroscopy studies exceed a dose alert level
 * Administration: added facility to list and delete studies where the import failed
 * Administration: added interface to RabbitMQ queues and Celery tasks
