@@ -67,16 +67,7 @@ Related tools
 Enabling django-debug-toolbar
 -----------------------------
 
-Add the following line to ``local_settings.py``:
-
-.. sourcecode:: console
-
-    INTERNAL_IPS= ['127.0.0.1']
-
-If you wish to make use of the debug toolbar on machines other than the one the code is running on, change the
-INTERNAL_IPS address list to include your client machine.
-
-Now when ``DEBUG = True`` the toolbar should appear.
+See :doc:`enabling_debug_toolbar`
 
 Creating test versions of production systems
 ============================================

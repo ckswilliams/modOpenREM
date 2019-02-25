@@ -10,6 +10,7 @@ OpenREM version history
 * `#725`_  Charts: added fluoroscopy charts of DAP and frequency per requested procedure
 * `#723`_  Task management: fixed issue with latest version of kombu and amqp on Windows
 * `#722`_  Interface: dual-plane DX studies are now displayed without error in filtered list and study detail page
+* `#721`_  Documentation: removed Django Debug Toolbar from default install and documented how to install and use it
 * `#720`_  Interface: fixed small overlap between skin dose map and irradiation type table
 * `#719`_  Interface: fixed hardcoded link in template rffiltered.html
 * `#717`_  Query-retrieve: fixed problem where an error was thrown if association is None

@@ -17,7 +17,10 @@ urlpatterns = patterns('',
 )
 
 if settings.DEBUG:
-    import debug_toolbar
-    urlpatterns = [
-        url(r'^{0}__debug__/'.format(VIRTUAL_DIRECTORY), include(debug_toolbar.urls)),
-    ] + urlpatterns
+    try:
+        import debug_toolbar
+        urlpatterns = [
+            url(r'^{0}__debug__/'.format(VIRTUAL_DIRECTORY), include(debug_toolbar.urls)),
+        ] + urlpatterns
+    except ImportError:
+        pass
