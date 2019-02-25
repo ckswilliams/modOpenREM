@@ -30,7 +30,7 @@ Codacy:
 OpenREM is a Django app to extract, store, display and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
 
-This is release 0.9.0 beta 6 for testing purposes.
+This is release 0.9.0 beta 7 for testing purposes.
 
 Please review the `release notes <https://docs.openrem.org/en/latest/release-0.9.0.html>`_ for more details.
 
