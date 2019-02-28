@@ -491,8 +491,8 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
         gantry_id=equip.gantry_id,
         gantry_id_hash=hash_id(equip.gantry_id),
         hash_generated=True,
-        device_observer_uid="",
-        device_observer_uid_hash=hash_id("")
+        device_observer_uid=None,
+        device_observer_uid_hash=None
     )
     if created:
         if equip.institution_name and equip.station_name:
