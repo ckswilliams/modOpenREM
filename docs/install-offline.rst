@@ -48,7 +48,7 @@ Download python packages from PyPI
 In a console, navigate to a suitable place and create an empty directory to collect all the packages in, then use pip to
 download them all:
 
-.. sourcecode:: console
+.. code-block:: console
 
     mkdir openremfiles
     pip download -d openremfiles celery==3.1.25  # this line not required for Linux
