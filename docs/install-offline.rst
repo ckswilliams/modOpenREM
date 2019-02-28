@@ -52,7 +52,7 @@ download them all:
 
     mkdir openremfiles
     pip download -d openremfiles celery==3.1.25  # this line not required for Linux
-    pip download -d openremfiles openrem==0.9.0b7
+    pip download -d openremfiles openrem==0.9.0b8
     pip download -d openremfiles psycopg2-binary
     pip download --no-deps -d openremfiles https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
@@ -60,7 +60,7 @@ download them all:
 
     Older versions of pip may need to use the following command instead:
 
-    ``pip install -d openremfiles openrem==0.9.0b7``
+    ``pip install -d openremfiles openrem==0.9.0b8``
 
     * Note: this  of ``pynetdicom`` is modified in comparison to the version in PyPI, and will malfunction if you use
       the official version
@@ -90,7 +90,9 @@ In a console, navigate to the directory that your ``openremfiles`` directory is 
 
 .. sourcecode:: python
 
-    pip install --no-index --find-links=openremfiles openrem==0.9.0b7  # where openremfiles is the directory you created
+    pip install --no-index --find-links=openremfiles celery==3.1.25  # this link not required for Linux
+    pip install --no-index --find-links=openremfiles openrem==0.9.0b8  # where openremfiles is the directory you created
+    pip install --no-index --find-links=openremfiles psycopg2-binary
 
     pip install openremfiles\default.tar.gz  # this is the custom version of pynetdicom
 
