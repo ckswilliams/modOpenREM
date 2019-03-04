@@ -19,7 +19,7 @@ from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomQR
 from remapp.netdicom import qrscu
 
 
-def _fake_check_sr_type_in_study_with_rdsr(assoc, study, query_id):
+def _fake_check_sr_type_in_study_with_rdsr(assoc, study, query_id, get_empty_sr):
     return 'RDSR'
 
 
@@ -237,7 +237,7 @@ class QRPhilipsCT(TestCase):
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 3)
 
         assoc = None
-        qrscu._prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        qrscu._prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
 
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 1)
@@ -278,7 +278,7 @@ class QRPhilipsCT(TestCase):
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 3)
 
         assoc = None
-        qrscu._prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        qrscu._prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
 
         # After pruning, two series
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
@@ -313,7 +313,7 @@ class QRPhilipsCT(TestCase):
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 2)
 
         assoc = None
-        qrscu._prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        qrscu._prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
 
         # After pruning, there should be no studies left
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 0)
@@ -363,7 +363,7 @@ class QRPhilipsCT(TestCase):
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 4)
 
         assoc = None
-        qrscu._prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        qrscu._prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
 
         # Should now have one SR series left, identified by the series description for the purposes of this test
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
@@ -588,7 +588,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -653,7 +653,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -706,7 +706,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -787,7 +787,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -840,7 +840,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 0)
 
@@ -903,7 +903,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -1016,7 +1016,7 @@ class PruneSeriesResponsesCT(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -1041,7 +1041,7 @@ class PruneSeriesResponsesCT(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -1068,7 +1068,7 @@ class PruneSeriesResponsesCT(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -1096,7 +1096,7 @@ class PruneSeriesResponsesCT(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False)
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
