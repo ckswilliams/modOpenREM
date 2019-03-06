@@ -1,10 +1,18 @@
+.. image:: https://bytebucket.org/openrem/openrem/raw/develop/docs/openrem0105.png
+    :width: 105px
+    :align: right
+    :height: 105px
+    :alt: OpenREM logo
+
 #######
 OpenREM
 #######
 
 
-OpenREM is a Django app to extract, store, display and export Radiation Exposure Monitoring related information,
-primarily from DICOM files.
+OpenREM is an open source application for patient dose monitoring. The software is capable of importing and displaying
+data from a wide variety of x-ray dose related sources with filtering, charts and analysis. The software also
+enables easy export of the data in a form that is suitable for further analysis by suitably qualified medical physics
+personnel.
 
 Documentation is on Read the Docs: https://docs.openrem.org/, and a demo site can be seen at
 http://demo.openrem.org; username `demo` password `demo`
@@ -24,7 +32,7 @@ For other environments please contact Highcharts for licencing. For more informa
 `their website <http://highcharts.com>`_, or the
 `Non-Commercial FAQ <https://shop.highsoft.com/faq>`_.
 
-Badges:
+.
 
 .. image:: https://img.shields.io/pypi/v/openrem.svg?
     :target: https://badge.fury.io/py/openrem
