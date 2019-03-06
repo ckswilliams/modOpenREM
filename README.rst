@@ -9,8 +9,8 @@ OpenREM
 #######
 
 
-OpenREM is an open source application for patient dose monitoring. The software is capable of importing and displaying
-data from a wide variety of x-ray dose related sources with filtering, charts and analysis. The software also
+OpenREM is a free, open source application for patient dose monitoring. The software is capable of importing and
+displaying data from a wide variety of x-ray dose related sources with filtering, charts and analysis. The software also
 enables easy export of the data in a form that is suitable for further analysis by suitably qualified medical physics
 personnel.
 
@@ -21,7 +21,7 @@ For upgrades, please review the `version release notes <https://docs.openrem.org
 fresh installs, please review the `install docs <https://docs.openrem.org/en/0.9.0-docs/installation.html>`_.
 
 Contribution of code, ideas, bug reports documentation is all welcome.
-Please feel free to fork the repository and send me pull requests. See
+Please feel free to fork the repository and send pull requests. See
 `the website <https://openrem.org/getinvolved>`_ for more information.
 
 There is a developer demo site, which at times has a working demo of recent code, but might not, and
