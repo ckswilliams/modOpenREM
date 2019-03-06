@@ -32,7 +32,7 @@ Badges:
 .. image:: https://img.shields.io/pypi/pyversions/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
-.. |GPLv3 license| image:: https://img.shields.io/badge/License-GPLv3-blue.svg?
+.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg?
    :target: https://bitbucket.org/openrem/openrem/raw/develop/LICENSE
 
 .. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg?
