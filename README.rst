@@ -24,18 +24,22 @@ For other environments please contact Highcharts for licencing. For more informa
 `their website <http://highcharts.com>`_, or the
 `Non-Commercial FAQ <https://shop.highsoft.com/faq>`_.
 
+Pypi:
 .. image:: https://img.shields.io/pypi/v/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
 .. image:: https://img.shields.io/pypi/pyversions/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
+Bitbucket:
 .. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg?
     :target: https://bitbucket.org/openrem/openrem/issues?status=new&status=open
 
+Coveralls:
 .. image:: https://coveralls.io/repos/bitbucket/openrem/openrem/badge.svg?branch=develop
     :target: https://coveralls.io/bitbucket/openrem/openrem?branch=develop
 
+Codacy:
 .. image:: https://api.codacy.com/project/badge/Grade/2117af7281134e42ace3efe5fc4a5255
     :target: https://www.codacy.com/app/OpenREM/openrem
 
