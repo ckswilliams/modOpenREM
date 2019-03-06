@@ -55,4 +55,14 @@ Update demo site for full release
     python manage.py migrate remapp
     sudo systemctl restart gunicorn-demo.openrem.org.service
 
+Update website for full release
+    Checkout and branch from deploy-live
+    Update release version and release docs link on index.html
+    Create new rst2html from CHANGES.rst to changes/changes.html
+    Update changes/index.html with new section
+    Push to bitbucket, pull request to deploy-stage
+    Merge, check https://stage.openrem.org
+    If good, pull request deploy-stage to deploy-live
+    Merge, check https://openrem.org
+
     Tell developers (beta) or public (late beta or release)
