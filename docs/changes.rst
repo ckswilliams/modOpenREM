@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.9.0b8 (2019-02-28)
---------------------
+0.9.0 (2019-03-06)
+------------------
 * `#731`_  Imports: fixed another issue with display names on upgrade to 0.9
 * `#729`_  Interface: replaced hard coded URLs in displaynameview.html and review_failed_imports.html with url names
 * `#727`_  Imports: fixed issue with display names on upgrade to 0.9

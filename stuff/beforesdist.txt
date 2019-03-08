@@ -41,6 +41,28 @@ Real upload:
 
     If release, merge into develop and push to bitbucket
 
+Update docs versions
     Go to https://readthedocs.org/projects/openrem/versions/ and find docs branch and set to public and active
+
+Update demo site for full release
+    If release, log into the demo site (ssh deploy@openrem.org)
+    Go to the folder /home/deploy/sites/demo.openrem.org/source/
+    git checkout master
+    . /home/deploy/sites/virtualenv/bin/activate
+    pip install -e /home/deploy/sites/demo.openrem.org/source/
+    cd openrem
+    python manage.py makemigrations remapp
+    python manage.py migrate remapp
+    sudo systemctl restart gunicorn-demo.openrem.org.service
+
+Update website for full release
+    Checkout and branch from deploy-live
+    Update release version and release docs link on index.html
+    Create new rst2html from CHANGES.rst to changes/changes.html
+    Update changes/index.html with new section
+    Push to bitbucket, pull request to deploy-stage
+    Merge, check https://stage.openrem.org
+    If good, pull request deploy-stage to deploy-live
+    Merge, check https://openrem.org
 
     Tell developers (beta) or public (late beta or release)
