@@ -13,6 +13,7 @@ Headline changes
 * Charts: added fluoroscopy charts of DAP and frequency per requested procedure, fixed bugs in links for others
 * Query-retrieve: handle non-return of ModalitiesInStudy correctly
 * Query-retrieve: increased query logging and summary feedback
+* Query-retrieve: use time range in search (command line only)
 * Imports: fix for empty NumericValues in RDSR
 * Imports: fix for Toshiba RDSR with incorrect multiple values in SD field for vHP
 * Imports: fix for Philips Azurion RDSR with incorrect AcquisitionDeviceType
