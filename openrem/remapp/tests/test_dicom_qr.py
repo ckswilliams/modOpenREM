@@ -539,8 +539,8 @@ def _fake_image_query(assoc, sr, query_id):
 
 class PruneSeriesResponses(TestCase):
     """
-    Test case for the study or series level filtering for desired or otherwise station names, study descriptions etc
-    Function tested is qrscu._filter
+    Test case for filtering series responses depending on availability and type of SR series, including using -emptysr
+    flag
     """
     def setUp(self):
         """
@@ -911,11 +911,105 @@ class PruneSeriesResponses(TestCase):
         sr_instance = series[0].dicomqrrspimage_set.get()
         self.assertEqual(sr_instance.sop_class_uid, u'1.2.840.10008.5.1.4.1.1.88.22')
 
+    @patch("remapp.netdicom.qrscu._query_images", _fake_image_query)
+    def test_prune_ser_resp_empty_sr_no_flag(self):
+        """
+        Test _prune_series_responses with mammo exam with one SR series & no -emptysr flag, simulating a PACS that
+        doesn't return any image level responses.
+        :return: SR series should remain, image series should be deleted.
+        """
+        from remapp.netdicom.qrscu import _prune_series_responses
+
+        query = DicomQuery.objects.create()
+        query.query_id = "MammoWithSR"
+        query.save()
+
+        st2 = DicomQRRspStudy.objects.create(dicom_query=query)
+        st2.query_id = query.query_id
+        st2.study_instance_uid = uuid.uuid4()
+        st2.study_description = u"MG study with SR"
+        st2.set_modalities_in_study(['MG', 'SR'])
+        st2.save()
+
+        st2_se1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
+        st2_se1.query_id = query.query_id
+        st2_se1.series_instance_uid = uuid.uuid4()
+        st2_se1.modality = u"MG"
+        st2_se1.series_number = 1
+        st2_se1.number_of_series_related_instances = 1
+        st2_se1.save()
+
+        st2_se2 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
+        st2_se2.query_id = query.query_id
+        st2_se2.series_instance_uid = uuid.uuid4()
+        st2_se2.modality = u"SR"
+        st2_se2.series_number = 2
+        st2_se2.number_of_series_related_instances = 1
+        st2_se2.save()
+
+        query = DicomQuery.objects.get(query_id__exact="MammoWithSR")
+        all_mods = self.all_mods
+        filters = self.filters
+        assoc = None
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
+        studies = query.dicomqrrspstudy_set.all()
+        self.assertEqual(studies.count(), 1)
+        series = studies[0].dicomqrrspseries_set.all()
+        self.assertEqual(series.count(), 1)
+        self.assertEqual(series[0].modality, u'MG')
+
+    @patch("remapp.netdicom.qrscu._query_images", _fake_image_query)
+    def test_prune_ser_resp_empty_sr_with_flag(self):
+        """
+        Test _prune_series_responses with mammo exam with one SR series & the -emptysr flag, simulating a PACS that
+        doesn't return any image level responses.
+        :return: SR series should remain, image series should be deleted.
+        """
+        from remapp.netdicom.qrscu import _prune_series_responses
+
+        query = DicomQuery.objects.create()
+        query.query_id = "MammoWithSR"
+        query.save()
+
+        st2 = DicomQRRspStudy.objects.create(dicom_query=query)
+        st2.query_id = query.query_id
+        st2.study_instance_uid = uuid.uuid4()
+        st2.study_description = u"MG study with SR"
+        st2.set_modalities_in_study(['MG', 'SR'])
+        st2.save()
+
+        st2_se1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
+        st2_se1.query_id = query.query_id
+        st2_se1.series_instance_uid = uuid.uuid4()
+        st2_se1.modality = u"MG"
+        st2_se1.series_number = 1
+        st2_se1.number_of_series_related_instances = 1
+        st2_se1.save()
+
+        st2_se2 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
+        st2_se2.query_id = query.query_id
+        st2_se2.series_instance_uid = uuid.uuid4()
+        st2_se2.modality = u"SR"
+        st2_se2.series_number = 2
+        st2_se2.number_of_series_related_instances = 1
+        st2_se2.save()
+
+        query = DicomQuery.objects.get(query_id__exact="MammoWithSR")
+        all_mods = self.all_mods
+        filters = self.filters
+        assoc = None
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=True)
+        studies = query.dicomqrrspstudy_set.all()
+        self.assertEqual(studies.count(), 1)
+        series = studies[0].dicomqrrspseries_set.all()
+        self.assertEqual(series.count(), 1)
+        self.assertEqual(series[0].modality, u'SR')
+
 
 class PruneSeriesResponsesCT(TestCase):
     """
-    Test case for the study or series level filtering for desired or otherwise station names, study descriptions etc
-    Function tested is qrscu._filter
+    Test case for filtering series responses of CT studies, depending on availability and type of SR series,
+    including using -emptysr flag
     """
     def setUp(self):
         """
