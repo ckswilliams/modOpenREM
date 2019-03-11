@@ -916,7 +916,7 @@ class PruneSeriesResponses(TestCase):
         """
         Test _prune_series_responses with mammo exam with one SR series & no -emptysr flag, simulating a PACS that
         doesn't return any image level responses.
-        :return: SR series should remain, image series should be deleted.
+        :return: image series should remain, SR series should be deleted.
         """
         from remapp.netdicom.qrscu import _prune_series_responses
 
@@ -1196,6 +1196,66 @@ class PruneSeriesResponsesCT(TestCase):
         series = studies[0].dicomqrrspseries_set.all()
         self.assertEqual(series.count(), 1)
         self.assertEqual(series[0].series_number, 4)
+
+    @patch("remapp.netdicom.qrscu._query_images", _fake_image_query)
+    def test_prune_ser_resp_ct_empty_sr_no_flag(self):
+        """
+        Test _prune_series_responses with CT exam with one SR series & no -emptysr flag, simulating a PACS that
+        doesn't return any image level responses.
+        :return: Dose info series.
+        """
+        from remapp.netdicom.qrscu import _prune_series_responses
+
+        query = DicomQuery.objects.get(query_id__exact="CT")
+
+        study = query.dicomqrrspstudy_set.get()
+
+        esr_series = study.dicomqrrspseries_set.filter(series_number__exact=2)
+        esr_series[0].dicomqrrspimage_set.get().delete()
+        study.dicomqrrspseries_set.filter(series_number__exact=3).all().delete()
+        study.dicomqrrspseries_set.filter(series_number__exact=5).all().delete()
+
+        all_mods = self.all_mods
+        filters = self.filters
+        assoc = None
+
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=False)
+
+        studies = query.dicomqrrspstudy_set.all()
+        self.assertEqual(studies.count(), 1)
+        series = studies[0].dicomqrrspseries_set.all()
+        self.assertEqual(series.count(), 1)
+        self.assertEqual(series[0].series_number, 4)
+
+    @patch("remapp.netdicom.qrscu._query_images", _fake_image_query)
+    def test_prune_ser_resp_ct_empty_sr_with_flag(self):
+        """
+        Test _prune_series_responses with CT exam with one SR series with -emptysr flag, simulating a PACS that
+        doesn't return any image level responses.
+        :return: SR series.
+        """
+        from remapp.netdicom.qrscu import _prune_series_responses
+
+        query = DicomQuery.objects.get(query_id__exact="CT")
+
+        study = query.dicomqrrspstudy_set.get()
+
+        esr_series = study.dicomqrrspseries_set.filter(series_number__exact=2)
+        esr_series[0].dicomqrrspimage_set.get().delete()
+        study.dicomqrrspseries_set.filter(series_number__exact=3).all().delete()
+        study.dicomqrrspseries_set.filter(series_number__exact=5).all().delete()
+
+        all_mods = self.all_mods
+        filters = self.filters
+        assoc = None
+
+        _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images=False, get_empty_sr=True)
+
+        studies = query.dicomqrrspstudy_set.all()
+        self.assertEqual(studies.count(), 1)
+        series = studies[0].dicomqrrspseries_set.all()
+        self.assertEqual(series.count(), 1)
+        self.assertEqual(series[0].series_number, 2)
 
 
 def _fake_qrscu(qr_scp_pk=None, store_scp_pk=None,
