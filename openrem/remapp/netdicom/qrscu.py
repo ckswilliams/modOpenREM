@@ -8,6 +8,7 @@ Specialised QR routine to get just the objects that might be useful for dose rel
 modality
 """
 
+from builtins import str
 from celery import shared_task
 import django
 import logging
@@ -38,7 +39,7 @@ def _generate_modalities_in_study(study_rsp, query_id):
     """
     logger.debug(u"{0} modalities_returned = False, so building from series info".format(query_id))
     series_rsp = study_rsp.dicomqrrspseries_set.all()
-    study_rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
+    study_rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in list(dic.values()))))
     study_rsp.save()
 
 
@@ -302,7 +303,7 @@ def _get_philips_dose_images(series, get_toshiba_images, query_id):
     :param query_id: UID for this query
     :return: Bool, Bool representing if series_descriptions are available and if a Philips image was or might be found
     """
-    series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
+    series_descriptions = set(val for dic in series.values('series_description') for val in list(dic.values()))
     logger.debug(u"{1} Get Philips:  series_descriptions are {0}".format(series_descriptions, query_id))
     if series_descriptions != {None}:
         if series.filter(series_description__iexact='dose info'):
@@ -682,7 +683,7 @@ def _query_for_each_modality(all_mods, query, d, assoc):
 
     # query for all requested studies
     # if ModalitiesInStudy is not supported by the PACS set modality_matching to False and stop querying further
-    for selection, details in all_mods.items():
+    for selection, details in list(all_mods.items()):
         if details['inc']:
             for mod in details['mods']:
                 if modality_matching:
@@ -934,7 +935,7 @@ def qrscu(
 
     if (not modality_matching) or qr_scp.use_modality_tag:
         before_not_modality_matching = study_numbers['current']
-        mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
+        mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in list(dic.values()))
         logger.debug(u"{1} mods in study are: {0}".format(study_rsp.values('modalities_in_study'), query_id))
         query.stage = u"Deleting studies we didn't ask for"
         query.save()
@@ -943,7 +944,7 @@ def qrscu(
         for mod_set in mods_in_study_set:
             logger.info(u"{1} mod_set is {0}".format(mod_set, query_id))
             delete = True
-            for mod_choice, details in all_mods.items():
+            for mod_choice, details in list(all_mods.items()):
                 if details['inc']:
                     logger.info(u"{2} mod_choice {0}, details {1}".format(mod_choice, details, query_id))
                     for mod in details['mods']:
