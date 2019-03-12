@@ -1,3 +1,4 @@
+from builtins import object
 from django import forms
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
@@ -294,7 +295,7 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = HighDoseMetricAlertSettings
         fields = ['alert_total_dap_rf',
                   'alert_total_rp_dose_rf',
@@ -463,7 +464,7 @@ class DicomDeleteSettingsForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = DicomDeleteSettings
         fields = ['del_no_match', 'del_rdsr', 'del_mg_im', 'del_dx_im', 'del_ct_phil']
 
@@ -517,7 +518,7 @@ class DicomQRForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = DicomRemoteQR
         fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname', 'use_modality_tag']
 
@@ -570,7 +571,7 @@ class DicomStoreForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = DicomStoreSCP
         fields = ['name', 'aetitle', 'port', 'controlled', 'keep_alive']
         labels = {
@@ -598,7 +599,7 @@ class SkinDoseMapCalcSettingsForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = SkinDoseMapCalcSettings
         fields = ['enable_skin_dose_maps', 'calc_on_import']
 
@@ -631,7 +632,7 @@ class NotPatientNameForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = NotPatientIndicatorsName
         fields = ['not_patient_name', ]
         labels = {
@@ -667,7 +668,7 @@ class NotPatientIDForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = NotPatientIndicatorsID
         fields = ['not_patient_id', ]
         labels = {
