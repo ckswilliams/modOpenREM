@@ -1,6 +1,6 @@
-#####################################
-Previous Release Notes and Change Log
-#####################################
+############################
+Release Notes and Change Log
+############################
 
 **************************
 Version history change log
