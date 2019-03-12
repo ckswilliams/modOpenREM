@@ -109,7 +109,7 @@ Changes to Celery for Windows
 For best performance and reliability when using Celery on Windows, it is recommended to do the following from the
 openrem folder (activate virtualenv if using one):
 
-.. soursecode:: bash
+.. sourcecode:: bash
 
     pip install celery==3.1.25
 
