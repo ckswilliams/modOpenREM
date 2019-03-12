@@ -1,6 +1,8 @@
 # This Python file uses the following encoding: utf-8
 # test_import_rf_rdsr_philips.py
 
+from __future__ import division
+from past.utils import old_div
 import os
 from decimal import Decimal
 
@@ -35,7 +37,7 @@ class ImportRFRDSRPhilips(TestCase):
 
         first_field_height = Decimal((164.5+164.5)*1.194)
         first_field_width = Decimal((131.+131.)*1.194)
-        first_field_area = (first_field_height * first_field_width) / 1000000
+        first_field_area = old_div((first_field_height * first_field_width), 1000000)
 
         self.assertAlmostEqual(first_source_data.collimated_field_height, first_field_height)
         self.assertAlmostEqual(first_source_data.collimated_field_width, first_field_width)
