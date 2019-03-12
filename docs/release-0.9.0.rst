@@ -117,6 +117,9 @@ If your command for starting Celery specifies a pool option, for example ``-P so
 to using the default ``prefork`` pool. This will enable multiple tasks to run concurrently and it will be possible to
 terminate tasks.
 
+If you are a Windows user you may also wish to review :doc:`celery-windows` as the example control batch files have
+been updated.
+
 E-mail server settings
 ======================
 If you want selected OpenREM users to be automatically sent fluoroscopy high
