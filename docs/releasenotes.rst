@@ -21,21 +21,24 @@ the links below for the appropriate version.
 Version specific information
 ============================
 
-    ..  toctree::
-        :maxdepth: 1
 
-        release-0.8.1
-        release-0.8.0
-        release-0.7.4
-        release-0.7.3
-        release-0.7.0
-        release-0.6.0
-        release-0.5.1
-        release-0.5.0
-        release-0.4.3
-        release-0.4.2
-        release-0.4.1
-        release-0.4.0
+* :doc:`release-0.9.0` (this release)
+
+..  toctree::
+    :maxdepth: 1
+
+    release-0.8.1
+    release-0.8.0
+    release-0.7.4
+    release-0.7.3
+    release-0.7.0
+    release-0.6.0
+    release-0.5.1
+    release-0.5.0
+    release-0.4.3
+    release-0.4.2
+    release-0.4.1
+    release-0.4.0
 
 
 ********************
