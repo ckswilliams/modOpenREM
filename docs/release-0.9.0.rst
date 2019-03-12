@@ -43,7 +43,7 @@ Upgrade
 * Back up your database
 
     * For PostgreSQL on linux you can refer to :ref:`backup-psql-db`
-    * For PostgreSQL on Windows you can refer to :ref:`backupRestorePostgreSQL`
+    * For PostgreSQL on Windows you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
 * Stop any Celery workers
