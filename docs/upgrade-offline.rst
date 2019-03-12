@@ -44,4 +44,4 @@ On the OpenREM server without internet access
 
     pip install --no-index --find-links=openremfiles openrem==0.9.0
 
-Now go back to :ref:`migratethedatabase` and update the configuration.
+Now go back to :ref:`migratethedatabase090` and update the configuration.

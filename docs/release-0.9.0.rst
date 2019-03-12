@@ -58,7 +58,7 @@ Upgrade
 
     pip install openrem==0.9.0
 
-.. _migratethedatabase:
+.. _migratethedatabase090:
 
 Migrate the database
 ====================
