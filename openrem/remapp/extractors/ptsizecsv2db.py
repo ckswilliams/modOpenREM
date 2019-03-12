@@ -27,6 +27,10 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from past.utils import old_div
 import logging
 
 from celery import shared_task
@@ -56,7 +60,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, *args, **kwargs
         return
     if height:
         if not patientatt.patient_size:
-            patientatt.patient_size = (Decimal(height) / Decimal(100.))
+            patientatt.patient_size = (old_div(Decimal(height), Decimal(100.)))
             if verbose:
                 if imp_log:
                     imp_log.file.open("ab")
@@ -223,7 +227,7 @@ def csv2db(*args, **kwargs):
     import os, csv
     import argparse
     import django
-    import openrem_settings
+    from . import openrem_settings
 
     # Required and optional arguments
     parser = argparse.ArgumentParser(

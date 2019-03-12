@@ -28,6 +28,7 @@
 ..  moduleauthor:: David Platten
 """
 
+from builtins import str
 import sys
 import os
 from openrem.remapp.extractors import rdsr
@@ -501,7 +502,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     # even if it is already present (Dose Utility generates a unique DeviceSerialNumber, but I'd prefer to use the
     # real one)
     logger.debug('Updating study-level data')
-    for key, val in additional_study_info.items():
+    for key, val in list(additional_study_info.items()):
         try:
             rdsr_val = getattr(dcm, key)
             logger.debug('{0}: {1}'.format(key, val))
@@ -544,7 +545,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                         logger.debug('DLP and CTDIvol match')
                                         # There's a match between CTDIvol and DLP, so see if things can be updated or added.
                                         try:
-                                            for key, val in acquisition.items():
+                                            for key, val in list(acquisition.items()):
                                                 if key != 'CTDIvol' and key != 'DLP':
                                                     logger.debug("{0} -> {1}".format(key, str(val)))
                                                     ##############################################
@@ -1027,9 +1028,9 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                     pass
                                                                                 except Exception:
                                                                                     logger.debug(traceback.format_exc())
-                                        except KeyError, e:
+                                        except KeyError as e:
                                             logger.debug(traceback.format_exc())
-                                        except Exception, e:
+                                        except Exception as e:
                                             logger.debug(traceback.format_exc())
                                             # The end of updating the RDSR
                                             ##############################################

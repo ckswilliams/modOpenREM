@@ -28,7 +28,10 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from __future__ import division
+from __future__ import absolute_import
 
+from past.utils import old_div
 import logging
 import os
 import sys
@@ -407,8 +410,8 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                         # at image receptor (shutter positions are defined at 1 meter)
                         private_collimated_field_height = (right_shutter_pos + left_shutter_pos) * Sdd  # in mm
                         private_collimated_field_width = (bottom_shutter_pos + top_shutter_pos) * Sdd  # in mm
-                        private_collimated_field_area = (private_collimated_field_height *
-                                                         private_collimated_field_width) / 1000000  # in m2
+                        private_collimated_field_area = old_div((private_collimated_field_height *
+                                                         private_collimated_field_width), 1000000)  # in m2
                 except AttributeError:
                     pass
         except IndexError:
@@ -1182,15 +1185,15 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
     pat.not_patient_indicator = get_not_pt(dataset)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
-        patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days) / Decimal(
-            '365.25')
+        patientatt.patient_age_decimal = old_div(Decimal((g.study_date.date() - patient_birth_date.date()).days),
+                                                 Decimal('365.25'))
     elif patientatt.patient_age:
         if patientatt.patient_age[-1:] == 'Y':
             patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])
         elif patientatt.patient_age[-1:] == 'M':
-            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1]) / Decimal('12')
+            patientatt.patient_age_decimal = old_div(Decimal(patientatt.patient_age[:-1]), Decimal('12'))
         elif patientatt.patient_age[-1:] == 'D':
-            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1]) / Decimal('365.25')
+            patientatt.patient_age_decimal = old_div(Decimal(patientatt.patient_age[:-1]), Decimal('365.25'))
     if patientatt.patient_age_decimal:
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
     patientatt.save()
@@ -1294,7 +1297,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
 
 
 def _rdsr2db(dataset):
-    import openrem_settings
+    from . import openrem_settings
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
 
@@ -1347,7 +1350,7 @@ def _rdsr2db(dataset):
                 study_uid, existing_event_uids))
 
             # Now compare the two
-            for study_index, uid_list in existing_event_uids.items():
+            for study_index, uid_list in list(existing_event_uids.items()):
                 if uid_list == new_event_uids:
                     # New RDSR is the same as the existing one
                     logger.debug(u"Import match on StudyInstUID {0}. Event level match, will not import.".format(
