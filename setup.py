@@ -30,6 +30,7 @@ requires = [
     'requests',
     'flower',
     'numpy',
+    'future',
     ]
 
 setup(
