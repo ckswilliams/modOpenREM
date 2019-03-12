@@ -211,7 +211,7 @@ class QRPhilipsCT(TestCase):
         rst1s3.save()
 
         rst1_series_rsp = rst1.dicomqrrspseries_set.all()
-        rst1.set_modalities_in_study(list(set(val for dic in rst1_series_rsp.values('modality') for val in dic.values())))
+        rst1.set_modalities_in_study(list(set(val for dic in rst1_series_rsp.values('modality') for val in list(dic.values()))))
         rst1.save()
 
     def test_response_sorting_ct_philips_with_desc(self):
@@ -354,7 +354,7 @@ class QRPhilipsCT(TestCase):
         rst1.set_modalities_in_study(
             list(
                 set(
-                    val for dic in rst1_series_rsp.values('modality') for val in dic.values()
+                    val for dic in rst1_series_rsp.values('modality') for val in list(dic.values())
                 )
             ))
         rst1.save()
@@ -454,7 +454,7 @@ class ResponseFiltering(TestCase):
         rst1.set_modalities_in_study(
             list(
                 set(
-                    val for dic in rst1_series_rsp.values('modality') for val in dic.values()
+                    val for dic in rst1_series_rsp.values('modality') for val in list(dic.values())
                 )
             ))
         rst1.save()
