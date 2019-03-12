@@ -27,8 +27,11 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from __future__ import division
 
 # Following three lines added so that sphinx autodocumentation works.
+from builtins import object
+from past.utils import old_div
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
@@ -93,7 +96,7 @@ def dap_min_filter(queryset, value):
 
     from decimal import Decimal, InvalidOperation
     try:
-        value_gy_m2 = Decimal(value) / Decimal(1000000)
+        value_gy_m2 = old_div(Decimal(value), Decimal(1000000))
     except InvalidOperation:
         return queryset
     filtered = queryset.filter(
@@ -108,7 +111,7 @@ def dap_max_filter(queryset, value):
 
     from decimal import Decimal, InvalidOperation
     try:
-        value_gy_m2 = Decimal(value) / Decimal(1000000)
+        value_gy_m2 = old_div(Decimal(value), Decimal(1000000))
     except InvalidOperation:
         return queryset
     filtered = queryset.filter(
@@ -140,7 +143,7 @@ class RFSummaryListFilter(django_filters.FilterSet):
     study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe(u'Max study DAP (cGy.cm<sup>2</sup>)')) # nosec
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
-    class Meta:
+    class Meta(object):
         model = GeneralStudyModuleAttr
         fields = []
         order_by = (
@@ -204,7 +207,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
                                                               name='ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning',
                                                               choices=CT_ACQ_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple)
 
-    class Meta:
+    class Meta(object):
         model = GeneralStudyModuleAttr
         fields = []
         order_by = (
@@ -325,7 +328,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
     display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
-    class Meta:
+    class Meta(object):
         model = GeneralStudyModuleAttr
         fields = [
             ]
@@ -379,7 +382,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
     display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
-    class Meta:
+    class Meta(object):
         model = GeneralStudyModuleAttr
         fields = [
             'date_after',

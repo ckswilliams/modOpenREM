@@ -1,3 +1,5 @@
+from builtins import filter
+from builtins import range
 def average_chart_inc_histogram_data(database_events, db_display_name_relationship, db_series_names, db_value_name,
                                      value_multiplier, plot_average, plot_freq, plot_series_per_system,
                                      plot_average_choice, median_available, num_hist_bins,
@@ -152,8 +154,8 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
         histogram_annotations = {}
         # Calculate histogram data for each series from each system
         return_structure['histogram_data'] =\
-            [[[None for k in xrange(2)] for j in xrange(len(return_structure['series_names']))]
-             for i in xrange(len(return_structure['system_list']))]
+            [[[None for k in range(2)] for j in range(len(return_structure['series_names']))]
+             for i in range(len(return_structure['system_list']))]
 
         if exclude_constant_angle:
             # Exclude "Constant Angle Acquisitions" from the calculations
