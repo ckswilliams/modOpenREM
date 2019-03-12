@@ -28,6 +28,9 @@
 
 """
 
+from builtins import str
+from builtins import range
+from past.builtins import basestring
 import logging
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
@@ -595,7 +598,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
                     exam_data[index] = ''
                 if isinstance(item, basestring) and u',' in item:
                     exam_data[index] = item.replace(u',', u';')
-            writer.writerow([unicode(data_string).encode("utf-8") for data_string in exam_data])
+            writer.writerow([str(data_string).encode("utf-8") for data_string in exam_data])
         except ObjectDoesNotExist:
             error_message = u"DoesNotExist error whilst exporting study {0} of {1},  study UID {2}, accession number" \
                             u" {3} - maybe database entry was deleted as part of importing later version of same" \

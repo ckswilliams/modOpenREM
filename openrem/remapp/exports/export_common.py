@@ -28,7 +28,11 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from past.utils import old_div
 import logging
 import sys
 from django.core.exceptions import ObjectDoesNotExist
@@ -440,7 +444,7 @@ def get_xray_filter_info(source):
             thicknesses = [current_filter.xray_filter_thickness_minimum,
                            current_filter.xray_filter_thickness_maximum]
             if thicknesses[0] is not None and thicknesses[1] is not None:
-                thick = sum(thicknesses) / len(thicknesses)
+                thick = old_div(sum(thicknesses), len(thicknesses))
             elif thicknesses[0] is None and thicknesses[1] is None:
                 thick = u''
             elif thicknesses[0] is not None:
@@ -599,7 +603,7 @@ def create_summary_sheet(task, studies, book, summary_sheet, sheet_list):
     # Generate list of Series Protocols
     summary_sheet.write(5, 6, u"Series Protocol")
     summary_sheet.write(5, 7, u"Frequency")
-    sorted_protocols = sorted(sheet_list.iteritems(), key=lambda (k, v): v['count'], reverse=True)
+    sorted_protocols = sorted(iter(sheet_list.items()), key=lambda k_v: k_v[1]['count'], reverse=True)
     for row, item in enumerate(sorted_protocols):
         summary_sheet.write(row+6, 6, u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
         summary_sheet.write(row+6, 7, item[1]['count'])

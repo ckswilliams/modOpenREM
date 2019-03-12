@@ -28,7 +28,11 @@
 ..  moduleauthor:: Ed McDonagh and Jonathan Cole
 
 """
+from __future__ import division
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 import logging
@@ -219,7 +223,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
                     target,
                     filter_mat,
                     exp.irradeventxraymechanicaldata_set.get().compression_thickness,
-                    exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure / 1000,
+                    old_div(exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure, 1000),
                     u'',  # not applicable to FFDM
                     automan_short,
                     automan,
