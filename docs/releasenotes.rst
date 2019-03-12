@@ -60,6 +60,7 @@ Many people have contributed to OpenREM - either with code, documentation, bugs,
 * `Richard Miles <https://bitbucket.org/r89m/>`_
 * `Luuk Oostveen <https://bitbucket.org/LuukO/>`_
 * `David Platten <https://bitbucket.org/dplatten/>`_
+* `Richard Raynor <https://bitbucket.org/RaynorR/>`_
 * `Erik-Jan Rijkhorst <https://bitbucket.org/rijkhorst/>`_
 * `Arnold Schilham <https://bitbucket.org/asch99/>`_
 * `Tim de Wit <https://bitbucket.org/tcdewit/>`_
