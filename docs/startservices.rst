@@ -163,7 +163,7 @@ Windows - ``^`` is the line continuation character:
 
 .. sourcecode:: console
 
-    celery flower -A openremproject --port=5555 --address=127.0.0.1  --loglevel=INFO \
+    celery flower -A openremproject --port=5555 --address=127.0.0.1  --loglevel=INFO ^
     ---log-file-prefix=C:\path\to\media\celery\flower.log
 
 For production use, see `Daemonising Celery`_ below.

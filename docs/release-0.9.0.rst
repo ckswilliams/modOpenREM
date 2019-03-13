@@ -43,7 +43,7 @@ Upgrade
 * Back up your database
 
     * For PostgreSQL on linux you can refer to :ref:`backup-psql-db`
-    * For PostgreSQL on Windows you can refer to :ref:`backupRestorePostgreSQL`
+    * For PostgreSQL on Windows you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
 * Stop any Celery workers
@@ -58,6 +58,7 @@ Upgrade
 
     pip install openrem==0.9.0
 
+.. _migratethedatabase090:
 
 Migrate the database
 ====================
@@ -109,13 +110,16 @@ Changes to Celery for Windows
 For best performance and reliability when using Celery on Windows, it is recommended to do the following from the
 openrem folder (activate virtualenv if using one):
 
-.. soursecode:: bash
+.. sourcecode:: bash
 
     pip install celery==3.1.25
 
 If your command for starting Celery specifies a pool option, for example ``-P solo``, remove it so that Celery reverts
 to using the default ``prefork`` pool. This will enable multiple tasks to run concurrently and it will be possible to
 terminate tasks.
+
+If you are a Windows user you may also wish to review :doc:`celery-windows` as the example control batch files have
+been updated.
 
 E-mail server settings
 ======================
