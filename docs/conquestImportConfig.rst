@@ -1,8 +1,6 @@
 Advanced Lua Conquest configuration (Windows)
 *********************************************
 
-*Drop/merge the non lua section of this document*
-
 Configuring Conquest DICOM server to automatically forward data to OpenREM
 
 Simple rules using the Conquest dicom.ini file
