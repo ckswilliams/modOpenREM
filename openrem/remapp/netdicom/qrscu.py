@@ -494,8 +494,8 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False, msg_id=N
                             query_id, d3.StudyInstanceUID, imRspNo))
             imagesrsp.sop_class_uid = u""
         try:
-            imagesrsp.instance_number = images[1].InstanceNumber
-        except AttributeError:
+            imagesrsp.instance_number = int(images[1].InstanceNumber)
+        except (ValueError, TypeError, AttributeError):
             logger.warning(u"Query_id {0}: Image Response {1}: illegal response, no InstanceNumber".format(
                 query_id, imRspNo))
             imagesrsp.instance_number = None  # integer so can't be ''
