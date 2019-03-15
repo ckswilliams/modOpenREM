@@ -9,6 +9,7 @@ SCP listening on the specified host and port.
 For help on usage, 
 python storescu.py -h
 """
+from __future__ import print_function
 
 import sys
 import argparse
@@ -41,7 +42,7 @@ else:
 
 # call back
 def OnAssociateResponse(association):
-    print "Association response received"
+    print("Association response received")
 
 # create application entity
 MyAE = AE(args.aet, 9999, [StorageSOPClass,  VerificationSOPClass], [], ts)
@@ -51,29 +52,29 @@ MyAE.OnAssociateResponse = OnAssociateResponse
 RemoteAE = dict(Address=args.remotehost, Port=args.remoteport, AET=args.aec)
 
 # create association with remote AE
-print "Request association"
+print("Request association")
 assoc = MyAE.RequestAssociation(RemoteAE)
 
 if not assoc:
-    print "Could not establish association"
+    print("Could not establish association")
     sys.exit(1)
 
 # perform a DICOM ECHO, just to make sure remote AE is listening
-print "DICOM Echo ... ",
+print("DICOM Echo ... ", end=' ')
 st = assoc.VerificationSOPClass.SCU(1)
-print 'done with status "%s"' % st
+print('done with status "%s"' % st)
 
 # create some dataset
 for ii in args.file:
-    print ii
+    print(ii)
     d = read_file(ii)
-    print "DICOM StoreSCU ... ",
+    print("DICOM StoreSCU ... ", end=' ')
     try:
         st = assoc.SCU(d, 1)
-        print 'done with status "%s"' % st
+        print('done with status "%s"' % st)
     except:
-        print "problem", d.SOPClassUID
-print "Release association"
+        print("problem", d.SOPClassUID)
+print("Release association")
 assoc.Release(0)
 
 # done
