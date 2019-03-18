@@ -62,9 +62,12 @@ Advanced query options
   studies with images and RDSRS will be ignored (they can be found without this option). If this box is ticked any
   modality choices will be ignored.
 * **Get SR series that return nothing at image level query** *default not ticked*: If you have a DICOM store with SR
-  series that you know contain RDSR objects, but when queried your store says they are empty, then check this box.
-  With the box checked the query will try to retrieve images from any SR series found, even when the store reports
-  the series as being empty.
+  series that you know contain RDSR objects, but when queried your store says they are empty, then check this box. If
+  this behaviour is found, a message will be added to the ``openrem_qr.log`` at ``INFO`` level with the phrase
+  ``Try '-emptysr' option?``. With the box checked the query will assume any SR series found contains an RDSR. Warning:
+  with this behavior, any non-RDSR structured report series (such as a radiologists report encoded as a structured
+  report) will be retrieved instead of images that could actually be used (for example with mammography and digital
+  radiographs). Therefore this option should be used with caution!
 
 When you have finished the query parameters, click ``Submit``
 
@@ -134,7 +137,6 @@ In a command window/shell, ``python openrem_qr.py -h`` should present you with t
       -sr                   Advanced: Use if store has RDSRs only, no images. Cannot be used with
                             -ct, -mg, -fl, -dx
       -dup                  Advanced: Retrieve duplicates (objects that have been processed before)
-
       -emptysr              Advanced: Get SR series that return nothing at image level query
 
 As an example, if you wanted to query the PACS for DX images on the 5th and 6th April 2010 with any study descriptions
@@ -273,9 +275,9 @@ If **SR only studies** were requested:
 
 If **Get SR series that return nothing at image level query** were requested:
 
-* It is assumed that any ``SR`` series contain useful SR data, and images are retrieved from the SR series even if the
-  DICOM store reports them as empty. All other image series are deleted. This is useful if your DICOM store reports
-  SR series as being empty even when SR objects are present.
+* It is assumed that any ``SR`` series that appears to be empty actually contains an RDSR, and the other series are
+  dealt with as above for when an RDSR is found. If at the image level query the full data requested is returned, then
+  the series will be processed the same whether this option is selected or not.
 
 Duplicates processing
 =====================
