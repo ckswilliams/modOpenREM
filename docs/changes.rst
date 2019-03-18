@@ -2,6 +2,10 @@
 OpenREM version history
 =======================
 
+0.9.1 (2019-03-xx)
+------------------
+* `#732`_  Query-retrieve: added advanced option to workaround empty series issue
+
 0.9.0 (2019-03-06)
 ------------------
 * `#733`_  Documentation: post-release fixes for 0.9.0 docs
