@@ -153,13 +153,14 @@ def _filter(query, level, filter_name, filter_list, filter_type):
     logger.info(u'{1} Now have {0} studies'.format(study_rsp.count(), query_id))
 
 
-def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images):
+def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images, get_empty_sr):
     """
     For each study level response, remove any series that we know can't be used.
     :param query: Current DicomQuery object
     :param all_mods: Ordered dict of dicts detailing modalities we are interested in
     :param filters: Include and exclude lists for StationName (StudyDescription not considered at series level)
     :param get_toshiba_images: Bool, whether to try to get Toshiba dose summary images
+    :param get_empty_sr: Bool, whether to get SR series that return nothing at image level query
     :return Series level response database rows are deleted if not useful
     """
     query.stage = u"Getting series and image level information and deleting series we can't use"
@@ -201,7 +202,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             study.save()
 
             if 'SR' in study.get_modalities_in_study():
-                if _check_sr_type_in_study(assoc, study, query.query_id) == 'RDSR':
+                if _check_sr_type_in_study(assoc, study, query.query_id, get_empty_sr) in ['RDSR', 'null_response']:
                     logger.debug(u"{0} RDSR in MG study, keep SR, delete all other series".format(query_id))
                     series = study.dicomqrrspseries_set.all()
                     series.exclude(modality__exact='SR').delete()
@@ -218,7 +219,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             study.save()
 
             if 'SR' in study.get_modalities_in_study():
-                if _check_sr_type_in_study(assoc, study, query.query_id) == 'RDSR':
+                if _check_sr_type_in_study(assoc, study, query.query_id, get_empty_sr) in ['RDSR', 'null_response']:
                     logger.debug(u"{0} RDSR in DX study, keep SR, delete all other series".format(query_id))
                     series = study.dicomqrrspseries_set.all()
                     series.exclude(modality__exact='SR').delete()
@@ -231,7 +232,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             # Only RDSR or some ESR useful here
             study.modality = 'FL'
             study.save()
-            sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
+            sr_type = _check_sr_type_in_study(assoc, study, query.query_id, get_empty_sr)
             if sr_type == 'no_dose_report':
                 logger.debug(u"{0} No usable SR in RF study. Deleting from query.".format(query_id))
                 study.delete()
@@ -253,8 +254,8 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             series = study.dicomqrrspseries_set.all()
             sr_type = None
             if 'SR' in study.get_modalities_in_study():
-                sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
-            if 'SR' and sr_type in ('RDSR', 'ESR'):
+                sr_type = _check_sr_type_in_study(assoc, study, query.query_id, get_empty_sr)
+            if 'SR' and sr_type in ('RDSR', 'ESR', 'null_response'):
                 logger.debug(u"{0} {1} in CT study, keep SR, delete all other series".format(query_id, sr_type))
                 series.exclude(modality__exact='SR').delete()
                 kept_ct['SR'] += 1
@@ -277,11 +278,13 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                     deleted_studies['CT'] += 1
 
         elif all_mods['SR']['inc']:
-            sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
+            sr_type = _check_sr_type_in_study(assoc, study, query.query_id, get_empty_sr)
             if sr_type == 'RDSR':
                 logger.debug(u"{0} SR only query, found RDSR, deleted other SRs".format(query_id))
             elif sr_type == 'ESR':
                 logger.debug(u"{0} SR only query, found ESR, deleted other SRs".format(query_id))
+            elif sr_type == 'null_response':
+                logger.debug(u"{0} SR type unknown, -emptysr=True".format(query_id))
             elif sr_type == 'no_dose_report':
                 logger.debug(u"{0} No RDSR or ESR found. Study will be deleted.".format(query_id))
                 study.delete()
@@ -400,18 +403,20 @@ def _prune_study_responses(query, filters):
 
 
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
-def _check_sr_type_in_study(assoc, study, query_id):
+def _check_sr_type_in_study(assoc, study, query_id, get_empty_sr):
     """Checks at an image level whether SR in study is RDSR, ESR, or something else (Radiologist's report for example)
 
     * If RDSR is found, all non-RDSR SR series responses are deleted
     * Otherwise, if an ESR is found, all non-ESR series responses are deleted
     * Otherwise, all SR series responses are retained *(change in 0.9.0)*
+    * If get_empty_sr=True, no RDSR or ESR objects are found and series image count is 0, SR series is kept
 
-    The function returns one of 'RDSR', 'ESR', 'no_dose_report'.
+    The function returns one of 'RDSR', 'ESR', 'no_dose_report', 'null_response'.
 
     :param assoc: Current DICOM query object
     :param study: study level C-Find response object in database
     :param query_id: current query ID for logging
+    :param get_empty_sr: Whether to get SR series that return empty at image level query
     :return: string indicating SR type remaining in study
     """
     series_sr = study.dicomqrrspseries_set.filter(modality__exact='SR')
@@ -421,8 +426,13 @@ def _check_sr_type_in_study(assoc, study, query_id):
         _query_images(assoc, sr, query_id)
         images = sr.dicomqrrspimage_set.all()
         if images.count() == 0:
-            logger.debug(u"{2} Check SR type: Oops, series {0} of study instance UID {1} has zero objects in!".format(
-                sr.series_number, study.study_instance_uid, query_id))
+            if get_empty_sr:
+                logger.debug(u"{0} Check SR type: studyuid: {1} seriesuid: {2}. Image level response returned null, "
+                             u"-emptysr=True so assuming SR is RDSR".format(
+                    query_id, study.study_instance_uid, sr.series_instance_uid))
+                sopclasses.add(u'null_response')
+            logger.info(u"{2} Check SR type: Oops, series {0} of study instance UID {1} returned null at image level"
+                        u"query. Try '-emptysr' option?".format(sr.series_number, study.study_instance_uid, query_id))
             continue
         sopclasses.add(images[0].sop_class_uid)
         sr.sop_class_in_series = images[0].sop_class_uid
@@ -442,6 +452,10 @@ def _check_sr_type_in_study(assoc, study, query_id):
                 logger.debug(u"{0} Check SR type: Have ESR, deleting non-RDSR, non-ESR SR".format(query_id))
                 sr.delete()
         return 'ESR'
+    elif u'null_response' in sopclasses:
+        logger.debug(u"{0} Check SR type: Image level response was null and -emptysr=True, "
+                     u"assuming SR series are RDSR.".format(query_id))
+        return 'null_response'
     else:
         logger.debug(u"{0} Check SR type: {1} non-RDSR, non-ESR SR series remain".format(query_id, series_sr.count()))
         return 'no_dose_report'
@@ -729,7 +743,7 @@ def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
         date_from=None, date_until=None, single_date=False, time_from=None, time_until=None, modalities=None,
-        inc_sr=False, remove_duplicates=True, filters=None, get_toshiba_images=False, *args, **kwargs):
+        inc_sr=False, remove_duplicates=True, filters=None, get_toshiba_images=False, get_empty_sr=False):
     """Query retrieve service class user function
 
     Queries a pre-configured remote query retrieve service class provider for dose metric related objects,
@@ -752,9 +766,7 @@ def qrscu(
       remove_duplicates(bool, optional): If True, studies that already exist in the database are removed from the query results (Default value = True)
       filters(dictionary list, optional): include and exclude lists for StationName and StudyDescription (Default value = None)
       get_toshiba_images(bool, optional): Whether to try to get Toshiba dose summary images
-
-      *args:
-      **kwargs:
+      get_empty_sr(bool, optional): Whether to get SR series that return nothing at image level
 
     Returns:
       : Series Instance UIDs are stored as rows in the database to be used by a move request. Move request is
@@ -965,7 +977,7 @@ def qrscu(
     logger.debug(u"{0} Pruning series responses".format(query_id))
     before_series_pruning = study_numbers['current']
     deleted_studies, deleted_studies_filters_series, kept_ct = _prune_series_responses(
-        assoc, query, all_mods, filters, get_toshiba_images)
+        assoc, query, all_mods, filters, get_toshiba_images, get_empty_sr)
     deleted_studies_filters['stationname_inc'] += deleted_studies_filters_series['stationname_inc']
     deleted_studies_filters['stationname_exc'] += deleted_studies_filters_series['stationname_exc']
 
@@ -1211,6 +1223,8 @@ def _create_parser():
                         help='Advanced: Use if store has RDSRs only, no images. Cannot be used with -ct, -mg, -fl, -dx')
     parser.add_argument('-dup', action="store_true",
                         help="Advanced: Retrieve duplicates (objects that have been processed before)")
+    parser.add_argument('-emptysr', action="store_true",
+                        help='Advanced: Get SR series that return nothing at image level query')
 
     return parser
 
@@ -1309,6 +1323,7 @@ def _process_args(parser_args, parser):
     remove_duplicates = not parser_args.dup  # if flag, duplicates will be retrieved.
 
     get_toshiba = parser_args.toshiba
+    get_empty_sr = parser_args.emptysr
 
     qr_node_up = echoscu(parser_args.qr_id, qr_scp=True)
     store_node_up = echoscu(parser_args.store_id, store_scp=True)
@@ -1329,7 +1344,8 @@ def _process_args(parser_args, parser):
                    'tfrom': parser_args.tfrom,
                    'tuntil': parser_args.tuntil,
                    'filters': filters,
-                   'get_toshiba': get_toshiba}
+                   'get_toshiba': get_toshiba,
+                   'get_empty_sr': get_empty_sr}
 
     return return_args
 
@@ -1356,7 +1372,8 @@ def qrscu_script():
                     time_from=processed_args['tfrom'],
                     time_until=processed_args['tuntil'],
                     filters=processed_args['filters'],
-                    get_toshiba_images=processed_args['get_toshiba']
+                    get_toshiba_images=processed_args['get_toshiba'],
+                    get_empty_sr=processed_args['get_empty_sr']
                     )
     )
 

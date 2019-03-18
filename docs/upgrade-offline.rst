@@ -34,7 +34,8 @@ On the OpenREM server without internet access
 
 * Back up your database
 
-    * For PostgreSQL you can refer to :ref:`backup-psql-db`
+    * For PostgreSQL on linux you can refer to :ref:`backup-psql-db`
+    * For PostgreSQL on Windows you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
 * Stop any Celery workers
@@ -44,4 +45,4 @@ On the OpenREM server without internet access
 
     pip install --no-index --find-links=openremfiles openrem==0.9.0
 
-Now go back to :ref:`upgradefrom074` and update the configuration.
+Now go back to :ref:`migratethedatabase090` and update the configuration.
