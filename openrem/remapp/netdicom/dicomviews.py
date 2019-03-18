@@ -231,6 +231,8 @@ def q_process(request, *args, **kwargs):
             stationname_exclude = form.cleaned_data.get('stationname_exclude_field')
             stationname_include = form.cleaned_data.get('stationname_include_field')
             get_toshiba_images = form.cleaned_data.get('get_toshiba_images_field')
+            get_empty_sr = form.cleaned_data.get('get_empty_sr_field')
+
             query_id = str(uuid.uuid4())
 
             if date_from:
@@ -265,7 +267,7 @@ def q_process(request, *args, **kwargs):
             task = qrscu.delay(qr_scp_pk=rh_pk, store_scp_pk=store_pk, query_id=query_id, date_from=date_from,
                                date_until=date_until, modalities=modalities, inc_sr=inc_sr,
                                remove_duplicates=remove_duplicates, filters=filters,
-                               get_toshiba_images=get_toshiba_images,
+                               get_toshiba_images=get_toshiba_images, get_empty_sr=get_empty_sr,
                                )
 
             resp = {}

@@ -369,7 +369,10 @@ class DicomQueryForm(forms.Form):
                                                 help_text="Comma separated list of terms")
     get_toshiba_images_field = forms.BooleanField(label=u"Attempt to get Toshiba dose images", required=False,
                                                   help_text=u"Only applicable if using Toshiba RDSR generator extension, "
-                                                            u"see Docs")
+                                                            u"see docs")
+    get_empty_sr_field = forms.BooleanField(label=u"Get SR series that return nothing at image level query",
+                                            help_text=u"Only use if suggested in qrscu log, see docs",
+                                            required=False,)
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
@@ -402,6 +405,7 @@ class DicomQueryForm(forms.Form):
                         'get_toshiba_images_field',
                         'duplicates_field',
                         'inc_sr_field',
+                        'get_empty_sr_field',
                         active=False
                     )
                 ),

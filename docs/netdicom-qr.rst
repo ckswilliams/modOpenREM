@@ -61,6 +61,13 @@ Advanced query options
   reports (RDSR) in, or a mix of whole studies and RDSRs without the corresponding study, then tick this box. Any
   studies with images and RDSRS will be ignored (they can be found without this option). If this box is ticked any
   modality choices will be ignored.
+* **Get SR series that return nothing at image level query** *default not ticked*: If you have a DICOM store with SR
+  series that you know contain RDSR objects, but when queried your store says they are empty, then check this box. If
+  this behaviour is found, a message will be added to the ``openrem_qr.log`` at ``INFO`` level with the phrase
+  ``Try '-emptysr' option?``. With the box checked the query will assume any SR series found contains an RDSR. Warning:
+  with this behavior, any non-RDSR structured report series (such as a radiologists report encoded as a structured
+  report) will be retrieved instead of images that could actually be used (for example with mammography and digital
+  radiographs). Therefore this option should be used with caution!
 
 When you have finished the query parameters, click ``Submit``
 
@@ -90,7 +97,7 @@ In a command window/shell, ``python openrem_qr.py -h`` should present you with t
     usage: openrem_qr.py [-h] [-ct] [-mg] [-fl] [-dx] [-f yyyy-mm-dd]
                          [-t yyyy-mm-dd] [-sd yyyy-mm-dd] [-tf hhmm] [-tt hhmm]
                          [-e string] [-i string] [-sne string] [-sni string]
-                         [-toshiba] [-sr] [-dup]
+                         [-toshiba] [-sr] [-dup] [-emptysr]
                          qr_id store_id
 
     Query remote server and retrieve to OpenREM
@@ -130,6 +137,7 @@ In a command window/shell, ``python openrem_qr.py -h`` should present you with t
       -sr                   Advanced: Use if store has RDSRs only, no images. Cannot be used with
                             -ct, -mg, -fl, -dx
       -dup                  Advanced: Retrieve duplicates (objects that have been processed before)
+      -emptysr              Advanced: Get SR series that return nothing at image level query
 
 As an example, if you wanted to query the PACS for DX images on the 5th and 6th April 2010 with any study descriptions
 including ``imported`` excluded, first you need to know the database IDs of the remote node and the local node you want
@@ -171,7 +179,7 @@ example PowerShell script is shown below:
     python D:\Server_Apps\python27\Scripts\openrem_qr.py 2 1 -ct -f $dateString -t $dateString
 
 The above PowerShell script could be run on a regular basis by adding a task to the Windows ``Task Scheduler`` that
-executes the ``powershell`` program with an argument of ``-file C:\\path\\to\\script.ps1``.
+executes the ``powershell`` program with an argument of ``-file C:\path\to\script.ps1``.
 
 Querying with time range
 ========================
@@ -264,6 +272,12 @@ If **SR only studies** were requested:
 
 * Each series response is checked at 'image' level to see which type of SR it is. If is not RDSR or ESR, the study
   response is deleted.
+
+If **Get SR series that return nothing at image level query** were requested:
+
+* It is assumed that any ``SR`` series that appears to be empty actually contains an RDSR, and the other series are
+  dealt with as above for when an RDSR is found. If at the image level query the full data requested is returned, then
+  the series will be processed the same whether this option is selected or not.
 
 Duplicates processing
 =====================
