@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.1 (2019-03-xx)
 ------------------
+* `#734`_  Query-retrieve: handle illegal image level response with no instance number
 * `#732`_  Query-retrieve: added advanced option to workaround empty series issue
 
 0.9.0 (2019-03-06)
