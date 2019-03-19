@@ -323,11 +323,6 @@ def _generalstudymoduleattributes(dataset, g, ch):
 
 
 def _philips_ct2db(dataset):
-    from . import openrem_settings
-
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-
-    openrem_settings.add_project_to_path()
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
 

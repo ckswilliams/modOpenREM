@@ -430,13 +430,8 @@ def _test_if_mammo(dataset):
 
 
 def _mammo2db(dataset):
-    from . import openrem_settings
     from time import sleep
     from random import random
-
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-
-    openrem_settings.add_project_to_path()
     from remapp.extractors.extract_common import get_study_check_dup
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid

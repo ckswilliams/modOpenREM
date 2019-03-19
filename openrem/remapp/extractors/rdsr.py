@@ -1297,11 +1297,6 @@ def _generalstudymoduleattributes(dataset, g, ch):
 
 
 def _rdsr2db(dataset):
-    from . import openrem_settings
-
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-
-    openrem_settings.add_project_to_path()
     from collections import OrderedDict
     from django.db.models import ObjectDoesNotExist
     from time import sleep
