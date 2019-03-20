@@ -1,5 +1,7 @@
 from builtins import filter
 from builtins import range
+
+
 def average_chart_inc_histogram_data(database_events, db_display_name_relationship, db_series_names, db_value_name,
                                      value_multiplier, plot_average, plot_freq, plot_series_per_system,
                                      plot_average_choice, median_available, num_hist_bins,
