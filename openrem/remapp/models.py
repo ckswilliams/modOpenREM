@@ -176,6 +176,7 @@ class DicomDeleteSettings(SingletonModel):
     def get_absolute_url(self):
         return reverse('dicom_summary')
 
+
 class PatientIDSettings(SingletonModel):
     """
     Table to store patient ID settings
@@ -191,6 +192,9 @@ class PatientIDSettings(SingletonModel):
         return u"Patient ID Settings"
 
     class Meta(object):
+        """
+        Verbose name for PatientIDSettings
+        """
         verbose_name = "Patient ID Settings"
 
     def get_absolute_url(self):
