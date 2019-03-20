@@ -28,10 +28,8 @@
 
 """
 from __future__ import print_function
-
-# Following two lines added so that sphinx autodocumentation works.
-from builtins import str
-from builtins import map
+from builtins import str  # pylint: disable=redefined-builtin
+from builtins import map  # pylint: disable=redefined-builtin
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 

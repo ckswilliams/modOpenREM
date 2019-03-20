@@ -29,8 +29,7 @@
 """
 from __future__ import division
 
-# Following three lines added so that sphinx autodocumentation works.
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
 from past.utils import old_div
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
@@ -43,6 +42,7 @@ from remapp.models import GeneralStudyModuleAttr
 from django.utils.safestring import mark_safe
 
 TEST_CHOICES = ((u'', u'Yes (default)'), (2, u'No (caution)'),)
+
 
 def custom_name_filter(queryset, value):
     if not value:
@@ -59,6 +59,7 @@ def custom_name_filter(queryset, value):
     )
     return filtered
 
+
 def custom_id_filter(queryset, value):
     if not value:
         return queryset
@@ -73,6 +74,7 @@ def custom_id_filter(queryset, value):
         )
     )
     return filtered
+
 
 def custom_acc_filter(queryset, value):
     if not value:
@@ -157,6 +159,7 @@ class RFSummaryListFilter(django_filters.FilterSet):
             ('-projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total','Total DAP'),
             ('-projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total','Total RP Dose'),
             )
+
     def get_order_by(self, order_value):
         if order_value == 'study_date':
             return ['study_date', 'study_time']
@@ -351,6 +354,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
             return ['-study_date','-study_time']
         return super(MGSummaryListFilter, self).get_order_by(order_value)
 
+
 class MGFilterPlusPid(MGSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(MGFilterPlusPid, self).__init__(*args, **kwargs)
@@ -420,6 +424,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
         elif order_value == '-study_date':
             return ['-study_date','-study_time']
         return super(DXSummaryListFilter, self).get_order_by(order_value)
+
 
 class DXFilterPlusPid(DXSummaryListFilter):
     def __init__(self, *args, **kwargs):

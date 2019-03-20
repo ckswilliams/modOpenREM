@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 # test_export_rf_xlsx.py
 
-from builtins import range
+from builtins import range  # pylint: disable=redefined-builtin
 import os
 from django.contrib.auth.models import User, Group
 from django.test import RequestFactory, TransactionTestCase

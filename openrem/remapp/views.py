@@ -35,10 +35,10 @@ from __future__ import absolute_import
 # Following two lines added so that sphinx autodocumentation works.
 from future import standard_library
 standard_library.install_aliases()
-from builtins import map
-from builtins import str
-from builtins import zip
-from builtins import next
+from builtins import map  # pylint: disable=redefined-builtin
+from builtins import str  # pylint: disable=redefined-builtin
+from builtins import zip  # pylint: disable=redefined-builtin
+from builtins import next  # pylint: disable=redefined-builtin
 import os
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'

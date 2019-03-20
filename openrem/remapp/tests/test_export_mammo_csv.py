@@ -1,8 +1,7 @@
 # This Python file uses the following encoding: utf-8
 # test_export_mammo_csv.py
 
-from builtins import range
-import hashlib
+from builtins import range  # pylint: disable=redefined-builtin
 import os
 from collections import Counter
 from django.contrib.auth.models import User, Group
@@ -11,6 +10,7 @@ from remapp.extractors import mam, rdsr
 from remapp.exports.mg_export import exportMG2excel
 from remapp.exports.mg_csv_nhsbsp import mg_csv_nhsbsp
 from remapp.models import PatientIDSettings, Exports
+
 
 class ExportMammoCSV(TestCase):
     def setUp(self):

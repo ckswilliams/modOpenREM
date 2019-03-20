@@ -8,7 +8,7 @@ Specialised QR routine to get just the objects that might be useful for dose rel
 modality
 """
 
-from builtins import str
+from builtins import str  # pylint: disable=redefined-builtin
 from celery import shared_task
 import django
 import logging

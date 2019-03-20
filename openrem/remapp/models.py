@@ -31,7 +31,7 @@ from __future__ import division
 
 # Following two lines added so that sphinx autodocumentation works.
 from past.utils import old_div
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 import json

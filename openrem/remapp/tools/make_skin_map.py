@@ -32,7 +32,7 @@ from __future__ import division
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
+from builtins import str  # pylint: disable=redefined-builtin
 from past.utils import old_div
 import os
 import sys

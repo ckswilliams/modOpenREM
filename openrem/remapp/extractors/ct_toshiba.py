@@ -28,7 +28,7 @@
 ..  moduleauthor:: David Platten
 """
 
-from builtins import str
+from builtins import str  # pylint: disable=redefined-builtin
 import sys
 import os
 from openrem.remapp.extractors import rdsr

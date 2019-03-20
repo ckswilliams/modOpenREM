@@ -30,8 +30,8 @@
 """
 from __future__ import division
 
-from builtins import str
-from builtins import range
+from builtins import str  # pylint: disable=redefined-builtin
+from builtins import range  # pylint: disable=redefined-builtin
 from past.utils import old_div
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist

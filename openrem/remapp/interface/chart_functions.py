@@ -1,5 +1,5 @@
-from builtins import filter
-from builtins import range
+from builtins import filter  # pylint: disable=redefined-builtin
+from builtins import range  # pylint: disable=redefined-builtin
 
 
 def average_chart_inc_histogram_data(database_events, db_display_name_relationship, db_series_names, db_value_name,

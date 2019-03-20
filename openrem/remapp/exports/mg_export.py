@@ -29,9 +29,9 @@
 
 """
 
-from builtins import str
-from builtins import range
-from past.builtins import basestring
+from builtins import str  # pylint: disable=redefined-builtin
+from builtins import range  # pylint: disable=redefined-builtin
+from past.builtins import basestring  # pylint: disable=redefined-builtin
 import logging
 
 from celery import shared_task

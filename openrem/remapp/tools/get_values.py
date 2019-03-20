@@ -28,7 +28,7 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
-from builtins import str
+from builtins import str  # pylint: disable=redefined-builtin
 from dicom.valuerep import PersonName
 from dicom import charset
 from django.utils.encoding import smart_text
