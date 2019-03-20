@@ -263,6 +263,4 @@ def csv2db(*args, **kwargs):
 
 
 if __name__ == "__main__":
-    import sys
-
     sys.exit(csv2db())
