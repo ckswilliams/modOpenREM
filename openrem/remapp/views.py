@@ -3396,13 +3396,13 @@ def celery_tasks(request, stage=None):
                     else:
                         older_tasks += [this_task, ]
                 if u"active" in stage:
-                    return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks},
+                    return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks, 'type': 'active'},
                                               context_instance=RequestContext(request))
                 elif u"recent" in stage:
-                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': recent_tasks},
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': recent_tasks, 'type': 'recent'},
                                               context_instance=RequestContext(request))
                 elif u"older" in stage:
-                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': older_tasks},
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': older_tasks, 'type': 'older'},
                                               context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
