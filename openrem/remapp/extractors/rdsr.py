@@ -504,7 +504,6 @@ def _get_patient_position_from_xml_string(event, xml_string):
         event.save()
     except (ParseError, AttributeError, TypeError):
         logger.debug(u"Failed to extract patient orientation from comment string (aimed at Siemens)")
-        pass
 
 
 def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
