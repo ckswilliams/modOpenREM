@@ -31,6 +31,7 @@ requires = [
     'flower',
     'numpy',
     'future',
+    'defusedxml',
     ]
 
 setup(

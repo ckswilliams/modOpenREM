@@ -316,7 +316,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
     from django.db.models import Avg
     from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_or_create_cid, safe_strings
-    from xml.etree import ElementTree as ET
+    from defusedxml.ElementTree import fromstring, ParseError
     # Variables below are used if privately defined parameters are available
     private_collimated_field_height = None
     private_collimated_field_width = None
@@ -418,10 +418,9 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
             pass
     _deviceparticipant(dataset, 'source', source, ch)
     try:
-        source.ii_field_size = ET.fromstring(source.irradiation_event_xray_data.comment).find('iiDiameter').get(
-            'SRData')
-    except:
-        pass
+        source.ii_field_size = fromstring(source.irradiation_event_xray_data.comment).find('iiDiameter').get('SRData')
+    except (ParseError, AttributeError, TypeError):
+        logger.debug(u"Failed in attempt to get II field size from comment (aimed at Siemens)")
     if (not source.collimated_field_height) and private_collimated_field_height:
         source.collimated_field_height = private_collimated_field_height
     if (not source.collimated_field_width) and private_collimated_field_width:
@@ -470,12 +469,50 @@ def _imageviewmodifier(dataset, event):
     modifier.save()
 
 
+def _get_patient_position_from_xml_string(event, xml_string):
+    """Use XML parser to extract patient position information from Comment value in Siemens RF RDSR
+
+    :param event: IrradEventXRayData object
+    :param xml_string: Comment value
+    :return:
+    """
+    from defusedxml.ElementTree import fromstring, ParseError
+    from remapp.tools.get_values import get_or_create_cid
+
+    if not xml_string:
+        return
+    try:
+        orientation = fromstring(xml_string).find('PatientPosition').find('Position').get('SRData')
+        if orientation.strip().lower() == 'hfs':
+            event.patient_table_relationship_cid = get_or_create_cid('F-10470', 'headfirst')
+            event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
+            event.patient_orientation_modifier_cid = get_or_create_cid('F-10340', 'supine')
+        elif orientation.strip().lower() == 'hfp':
+            event.patient_table_relationship_cid = get_or_create_cid('F-10470', 'headfirst')
+            event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
+            event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'prone')
+        elif orientation.strip().lower() == 'ffs':
+            event.patient_table_relationship_cid = get_or_create_cid('F-10480', 'feet-first')
+            event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
+            event.patient_orientation_modifier_cid = get_or_create_cid('F-10340', 'supine')
+        elif orientation.strip().lower() == 'ffp':
+            event.patient_table_relationship_cid = get_or_create_cid('F-10480', 'feet-first')
+            event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
+            event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'prone')
+        else:
+            event.patient_table_relationship_cid = None
+            event.patient_orientation_cid = None
+            event.patient_orientation_modifier_cid = None
+        event.save()
+    except (ParseError, AttributeError, TypeError):
+        logger.debug(u"Failed to extract patient orientation from comment string (aimed at Siemens)")
+
+
 def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_or_create_cid, safe_strings
     from remapp.tools.dcmdatetime import make_date_time
-    from xml.etree import ElementTree as ET
     event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Plane':
@@ -553,33 +590,10 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
                         event.percent_fibroglandular_tissue = cont2.NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
             event.comment = safe_strings(cont.TextValue, char_set=ch)
+    event.save()
     for cont3 in fulldataset.ContentSequence:
         if cont3.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
-            try:
-                orientation = ET.fromstring(cont3.TextValue).find('PatientPosition').find('Position').get('SRData')
-                if orientation.strip().lower() == 'hfs':
-                    event.patient_table_relationship_cid = get_or_create_cid('F-10470', 'headfirst')
-                    event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
-                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10340', 'supine')
-                elif orientation.strip().lower() == 'hfp':
-                    event.patient_table_relationship_cid = get_or_create_cid('F-10470', 'headfirst')
-                    event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
-                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'prone')
-                elif orientation.strip().lower() == 'ffs':
-                    event.patient_table_relationship_cid = get_or_create_cid('F-10480', 'feet-first')
-                    event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
-                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10340', 'supine')
-                elif orientation.strip().lower() == 'ffp':
-                    event.patient_table_relationship_cid = get_or_create_cid('F-10480', 'feet-first')
-                    event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
-                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'prone')
-                else:
-                    event.patient_table_relationship_cid = None
-                    event.patient_orientation_cid = None
-                    event.patient_orientation_modifier_cid = None
-            except:
-                pass
-            event.save()
+            _get_patient_position_from_xml_string(event, cont3.TextValue)
     # needs include for optional multiple person participant
     _irradiationeventxraydetectordata(dataset, event, ch)
     _irradiationeventxraymechanicaldata(dataset, event)
