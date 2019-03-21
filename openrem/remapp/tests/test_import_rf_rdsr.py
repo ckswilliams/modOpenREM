@@ -151,7 +151,9 @@ class ImportRFRDSRSiemens(TestCase):
         rdsr(dicom_path)
         study = GeneralStudyModuleAttr.objects.order_by('id')[0]
 
-        irrad_event = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0]
-        self.assertEqual(irrad_event.patient_table_relationship_cid.code_value, 'F-10470')
-        self.assertEqual(irrad_event.patient_orientation_cid.code_value, 'F-10450')
-        self.assertEqual(irrad_event.patient_orientation_modifier_cid.code_meaning, 'supine')
+        event_data = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0]
+        self.assertEqual(event_data.patient_table_relationship_cid.code_value, 'F-10470')
+        self.assertEqual(event_data.patient_orientation_cid.code_value, 'F-10450')
+        self.assertEqual(event_data.patient_orientation_modifier_cid.code_meaning, 'supine')
+        source_data = event_data.irradeventxraysourcedata_set.get()
+        self.assertEqual(source_data.ii_field_size, 220)
