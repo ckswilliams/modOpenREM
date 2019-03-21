@@ -418,7 +418,6 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
         source.ii_field_size = fromstring(source.irradiation_event_xray_data.comment).find('iiDiameter').get('SRData')
     except (ParseError, AttributeError, TypeError):
         logger.debug(u"Failed in attempt to get II field size from comment (aimed at Siemens)")
-        pass
     if (not source.collimated_field_height) and private_collimated_field_height:
         source.collimated_field_height = private_collimated_field_height
     if (not source.collimated_field_width) and private_collimated_field_width:
