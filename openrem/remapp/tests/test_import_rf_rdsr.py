@@ -130,3 +130,28 @@ class DAPUnitsTest(TestCase):
         dap = _check_dap_units(measured_values_sequence)
         self.assertAlmostEqual(dap, 0.000016)
 
+
+class ImportRFRDSRSiemens(TestCase):
+    """Tests for importing the Siemens Zee RDSR
+
+    """
+
+    def test_comment_xml_extraction(self):
+        """Tests that the patient orientation and II size information has been successfully obtained
+
+        :return: None
+        """
+
+        PatientIDSettings.objects.create()
+
+        dicom_file = "test_files/RF-RDSR-Siemens-Zee.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path = os.path.join(root_tests, dicom_file)
+
+        rdsr(dicom_path)
+        study = GeneralStudyModuleAttr.objects.order_by('id')[0]
+
+        irrad_event = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0]
+        self.assertEqual(irrad_event.patient_table_relationship_cid.code_value, 'F-10470')
+        self.assertEqual(irrad_event.patient_orientation_cid.code_value, 'F-10450')
+        self.assertEqual(irrad_event.patient_orientation_modifier_cid.code_meaning, 'supine')
