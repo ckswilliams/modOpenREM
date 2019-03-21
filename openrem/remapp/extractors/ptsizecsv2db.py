@@ -150,7 +150,6 @@ def websizeimport(csv_pk=None, *args, **kwargs):
 
     """
 
-    import sys
     import csv
     import datetime
     from django.core.files.base import ContentFile

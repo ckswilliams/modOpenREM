@@ -146,6 +146,9 @@ class RFSummaryListFilter(django_filters.FilterSet):
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta(object):
+        """
+        Lists fields and order-by information for django-filter filtering
+        """
         model = GeneralStudyModuleAttr
         fields = []
         order_by = (
@@ -211,6 +214,9 @@ class CTSummaryListFilter(django_filters.FilterSet):
                                                               choices=CT_ACQ_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple)
 
     class Meta(object):
+        """
+        Lists fields and order-by information for django-filter filtering
+        """
         model = GeneralStudyModuleAttr
         fields = []
         order_by = (
@@ -332,6 +338,10 @@ class MGSummaryListFilter(django_filters.FilterSet):
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta(object):
+        """
+        Lists fields and order-by information for django-filter filtering
+        """
+
         model = GeneralStudyModuleAttr
         fields = [
             ]
