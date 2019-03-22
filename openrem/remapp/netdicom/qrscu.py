@@ -940,16 +940,20 @@ def qrscu(
     if filters['stationname_exc']:
         filter_logs += [u"station name excludes {0}, ".format(u", ".join(filters['stationname_exc']))]
 
-    query.stage = u"Pruning study responses based on inc/exc options"
-    query.save()
-    logger.info(u"{1} Pruning study responses based on inc/exc options: {0}".format(u"".join(filter_logs), query_id))
-    before_study_prune = study_numbers['current']
-    deleted_studies_filters = _prune_study_responses(query, filters)
-    study_rsp = query.dicomqrrspstudy_set.all()
-    study_numbers['current'] = study_rsp.count()
-    study_numbers['inc_exc_removed'] = before_study_prune - study_numbers['current']
-    logger.info(u"{2} Pruning studies based on inc/exc has removed {0} studies, {1} studies remain.".format(
-        study_numbers['inc_exc_removed'], study_numbers['current'], query_id))
+    if filter_logs:
+        query.stage = u"Pruning study responses based on inc/exc options"
+        query.save()
+        logger.info(u"{1} Pruning study responses based on inc/exc options: {0}".format(u"".join(filter_logs), query_id))
+        before_study_prune = study_numbers['current']
+        deleted_studies_filters = _prune_study_responses(query, filters)
+        study_rsp = query.dicomqrrspstudy_set.all()
+        study_numbers['current'] = study_rsp.count()
+        study_numbers['inc_exc_removed'] = before_study_prune - study_numbers['current']
+        logger.info(u"{2} Pruning studies based on inc/exc has removed {0} studies, {1} studies remain.".format(
+            study_numbers['inc_exc_removed'], study_numbers['current'], query_id))
+    else:
+        deleted_studies_filters = {'study_desc_inc': 0, 'study_desc_exc': 0, 'stationname_inc': 0, 'stationname_exc': 0}
+        logger.info(u"{0} No inc/exc options selected".format(query_id))
 
     query.stage = u"Querying at series level to get more details about studies"
     query.save()
