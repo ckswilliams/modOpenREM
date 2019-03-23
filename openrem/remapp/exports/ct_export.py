@@ -276,7 +276,7 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
 
 
 def _generate_all_data_headers_ct(max_events):
-    """Generate the headers for CT that repeat once for each series of the exaqm with the most series in
+    """Generate the headers for CT that repeat once for each series of the exam with the most series in
 
     :param max_events: maximum number of times to repeat headers
     :return: list of headers
@@ -432,3 +432,68 @@ def _ct_get_series_data(s):
         s.comment,
         ]
     return seriesdata
+
+
+@shared_task
+def ct_phe_2019(filterdict, user=None):
+    """Export filtered CT database data in the format required for the 2019 Public Health England
+    CT dose survey
+
+    :param filterdict: Queryset of studies to export
+    :param user:  User that has started the export
+    :return: Saves Excel file into Media directory for user to download
+    """
+
+    import datetime
+    from django.db.models import Max
+    from remapp.exports.export_common import text_and_date_formats, generate_sheets, sheet_name
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import ct_acq_filter
+    import uuid
+
+    tsk = Exports.objects.create()
+
+    tsk.task_id = ctxlsx.request.id
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
+    tsk.modality = u"CT"
+    tsk.export_type = u"PHE export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
+    tsk.includes_pid = False
+    tsk.export_user_id = user
+    tsk.save()
+
+    tmp_xlsx, book = create_xlsx(tsk)
+    if not tmp_xlsx:
+        exit()
+
+    # Get the data!
+    e = ct_acq_filter(filterdict, pid=False).qs
+
+    tsk.num_records = e.count()
+    if abort_if_zero_studies(tsk.num_records, tsk):
+        return
+
+    tsk.progress = u'{0} studies in query.'.format(tsk.num_records)
+    tsk.save()
+
+    headings = [
+        u'Patient No',
+        u'Age (yrs)',
+        u'Weight (kg)',
+        u'Height (cm)',
+    ]
+    for x in range(4):
+        headings += [
+            u'Imaged length',
+            u'Start position',
+            u'End position',
+            u'kV',
+            u'CTDI phantom',
+            u'Scan FOV (mm)',
+            u'CTDIvol (mGy)*',
+            u'DLP (mGy.cm)*',
+        ]
