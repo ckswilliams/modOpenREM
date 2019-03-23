@@ -203,6 +203,49 @@ CT_ACQ_TYPE_CHOICES = (
 )
 
 
+def _specify_event_numbers(queryset, value, type):
+    """Filter queryset to specific number of events of each type
+
+    :param queryset: Study list
+    :param value: number of events
+    :param type: acquisition type
+    :return: filtered queryset
+    """
+    from django.db.models import Count
+    print("Value is {0}, type is {1}".format(value, type))
+    filtered = queryset.filter(
+        ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact=type
+    ).annotate(
+        Count('ctradiationdose__ctirradiationeventdata')
+    ).filter(ctradiationdose__ctirradiationeventdata__count=value)
+    return filtered
+
+
+def _specify_event_numbers_spiral(queryset, value):
+    """Method filter for specifying number of spiral (helical) events in each study
+
+    :param queryset: Study list
+    :param value: number of events
+    :return: filtered queryset
+    """
+    if not isinstance(value, int):
+        return queryset
+    return _specify_event_numbers(queryset, value, 'Spiral Acquisition')
+
+
+def _specify_event_numbers_axial(queryset, value):
+    """Method filter for specifying number of axial events in each study
+
+    :param queryset: Study list
+    :param value: number of events
+    :return: filtered queryset
+    """
+    print("In specify axial no. - value is {0}".format(value))
+    if not isinstance(value, int):
+        return queryset
+    return _specify_event_numbers(queryset, value, 'Sequenced Acquisition')
+
+
 class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
@@ -249,6 +292,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
                                                                    'acquisition_type__code_meaning',
                                                               choices=CT_ACQ_TYPE_CHOICES,
                                                               widget=forms.CheckboxSelectMultiple)
+    num_spiral_events = django_filters.MethodFilter(action=_specify_event_numbers_spiral, label=u'Num. spiral events')
+    num_axial_events = django_filters.MethodFilter(action=_specify_event_numbers_axial, label=u'Num. axial events')
 
     class Meta:
         model = GeneralStudyModuleAttr
