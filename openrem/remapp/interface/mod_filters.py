@@ -202,18 +202,33 @@ CT_ACQ_TYPE_CHOICES = (
     ('Free Acquisition', 'Free acquisition'),
 )
 
+EVENT_NUMBER_CHOICES = (
+    (None, 'Any'),
+    (0, '0'),
+    (1, '1'),
+    (2, '2'),
+    (3, '3'),
+    (4, '4'),
+    (5, '5'),
+    (6, '6'),
+    (7, '7'),
+    (8, '8'),
+    (9, '9'),
+    (10, '10'),
+)
 
-def _specify_event_numbers(queryset, value, type):
+
+def _specify_event_numbers(queryset, value, event_type):
     """Filter queryset to specific number of events of each type
 
     :param queryset: Study list
     :param value: number of events
-    :param type: acquisition type
+    :param event_type: acquisition type
     :return: filtered queryset
     """
     from django.db.models import Count
     filtered = queryset.filter(
-        ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact=type
+        ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact=event_type
     ).annotate(
         Count('ctradiationdose__ctirradiationeventdata')
     ).filter(ctradiationdose__ctirradiationeventdata__count=value)
@@ -243,9 +258,37 @@ def _specify_event_numbers_axial(queryset, value):
     """
     try:
         value = int(value)
+        return _specify_event_numbers(queryset, value, 'Sequenced Acquisition')
     except ValueError:
         return queryset
-    return _specify_event_numbers(queryset, value, 'Sequenced Acquisition')
+
+
+def _specify_event_numbers_spr(queryset, value):
+    """Method filter for specifying number of scan projection radiograph events in each study
+
+    :param queryset: Study list
+    :param value: number of events
+    :return: filtered queryset
+    """
+    try:
+        value = int(value)
+        return _specify_event_numbers(queryset, value, 'Constant Angle Acquisition')
+    except ValueError:
+        return queryset
+
+
+def _specify_event_numbers_stationary(queryset, value):
+    """Method filter for specifying number of scan projection radiograph events in each study
+
+    :param queryset: Study list
+    :param value: number of events
+    :return: filtered queryset
+    """
+    try:
+        value = int(value)
+        return _specify_event_numbers(queryset, value, 'Stationary Acquisition')
+    except ValueError:
+        return queryset
 
 
 class CTSummaryListFilter(django_filters.FilterSet):
@@ -294,8 +337,15 @@ class CTSummaryListFilter(django_filters.FilterSet):
                                                                    'acquisition_type__code_meaning',
                                                               choices=CT_ACQ_TYPE_CHOICES,
                                                               widget=forms.CheckboxSelectMultiple)
-    num_spiral_events = django_filters.MethodFilter(action=_specify_event_numbers_spiral, label=u'Num. spiral events')
-    num_axial_events = django_filters.MethodFilter(action=_specify_event_numbers_axial, label=u'Num. axial events')
+    num_spiral_events = django_filters.ChoiceFilter(action=_specify_event_numbers_spiral, label=u'Num. spiral events',
+                                                    choices=EVENT_NUMBER_CHOICES, widget=forms.Select)
+    num_axial_events = django_filters.ChoiceFilter(action=_specify_event_numbers_axial, label=u'Num. axial events',
+                                                   choices=EVENT_NUMBER_CHOICES, widget=forms.Select)
+    num_spr_events = django_filters.ChoiceFilter(action=_specify_event_numbers_spr, label=u'Num. topograms',
+                                                 choices=EVENT_NUMBER_CHOICES, widget=forms.Select)
+    num_stationary_events = django_filters.ChoiceFilter(action=_specify_event_numbers_spiral,
+                                                        label=u'Num. stationary events', choices=EVENT_NUMBER_CHOICES,
+                                                        widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
