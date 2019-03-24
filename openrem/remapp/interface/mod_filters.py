@@ -212,7 +212,6 @@ def _specify_event_numbers(queryset, value, type):
     :return: filtered queryset
     """
     from django.db.models import Count
-    print("Value is {0}, type is {1}".format(value, type))
     filtered = queryset.filter(
         ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact=type
     ).annotate(
@@ -228,7 +227,9 @@ def _specify_event_numbers_spiral(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    if not isinstance(value, int):
+    try:
+        value = int(value)
+    except ValueError:
         return queryset
     return _specify_event_numbers(queryset, value, 'Spiral Acquisition')
 
@@ -240,8 +241,9 @@ def _specify_event_numbers_axial(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    print("In specify axial no. - value is {0}".format(value))
-    if not isinstance(value, int):
+    try:
+        value = int(value)
+    except ValueError:
         return queryset
     return _specify_event_numbers(queryset, value, 'Sequenced Acquisition')
 
