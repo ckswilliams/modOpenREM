@@ -37,6 +37,7 @@ from django.db import models
 import logging
 import django_filters
 from django import forms
+from django.db.models import Count
 from remapp.models import GeneralStudyModuleAttr
 from django.utils.safestring import mark_safe
 
@@ -218,23 +219,6 @@ EVENT_NUMBER_CHOICES = (
 )
 
 
-def _specify_event_numbers(queryset, value, event_type):
-    """Filter queryset to specific number of events of each type
-
-    :param queryset: Study list
-    :param value: number of events
-    :param event_type: acquisition type
-    :return: filtered queryset
-    """
-    from django.db.models import Count
-    filtered = queryset.filter(
-        ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact=event_type
-    ).annotate(
-        Count('ctradiationdose__ctirradiationeventdata')
-    ).filter(ctradiationdose__ctirradiationeventdata__count=value)
-    return filtered
-
-
 def _specify_event_numbers_spiral(queryset, value):
     """Method filter for specifying number of spiral (helical) events in each study
 
@@ -242,11 +226,22 @@ def _specify_event_numbers_spiral(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
+    print(u"spiral before is {0}".format(queryset.count()))
     try:
         value = int(value)
     except ValueError:
         return queryset
-    return _specify_event_numbers(queryset, value, 'Spiral Acquisition')
+    if value == 0:
+        filtered = queryset.exclude(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Spiral Acquisition')
+    else:
+        filtered = queryset.filter(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Spiral Acquisition'
+        ).annotate(
+            spiral_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
+        ).filter(spiral_count=value)
+    print(u"spiral after is {0}".format(filtered.count()))
+    return filtered
 
 
 def _specify_event_numbers_axial(queryset, value):
@@ -256,11 +251,22 @@ def _specify_event_numbers_axial(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
+    print(u"axial before is {0}".format(queryset.count()))
     try:
         value = int(value)
-        return _specify_event_numbers(queryset, value, 'Sequenced Acquisition')
     except ValueError:
         return queryset
+    if value == 0:
+        filtered = queryset.exclude(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Sequenced Acquisition')
+    else:
+        filtered = queryset.filter(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Sequenced Acquisition'
+        ).annotate(
+            axial_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
+        ).filter(axial_count=value)
+    print(u"axial after is {0}".format(filtered.count()))
+    return filtered
 
 
 def _specify_event_numbers_spr(queryset, value):
@@ -270,11 +276,22 @@ def _specify_event_numbers_spr(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
+    print(u"spr before is {0}".format(queryset.count()))
     try:
         value = int(value)
-        return _specify_event_numbers(queryset, value, 'Constant Angle Acquisition')
     except ValueError:
         return queryset
+    if value == 0:
+        filtered = queryset.exclude(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition')
+    else:
+        filtered = queryset.filter(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition'
+        ).annotate(
+            spr_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
+        ).filter(spr_count=value)
+    print(u"spr after is {0}".format(filtered.count()))
+    return filtered
 
 
 def _specify_event_numbers_stationary(queryset, value):
@@ -284,11 +301,22 @@ def _specify_event_numbers_stationary(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
+    print(u"stationary before is {0}".format(queryset.count()))
     try:
         value = int(value)
-        return _specify_event_numbers(queryset, value, 'Stationary Acquisition')
     except ValueError:
         return queryset
+    if value == 0:
+        filtered = queryset.exclude(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition')
+    else:
+        filtered = queryset.filter(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
+        ).annotate(
+            stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
+        ).filter(stationary_count=value)
+    print(u"stationary after is {0}".format(filtered.count()))
+    return filtered
 
 
 class CTSummaryListFilter(django_filters.FilterSet):
@@ -343,7 +371,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
                                                    choices=EVENT_NUMBER_CHOICES, widget=forms.Select)
     num_spr_events = django_filters.ChoiceFilter(action=_specify_event_numbers_spr, label=u'Num. topograms',
                                                  choices=EVENT_NUMBER_CHOICES, widget=forms.Select)
-    num_stationary_events = django_filters.ChoiceFilter(action=_specify_event_numbers_spiral,
+    num_stationary_events = django_filters.ChoiceFilter(action=_specify_event_numbers_stationary,
                                                         label=u'Num. stationary events', choices=EVENT_NUMBER_CHOICES,
                                                         widget=forms.Select)
 
