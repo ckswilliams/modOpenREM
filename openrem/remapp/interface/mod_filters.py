@@ -205,7 +205,7 @@ CT_ACQ_TYPE_CHOICES = (
 
 EVENT_NUMBER_CHOICES = (
     (None, 'Any'),
-    (0, '0'),
+    (0, 'None'),
     (1, '1'),
     (2, '2'),
     (3, '3'),
