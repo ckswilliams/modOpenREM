@@ -226,7 +226,6 @@ def _specify_event_numbers_spiral(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    print(u"spiral before is {0}".format(queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -240,7 +239,6 @@ def _specify_event_numbers_spiral(queryset, value):
         ).annotate(
             spiral_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spiral_count=value)
-    print(u"spiral after is {0}".format(filtered.count()))
     return filtered
 
 
@@ -251,7 +249,6 @@ def _specify_event_numbers_axial(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    print(u"axial before is {0}".format(queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -265,7 +262,6 @@ def _specify_event_numbers_axial(queryset, value):
         ).annotate(
             axial_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(axial_count=value)
-    print(u"axial after is {0}".format(filtered.count()))
     return filtered
 
 
@@ -276,7 +272,6 @@ def _specify_event_numbers_spr(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    print(u"spr before is {0}".format(queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -290,7 +285,6 @@ def _specify_event_numbers_spr(queryset, value):
         ).annotate(
             spr_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spr_count=value)
-    print(u"spr after is {0}".format(filtered.count()))
     return filtered
 
 
@@ -301,7 +295,6 @@ def _specify_event_numbers_stationary(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    print(u"stationary before is {0}".format(queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -315,7 +308,6 @@ def _specify_event_numbers_stationary(queryset, value):
         ).annotate(
             stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(stationary_count=value)
-    print(u"stationary after is {0}".format(filtered.count()))
     return filtered
 
 
