@@ -445,6 +445,7 @@ def ct_phe_2019(filterdict, user=None):
     """
 
     import datetime
+    from decimal import Decimal
     from django.db.models import Max
     from remapp.exports.export_common import text_and_date_formats, generate_sheets, sheet_name
     from remapp.models import Exports
@@ -457,7 +458,7 @@ def ct_phe_2019(filterdict, user=None):
     if tsk.task_id is None:  # Required when testing without celery
         tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = u"CT"
-    tsk.export_type = u"PHE export"
+    tsk.export_type = u"PHE CT 2019 export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
     tsk.progress = u'Query filters imported, task started'
@@ -471,9 +472,9 @@ def ct_phe_2019(filterdict, user=None):
         exit()
 
     # Get the data!
-    e = ct_acq_filter(filterdict, pid=False).qs
+    exams = ct_acq_filter(filterdict, pid=False).qs
 
-    tsk.num_records = e.count()
+    tsk.num_records = exams.count()
     if abort_if_zero_studies(tsk.num_records, tsk):
         return
 
@@ -497,3 +498,98 @@ def ct_phe_2019(filterdict, user=None):
             u'CTDIvol (mGy)*',
             u'DLP (mGy.cm)*',
         ]
+    headings += u"Patient comments"
+    sheet = book.add_worksheet("PHE CT 2019")
+    sheet.write_row(0, 0, headings)
+
+    num_rows = exams.count()
+    for row, exam in enumerate(exams):
+        tsk.progress = u"Writing study {0} of {1}".format(row+1, num_rows)
+        tsk.save()
+
+        exam_data = []
+        comments = []
+        patient_age_decimal = None
+        patient_size = None
+        patient_weight = None
+        try:
+            patient_study_module = exam.patientstudymoduleattr_set.get()
+            patient_age_decimal = patient_study_module.patient_age_decimal
+            patient_size = patient_study_module.patient_size
+            patient_weight = patient_study_module.patient_weight
+        except ObjectDoesNotExist:
+            logger.debug(u"PHE CT 2019 export: patientstudymoduleattr_set object does not exist."
+                         u" AccNum {0}, Date {1}".format(exam.accession_number, exam.study_date))
+        exam_data += [
+            row+1,
+            patient_age_decimal,
+            patient_weight,
+            patient_size * Decimal(100.),
+        ]
+        for event in exam.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
+            try:
+                ct_acquisition_type = event.ct_acquisition_type.code_meaning
+                if ct_acquisition_type in u"Constant Angle Acquisition":
+                    continue
+                comments += [ct_acquisition_type, ]
+            except (ObjectDoesNotExist, AttributeError):
+                comments += ["unknown type", ]
+            scanning_length = None
+            start_position = None
+            end_position = None
+            kv = None
+            ctdi_phantom = None
+            scan_fov = None
+            ctdi_vol = None
+            dlp = None
+            try:
+                scanning_length_data = event.scanninglength_set.get()
+                scanning_length = scanning_length_data.scanning_length
+                start_position = scanning_length_data.bottom_z_location_of_scanning_length
+                end_position = scanning_length_data.top_z_location_of_scanning_length
+            except ObjectDoesNotExist:
+                pass
+            try:
+                source_parameters = event.ctxraysourceparameters_set.order_by('pk')
+                if source_parameters.count() == 2:
+                    kv = u"{0} | {1}".format(source_parameters[0].kvp, source_parameters[1].kvp)
+                else:
+                    kv = source_parameters[0].kvp
+            except ObjectDoesNotExist:
+                pass
+            try:
+                if event.ctdiw_phantom_type.code_value == u'113691':
+                    ctdi_phantom = u'32 cm'
+                elif event.ctdiw_phantom_type.code_value == u'113690':
+                    ctdi_phantom = u'16 cm'
+                else:
+                    ctdi_phantom = event.ctdiw_phantom_type.code_meaning
+            except AttributeError:
+                pass
+            exam_data += [
+                scanning_length,
+                start_position,
+                end_position,
+                kv,
+                ctdi_phantom,
+                scan_fov,
+                ctdi_vol,
+                dlp,
+            ]
+        exam_data += [
+            u"Series types: " + u", ".join(comments)
+        ]
+        sheet.write_row(row+1, 0, exam_data)
+    book.close()
+    tsk.progress = u"PHE CT 2019 export complete"
+    tsk.save()
+
+    xlsxfilename = u"PHE_CT2019{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    write_export(tsk, xlsxfilename, tmp_xlsx, datestamp)
+
+
+
+
+
+
