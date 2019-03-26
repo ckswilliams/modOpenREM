@@ -446,15 +446,13 @@ def ct_phe_2019(filterdict, user=None):
 
     import datetime
     from decimal import Decimal
-    from django.db.models import Max
-    from remapp.exports.export_common import text_and_date_formats, generate_sheets, sheet_name
     from remapp.models import Exports
     from remapp.interface.mod_filters import ct_acq_filter
     import uuid
 
     tsk = Exports.objects.create()
 
-    tsk.task_id = ctxlsx.request.id
+    tsk.task_id = ct_phe_2019.request.id
     if tsk.task_id is None:  # Required when testing without celery
         tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = u"CT"
@@ -498,7 +496,10 @@ def ct_phe_2019(filterdict, user=None):
             u'CTDIvol (mGy)*',
             u'DLP (mGy.cm)*',
         ]
-    headings += u"Patient comments"
+    headings += [
+        u"Total DLP* (whole scan) mGy.cm",
+        u"Patient comments",
+    ]
     sheet = book.add_worksheet("PHE CT 2019")
     sheet.write_row(0, 0, headings)
 
@@ -516,7 +517,10 @@ def ct_phe_2019(filterdict, user=None):
             patient_study_module = exam.patientstudymoduleattr_set.get()
             patient_age_decimal = patient_study_module.patient_age_decimal
             patient_size = patient_study_module.patient_size
-            patient_weight = patient_study_module.patient_weight
+            try:
+                patient_size = patient_study_module.patient_size * Decimal(100.)
+            except TypeError:
+                pass
         except ObjectDoesNotExist:
             logger.debug(u"PHE CT 2019 export: patientstudymoduleattr_set object does not exist."
                          u" AccNum {0}, Date {1}".format(exam.accession_number, exam.study_date))
@@ -524,7 +528,7 @@ def ct_phe_2019(filterdict, user=None):
             row+1,
             patient_age_decimal,
             patient_weight,
-            patient_size * Decimal(100.),
+            patient_size,
         ]
         for event in exam.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
             try:
@@ -573,13 +577,19 @@ def ct_phe_2019(filterdict, user=None):
                 kv,
                 ctdi_phantom,
                 scan_fov,
-                ctdi_vol,
-                dlp,
+                event.mean_ctdivol,
+                event.dlp,
             ]
-        exam_data += [
-            u"Series types: " + u", ".join(comments)
-        ]
+        ct_dose_length_product_total = None
+        try:
+            ct_accumulated = exam.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
+            ct_dose_length_product_total = ct_accumulated.ct_dose_length_product_total
+        except ObjectDoesNotExist:
+            pass
         sheet.write_row(row+1, 0, exam_data)
+        sheet.write(row+1, 36, ct_dose_length_product_total)
+        patient_comment_cell = u"Series types: " + u", ".join(comments)
+        sheet.write(row+1, 37, patient_comment_cell)
     book.close()
     tsk.progress = u"PHE CT 2019 export complete"
     tsk.save()
