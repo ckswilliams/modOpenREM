@@ -559,7 +559,7 @@ def ct_phe_2019(filterdict, user=None):
                     kv = u"{0} | {1}".format(source_parameters[0].kvp, source_parameters[1].kvp)
                 else:
                     kv = source_parameters[0].kvp
-            except ObjectDoesNotExist:
+            except (ObjectDoesNotExist, IndexError):
                 pass
             try:
                 if event.ctdiw_phantom_type.code_value == u'113691':
