@@ -4,6 +4,8 @@ OpenREM version history
 
 0.9.1 (2019-03-xx)
 ------------------
+* `#735`_  Imports: Switched to more secure defusedxml for parsing XML in comments
+* `#734`_  Query-retrieve: handle illegal image level response with no instance number
 * `#732`_  Query-retrieve: added advanced option to workaround empty series issue
 * `#710`_  Interface: Time-based columns in Celery and RabbitMQ tables now sorted correctly
 
