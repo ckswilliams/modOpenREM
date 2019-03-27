@@ -5,6 +5,7 @@ OpenREM version history
 0.9.1 (2019-03-xx)
 ------------------
 * `#732`_  Query-retrieve: added advanced option to workaround empty series issue
+* `#710`_  Interface: Time-based columns in Celery and RabbitMQ tables now sorted correctly
 
 0.9.0 (2019-03-06)
 ------------------

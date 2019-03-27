@@ -10,8 +10,8 @@
     <tr>
       <td>{{ task.uuid }}</td>
       <td>{{ task.name }}</td>
-      <td>{{ task.received }}</td>
-      <td>{{ task.started }}</td>
+      <td sorttable_customkey="{{ task.received_delta_s }}">{{ task.received }}</td>
+      <td sorttable_customkey="{{ task.started_delta_s }}">{{ task.started }}</td>
       <td>{{ task.state }}</td>
     </tr>
   {% endfor %}
