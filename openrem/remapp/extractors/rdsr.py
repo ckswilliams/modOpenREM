@@ -56,7 +56,10 @@ def _observercontext(dataset, obs, ch):  # TID 1002
             obs.observer_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                   cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer UID':
-            obs.device_observer_uid = cont.UID
+            try:
+                obs.device_observer_uid = cont.UID
+            except AttributeError:
+                obs.device_observer_uid = cont.TextValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Name':
             obs.device_observer_name = safe_strings(cont.TextValue, ch)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Manufacturer':
@@ -1092,6 +1095,10 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration", dataset)
     try:
         device_observer_uid = [content.UID for content in dataset.ContentSequence if (
+                content.ConceptNameCodeSequence[0].CodeValue == '121012' and
+                content.ConceptNameCodeSequence[0].CodingSchemeDesignator == 'DCM')][0]  # 121012 = DeviceObserverUID
+    except AttributeError:
+        device_observer_uid = [content.TextValue for content in dataset.ContentSequence if (
                 content.ConceptNameCodeSequence[0].CodeValue == '121012' and
                 content.ConceptNameCodeSequence[0].CodingSchemeDesignator == 'DCM')][0]  # 121012 = DeviceObserverUID
     except IndexError:
