@@ -674,7 +674,7 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
         try:
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose Area Product Total':
                 accumproj.fluoro_dose_area_product_total = _check_dap_units(cont.MeasuredValueSequence[0])
-            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
+            elif cont.ConceptNameCodeSequence[0].CodeValue == '113728':  # = 'Fluoro Dose (RP) Total'
                 accumproj.fluoro_dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Fluoro Time':
                 accumproj.total_fluoro_time = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
