@@ -273,23 +273,50 @@ def _irradiationeventxraymechanicaldata(dataset, event):  # TID 10003c
             mech.crdr_mechanical_configuration = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                                    cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary Angle':
-            mech.positioner_primary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.positioner_primary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary Angle':
-            mech.positioner_secondary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.positioner_secondary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary End Angle':
-            mech.positioner_primary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.positioner_primary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary End Angle':
-            mech.positioner_secondary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.positioner_secondary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Column Angulation':
-            mech.column_angulation = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.column_angulation = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Head Tilt Angle':
-            mech.table_head_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.table_head_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Horizontal Rotation Angle':
-            mech.table_horizontal_rotation_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.table_horizontal_rotation_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Cradle Tilt Angle':
-            mech.table_cradle_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.table_cradle_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Compression Thickness':
-            mech.compression_thickness = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.compression_thickness = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
     _doserelateddistancemeasurements(dataset, mech)
     mech.save()
 
