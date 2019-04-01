@@ -530,7 +530,7 @@ def ct_phe_2019(filterdict, user=None):
             patient_weight,
             patient_size,
         ]
-        for event in exam.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
+        for i, event in enumerate(exam.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id')):
             try:
                 ct_acquisition_type = event.ct_acquisition_type.code_meaning
                 if ct_acquisition_type in u"Constant Angle Acquisition":
@@ -544,8 +544,6 @@ def ct_phe_2019(filterdict, user=None):
             kv = None
             ctdi_phantom = None
             scan_fov = None
-            ctdi_vol = None
-            dlp = None
             try:
                 scanning_length_data = event.scanninglength_set.get()
                 scanning_length = scanning_length_data.scanning_length
