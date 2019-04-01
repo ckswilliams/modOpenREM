@@ -2061,6 +2061,8 @@ def size_abort(request, pk):
         size_import.logfile.delete()
         size_import.sizefile.delete()
         size_import.delete()
+        logger.info(u"Size import task {0} terminated from the patient size imports interface".format(
+            size_import.task_id))
     else:
         messages.error(request, "Only members of the importsizegroup or admingroup can abort a size import task")
 
@@ -3361,6 +3363,7 @@ def celery_tasks(request, stage=None):
                 active_tasks = []
                 older_tasks = []
                 task_dict_list = flower.json()
+                datetime_now = datetime.now()
                 for task_uuid in task_dict_list.keys():
                     this_task = {'uuid': task_uuid,
                                  'name': task_dict_list[task_uuid]['name'],
@@ -3368,8 +3371,10 @@ def celery_tasks(request, stage=None):
                                  }
                     if isinstance(task_dict_list[task_uuid]['received'], float):
                         this_task['received'] = datetime.fromtimestamp(task_dict_list[task_uuid]['received'])
+                        this_task['received_delta_s'] = int((datetime_now - this_task['received']).total_seconds())
                     if isinstance(task_dict_list[task_uuid]['started'], float):
                         this_task['started'] = datetime.fromtimestamp(task_dict_list[task_uuid]['started'])
+                        this_task['started_delta_s'] = int((datetime_now - this_task['started']).total_seconds())
                     else:
                         this_task['started'] = ''
                     try:
@@ -3386,7 +3391,6 @@ def celery_tasks(request, stage=None):
                     except AttributeError:
                         this_task['type'] = None
                     tasks += [this_task, ]
-                    datetime_now = datetime.now()
                     recent_time_delta = 60*60*6  # six hours
                     if u'STARTED' in this_task['state']:
                         active_tasks += [this_task, ]
@@ -3396,13 +3400,13 @@ def celery_tasks(request, stage=None):
                     else:
                         older_tasks += [this_task, ]
                 if u"active" in stage:
-                    return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks},
+                    return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks, 'type': 'active'},
                                               context_instance=RequestContext(request))
                 elif u"recent" in stage:
-                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': recent_tasks},
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': recent_tasks, 'type': 'recent'},
                                               context_instance=RequestContext(request))
                 elif u"older" in stage:
-                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': older_tasks},
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': older_tasks, 'type': 'older'},
                                               context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
@@ -3424,14 +3428,25 @@ def celery_abort(request, task_id=None, type=None):
                 if type in u'netdicom':
                     description = u'query or move'
                     task = DicomQuery.objects.get(query_id__exact=task_id)
+                    abort_logger = logging.getLogger('remapp.netdicom.qrscu')
+                    abort_logger.info(u"Query or move task {0} terminated from the Tasks interface".format(task_id))
                 elif type in u'export':
                     description = u'export'
                     task = Exports.objects.get(task_id__exact=task_id)
+                    abort_logger = logging.getLogger('remapp')
+                    abort_logger.info(u"Export task {0} terminated from the Tasks interface".format(task_id))
                 elif type in u'size':
                     description = u'size import'
                     task = SizeUpload.objects.get(task_id__exact=task_id)
+                    task.logfile.delete()
+                    task.sizefile.delete()
+                    abort_logger = logging.getLogger('remapp')
+                    abort_logger.info(u"Size import task {0} terminated from the Tasks interface".format(task_id))
                 else:
-                    messages.success(request, u"Success! Task {0} terminated. Type was '{1}' which didn't match".format(task_id, type))
+                    messages.success(request, u"Success! Task {0} terminated. Type was '{1}' which didn't match".format(
+                        task_id, type))
+                    abort_logger = logging.getLogger('remapp')
+                    abort_logger.info(u"Task {0} of type {1} terminated from the Tasks interface".format(task_id, type))
                     return redirect(reverse_lazy('celery_admin'))
                 task.delete()
                 messages.success(request, u"Task {0} terminated, and matching {1} job in database deleted.".format(

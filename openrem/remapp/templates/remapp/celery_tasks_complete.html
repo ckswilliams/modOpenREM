@@ -1,19 +1,29 @@
-<table class="table">
+<table class="table sortable" id="{{ type }}">
   <tr>
-    <th style="width: 30%">UUID</th>
-    <th style="width: 24%">Task</th>
-    <th style="width: 18%">Received</th>
-    <th style="width: 18%">Started</th>
-    <th>State</th>
+    <th id="uuid_{{ type }}" onclick="updateSort(this.id, 'user_click');" style="width: 30%">UUID</th>
+    <th id="task_{{ type }}" onclick="updateSort(this.id, 'user_click');" style="width: 24%">Task</th>
+    <th id="received_{{ type }}" onclick="updateSort(this.id, 'user_click');" style="width: 18%">Received</th>
+    <th id="started_{{ type }}" onclick="updateSort(this.id, 'user_click');" style="width: 18%">Started</th>
+    <th id="state_{{ type }}" onclick="updateSort(this.id, 'user_click');">State</th>
   </tr>
   {% for task in tasks %}
     <tr>
       <td>{{ task.uuid }}</td>
       <td>{{ task.name }}</td>
-      <td>{{ task.received }}</td>
-      <td>{{ task.started }}</td>
+      <td sorttable_customkey="{{ task.received_delta_s }}">{{ task.received }}</td>
+      <td sorttable_customkey="{{ task.started_delta_s }}">{{ task.started }}</td>
       <td>{{ task.state }}</td>
     </tr>
   {% endfor %}
 </table>
+
+<script>
+    $(document).ready(function () {
+        document.getElementById("{{ type }}")
+        var taskTable{{ type }} = document.getElementById("{{ type }}");
+        sorttable.makeSortable(taskTable{{ type }});
+        updateSort(sort_info_{{ type }}.heading);
+    });
+</script>
+
 

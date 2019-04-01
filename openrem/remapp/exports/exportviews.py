@@ -431,6 +431,7 @@ def export_abort(request, pk):
     if request.user.groups.filter(name="exportgroup"):
         app.control.revoke(export_task.task_id, terminate=True)
         export_task.delete()
+        logger.info(u"Export task {0} terminated from the Exports interface".format(export_task.task_id))
 
     return HttpResponseRedirect(reverse_lazy('export'))
 
