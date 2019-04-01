@@ -396,7 +396,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                 _pulsewidth(cont.MeasuredValueSequence[0].NumericValue, source)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'KVP':
                 _kvptable(cont.MeasuredValueSequence[0].NumericValue, source)
-            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Tube Current':
+            elif cont.ConceptNameCodeSequence[0].CodeValue == u'113734':  # 'X-Ray Tube Current':
                 _xraytubecurrent(cont.MeasuredValueSequence[0].NumericValue, source)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure':
                 _exposure(cont.MeasuredValueSequence[0].NumericValue, source)
@@ -553,7 +553,7 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
                 if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Label Type':
                     event.label_type = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
                                                          cont2.ConceptCodeSequence[0].CodeMeaning)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'DateTime Started':
+        elif cont.ConceptNameCodeSequence[0].CodeValue == u'111526':  # 'DateTime Started'
             event.date_time_started = make_date_time(cont.DateTime)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event Type':
             event.irradiation_event_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
