@@ -2,10 +2,11 @@
 OpenREM version history
 =======================
 
-0.9.1 (2019-03-xx)
+0.9.1 (2019-04-xx)
 ------------------
+* `#740`_  Installation: fixed Celery version to avoid dependency on Django 1.11
 * `#736`_  Query-retrieve: duplicate study level responses now removed from query
-* `#735`_  Imports: Switched to more secure defusedxml for parsing XML in comments
+* `#735`_  Imports: switched to more secure defusedxml for parsing XML in comments
 * `#734`_  Query-retrieve: handle illegal image level response with no instance number
 * `#732`_  Query-retrieve: added advanced option to workaround empty series issue
 
