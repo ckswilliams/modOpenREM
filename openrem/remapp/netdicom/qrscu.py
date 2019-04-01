@@ -1270,7 +1270,7 @@ def _process_args(parser_args, parser):
             logger.info(u"Date until: {0}".format(parser_args.duntil))
         if parser_args.single_date:
             datetime.datetime.strptime(parser_args.single_date, '%Y-%m-%d')
-            logger.debug(u"Single date: {0}".format(parser_args.single_date))
+            logger.info(u"Single date: {0}".format(parser_args.single_date))
             date_1 = parser_args.single_date
             single_date = True
     except ValueError:

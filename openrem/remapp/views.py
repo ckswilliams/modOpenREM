@@ -2061,6 +2061,8 @@ def size_abort(request, pk):
         size_import.logfile.delete()
         size_import.sizefile.delete()
         size_import.delete()
+        logger.info(u"Size import task {0} terminated from the patient size imports interface".format(
+            size_import.task_id))
     else:
         messages.error(request, "Only members of the importsizegroup or admingroup can abort a size import task")
 
@@ -3426,14 +3428,25 @@ def celery_abort(request, task_id=None, type=None):
                 if type in u'netdicom':
                     description = u'query or move'
                     task = DicomQuery.objects.get(query_id__exact=task_id)
+                    abort_logger = logging.getLogger('remapp.netdicom.qrscu')
+                    abort_logger.info(u"Query or move task {0} terminated from the Tasks interface".format(task_id))
                 elif type in u'export':
                     description = u'export'
                     task = Exports.objects.get(task_id__exact=task_id)
+                    abort_logger = logging.getLogger('remapp')
+                    abort_logger.info(u"Export task {0} terminated from the Tasks interface".format(task_id))
                 elif type in u'size':
                     description = u'size import'
                     task = SizeUpload.objects.get(task_id__exact=task_id)
+                    task.logfile.delete()
+                    task.sizefile.delete()
+                    abort_logger = logging.getLogger('remapp')
+                    abort_logger.info(u"Size import task {0} terminated from the Tasks interface".format(task_id))
                 else:
-                    messages.success(request, u"Success! Task {0} terminated. Type was '{1}' which didn't match".format(task_id, type))
+                    messages.success(request, u"Success! Task {0} terminated. Type was '{1}' which didn't match".format(
+                        task_id, type))
+                    abort_logger = logging.getLogger('remapp')
+                    abort_logger.info(u"Task {0} of type {1} terminated from the Tasks interface".format(task_id, type))
                     return redirect(reverse_lazy('celery_admin'))
                 task.delete()
                 messages.success(request, u"Task {0} terminated, and matching {1} job in database deleted.".format(
