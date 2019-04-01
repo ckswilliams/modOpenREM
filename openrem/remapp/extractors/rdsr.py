@@ -695,9 +695,8 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
                     cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
                 try:
-                    accumproj.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
-                                                                                  cont.ConceptCodeSequence[
-                                                                                      0].CodeMeaning)
+                    accumproj.reference_point_definition_code = get_or_create_cid(
+                        cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
                 except AttributeError:
                     accumproj.reference_point_definition = cont.TextValue
         except IndexError:
