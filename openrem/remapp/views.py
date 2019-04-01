@@ -3361,6 +3361,7 @@ def celery_tasks(request, stage=None):
                 active_tasks = []
                 older_tasks = []
                 task_dict_list = flower.json()
+                datetime_now = datetime.now()
                 for task_uuid in task_dict_list.keys():
                     this_task = {'uuid': task_uuid,
                                  'name': task_dict_list[task_uuid]['name'],
@@ -3368,8 +3369,10 @@ def celery_tasks(request, stage=None):
                                  }
                     if isinstance(task_dict_list[task_uuid]['received'], float):
                         this_task['received'] = datetime.fromtimestamp(task_dict_list[task_uuid]['received'])
+                        this_task['received_delta_s'] = int((datetime_now - this_task['received']).total_seconds())
                     if isinstance(task_dict_list[task_uuid]['started'], float):
                         this_task['started'] = datetime.fromtimestamp(task_dict_list[task_uuid]['started'])
+                        this_task['started_delta_s'] = int((datetime_now - this_task['started']).total_seconds())
                     else:
                         this_task['started'] = ''
                     try:
@@ -3386,7 +3389,6 @@ def celery_tasks(request, stage=None):
                     except AttributeError:
                         this_task['type'] = None
                     tasks += [this_task, ]
-                    datetime_now = datetime.now()
                     recent_time_delta = 60*60*6  # six hours
                     if u'STARTED' in this_task['state']:
                         active_tasks += [this_task, ]
@@ -3396,13 +3398,13 @@ def celery_tasks(request, stage=None):
                     else:
                         older_tasks += [this_task, ]
                 if u"active" in stage:
-                    return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks},
+                    return render_to_response('remapp/celery_tasks.html', {'tasks': active_tasks, 'type': 'active'},
                                               context_instance=RequestContext(request))
                 elif u"recent" in stage:
-                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': recent_tasks},
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': recent_tasks, 'type': 'recent'},
                                               context_instance=RequestContext(request))
                 elif u"older" in stage:
-                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': older_tasks},
+                    return render_to_response('remapp/celery_tasks_complete.html', {'tasks': older_tasks, 'type': 'older'},
                                               context_instance=RequestContext(request))
         except requests.ConnectionError:
             admin = _create_admin_dict(request)
