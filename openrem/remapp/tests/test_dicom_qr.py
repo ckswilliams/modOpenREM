@@ -1608,4 +1608,36 @@ class InvalidMove(TestCase):
                                u"Move called with invalid query_id not_a_query_ID. Move abandoned."))
 
 
+class DuplicatesInStudyResponse(TestCase):
+    """Test function that removes duplicates within the response at study level"""
 
+    def test_remove_duplicates_in_study_response(self):
+        """Test to ensure duplicates are removed from the response query set
+
+        """
+        from remapp.netdicom.qrscu import _remove_duplicates_in_study_response
+
+        query = DicomQuery.objects.create()
+        query.query_id = uuid.uuid4()
+        query.save()
+
+        rst1 = DicomQRRspStudy.objects.create(dicom_query=query)
+        rst1.query_id = query.query_id
+        rst1.study_instance_uid = uuid.uuid4()
+        rst1.save()
+
+        rst2 = DicomQRRspStudy.objects.create(dicom_query=query)
+        rst2.query_id = query.query_id
+        rst2.study_instance_uid = uuid.uuid4()
+        rst2.save()
+
+        rst3 = DicomQRRspStudy.objects.create(dicom_query=query)
+        rst3.query_id = query.query_id
+        rst3.study_instance_uid = rst1.study_instance_uid
+        rst3.save()
+
+        self.assertEqual(query.dicomqrrspstudy_set.count(), 3)
+
+        current_count = _remove_duplicates_in_study_response(query, 3)
+        self.assertEqual(current_count, 2)
+        self.assertEqual(query.dicomqrrspstudy_set.count(), 2)

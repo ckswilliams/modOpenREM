@@ -34,25 +34,46 @@
                     source = null;
                 }
 
-                sort_info.heading = heading;
+                if (heading.includes("recent")) sort_info_recent.heading = heading;
+                else sort_info_older.heading = heading;
 
                 if (source === 'user_click') {
                     // It's a user-generated call and the headings already match
                     // so reverse the sorting direction
-                    sort_info.direction = sort_info.direction === "ascending" ? "descending" : "ascending";
-                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                    if (heading.includes("recent")) {
+                        sort_info_recent.direction = sort_info_recent.direction === "ascending" ? "descending" : "ascending";
+                        sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                    }
+                    else {
+                        sort_info_older.direction = sort_info_older.direction === "ascending" ? "descending" : "ascending";
+                        sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                    }
                 }
 
-                if (sort_info.direction === "ascending") {
-                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                } else {
-                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
-                    sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                if (heading.includes("recent")) {
+                    if (sort_info_recent.direction === "ascending") {
+                        sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                    } else {
+                        sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                        sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                    }
+                }
+                else {
+                    if (sort_info_older.direction === "ascending") {
+                        sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                    } else {
+                        sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                        sorttable.innerSortFunction.apply(document.getElementById(heading), []);
+                    }
                 }
             }
 
-            sort_info = {
-                heading: "uuid",
+            sort_info_recent = {
+                heading: "received_recent",
+                direction: "ascending"
+            };
+            sort_info_older = {
+                heading: "received_older",
                 direction: "ascending"
             };
 
