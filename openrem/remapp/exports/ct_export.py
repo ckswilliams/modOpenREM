@@ -531,6 +531,8 @@ def ct_phe_2019(filterdict, user=None):
             patient_size,
         ]
         for i, event in enumerate(exam.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id')):
+            if i == 4:
+                exam_data += ['', '', ]
             try:
                 ct_acquisition_type = event.ct_acquisition_type.code_meaning
                 if ct_acquisition_type in u"Constant Angle Acquisition":
