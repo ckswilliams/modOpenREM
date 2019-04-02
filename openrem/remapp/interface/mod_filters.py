@@ -241,6 +241,7 @@ def _specify_event_numbers_spiral(queryset, value):
             spiral_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spiral_count=value)
     print(u"spiral: returning queryset {0}".format(filtered.count()))
+    print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
@@ -266,6 +267,7 @@ def _specify_event_numbers_axial(queryset, value):
             axial_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(axial_count=value)
     print(u"axial: returning queryset {0}".format(filtered.count()))
+    print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
@@ -291,6 +293,7 @@ def _specify_event_numbers_spr(queryset, value):
             spr_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spr_count=value)
     print(u"spr: returning queryset {0}".format(filtered.count()))
+    print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
@@ -316,6 +319,7 @@ def _specify_event_numbers_stationary(queryset, value):
             stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(stationary_count=value)
     print(u"stationary: returning queryset {0}".format(filtered.count()))
+    print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
