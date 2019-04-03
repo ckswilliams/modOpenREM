@@ -313,6 +313,15 @@ def _specify_event_numbers_stationary(queryset, value):
         filtered = queryset.exclude(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition')
     else:
+        for study in queryset:
+            for event in study.ctradiationdose_set.get().ctirradiationeventdata_set.all():
+                print("Event type is {0}".format(event.ct_acquisition_type.code_meaning))
+        filtered_number = queryset.filter(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
+        ).annotate(
+            stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
+        )
+        print(u"{0} studies in the queryset have stationary events".format(filtered_number[0].stationary_count))
         filtered = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
         ).annotate(
