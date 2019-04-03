@@ -329,6 +329,8 @@ def _specify_event_numbers_stationary(queryset, value):
         ).filter(stationary_count=value)
     print(u"stationary: returning queryset {0}".format(filtered.count()))
     print(u"StudyUIDs are {0}".format(filtered))
+    import sqlite3
+    print(u"SQLite3 version is {0}".format(sqlite3.sqlite_version))
     return filtered
 
 
