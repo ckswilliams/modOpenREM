@@ -321,7 +321,8 @@ def _specify_event_numbers_stationary(queryset, value):
         ).annotate(
             stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         )
-        print(u"{0} studies in the queryset have stationary events".format(filtered_number[0].stationary_count))
+        for study in filtered_number:
+            print(u"Study in the queryset has {0} stationary events".format(study.stationary_count))
         filtered_temp = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
         )
