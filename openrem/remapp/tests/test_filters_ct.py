@@ -153,6 +153,7 @@ class FilterViewTests(TestCase):
             'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=0&num_spr_events=1&num_stationary_events=2',
             follow=True)
         self.assertEqual(response.status_code, 200)
+        print(response)
         one_responses_text = u'There are 1 studies in this list.'
         self.assertContains(response, one_responses_text)
         accession_number_1 = u'ACC12345601'

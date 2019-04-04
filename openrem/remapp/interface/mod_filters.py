@@ -322,6 +322,7 @@ def _specify_event_numbers_stationary(queryset, value):
             print(u"study in c has {0} stationary series".format(study.stationary_count))
         print(u"There are {0} studies in c".format(c.count()))
         filtered = c.filter(stationary_count=value)
+        print(filtered)
         return filtered
     #     for study in queryset:
     #         for event in study.ctradiationdose_set.get().ctirradiationeventdata_set.all():
