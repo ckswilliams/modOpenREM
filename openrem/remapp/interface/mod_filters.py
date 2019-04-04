@@ -347,6 +347,14 @@ def _specify_event_numbers_stationary(queryset, value):
         print(u"study in b has {0} stationary series".format(study.stationary_count))
     print(u"There are {0} studies in b".format(b.count()))
 
+    new_qs = queryset
+    c = new_qs.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
+                      ).annotate(
+        stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True))
+    for study in c:
+        print(u"study in c has {0} stationary series".format(study.stationary_count))
+    print(u"There are {0} studies in c".format(c.count()))
+
     return filtered
 
 
