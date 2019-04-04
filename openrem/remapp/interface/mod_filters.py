@@ -315,7 +315,7 @@ def _specify_event_numbers_stationary(queryset, value):
         return filtered
     else:
         new_qs = queryset
-        print(u"new_qs is {0}".format(new_qs))
+        # print(u"new_qs is {0}".format(new_qs))
         c = new_qs.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
                           ).annotate(
             stationary_count=Count('ctradiationdose__ctirradiationeventdata'))
