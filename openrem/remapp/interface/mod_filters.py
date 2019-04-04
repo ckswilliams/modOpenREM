@@ -312,6 +312,7 @@ def _specify_event_numbers_stationary(queryset, value):
     if value == 0:
         filtered = queryset.exclude(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition')
+        return filtered
     else:
         new_qs = queryset
         c = new_qs.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
@@ -321,6 +322,7 @@ def _specify_event_numbers_stationary(queryset, value):
             print(u"study in c has {0} stationary series".format(study.stationary_count))
         print(u"There are {0} studies in c".format(c.count()))
         filtered = c.filter(stationary_count=value)
+        return filtered
     #     for study in queryset:
     #         for event in study.ctradiationdose_set.get().ctirradiationeventdata_set.all():
     #             print(u"Event type is {0}".format(event.ct_acquisition_type.code_meaning))
@@ -356,7 +358,6 @@ def _specify_event_numbers_stationary(queryset, value):
     # print(u"There are {0} studies in b".format(b.count()))
     #
 
-    return filtered
 
 
 class CTSummaryListFilter(django_filters.FilterSet):
