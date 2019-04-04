@@ -315,7 +315,7 @@ def _specify_event_numbers_stationary(queryset, value):
     else:
         for study in queryset:
             for event in study.ctradiationdose_set.get().ctirradiationeventdata_set.all():
-                print("Event type is {0}".format(event.ct_acquisition_type.code_meaning))
+                print(u"Event type is {0}".format(event.ct_acquisition_type.code_meaning))
         filtered_number = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
         ).annotate(
@@ -327,7 +327,7 @@ def _specify_event_numbers_stationary(queryset, value):
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
         )
         for study in filtered_temp:
-            print("study has {0} stationary events".format(
+            print(u"study has {0} stationary events".format(
                 study.ctradiationdose_set.get().ctirradiationeventdata_set.filter(ct_acquisition_type__code_meaning__exact='Stationary Acquisition').count()))
         filtered = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
@@ -338,6 +338,15 @@ def _specify_event_numbers_stationary(queryset, value):
     print(u"StudyUIDs are {0}".format(filtered))
     import sqlite3
     print(u"SQLite3 version is {0}".format(sqlite3.sqlite_version))
+
+    a = GeneralStudyModuleAttr.objects.filter(accession_number__exact='ACC12345601')
+    b = a.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
+                 ).annotate(
+        stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True))
+    for study in b:
+        print(u"study in b has {0} stationary series".format(study.stationary_count))
+    print(u"There are {0} studies in b".format(b.count()))
+
     return filtered
 
 
