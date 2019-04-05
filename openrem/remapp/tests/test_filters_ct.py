@@ -138,15 +138,15 @@ class FilterViewTests(TestCase):
         self.assertContains(response, accession_number_2)
         self.assertContains(response, accession_number_3)
 
-        # print(u"**3** Test 2 spiral, 5 axial, 4 stationary, expect 1")
-        # response = self.client.get(
-        #     'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=5&num_spr_events=&num_stationary_events=4',
-        #     follow=True)
-        # self.assertEqual(response.status_code, 200)
-        # one_responses_text = u'There are 1 studies in this list.'
-        # self.assertContains(response, one_responses_text)
-        # accession_number_1 = u'001234512345678'
-        # self.assertContains(response, accession_number_1)
+        print(u"**3** Test 2 spiral, 5 axial, 4 stationary, expect 1")
+        response = self.client.get(
+            'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=5&num_spr_events=&num_stationary_events=4',
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        accession_number_1 = u'001234512345678'
+        self.assertContains(response, accession_number_1)
 
         print(u"**4** Test 1 spiral, 0 axial, 1 spr, 2 stationary, expect 1")
         response = self.client.get(

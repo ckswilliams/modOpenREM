@@ -235,6 +235,7 @@ def _specify_event_numbers_spiral(queryset, value):
         filtered = queryset.exclude(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Spiral Acquisition')
     else:
+        queryset.query.annotations.clear()
         filtered = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Spiral Acquisition'
         ).annotate(
@@ -261,6 +262,7 @@ def _specify_event_numbers_axial(queryset, value):
         filtered = queryset.exclude(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Sequenced Acquisition')
     else:
+        queryset.query.annotations.clear()
         filtered = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Sequenced Acquisition'
         ).annotate(
@@ -287,6 +289,7 @@ def _specify_event_numbers_spr(queryset, value):
         filtered = queryset.exclude(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition')
     else:
+        queryset.query.annotations.clear()
         filtered = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition'
         ).annotate(
