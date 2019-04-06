@@ -239,7 +239,7 @@ def _specify_event_numbers_spiral(queryset, value):
         filtered = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Spiral Acquisition'
         ).annotate(
-            spiral_count=Count('ctradiationdose__ctirradiationeventdata')
+            spiral_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spiral_count=value)
     print(u"spiral: returning queryset {0}".format(filtered.count()))
     print(u"StudyUIDs are {0}".format(filtered))
@@ -266,7 +266,7 @@ def _specify_event_numbers_axial(queryset, value):
         filtered = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Sequenced Acquisition'
         ).annotate(
-            axial_count=Count('ctradiationdose__ctirradiationeventdata')
+            axial_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(axial_count=value)
     print(u"axial: returning queryset {0}".format(filtered.count()))
     print(u"StudyUIDs are {0}".format(filtered))
@@ -293,7 +293,7 @@ def _specify_event_numbers_spr(queryset, value):
         filtered = queryset.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition'
         ).annotate(
-            spr_count=Count('ctradiationdose__ctirradiationeventdata')
+            spr_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spr_count=value)
     print(u"spr: returning queryset {0}".format(filtered.count()))
     print(u"StudyUIDs are {0}".format(filtered))
@@ -320,7 +320,7 @@ def _specify_event_numbers_stationary(queryset, value):
         queryset.query.annotations.clear()
         c = queryset.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
                           ).annotate(
-            stationary_count=Count('ctradiationdose__ctirradiationeventdata'))
+            stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True))
         print(c.query)
         for study in c:
             print(u"study in c has {0} stationary series".format(study.stationary_count))
