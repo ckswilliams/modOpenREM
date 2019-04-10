@@ -3,6 +3,7 @@
 
 import os
 from decimal import Decimal
+import datetime
 
 from django.test import TestCase
 
@@ -157,3 +158,49 @@ class ImportRFRDSRSiemens(TestCase):
         self.assertEqual(event_data.patient_orientation_modifier_cid.code_meaning, 'supine')
         source_data = event_data.irradeventxraysourcedata_set.get()
         self.assertEqual(source_data.ii_field_size, 220)
+
+
+class ImportRFRDSRGESurgical(TestCase):
+    """
+    Tests for importing an RDSR from a GE Surgical C-Arm FPD system
+    """
+
+    def test_ge_c_arm_rdsr(self):
+        """Tests for extracting from GE RDSRs, particularly the fields that have the wrong type
+        or typographical errors.
+
+        :return: None
+        """
+
+        PatientIDSettings.objects.create()
+
+        dicom_file = "test_files/RF-RDSR-GE.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path = os.path.join(root_tests, dicom_file)
+
+        rdsr(dicom_path)
+        study = GeneralStudyModuleAttr.objects.order_by('id')[0]
+
+        device_observer_uid = study.generalequipmentmoduleattr_set.get().unique_equipment_name.device_observer_uid
+        self.assertEqual(device_observer_uid, u'1.3.6.1.4.1.45593.912345678.9876543123')
+
+        accum_proj = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
+        total_fluoro_dap = accum_proj.fluoro_dose_area_product_total
+        total_fluoro_rp_dose = accum_proj.fluoro_dose_rp_total
+        total_acq_dap = accum_proj.acquisition_dose_area_product_total
+        total_acq_rp_dose = accum_proj.acquisition_dose_rp_total
+        self.assertAlmostEqual(total_fluoro_dap, Decimal(0.00024126))
+        self.assertAlmostEqual(total_fluoro_rp_dose, Decimal(0.01173170))
+        self.assertEqual(total_acq_dap, Decimal(0))
+        self.assertEqual(total_acq_rp_dose, Decimal(0))
+
+        events = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('pk')
+        event_4 = events[3]
+        self.assertEqual(event_4.date_time_started, datetime.datetime(2019, 3, 16, 13, 27, 25))
+        self.assertEqual(event_4.reference_point_definition.code_value, u'113861')
+        self.assertEqual(event_4.irradiation_event_uid, u'1.3.6.1.4.1.5962.99.1.3577657414.286912992.1554060884038.8.0')
+        self.assertAlmostEqual(event_4.dose_area_product, Decimal(0.00004334))
+        event_4_source = event_4.irradeventxraysourcedata_set.get()
+        self.assertAlmostEqual(event_4_source.dose_rp, Decimal(0.00210763))
+        self.assertAlmostEqual(event_4_source.collimated_field_area, Decimal(0.04196800))
+        self.assertAlmostEqual(event_4_source.average_xray_tube_current, Decimal(18.90340042))
