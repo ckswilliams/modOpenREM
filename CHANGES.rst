@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.1 (2019-04-xx)
 ------------------
+* `#743`_  Testing: added configuration to enable testing with default logging
 * `#740`_  Installation: fixed Celery version to avoid dependency on Django 1.11
 * `#738`_  Logging: added single_date query date to log, added tasks aborts to logs
 * `#736`_  Query-retrieve: duplicate study level responses now removed from query
