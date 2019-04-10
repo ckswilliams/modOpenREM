@@ -5,6 +5,7 @@ OpenREM version history
 0.9.1 (2019-04-xx)
 ------------------
 * `#740`_  Installation: fixed Celery version to avoid dependency on Django 1.11
+* `#739`_  Imports: fixed import errors for GE surgical fluoroscopy
 * `#738`_  Logging: added single_date query date to log, added tasks aborts to logs
 * `#736`_  Query-retrieve: duplicate study level responses now removed from query
 * `#735`_  Imports: switched to more secure defusedxml for parsing XML in comments
