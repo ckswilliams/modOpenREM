@@ -59,7 +59,10 @@ def _observercontext(dataset, obs, ch):  # TID 1002
             obs.observer_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                   cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer UID':
-            obs.device_observer_uid = cont.UID
+            try:
+                obs.device_observer_uid = cont.UID
+            except AttributeError:
+                obs.device_observer_uid = cont.TextValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Name':
             obs.device_observer_name = safe_strings(cont.TextValue, ch)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Manufacturer':
@@ -273,23 +276,50 @@ def _irradiationeventxraymechanicaldata(dataset, event):  # TID 10003c
             mech.crdr_mechanical_configuration = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                                    cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary Angle':
-            mech.positioner_primary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.positioner_primary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary Angle':
-            mech.positioner_secondary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.positioner_secondary_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary End Angle':
-            mech.positioner_primary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.positioner_primary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary End Angle':
-            mech.positioner_secondary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.positioner_secondary_end_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Column Angulation':
-            mech.column_angulation = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.column_angulation = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Head Tilt Angle':
-            mech.table_head_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.table_head_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Horizontal Rotation Angle':
-            mech.table_horizontal_rotation_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.table_horizontal_rotation_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Cradle Tilt Angle':
-            mech.table_cradle_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.table_cradle_tilt_angle = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Compression Thickness':
-            mech.compression_thickness = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            try:
+                mech.compression_thickness = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
+            except IndexError:
+                pass
     _doserelateddistancemeasurements(dataset, mech)
     mech.save()
 
@@ -369,7 +399,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                 _pulsewidth(cont.MeasuredValueSequence[0].NumericValue, source)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'KVP':
                 _kvptable(cont.MeasuredValueSequence[0].NumericValue, source)
-            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Tube Current':
+            elif cont.ConceptNameCodeSequence[0].CodeValue == u'113734':  # 'X-Ray Tube Current':
                 _xraytubecurrent(cont.MeasuredValueSequence[0].NumericValue, source)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure':
                 _exposure(cont.MeasuredValueSequence[0].NumericValue, source)
@@ -526,7 +556,7 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
                 if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Label Type':
                     event.label_type = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
                                                          cont2.ConceptCodeSequence[0].CodeMeaning)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'DateTime Started':
+        elif cont.ConceptNameCodeSequence[0].CodeValue == u'111526':  # 'DateTime Started'
             event.date_time_started = make_date_time(cont.DateTime)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event Type':
             event.irradiation_event_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
@@ -647,7 +677,7 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
         try:
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose Area Product Total':
                 accumproj.fluoro_dose_area_product_total = _check_dap_units(cont.MeasuredValueSequence[0])
-            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
+            elif cont.ConceptNameCodeSequence[0].CodeValue == '113728':  # = 'Fluoro Dose (RP) Total'
                 accumproj.fluoro_dose_rp_total = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Fluoro Time':
                 accumproj.total_fluoro_time = test_numeric_value(cont.MeasuredValueSequence[0].NumericValue)
@@ -668,9 +698,8 @@ def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
                     cont.MeasuredValueSequence[0].NumericValue)
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
                 try:
-                    accumproj.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
-                                                                                  cont.ConceptCodeSequence[
-                                                                                      0].CodeMeaning)
+                    accumproj.reference_point_definition_code = get_or_create_cid(
+                        cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
                 except AttributeError:
                     accumproj.reference_point_definition = cont.TextValue
         except IndexError:
@@ -1095,6 +1124,10 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration", dataset)
     try:
         device_observer_uid = [content.UID for content in dataset.ContentSequence if (
+                content.ConceptNameCodeSequence[0].CodeValue == '121012' and
+                content.ConceptNameCodeSequence[0].CodingSchemeDesignator == 'DCM')][0]  # 121012 = DeviceObserverUID
+    except AttributeError:
+        device_observer_uid = [content.TextValue for content in dataset.ContentSequence if (
                 content.ConceptNameCodeSequence[0].CodeValue == '121012' and
                 content.ConceptNameCodeSequence[0].CodingSchemeDesignator == 'DCM')][0]  # 121012 = DeviceObserverUID
     except IndexError:
