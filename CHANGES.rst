@@ -12,6 +12,7 @@ OpenREM version history
 * `#734`_  Query-retrieve: handle illegal image level response with no instance number
 * `#732`_  Query-retrieve: added advanced option to workaround empty series issue
 * `#710`_  Interface: Time-based columns in Celery and RabbitMQ tables now sorted correctly
+* `#404`_  Code quality: changes to lead toward Python 3 compliance
 
 0.9.0 (2019-03-06)
 ------------------
