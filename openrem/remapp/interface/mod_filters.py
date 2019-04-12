@@ -27,8 +27,10 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from __future__ import division
 
-# Following three lines added so that sphinx autodocumentation works.
+from builtins import object  # pylint: disable=redefined-builtin
+from past.utils import old_div
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
@@ -40,6 +42,7 @@ from remapp.models import GeneralStudyModuleAttr
 from django.utils.safestring import mark_safe
 
 TEST_CHOICES = ((u'', u'Yes (default)'), (2, u'No (caution)'),)
+
 
 def custom_name_filter(queryset, value):
     if not value:
@@ -56,6 +59,7 @@ def custom_name_filter(queryset, value):
     )
     return filtered
 
+
 def custom_id_filter(queryset, value):
     if not value:
         return queryset
@@ -70,6 +74,7 @@ def custom_id_filter(queryset, value):
         )
     )
     return filtered
+
 
 def custom_acc_filter(queryset, value):
     if not value:
@@ -93,7 +98,7 @@ def dap_min_filter(queryset, value):
 
     from decimal import Decimal, InvalidOperation
     try:
-        value_gy_m2 = Decimal(value) / Decimal(1000000)
+        value_gy_m2 = old_div(Decimal(value), Decimal(1000000))
     except InvalidOperation:
         return queryset
     filtered = queryset.filter(
@@ -108,7 +113,7 @@ def dap_max_filter(queryset, value):
 
     from decimal import Decimal, InvalidOperation
     try:
-        value_gy_m2 = Decimal(value) / Decimal(1000000)
+        value_gy_m2 = old_div(Decimal(value), Decimal(1000000))
     except InvalidOperation:
         return queryset
     filtered = queryset.filter(
@@ -140,7 +145,10 @@ class RFSummaryListFilter(django_filters.FilterSet):
     study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe(u'Max study DAP (cGy.cm<sup>2</sup>)')) # nosec
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
-    class Meta:
+    class Meta(object):
+        """
+        Lists fields and order-by information for django-filter filtering
+        """
         model = GeneralStudyModuleAttr
         fields = []
         order_by = (
@@ -154,6 +162,7 @@ class RFSummaryListFilter(django_filters.FilterSet):
             ('-projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total','Total DAP'),
             ('-projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total','Total RP Dose'),
             )
+
     def get_order_by(self, order_value):
         if order_value == 'study_date':
             return ['study_date', 'study_time']
@@ -204,7 +213,10 @@ class CTSummaryListFilter(django_filters.FilterSet):
                                                               name='ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning',
                                                               choices=CT_ACQ_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple)
 
-    class Meta:
+    class Meta(object):
+        """
+        Lists fields and order-by information for django-filter filtering
+        """
         model = GeneralStudyModuleAttr
         fields = []
         order_by = (
@@ -325,7 +337,11 @@ class MGSummaryListFilter(django_filters.FilterSet):
     display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
-    class Meta:
+    class Meta(object):
+        """
+        Lists fields and order-by information for django-filter filtering
+        """
+
         model = GeneralStudyModuleAttr
         fields = [
             ]
@@ -347,6 +363,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
         elif order_value == '-study_date':
             return ['-study_date','-study_time']
         return super(MGSummaryListFilter, self).get_order_by(order_value)
+
 
 class MGFilterPlusPid(MGSummaryListFilter):
     def __init__(self, *args, **kwargs):
@@ -379,7 +396,10 @@ class DXSummaryListFilter(django_filters.FilterSet):
     display_name = django_filters.CharFilter(lookup_type='icontains', label=u'Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label=u"Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
-    class Meta:
+    class Meta(object):
+        """
+        Lists fields and order-by information for django-filter filtering
+        """
         model = GeneralStudyModuleAttr
         fields = [
             'date_after',
@@ -417,6 +437,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
         elif order_value == '-study_date':
             return ['-study_date','-study_time']
         return super(DXSummaryListFilter, self).get_order_by(order_value)
+
 
 class DXFilterPlusPid(DXSummaryListFilter):
     def __init__(self, *args, **kwargs):

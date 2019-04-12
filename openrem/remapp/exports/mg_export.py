@@ -29,6 +29,9 @@
 
 """
 
+from builtins import str  # pylint: disable=redefined-builtin
+from builtins import range  # pylint: disable=redefined-builtin
+from past.builtins import basestring  # pylint: disable=redefined-builtin
 import logging
 
 from celery import shared_task
@@ -300,7 +303,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None, xlsx
                             series_data[index] = ''
                         if isinstance(item, basestring) and u',' in item:
                             series_data[index] = item.replace(u',', u';')
-                    writer.writerow([unicode(data_string).encode("utf-8") for data_string in series_data])
+                    writer.writerow([str(data_string).encode("utf-8") for data_string in series_data])
                 else:
                     all_exam_data += series_data  # For all data
                     protocol = series.acquisition_protocol

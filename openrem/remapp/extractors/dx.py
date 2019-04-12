@@ -33,7 +33,10 @@
 ..  moduleauthor:: David Platten, Ed McDonagh
 
 """
+from __future__ import division
+from __future__ import absolute_import
 
+from past.utils import old_div
 import os
 import sys
 import django
@@ -408,7 +411,7 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
         event.comment = event.comment + ', ' + exposure_control
 
     dap = get_value_kw('ImageAndFluoroscopyAreaDoseProduct', dataset)
-    if dap: event.dose_area_product = dap / 100000  # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
+    if dap: event.dose_area_product = old_div(dap, 100000)  # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
     event.save()
 
     _irradiationeventxraydetectordata(dataset, event)
@@ -535,15 +538,15 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
     pat.not_patient_indicator = get_not_pt(dataset)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
-        patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days) / Decimal(
-            '365.25')
+        patientatt.patient_age_decimal = old_div(Decimal((g.study_date.date() - patient_birth_date.date()).days), Decimal(
+            '365.25'))
     elif patientatt.patient_age:
         if patientatt.patient_age[-1:] == 'Y':
             patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])
         elif patientatt.patient_age[-1:] == 'M':
-            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1]) / Decimal('12')
+            patientatt.patient_age_decimal = old_div(Decimal(patientatt.patient_age[:-1]), Decimal('12'))
         elif patientatt.patient_age[-1:] == 'D':
-            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1]) / Decimal('365.25')
+            patientatt.patient_age_decimal = old_div(Decimal(patientatt.patient_age[:-1]), Decimal('365.25'))
     if patientatt.patient_age_decimal:
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
     patientatt.save()
@@ -644,13 +647,8 @@ def _test_if_dx(dataset):
 
 def _dx2db(dataset):
     import sys
-    import openrem_settings
     from time import sleep
     from random import random
-
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-
-    openrem_settings.add_project_to_path()
     from remapp.extractors.extract_common import get_study_check_dup
     from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
