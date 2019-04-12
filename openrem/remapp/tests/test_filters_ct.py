@@ -102,7 +102,7 @@ class FilterViewTests(TestCase):
         accession_number = u'ACC12345601'  # Accession number of study with matching acquisition protocol
         self.assertContains(response, accession_number)
 
-    def test_specify_event_numbers_spiral(self):
+    def test_specify_event_numbers(self):
         """
         Apply specific event number filters
         """
@@ -123,12 +123,6 @@ class FilterViewTests(TestCase):
         self.assertContains(response, accession_number_3)
         self.assertContains(response, accession_number_4)
 
-    def test_specify_event_numbers_spiral_0axial(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
-
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=0&num_spr_events=&num_stationary_events=',
             follow=True)
@@ -142,12 +136,6 @@ class FilterViewTests(TestCase):
         self.assertContains(response, accession_number_2)
         self.assertContains(response, accession_number_3)
 
-    def test_specify_event_numbers_spiral_axial_stat(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
-
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=5&num_spr_events=&num_stationary_events=4',
             follow=True)
@@ -156,12 +144,6 @@ class FilterViewTests(TestCase):
         self.assertContains(response, one_responses_text)
         accession_number_1 = u'001234512345678'
         self.assertContains(response, accession_number_1)
-
-    def test_specify_event_numbers_spiral_0axial_spr_stat(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
 
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=0&num_spr_events=1&num_stationary_events=2',
@@ -172,12 +154,6 @@ class FilterViewTests(TestCase):
         accession_number_1 = u'ACC12345601'
         self.assertContains(response, accession_number_1)
 
-    def test_specify_event_numbers_axial(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
-
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=&num_axial_events=5&num_spr_events=&num_stationary_events=',
             follow=True)
@@ -186,12 +162,6 @@ class FilterViewTests(TestCase):
         self.assertContains(response, one_responses_text)
         accession_number_1 = u'001234512345678'
         self.assertContains(response, accession_number_1)
-
-    def test_specify_event_numbers_spr(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
 
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=&num_axial_events=&num_spr_events=1&num_stationary_events=',
@@ -206,12 +176,6 @@ class FilterViewTests(TestCase):
         self.assertContains(response, accession_number_2)
         self.assertContains(response, accession_number_3)
 
-    def test_specify_event_numbers_stationary(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
-
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=&num_axial_events=&num_spr_events=&num_stationary_events=2',
             follow=True)
@@ -220,12 +184,6 @@ class FilterViewTests(TestCase):
         self.assertContains(response, one_responses_text)
         accession_number_1 = u'ACC12345601'
         self.assertContains(response, accession_number_1)
-
-    def test_specify_event_numbers_axial_stat(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
 
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=&num_axial_events=5&num_spr_events=&num_stationary_events=4',
@@ -236,12 +194,6 @@ class FilterViewTests(TestCase):
         accession_number_1 = u'001234512345678'
         self.assertContains(response, accession_number_1)
 
-    def test_specify_event_numbers_spiral_spr(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
-
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=&num_spr_events=1&num_stationary_events=',
             follow=True)
@@ -251,12 +203,6 @@ class FilterViewTests(TestCase):
         accession_number_1 = u'ACC12345601'
         self.assertContains(response, accession_number_1)
 
-    def test_specify_event_numbers_spiral_stat(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
-
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=&num_spr_events=&num_stationary_events=7',
             follow=True)
@@ -265,12 +211,6 @@ class FilterViewTests(TestCase):
         self.assertContains(response, one_responses_text)
         accession_number_1 = u'74624646290'
         self.assertContains(response, accession_number_1)
-
-    def test_specify_event_numbers_spr_spiral_stat(self):
-        """
-        Apply specific event number filters
-        """
-        self.client.login(username='temporary', password='temporary')
 
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=&num_spr_events=1&num_stationary_events=2',
