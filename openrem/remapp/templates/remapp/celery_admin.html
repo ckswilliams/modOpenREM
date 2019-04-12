@@ -18,6 +18,7 @@
 
 {% block mainblock %}
 
+
   {% if admin.admingroup %}
     <div class="row">
       <div class="col-md-8 col-md-offset-2">
@@ -34,13 +35,13 @@
                     source = null;
                 }
 
-                if (heading.includes("recent")) sort_info_recent.heading = heading;
+                if (heading.indexOf("recent") !== -1) sort_info_recent.heading = heading;
                 else sort_info_older.heading = heading;
 
                 if (source === 'user_click') {
                     // It's a user-generated call and the headings already match
                     // so reverse the sorting direction
-                    if (heading.includes("recent")) {
+                    if (heading.indexOf("recent") !== -1) {
                         sort_info_recent.direction = sort_info_recent.direction === "ascending" ? "descending" : "ascending";
                         sorttable.innerSortFunction.apply(document.getElementById(heading), []);
                     }
@@ -50,7 +51,7 @@
                     }
                 }
 
-                if (heading.includes("recent")) {
+                if (heading.indexOf("recent") !== -1) {
                     if (sort_info_recent.direction === "ascending") {
                         sorttable.innerSortFunction.apply(document.getElementById(heading), []);
                     } else {

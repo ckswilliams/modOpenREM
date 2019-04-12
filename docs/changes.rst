@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.1 (2019-04-xx)
 ------------------
+* `#742`_  Interface: Sorting of task tables now works in Internet Explorer 11
 * `#740`_  Installation: fixed Celery version to avoid dependency on Django 1.11
 * `#739`_  Imports: fixed import errors for GE surgical fluoroscopy
 * `#738`_  Logging: added single_date query date to log, added tasks aborts to logs
