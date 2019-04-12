@@ -28,6 +28,7 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from builtins import str  # pylint: disable=redefined-builtin
 from dicom.valuerep import PersonName
 from dicom import charset
 from django.utils.encoding import smart_text
@@ -139,7 +140,7 @@ def return_for_export(model, field):
         if val:
             if isinstance(val, datetime.date):
                 return val
-            val = unicode(val)
+            val = str(val)
         return val
     except ObjectDoesNotExist:
         return None
@@ -206,7 +207,7 @@ def get_keys_by_value(dict_of_elements, value_to_find):
     :return: list of key names matching the given value
     """
     list_of_keys = list()
-    list_of_items = dict_of_elements.items()
+    list_of_items = list(dict_of_elements.items())
     for item in list_of_items:
         if item[1] == value_to_find:
             list_of_keys.append(item[0])

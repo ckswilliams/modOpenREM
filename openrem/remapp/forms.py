@@ -1,3 +1,33 @@
+# This Python file uses the following encoding: utf-8
+#    OpenREM - Radiation Exposure Monitoring tools for the physicist
+#    Copyright (C) 2019  The Royal Marsden NHS Foundation Trust
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    Additional permission under section 7 of GPLv3:
+#    You shall not make any use of the name of The Royal Marsden NHS
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
+#    The Royal Marsden NHS Foundation Trust.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+..  module:: forms
+    :synopsis: Django forms definitions
+"""
+
+
+from builtins import object  # pylint: disable=redefined-builtin
 from django import forms
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
@@ -294,7 +324,7 @@ class RFHighDoseFluoroAlertsForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = HighDoseMetricAlertSettings
         fields = ['alert_total_dap_rf',
                   'alert_total_rp_dose_rf',
@@ -467,7 +497,7 @@ class DicomDeleteSettingsForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = DicomDeleteSettings
         fields = ['del_no_match', 'del_rdsr', 'del_mg_im', 'del_dx_im', 'del_ct_phil']
 
@@ -521,7 +551,7 @@ class DicomQRForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = DicomRemoteQR
         fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname', 'use_modality_tag']
 
@@ -574,7 +604,7 @@ class DicomStoreForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = DicomStoreSCP
         fields = ['name', 'aetitle', 'port', 'controlled', 'keep_alive']
         labels = {
@@ -602,7 +632,7 @@ class SkinDoseMapCalcSettingsForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = SkinDoseMapCalcSettings
         fields = ['enable_skin_dose_maps', 'calc_on_import']
 
@@ -635,7 +665,7 @@ class NotPatientNameForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = NotPatientIndicatorsName
         fields = ['not_patient_name', ]
         labels = {
@@ -671,7 +701,7 @@ class NotPatientIDForm(forms.ModelForm):
             )
         )
 
-    class Meta:
+    class Meta(object):
         model = NotPatientIndicatorsID
         fields = ['not_patient_id', ]
         labels = {

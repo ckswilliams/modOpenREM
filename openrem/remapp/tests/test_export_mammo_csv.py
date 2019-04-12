@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 # test_export_mammo_csv.py
 
-import hashlib
+from builtins import range  # pylint: disable=redefined-builtin
 import os
 from collections import Counter
 from django.contrib.auth.models import User, Group
@@ -10,6 +10,7 @@ from remapp.extractors import mam, rdsr
 from remapp.exports.mg_export import exportMG2excel
 from remapp.exports.mg_csv_nhsbsp import mg_csv_nhsbsp
 from remapp.models import PatientIDSettings, Exports
+
 
 class ExportMammoCSV(TestCase):
     def setUp(self):
@@ -57,7 +58,7 @@ class ExportMammoCSV(TestCase):
                       'AOP standard RECTANGLE 1662 mm 10 mm 180 mm 240 mm EXP DOSE 87504 nGy PRE-EXP DOSE 5655 nGy '
                       'PRE-EXP THICK 45 mm PRE-EXP COMPO 29 % PRE-EXP KV 28 PRE-EXP TRACK Rh PRE-EXP FILTER Rh PADDLE '
                       '1 FLATFIELD no']
-        refdf = pd.DataFrame([exportline], columns=cols, index=range(1))
+        refdf = pd.DataFrame([exportline], columns=cols, index=list(range(1)))
 
         self.assertEqual(list(csvdf.columns), cols)
         for col in cols:

@@ -1,3 +1,38 @@
+# This Python file uses the following encoding: utf-8
+#    OpenREM - Radiation Exposure Monitoring tools for the physicist
+#    Copyright (C) 2017  The Royal Marsden NHS Foundation Trust
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    Additional permission under section 7 of GPLv3:
+#    You shall not make any use of the name of The Royal Marsden NHS
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
+#    The Royal Marsden NHS Foundation Trust.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+..  module:: chart_functions
+    :synopsis: Helper functions for calculating chart data
+
+..  moduleauthor:: David Platten
+
+"""
+
+from builtins import filter  # pylint: disable=redefined-builtin
+from builtins import range  # pylint: disable=redefined-builtin
+
+
 def average_chart_inc_histogram_data(database_events, db_display_name_relationship, db_series_names, db_value_name,
                                      value_multiplier, plot_average, plot_freq, plot_series_per_system,
                                      plot_average_choice, median_available, num_hist_bins,
@@ -152,8 +187,8 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
         histogram_annotations = {}
         # Calculate histogram data for each series from each system
         return_structure['histogram_data'] =\
-            [[[None for k in xrange(2)] for j in xrange(len(return_structure['series_names']))]
-             for i in xrange(len(return_structure['system_list']))]
+            [[[None for k in range(2)] for j in range(len(return_structure['series_names']))]
+             for i in range(len(return_structure['system_list']))]
 
         if exclude_constant_angle:
             # Exclude "Constant Angle Acquisitions" from the calculations

@@ -27,12 +27,28 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from past.utils import old_div
+import django
 import logging
+import os
+import sys
 
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger(__name__)
+
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1, projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+django.setup()
 
 
 def _patientstudymoduleattributes(exam, height, weight, verbose, *args, **kwargs):  # C.7.2.2
@@ -56,7 +72,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, *args, **kwargs
         return
     if height:
         if not patientatt.patient_size:
-            patientatt.patient_size = (Decimal(height) / Decimal(100.))
+            patientatt.patient_size = (old_div(Decimal(height), Decimal(100.)))
             if verbose:
                 if imp_log:
                     imp_log.file.open("ab")
@@ -134,7 +150,6 @@ def websizeimport(csv_pk=None, *args, **kwargs):
 
     """
 
-    import sys
     import csv
     import datetime
     from django.core.files.base import ContentFile
@@ -220,10 +235,8 @@ def csv2db(*args, **kwargs):
 
     """
 
-    import os, csv
+    import csv
     import argparse
-    import django
-    import openrem_settings
 
     # Required and optional arguments
     parser = argparse.ArgumentParser(
@@ -238,10 +251,6 @@ def csv2db(*args, **kwargs):
     parser.add_argument("weight", help="Column title for the patient weight, values in kg")
     args = parser.parse_args()
 
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-    openrem_settings.add_project_to_path()
-    django.setup()
-
     f = open(args.csvfile, 'rb')
     try:
         dataset = csv.DictReader(f)
@@ -253,6 +262,4 @@ def csv2db(*args, **kwargs):
 
 
 if __name__ == "__main__":
-    import sys
-
     sys.exit(csv2db())

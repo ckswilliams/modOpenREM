@@ -60,11 +60,11 @@ class ImportCTRDSR(TestCase):
         # Test that patient level data is recorded correctly
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_name, 'Patient^Optima')
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_id, '00001234')
-        self.assertEqual(studies[0].patientmoduleattr_set.get().patient_birth_date, datetime.date(1957, 03, 12))
+        self.assertEqual(studies[0].patientmoduleattr_set.get().patient_birth_date, datetime.date(1957, 3, 12))
         self.assertAlmostEqual(studies[0].patientstudymoduleattr_set.get().patient_age_decimal, Decimal(49.4))
         self.assertEqual(studies[1].patientmoduleattr_set.get().patient_name, 'Patient^DiscoVCT')
         self.assertEqual(studies[1].patientmoduleattr_set.get().patient_id, '008F/g234')
-        self.assertEqual(studies[1].patientmoduleattr_set.get().patient_birth_date, datetime.date(1923, 05, 9))
+        self.assertEqual(studies[1].patientmoduleattr_set.get().patient_birth_date, datetime.date(1923, 5, 9))
         self.assertEqual(studies[1].patientstudymoduleattr_set.get().patient_age, '89Y')
         self.assertAlmostEqual(studies[1].patientstudymoduleattr_set.get().patient_age_decimal, Decimal(89.8))
 
@@ -76,7 +76,7 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(studies[1].ctradiationdose_set.get().start_of_xray_irradiation,
                          datetime.datetime(2013, 2, 28, 11, 37, 31))
         self.assertEqual(studies[1].ctradiationdose_set.get().end_of_xray_irradiation,
-                         datetime.datetime(2013, 2, 28, 11, 52, 07))
+                         datetime.datetime(2013, 2, 28, 11, 52, 7))
 
         # Test that device observer data is stored correctly
         self.assertEqual(studies[0].ctradiationdose_set.get().observercontext_set.get().
