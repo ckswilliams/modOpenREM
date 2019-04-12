@@ -44,63 +44,63 @@ class FilterViewTests(TestCase):
         rdsr(path_ct6)
         ct_philips(path_ct7)
 
-    # def test_list_all_ct(self):
-    #     """
-    #     Initial test to ensure seven studies are listed with no filter
-    #     """
-    #     self.client.login(username='temporary', password='temporary')
-    #     response = self.client.get(reverse('ct_summary_list_filter'), follow=True)
-    #     self.assertEqual(response.status_code, 200)
-    #     responses_text = u'There are 7 studies in this list.'
-    #     self.assertContains(response, responses_text)
-    #
-    # def test_filter_study_desc(self):
-    #     """
-    #     Apply study description filter
-    #     """
-    #     self.client.login(username='temporary', password='temporary')
-    #     response = self.client.get('http://test/openrem/ct/?study_description=abdomen', follow=True)
-    #     self.assertEqual(response.status_code, 200)
-    #     one_responses_text = u'There are 1 studies in this list.'
-    #     self.assertContains(response, one_responses_text)
-    #     display_name = u'PHILIPS-E71E3F0'  # Display name of study with matching study description
-    #     self.assertContains(response, display_name)
-    #
-    # def test_filter_procedure(self):
-    #     """
-    #     Apply procedure filter
-    #     """
-    #     self.client.login(username='temporary', password='temporary')
-    #     response = self.client.get('http://test/openrem/ct/?procedure_code_meaning=abdomen', follow=True)
-    #     self.assertEqual(response.status_code, 200)
-    #     one_responses_text = u'There are 1 studies in this list.'
-    #     self.assertContains(response, one_responses_text)
-    #     display_name = u'ACC12345601'  # Display name of study with matching study description
-    #     self.assertContains(response, display_name)
-    #
-    # def test_filter_requested_procedure(self):
-    #     """
-    #     Apply procedure filter
-    #     """
-    #     self.client.login(username='temporary', password='temporary')
-    #     response = self.client.get('http://test/openrem/ct/?requested_procedure=bones', follow=True)
-    #     self.assertEqual(response.status_code, 200)
-    #     one_responses_text = u'There are 1 studies in this list.'
-    #     self.assertContains(response, one_responses_text)
-    #     display_name = u'001234512345678'  # Display name of study with matching study description
-    #     self.assertContains(response, display_name)
-    #
-    # def test_filter_acquisition_protocol(self):
-    #     """
-    #     Apply acquisition protocol filter
-    #     """
-    #     self.client.login(username='temporary', password='temporary')
-    #     response = self.client.get('http://test/openrem/ct/?acquisition_protocol=monitoring', follow=True)
-    #     self.assertEqual(response.status_code, 200)
-    #     one_responses_text = u'There are 1 studies in this list.'
-    #     self.assertContains(response, one_responses_text)
-    #     accession_number = u'ACC12345601'  # Accession number of study with matching acquisition protocol
-    #     self.assertContains(response, accession_number)
+    def test_list_all_ct(self):
+        """
+        Initial test to ensure seven studies are listed with no filter
+        """
+        self.client.login(username='temporary', password='temporary')
+        response = self.client.get(reverse('ct_summary_list_filter'), follow=True)
+        self.assertEqual(response.status_code, 200)
+        responses_text = u'There are 7 studies in this list.'
+        self.assertContains(response, responses_text)
+
+    def test_filter_study_desc(self):
+        """
+        Apply study description filter
+        """
+        self.client.login(username='temporary', password='temporary')
+        response = self.client.get('http://test/openrem/ct/?study_description=abdomen', follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        display_name = u'PHILIPS-E71E3F0'  # Display name of study with matching study description
+        self.assertContains(response, display_name)
+
+    def test_filter_procedure(self):
+        """
+        Apply procedure filter
+        """
+        self.client.login(username='temporary', password='temporary')
+        response = self.client.get('http://test/openrem/ct/?procedure_code_meaning=abdomen', follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        display_name = u'ACC12345601'  # Display name of study with matching study description
+        self.assertContains(response, display_name)
+
+    def test_filter_requested_procedure(self):
+        """
+        Apply procedure filter
+        """
+        self.client.login(username='temporary', password='temporary')
+        response = self.client.get('http://test/openrem/ct/?requested_procedure=bones', follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        display_name = u'001234512345678'  # Display name of study with matching study description
+        self.assertContains(response, display_name)
+
+    def test_filter_acquisition_protocol(self):
+        """
+        Apply acquisition protocol filter
+        """
+        self.client.login(username='temporary', password='temporary')
+        response = self.client.get('http://test/openrem/ct/?acquisition_protocol=monitoring', follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        accession_number = u'ACC12345601'  # Accession number of study with matching acquisition protocol
+        self.assertContains(response, accession_number)
 
     def test_specify_event_numbers_spiral(self):
         """
@@ -108,7 +108,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**spiral** Test 2 spiral, expect 4")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=&num_spr_events=&num_stationary_events=',
             follow=True)
@@ -130,7 +129,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**spiral 0axial** Test 2 spiral, 0 axial, expect 3")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=0&num_spr_events=&num_stationary_events=',
             follow=True)
@@ -150,7 +148,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**Spiral axial stat** Test 2 spiral, 5 axial, 4 stationary, expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=5&num_spr_events=&num_stationary_events=4',
             follow=True)
@@ -166,7 +163,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**spiral 0axial spr stat** Test 1 spiral, 0 axial, 1 spr, 2 stationary, expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=0&num_spr_events=1&num_stationary_events=2',
             follow=True)
@@ -182,7 +178,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**axial** Test 5 axial, expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=&num_axial_events=5&num_spr_events=&num_stationary_events=',
             follow=True)
@@ -198,7 +193,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**spr** Test 1 spr, expect 3")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=&num_axial_events=&num_spr_events=1&num_stationary_events=',
             follow=True)
@@ -218,7 +212,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**stationary** Test 2 stationary, expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=&num_axial_events=&num_spr_events=&num_stationary_events=2',
             follow=True)
@@ -234,7 +227,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**axial stat** Test 5 axial, 4 stationary; expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=&num_axial_events=5&num_spr_events=&num_stationary_events=4',
             follow=True)
@@ -250,7 +242,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**spiral spr** Test 1 spiral, 1 spr; expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=&num_spr_events=1&num_stationary_events=',
             follow=True)
@@ -266,7 +257,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**spiral stat** Test 2 spiral, 7 stat; expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=&num_spr_events=&num_stationary_events=7',
             follow=True)
@@ -282,7 +272,6 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**spr spiral stat** Test 1 spr, 2 stat, 1 spiral; expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=&num_spr_events=1&num_stationary_events=2',
             follow=True)
