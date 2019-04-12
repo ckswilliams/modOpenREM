@@ -108,7 +108,7 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**1**spiral** Test 2 spiral, expect 4")
+        print(u"**spiral** Test 2 spiral, expect 4")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=&num_spr_events=&num_stationary_events=',
             follow=True)
@@ -124,13 +124,13 @@ class FilterViewTests(TestCase):
         self.assertContains(response, accession_number_3)
         self.assertContains(response, accession_number_4)
 
-    def test_specify_event_numbers_2(self):
+    def test_specify_event_numbers_spiral_0axial(self):
         """
         Apply specific event number filters
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**2** Test 2 spiral, 0 axial, expect 3")
+        print(u"**spiral 0axial** Test 2 spiral, 0 axial, expect 3")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=0&num_spr_events=&num_stationary_events=',
             follow=True)
@@ -144,13 +144,13 @@ class FilterViewTests(TestCase):
         self.assertContains(response, accession_number_2)
         self.assertContains(response, accession_number_3)
 
-    def test_specify_event_numbers_3(self):
+    def test_specify_event_numbers_spiral_axial_stat(self):
         """
         Apply specific event number filters
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**3** Test 2 spiral, 5 axial, 4 stationary, expect 1")
+        print(u"**Spiral axial stat** Test 2 spiral, 5 axial, 4 stationary, expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=5&num_spr_events=&num_stationary_events=4',
             follow=True)
@@ -160,13 +160,13 @@ class FilterViewTests(TestCase):
         accession_number_1 = u'001234512345678'
         self.assertContains(response, accession_number_1)
 
-    def test_specify_event_numbers_4(self):
+    def test_specify_event_numbers_spiral_0axial_spr_stat(self):
         """
         Apply specific event number filters
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**4** Test 1 spiral, 0 axial, 1 spr, 2 stationary, expect 1")
+        print(u"**spiral 0axial spr stat** Test 1 spiral, 0 axial, 1 spr, 2 stationary, expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=0&num_spr_events=1&num_stationary_events=2',
             follow=True)
@@ -234,7 +234,7 @@ class FilterViewTests(TestCase):
         """
         self.client.login(username='temporary', password='temporary')
 
-        print(u"**axial** Test 5 axial, 4 stationary; expect 1")
+        print(u"**axial stat** Test 5 axial, 4 stationary; expect 1")
         response = self.client.get(
             'http://test/openrem/ct/?num_spiral_events=&num_axial_events=5&num_spr_events=&num_stationary_events=4',
             follow=True)
@@ -242,5 +242,53 @@ class FilterViewTests(TestCase):
         one_responses_text = u'There are 1 studies in this list.'
         self.assertContains(response, one_responses_text)
         accession_number_1 = u'001234512345678'
+        self.assertContains(response, accession_number_1)
+
+    def test_specify_event_numbers_spiral_spr(self):
+        """
+        Apply specific event number filters
+        """
+        self.client.login(username='temporary', password='temporary')
+
+        print(u"**spiral spr** Test 1 spiral, 1 spr; expect 1")
+        response = self.client.get(
+            'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=&num_spr_events=1&num_stationary_events=',
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        accession_number_1 = u'ACC12345601'
+        self.assertContains(response, accession_number_1)
+
+    def test_specify_event_numbers_spiral_stat(self):
+        """
+        Apply specific event number filters
+        """
+        self.client.login(username='temporary', password='temporary')
+
+        print(u"**spiral stat** Test 2 spiral, 7 stat; expect 1")
+        response = self.client.get(
+            'http://test/openrem/ct/?num_spiral_events=2&num_axial_events=&num_spr_events=&num_stationary_events=7',
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        accession_number_1 = u'74624646290'
+        self.assertContains(response, accession_number_1)
+
+    def test_specify_event_numbers_spr_spiral_stat(self):
+        """
+        Apply specific event number filters
+        """
+        self.client.login(username='temporary', password='temporary')
+
+        print(u"**spr spiral stat** Test 1 spr, 2 stat, 1 spiral; expect 1")
+        response = self.client.get(
+            'http://test/openrem/ct/?num_spiral_events=1&num_axial_events=&num_spr_events=1&num_stationary_events=2',
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        accession_number_1 = u'ACC12345601'
         self.assertContains(response, accession_number_1)
 

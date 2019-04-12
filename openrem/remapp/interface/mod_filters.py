@@ -226,7 +226,7 @@ def _specify_event_numbers_spiral(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    print(u"spiral: value {0}, starting queryset {1}".format(value, queryset.count()))
+    # print(u"spiral: value {0}, starting queryset {1}".format(value, queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -241,8 +241,8 @@ def _specify_event_numbers_spiral(queryset, value):
         ).annotate(
             spiral_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spiral_count=value)
-    print(u"spiral: returning queryset {0}".format(filtered.count()))
-    print(u"StudyUIDs are {0}".format(filtered))
+    # print(u"spiral: returning queryset {0}".format(filtered.count()))
+    # print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
@@ -253,7 +253,7 @@ def _specify_event_numbers_axial(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    print(u"axial: value {0}, starting queryset {1}".format(value, queryset.count()))
+    # print(u"axial: value {0}, starting queryset {1}".format(value, queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -268,8 +268,8 @@ def _specify_event_numbers_axial(queryset, value):
         ).annotate(
             axial_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(axial_count=value)
-    print(u"axial: returning queryset {0}".format(filtered.count()))
-    print(u"StudyUIDs are {0}".format(filtered))
+    # print(u"axial: returning queryset {0}".format(filtered.count()))
+    # print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
@@ -280,7 +280,7 @@ def _specify_event_numbers_spr(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    print(u"spr: value {0}, starting queryset {1}".format(value, queryset.count()))
+    # print(u"spr: value {0}, starting queryset {1}".format(value, queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -295,8 +295,8 @@ def _specify_event_numbers_spr(queryset, value):
         ).annotate(
             spr_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spr_count=value)
-    print(u"spr: returning queryset {0}".format(filtered.count()))
-    print(u"StudyUIDs are {0}".format(filtered))
+    # print(u"spr: returning queryset {0}".format(filtered.count()))
+    # print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
@@ -307,7 +307,7 @@ def _specify_event_numbers_stationary(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    print(u"stationary: value {0}, starting queryset {1}".format(value, queryset.count()))
+    # print(u"stationary: value {0}, starting queryset {1}".format(value, queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -321,12 +321,12 @@ def _specify_event_numbers_stationary(queryset, value):
         c = queryset.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
                           ).annotate(
             stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True))
-        print(c.query)
-        for study in c:
-            print(u"study in c has {0} stationary series".format(study.stationary_count))
-        print(u"There are {0} studies in c".format(c.count()))
+        # print(c.query)
+        # for study in c:
+        #     print(u"study in c has {0} stationary series".format(study.stationary_count))
+        # print(u"There are {0} studies in c".format(c.count()))
         filtered = c.filter(stationary_count=value)
-        print(filtered)
+        # print(filtered)
         return filtered
     #     for study in queryset:
     #         for event in study.ctradiationdose_set.get().ctirradiationeventdata_set.all():
