@@ -1,6 +1,8 @@
 # This Python file uses the following encoding: utf-8
 # test_import_mam.py
 
+from __future__ import division
+from past.utils import old_div
 import datetime
 import logging
 import os
@@ -35,7 +37,7 @@ class ImportMGImg(TestCase):
         self.assertEqual(study.patientmoduleattr_set.get().patient_birth_date, None)
 
         # Test that study level data is recorded correctly
-        self.assertEqual(study.study_date, datetime.date(2013, 04, 12))
+        self.assertEqual(study.study_date, datetime.date(2013, 4, 12))
         self.assertEqual(study.study_time, datetime.time(12, 35, 46))
         self.assertEqual(study.accession_number, u'AAAA9876')
         self.assertEqual(study.modality_type, u'MG')
@@ -82,7 +84,8 @@ class ImportMGImg(TestCase):
         self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
             ).irradeventxraysourcedata_set.get().focal_spot_size, Decimal(0.30))  # in mm
         self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
-            ).irradeventxraysourcedata_set.get().collimated_field_area, (Decimal(229)*Decimal(191))/Decimal(1000000))
+            ).irradeventxraysourcedata_set.get().collimated_field_area, old_div((Decimal(229)*Decimal(191)),
+                                                                                Decimal(1000000)))
         self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
             ).irradeventxraysourcedata_set.get().average_glandular_dose, Decimal(0.01373)*Decimal(100))
 

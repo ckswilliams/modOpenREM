@@ -8,6 +8,10 @@ import logging
 from testfixtures import LogCapture
 from remapp.extractors import rdsr
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
+from openremproject import settings
+
+
+settings.LOGGING['loggers']['remapp']['level'] = 'DEBUG'
 
 
 class ImportMultipleRDSRs(TestCase):  # pylint: disable=unused-variable

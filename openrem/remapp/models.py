@@ -27,8 +27,11 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from __future__ import division
 
 # Following two lines added so that sphinx autodocumentation works.
+from past.utils import old_div
+from builtins import object  # pylint: disable=redefined-builtin
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 import json
@@ -60,7 +63,8 @@ class NotPatientIndicatorsID(models.Model):
     def __unicode__(self):
         return self.not_patient_id
 
-    class Meta:
+    class Meta(object):
+        """Meta class to define verbose names for not patient indicators for IDs"""
         verbose_name = u'Not-patient indicator ID'
         verbose_name_plural = u'Not-patient indicator IDs'
 
@@ -77,7 +81,8 @@ class NotPatientIndicatorsName(models.Model):
     def __unicode__(self):
         return self.not_patient_name
 
-    class Meta:
+    class Meta(object):
+        """Meta class to define verbose names for not-patient indicator names table"""
         verbose_name = u'Not-patient indicator name'
         verbose_name_plural = u'Not-patient indicator names'
 
@@ -167,11 +172,13 @@ class DicomDeleteSettings(SingletonModel):
     def __unicode__(self):
         return u"Delete DICOM objects settings"
 
-    class Meta:
+    class Meta(object):
+        """Meta class to define verbose name for DICOM delete settings"""
         verbose_name = "Delete DICOM objects settings"
 
     def get_absolute_url(self):
         return reverse('dicom_summary')
+
 
 class PatientIDSettings(SingletonModel):
     """
@@ -187,7 +194,10 @@ class PatientIDSettings(SingletonModel):
     def __unicode__(self):
         return u"Patient ID Settings"
 
-    class Meta:
+    class Meta(object):
+        """
+        Verbose name for PatientIDSettings
+        """
         verbose_name = "Patient ID Settings"
 
     def get_absolute_url(self):
@@ -470,7 +480,10 @@ class UniqueEquipmentNames(models.Model):
     device_observer_uid = models.TextField(blank=True, null=True)
     device_observer_uid_hash = models.CharField(max_length=64, blank=True, null=True)
 
-    class Meta:
+    class Meta(object):
+        """
+        Define unique_together Meta class to enable sorting of similar devices
+        """
         unique_together = ('manufacturer_hash', 'institution_name_hash', 'station_name_hash',
                            'institutional_department_name_hash', 'manufacturer_model_name_hash',
                            'device_serial_number_hash', 'software_versions_hash', 'gantry_id_hash',
@@ -527,7 +540,8 @@ class ContextID(models.Model):
     def __unicode__(self):
         return self.code_meaning
 
-    class Meta:
+    class Meta(object):
+        """Meta class to define ordering of objects in ContextID tables"""
         ordering = ['code_value']
 
 
@@ -832,7 +846,7 @@ class Exposure(models.Model):  # EV 113736
         from decimal import Decimal
         from numbers import Number
         if isinstance(self.exposure, Number):
-            return self.exposure / Decimal(1000.)
+            return old_div(self.exposure, Decimal(1000.))
 
 
 class XrayFilters(models.Model):  # EV 113771

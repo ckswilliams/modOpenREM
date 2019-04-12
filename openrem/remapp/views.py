@@ -30,8 +30,15 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from __future__ import absolute_import
 # from __future__ import unicode_literals
 # Following two lines added so that sphinx autodocumentation works.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map  # pylint: disable=redefined-builtin
+from builtins import str  # pylint: disable=redefined-builtin
+from builtins import zip  # pylint: disable=redefined-builtin
+from builtins import next  # pylint: disable=redefined-builtin
 import os
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
@@ -265,7 +272,7 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                          plot_histogram_bins, plot_histograms, plot_case_insensitive_categories):
     """Calculations for radiographic charts
     """
-    from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
+    from .interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
     from django.utils.datastructures import MultiValueDictKeyError
 
     return_structure = {}
@@ -680,7 +687,7 @@ def rf_plot_calculations(f, median_available, plot_average_choice,
                          plot_histograms, plot_case_insensitive_categories):
     """Calculations for fluoroscopy charts
     """
-    from interface.chart_functions import average_chart_inc_histogram_data, workload_chart_data
+    from .interface.chart_functions import average_chart_inc_histogram_data, workload_chart_data
 
     return_structure = {}
 
@@ -791,12 +798,12 @@ def rf_detail_view(request, pk=None):
             'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
     # stu_time_totals = [None] * len(stu_irr_types)
     for _, irr_type in enumerate(acq_irr_types):
-        stu_time_totals.append(GeneralStudyModuleAttr.objects.filter(
+        stu_time_totals.append(list(GeneralStudyModuleAttr.objects.filter(
             pk=pk,
             projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
             irr_type[0]).aggregate(
                 Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__irradiation_duration')
-            ).values()[0])
+            ).values())[0])
     irradiation_types.extend([(u'- ' + acq_type[0],) for acq_type in acq_irr_types])
 
     # Add the study totals
@@ -859,7 +866,7 @@ def rf_detail_view_skin_map(request, pk=None):
     from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
     from django.http import JsonResponse
-    import cPickle as pickle
+    import pickle as pickle
     import gzip
 
     from django.core.exceptions import ObjectDoesNotExist
@@ -1091,7 +1098,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                          plot_histograms, plot_case_insensitive_categories):
     """CT chart data calculations
     """
-    from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
+    from .interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
     return_structure = {}
 
@@ -1472,7 +1479,7 @@ def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_p
                          plot_kvp_vs_thickness, plot_mas_vs_thickness):
     """Calculations for mammography charts
     """
-    from interface.chart_functions import workload_chart_data, scatter_plot_data
+    from .interface.chart_functions import workload_chart_data, scatter_plot_data
 
     return_structure = {}
 
@@ -1766,7 +1773,7 @@ def update_latest_studies(request):
                 'displayname': displayname,
                 'displayname_pk': modality.lower() + str(pk)
             }
-        ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
+        ordereddata = OrderedDict(sorted(list(modalitydata.items()), key=lambda t: t[1]['latest'], reverse=True))
 
         admin = {}
         for group in request.user.groups.all():
@@ -1837,7 +1844,7 @@ def update_study_workload(request):
                 'displayname': displayname,
                 'displayname_pk': modality.lower() + str(pk)
             }
-        data = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['displayname_pk'], reverse=True))
+        data = OrderedDict(sorted(list(modalitydata.items()), key=lambda t: t[1]['displayname_pk'], reverse=True))
 
         template = 'remapp/home-modality-workload.html'
 
@@ -1859,7 +1866,7 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
     if request.user.groups.filter(name="admingroup"):
         return render(request, template_name, {'exam': study,'return_url': request.META['HTTP_REFERER']})
 
-    if 'HTTP_REFERER' in request.META.keys():
+    if 'HTTP_REFERER' in list(request.META.keys()):
         return redirect(request.META['HTTP_REFERER'])
     else:
         return redirect(reverse_lazy('home'))
@@ -1921,7 +1928,7 @@ def size_process(request, *args, **kwargs):
 
     if request.method == 'POST':
 
-        itemsInPost = len(request.POST.values())
+        itemsInPost = len(list(request.POST.values()))
         uniqueItemsInPost = len(set(request.POST.values()))
 
         if itemsInPost == uniqueItemsInPost:
@@ -2135,7 +2142,7 @@ def charts_off(request):
 def display_names_view(request):
     from django.db.models import Q
     from remapp.models import UniqueEquipmentNames, MergeOnDeviceObserverUIDSettings
-    from forms import MergeOnDeviceObserverUIDForm
+    from .forms import MergeOnDeviceObserverUIDForm
 
     try:
         match_on_device_observer_uid = MergeOnDeviceObserverUIDSettings.objects.values_list(
@@ -2272,7 +2279,7 @@ def display_name_update(request):
             if int(current_pk) > max_pk:
                 return HttpResponseRedirect(reverse_lazy('display_names_view'))
 
-        f = UniqueEquipmentNames.objects.filter(pk__in=map(int, request.GET.values()))
+        f = UniqueEquipmentNames.objects.filter(pk__in=list(map(int, list(request.GET.values()))))
 
         form = UpdateDisplayNamesForm(
             initial={'display_names': [x.encode('utf-8') for x in f.values_list('display_name', flat=True)]},
@@ -3364,7 +3371,7 @@ def celery_tasks(request, stage=None):
                 older_tasks = []
                 task_dict_list = flower.json()
                 datetime_now = datetime.now()
-                for task_uuid in task_dict_list.keys():
+                for task_uuid in list(task_dict_list.keys()):
                     this_task = {'uuid': task_uuid,
                                  'name': task_dict_list[task_uuid]['name'],
                                  'state': task_dict_list[task_uuid]['state']
@@ -3701,11 +3708,11 @@ def rf_alert_notifications_view(request):
     from django.contrib.auth.models import User
     from remapp.models import HighDoseMetricAlertRecipients
     from remapp.tools.send_high_dose_alert_emails import send_rf_high_dose_alert_email
-    from tools.get_values import get_keys_by_value
+    from .tools.get_values import get_keys_by_value
 
     if request.method == 'POST' and request.user.groups.filter(name="admingroup"):
         # Check to see if we need to send a test message
-        if 'Send test' in request.POST.values():
+        if 'Send test' in list(request.POST.values()):
             recipient = get_keys_by_value(request.POST, 'Send test')[0]
             email_response = send_rf_high_dose_alert_email(study_pk=None, test_message=True, test_user=recipient)
             if email_response == None:
@@ -3715,7 +3722,7 @@ def rf_alert_notifications_view(request):
 
         all_users = User.objects.all()
         for user in all_users:
-            if str(user.pk) in request.POST.values():
+            if str(user.pk) in list(request.POST.values()):
                 if not hasattr(user, 'highdosemetricalertrecipients'):
                     new_objects = HighDoseMetricAlertRecipients.objects.create(user=user)
                     new_objects.save()

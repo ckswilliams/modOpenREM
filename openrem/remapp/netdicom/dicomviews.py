@@ -27,8 +27,9 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
-
-# Following two lines added so that sphinx autodocumentation works.
+from __future__ import print_function
+from builtins import str  # pylint: disable=redefined-builtin
+from builtins import map  # pylint: disable=redefined-builtin
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
@@ -65,7 +66,7 @@ def stop_store(request, pk):
             store[0].status = u"Quit signal sent"
             store[0].save()
         else:
-            print u"Can't stop store SCP: Invalid primary key"
+            print(u"Can't stop store SCP: Invalid primary key")
     return redirect(reverse_lazy('dicom_summary'))
 
 import json
@@ -238,19 +239,19 @@ def q_process(request, *args, **kwargs):
                 date_until = date_until.isoformat()
 
             if desc_exclude:
-                study_desc_exc = map(unicode.lower, map(unicode.strip, desc_exclude.split(',')))
+                study_desc_exc = list(map(str.lower, list(map(str.strip, desc_exclude.split(',')))))
             else:
                 study_desc_exc = None
             if desc_include:
-                study_desc_inc = map(unicode.lower, map(unicode.strip, desc_include.split(',')))
+                study_desc_inc = list(map(str.lower, list(map(str.strip, desc_include.split(',')))))
             else:
                 study_desc_inc = None
             if stationname_exclude:
-                stationname_exc = map(unicode.lower, map(unicode.strip, stationname_exclude.split(',')))
+                stationname_exc = list(map(str.lower, list(map(str.strip, stationname_exclude.split(',')))))
             else:
                 stationname_exc = None
             if stationname_include:
-                stationname_inc = map(unicode.lower, map(unicode.strip, stationname_include.split(',')))
+                stationname_inc = list(map(str.lower, list(map(str.strip, stationname_include.split(',')))))
             else:
                 stationname_inc = None
 
@@ -274,10 +275,10 @@ def q_process(request, *args, **kwargs):
 
             return HttpResponse(json.dumps(resp), content_type='application/json')
         else:
-            print u"Bother, form wasn't valid"
+            print(u"Bother, form wasn't valid")
             errors = form.errors
-            print errors
-            print form
+            print(errors)
+            print(form)
 
             # Need to find a way to deal with this event
 #            render_to_response('remapp/dicomqr.html', {'form': form}, context_instance=RequestContext(request))

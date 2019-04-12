@@ -28,7 +28,12 @@
 ..  moduleauthor:: Ed McDonagh, David Platten
 
 """
+from __future__ import division
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str  # pylint: disable=redefined-builtin
+from past.utils import old_div
 import os
 import sys
 import logging
@@ -52,7 +57,7 @@ def make_skin_map(study_pk=None):
     import remapp.tools.openskin.calc_exp_map as calc_exp_map
     from remapp.models import GeneralStudyModuleAttr
     from openremproject.settings import MEDIA_ROOT
-    import cPickle as pickle
+    import pickle as pickle
     import gzip
     from remapp.version import __skin_map_version__
     from django.core.exceptions import ObjectDoesNotExist
@@ -210,7 +215,7 @@ def make_skin_map(study_pk=None):
         # Flip the skin dose map left-right so the view is from the front
         # my_exp_map.my_dose.fliplr()
         my_exp_map.my_dose.totalDose = np.roll(my_exp_map.my_dose.totalDose,
-                                               int(my_exp_map.phantom.phantom_flat_dist / 2),
+                                               int(old_div(my_exp_map.phantom.phantom_flat_dist, 2)),
                                                axis=0)
         try:
             my_exp_map.my_dose.totalDose = np.rot90(my_exp_map.my_dose.totalDose)
