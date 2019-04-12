@@ -235,8 +235,10 @@ def _specify_event_numbers_spiral(queryset, value):
         filtered = queryset.exclude(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Spiral Acquisition')
     else:
-        queryset.query.annotations.clear()
-        filtered = queryset.filter(
+        study_uids = queryset.values_list('study_instance_uid')
+        c = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids)
+        # queryset.query.annotations.clear()
+        filtered = c.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Spiral Acquisition'
         ).annotate(
             spiral_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
@@ -262,8 +264,10 @@ def _specify_event_numbers_axial(queryset, value):
         filtered = queryset.exclude(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Sequenced Acquisition')
     else:
-        queryset.query.annotations.clear()
-        filtered = queryset.filter(
+        study_uids = queryset.values_list('study_instance_uid')
+        c = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids)
+        # queryset.query.annotations.clear()
+        filtered = c.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Sequenced Acquisition'
         ).annotate(
             axial_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
@@ -289,8 +293,10 @@ def _specify_event_numbers_spr(queryset, value):
         filtered = queryset.exclude(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition')
     else:
-        queryset.query.annotations.clear()
-        filtered = queryset.filter(
+        study_uids = queryset.values_list('study_instance_uid')
+        c = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids)
+        # queryset.query.annotations.clear()
+        filtered = c.filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition'
         ).annotate(
             spr_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
@@ -317,9 +323,11 @@ def _specify_event_numbers_stationary(queryset, value):
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition')
         return filtered
     else:
-        queryset.query.annotations.clear()
-        c = queryset.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
-                          ).annotate(
+        study_uids = queryset.values_list('study_instance_uid')
+        c = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids)
+        # queryset.query.annotations.clear()
+        c = c.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
+                     ).annotate(
             stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True))
         # print(c.query)
         # for study in c:
