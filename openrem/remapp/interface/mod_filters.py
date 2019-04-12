@@ -226,7 +226,6 @@ def _specify_event_numbers_spiral(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    # print(u"spiral: value {0}, starting queryset {1}".format(value, queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -236,15 +235,11 @@ def _specify_event_numbers_spiral(queryset, value):
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Spiral Acquisition')
     else:
         study_uids = queryset.values_list('study_instance_uid')
-        c = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids)
-        # queryset.query.annotations.clear()
-        filtered = c.filter(
+        filtered = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids).filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Spiral Acquisition'
         ).annotate(
             spiral_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spiral_count=value)
-    # print(u"spiral: returning queryset {0}".format(filtered.count()))
-    # print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
@@ -255,7 +250,6 @@ def _specify_event_numbers_axial(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    # print(u"axial: value {0}, starting queryset {1}".format(value, queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -265,15 +259,11 @@ def _specify_event_numbers_axial(queryset, value):
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Sequenced Acquisition')
     else:
         study_uids = queryset.values_list('study_instance_uid')
-        c = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids)
-        # queryset.query.annotations.clear()
-        filtered = c.filter(
+        filtered = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids).filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Sequenced Acquisition'
         ).annotate(
             axial_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(axial_count=value)
-    # print(u"axial: returning queryset {0}".format(filtered.count()))
-    # print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
@@ -284,7 +274,6 @@ def _specify_event_numbers_spr(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    # print(u"spr: value {0}, starting queryset {1}".format(value, queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -294,15 +283,11 @@ def _specify_event_numbers_spr(queryset, value):
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition')
     else:
         study_uids = queryset.values_list('study_instance_uid')
-        c = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids)
-        # queryset.query.annotations.clear()
-        filtered = c.filter(
+        filtered = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids).filter(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition'
         ).annotate(
             spr_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
         ).filter(spr_count=value)
-    # print(u"spr: returning queryset {0}".format(filtered.count()))
-    # print(u"StudyUIDs are {0}".format(filtered))
     return filtered
 
 
@@ -313,7 +298,6 @@ def _specify_event_numbers_stationary(queryset, value):
     :param value: number of events
     :return: filtered queryset
     """
-    # print(u"stationary: value {0}, starting queryset {1}".format(value, queryset.count()))
     try:
         value = int(value)
     except ValueError:
@@ -321,56 +305,14 @@ def _specify_event_numbers_stationary(queryset, value):
     if value == 0:
         filtered = queryset.exclude(
             ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition')
-        return filtered
     else:
         study_uids = queryset.values_list('study_instance_uid')
-        c = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids)
-        # queryset.query.annotations.clear()
-        c = c.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
-                     ).annotate(
-            stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True))
-        # print(c.query)
-        # for study in c:
-        #     print(u"study in c has {0} stationary series".format(study.stationary_count))
-        # print(u"There are {0} studies in c".format(c.count()))
-        filtered = c.filter(stationary_count=value)
-        # print(filtered)
-        return filtered
-    #     for study in queryset:
-    #         for event in study.ctradiationdose_set.get().ctirradiationeventdata_set.all():
-    #             print(u"Event type is {0}".format(event.ct_acquisition_type.code_meaning))
-    #     filtered_number = queryset.filter(
-    #         ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
-    #     ).annotate(
-    #         stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
-    #     )
-    #     for study in filtered_number:
-    #         print(u"Study in the queryset has {0} stationary events".format(study.stationary_count))
-    #     filtered_temp = queryset.filter(
-    #         ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
-    #     )
-    #     for study in filtered_temp:
-    #         print(u"study has {0} stationary events".format(
-    #             study.ctradiationdose_set.get().ctirradiationeventdata_set.filter(ct_acquisition_type__code_meaning__exact='Stationary Acquisition').count()))
-    #     filtered = queryset.filter(
-    #         ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
-    #     ).annotate(
-    #         stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
-    #     ).filter(stationary_count=value)
-    # print(u"stationary: returning queryset {0}".format(filtered.count()))
-    # print(u"StudyUIDs are {0}".format(filtered))
-    # import sqlite3
-    # print(u"SQLite3 version is {0}".format(sqlite3.sqlite_version))
-    #
-    # a = GeneralStudyModuleAttr.objects.filter(accession_number__exact='ACC12345601')
-    # b = a.filter(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
-    #              ).annotate(
-    #     stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True))
-    # for study in b:
-    #     print(u"study in b has {0} stationary series".format(study.stationary_count))
-    # print(u"There are {0} studies in b".format(b.count()))
-    #
-
+        filtered = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=study_uids).filter(
+            ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Stationary Acquisition'
+        ).annotate(
+            stationary_count=Count('ctradiationdose__ctirradiationeventdata', distinct=True)
+        ).filter(stationary_count=value)
+    return filtered
 
 
 class CTSummaryListFilter(django_filters.FilterSet):
