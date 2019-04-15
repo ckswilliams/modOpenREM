@@ -117,7 +117,7 @@ def dx_summary_list_filter(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -230,7 +230,7 @@ def dx_summary_chart_data(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -515,7 +515,7 @@ def rf_summary_list_filter(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -652,7 +652,7 @@ def rf_summary_chart_data(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -956,7 +956,7 @@ def ct_summary_list_filter(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -1063,7 +1063,7 @@ def ct_summary_chart_data(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -1362,7 +1362,7 @@ def mg_summary_list_filter(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -1449,7 +1449,7 @@ def mg_summary_chart_data(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -1609,7 +1609,7 @@ def openrem_home(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         if request.user.is_authenticated():
             # Create a default userprofile for the user if one doesn't exist
             create_user_profile(sender=request.user, instance=request.user, created=True)
@@ -2119,7 +2119,7 @@ def charts_off(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         if request.user.is_authenticated():
             # Create a default userprofile for the user if one doesn't exist
             create_user_profile(sender=request.user, instance=request.user, created=True)
@@ -2989,7 +2989,7 @@ def chart_options_view(request):
             try:
                 # See if the user has plot settings in userprofile
                 user_profile = request.user.userprofile
-            except:
+            except ObjectDoesNotExist:
                 # Create a default userprofile for the user if one doesn't exist
                 create_user_profile(sender=request.user, instance=request.user, created=True)
                 user_profile = request.user.userprofile
@@ -3058,7 +3058,7 @@ def chart_options_view(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -3161,7 +3161,7 @@ def homepage_options_view(request):
             try:
                 # See if the user has a userprofile
                 user_profile = request.user.userprofile
-            except:
+            except ObjectDoesNotExist:
                 # Create a default userprofile for the user if one doesn't exist
                 create_user_profile(sender=request.user, instance=request.user, created=True)
                 user_profile = request.user.userprofile
@@ -3192,7 +3192,7 @@ def homepage_options_view(request):
     try:
         # See if the user has a userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
