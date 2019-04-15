@@ -4,8 +4,6 @@
 
 {% block toprow %}
 
-    {% load pagination_tags %}
-
     <p>
         There are {{ filter.count }} studies in this list.
     </p>
@@ -109,8 +107,39 @@
 
 {% block col1 %}
 
-    {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
-    {% paginate %}
+    {% if study_list.has_other_pages %}
+    {% load proper_paginate %}
+    {% load url_replace %}
+    <ul class="pagination">
+        {% if study_list.number == 1 %}
+            <li class="disabled"><span>⇤</span></li>
+        {% else %}
+            <li><a class="page-link" href="?{% url_replace request 'page' 1 %}">⇤</a></li>
+        {% endif %}
+        {% if study_list.has_previous %}
+            <li><a class="page-link" href="?{% url_replace request 'page' study_list.previous_page_number %}">&laquo;</a></li>
+        {% else %}
+            <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in study_list.paginator|proper_paginate:study_list.number %}
+            {% if study_list.number == i %}
+                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% else %}
+                <li><a class="page-link" href="?{% url_replace request 'page' i %}">{{ i }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if study_list.has_next %}
+            <li><a class="page-link" href="?{% url_replace request 'page' study_list.next_page_number %}">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+        {% if study_list.number == study_list.paginator.num_pages %}
+            <li class="disabled"><span>⇥</span></li>
+        {% else %}
+            <li><a class="page-link" href="?{% url_replace request 'page' study_list.paginator.num_pages %}">⇥</a></li>
+        {% endif %}
+    </ul>
+{% endif %}
 
     <table class="table table-bordered table-hover row-clickable small">
         <tr>
@@ -137,7 +166,7 @@
                 <th>Delete?</th>
             {% endif %}
         </tr>
-        {% for exam in filter_list %}
+        {% for exam in study_list %}
           {% with equipment=exam.generalequipmentmoduleattr_set.get %}
           {% with ct_dose_set=exam.ctradiationdose_set.get %}
           {% with ct_accumulated=ct_dose_set.ctaccumulateddosedata_set.get %}
@@ -192,7 +221,37 @@
         {% endfor %}
     </table>
 
-    {% paginate %}
+    {% if study_list.has_other_pages %}
+    <ul class="pagination">
+        {% if study_list.number == 1 %}
+            <li class="disabled"><span>⇤</span></li>
+        {% else %}
+            <li><a class="page-link" href="?{% url_replace request 'page' 1 %}">⇤</a></li>
+        {% endif %}
+        {% if study_list.has_previous %}
+            <li><a class="page-link" href="?{% url_replace request 'page' study_list.previous_page_number %}">&laquo;</a></li>
+        {% else %}
+            <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in study_list.paginator|proper_paginate:study_list.number %}
+            {% if study_list.number == i %}
+                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% else %}
+                <li><a class="page-link" href="?{% url_replace request 'page' i %}">{{ i }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if study_list.has_next %}
+            <li><a class="page-link" href="?{% url_replace request 'page' study_list.next_page_number %}">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+        {% if study_list.number == study_list.paginator.num_pages %}
+            <li class="disabled"><span>⇥</span></li>
+        {% else %}
+            <li><a class="page-link" href="?{% url_replace request 'page' study_list.paginator.num_pages %}">⇥</a></li>
+        {% endif %}
+    </ul>
+{% endif %}
 
 {% endblock %}
 

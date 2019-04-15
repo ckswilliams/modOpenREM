@@ -49,6 +49,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
@@ -1040,7 +1041,16 @@ def ct_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
+    paginator = Paginator(f, user_profile.itemsPerPage)
+    page = request.GET.get('page')
+    try:
+        study_list = paginator.page(page)
+    except PageNotAnInteger:
+        study_list = paginator.page(1)
+    except EmptyPage:
+        study_list = paginator.page(paginator.num_pages)
+
+    return_structure = {'filter': f, 'study_list': study_list, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/ctfiltered.html',
