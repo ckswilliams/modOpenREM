@@ -14,7 +14,6 @@ requires = [
     'pytz >= 0a',
     'humanize',
     'pydicom == 0.9.9',
-    'django-pagination',
     'xlsxwriter',
     'celery>=3.1,<4.3',
     'argparse >= 1.2.1',
