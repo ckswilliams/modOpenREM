@@ -16,6 +16,10 @@ from testfixtures import LogCapture
 from remapp.extractors.dx import _xray_filters_prep
 from remapp.models import GeneralStudyModuleAttr, ProjectionXRayRadiationDose, IrradEventXRayData, \
     IrradEventXRaySourceData
+from openremproject import settings
+
+
+settings.LOGGING['loggers']['remapp']['level'] = 'DEBUG'
 
 
 class DXFilterTests(TestCase):
