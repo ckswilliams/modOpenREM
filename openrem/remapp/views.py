@@ -206,7 +206,18 @@ def dx_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
+    paginator = Paginator(f, user_profile.itemsPerPage)
+    page = request.GET.get('page')
+    try:
+        study_list = paginator.page(page)
+    except PageNotAnInteger:
+        study_list = paginator.page(1)
+    except EmptyPage:
+        study_list = paginator.page(paginator.num_pages)
+
+    return_structure = {'filter': f, 'study_list': study_list,
+                        'admin': admin, 'chartOptionsForm': chart_options_form,
+                        'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/dxfiltered.html',
@@ -626,7 +637,18 @@ def rf_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form, 'alertLevels': alert_levels}
+    paginator = Paginator(f, user_profile.itemsPerPage)
+    page = request.GET.get('page')
+    try:
+        study_list = paginator.page(page)
+    except PageNotAnInteger:
+        study_list = paginator.page(1)
+    except EmptyPage:
+        study_list = paginator.page(paginator.num_pages)
+
+    return_structure = {'filter': f, 'study_list': study_list,
+                        'admin': admin, 'chartOptionsForm': chart_options_form,
+                        'itemsPerPageForm': items_per_page_form, 'alertLevels': alert_levels}
 
     return render_to_response(
         'remapp/rffiltered.html',
@@ -1050,7 +1072,9 @@ def ct_summary_list_filter(request):
     except EmptyPage:
         study_list = paginator.page(paginator.num_pages)
 
-    return_structure = {'filter': f, 'study_list': study_list, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
+    return_structure = {'filter': f, 'study_list': study_list,
+                        'admin': admin, 'chartOptionsForm': chart_options_form,
+                        'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/ctfiltered.html',
@@ -1432,7 +1456,18 @@ def mg_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
+    paginator = Paginator(f, user_profile.itemsPerPage)
+    page = request.GET.get('page')
+    try:
+        study_list = paginator.page(page)
+    except PageNotAnInteger:
+        study_list = paginator.page(1)
+    except EmptyPage:
+        study_list = paginator.page(paginator.num_pages)
+
+    return_structure = {'filter': f, 'study_list': study_list,
+                        'admin': admin, 'chartOptionsForm': chart_options_form,
+                        'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/mgfiltered.html',

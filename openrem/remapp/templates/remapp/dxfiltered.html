@@ -4,7 +4,6 @@
   <li class="active">{% endblock %}
 
 {% block toprow %}
-  {% load pagination_tags %}
 
   <p>
     There are {{ filter.count }} studies in this list.
@@ -109,8 +108,6 @@
 {% endblock %}
 
 {% block col1 %}
-  {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
-  {% paginate %}
 
   <table class="table table-bordered table-hover row-clickable small">
     <row>
@@ -243,7 +240,6 @@
     {% endfor %}
   </table>
 
-  {% paginate %}
 {% endblock %}
 
 {% block plotdata %}

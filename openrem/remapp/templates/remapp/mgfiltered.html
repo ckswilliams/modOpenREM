@@ -3,7 +3,6 @@
 {% block navmg%}<li class="active">{% endblock %}
 
 {% block toprow %}
-      {% load pagination_tags %}
       <p>
         There are {{ filter|length }} studies in this list.
       </p>
@@ -110,8 +109,6 @@
 
 {% block col1 %}
 
-    {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
-    {% paginate %}
 
     <table class="table table-bordered table-hover row-clickable small">
         <tr>
@@ -202,7 +199,6 @@
         {% endfor %}
     </table>
 
-    {% paginate %}
 
 
 {% endblock %}
