@@ -177,7 +177,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                             {'db_series_names_to_use': missing_name, 'num': 0})
 
                 # Rearrange the list into the same order as series_names
-                return_structure['summary'][index] = sorted(return_structure['summary'][index], key=lambda k: k['db_series_names_to_use'])
+                return_structure['summary'][index] = sorted(return_structure['summary'][index], key=lambda k: k['db_series_names_to_use'].lower())
 
     if plot_average and calculate_histograms:
         histogram_annotations = {}
