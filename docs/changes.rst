@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.1 (2019-04-xx)
 ------------------
+* `#748`_  Charts: fixed error that caused blank charts if series per system was selected
 * `#743`_  Testing: added configuration to enable testing with default logging
 * `#742`_  Interface: sorting of task tables now works in Internet Explorer 11
 * `#740`_  Installation: fixed Celery version to avoid dependency on Django 1.11

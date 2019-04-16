@@ -13,6 +13,10 @@ from testfixtures import LogCapture
 
 from remapp.extractors import mam
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
+from openremproject import settings
+
+
+settings.LOGGING['loggers']['remapp']['level'] = 'DEBUG'
 
 
 class ImportMGImg(TestCase):
