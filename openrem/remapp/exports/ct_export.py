@@ -533,9 +533,8 @@ def ct_phe_2019(filterdict, user=None):
             patient_weight,
             patient_size,
         ]
-        for i, event in enumerate(exam.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id')):
-            if i == 4:
-                exam_data += ['', '', ]
+        series_index = 0
+        for event in exam.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
             try:
                 ct_acquisition_type = event.ct_acquisition_type.code_meaning
                 if ct_acquisition_type in u"Constant Angle Acquisition":
@@ -543,6 +542,9 @@ def ct_phe_2019(filterdict, user=None):
                 comments += [ct_acquisition_type, ]
             except (ObjectDoesNotExist, AttributeError):
                 comments += ["unknown type", ]
+            if series_index == 4:
+                exam_data += ['', '', ]
+            series_index += 1
             scanning_length = None
             start_position = None
             end_position = None
