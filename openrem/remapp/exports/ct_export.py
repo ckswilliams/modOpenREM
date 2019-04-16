@@ -488,7 +488,7 @@ def ct_phe_2019(filterdict, user=None):
         u'Weight (kg)',
         u'Height (cm)',
     ]
-    for x in range(4):
+    for x in range(4):  #pylint: disable=unused-argument
         headings += [
             u'Imaged length',
             u'Start position',
