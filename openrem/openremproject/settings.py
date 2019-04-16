@@ -136,7 +136,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'pagination.middleware.PaginationMiddleware',
 )
 
 ROOT_URLCONF = 'openremproject.urls'
@@ -157,7 +156,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'remapp',
     'django_filters',
-    'pagination',
     'django.contrib.humanize',
     'solo',
     'crispy_forms',
