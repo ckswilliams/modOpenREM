@@ -202,7 +202,7 @@ class RFFilterPlusPid(RFSummaryListFilter):
 CT_ACQ_TYPE_CHOICES = (
     ('Spiral Acquisition', 'Spiral'),
     ('Sequenced Acquisition', 'Axial'),
-    ('Constant Angle Acquisition', 'Scan projection radiograph'),
+    ('Constant Angle Acquisition', 'Localiser'),
     ('Stationary Acquisition', 'Stationary acquisition'),
     ('Free Acquisition', 'Free acquisition'),
 )
@@ -369,7 +369,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
                                                     choices=EVENT_NUMBER_CHOICES, widget=forms.Select)
     num_axial_events = django_filters.ChoiceFilter(action=_specify_event_numbers_axial, label=u'Num. axial events',
                                                    choices=EVENT_NUMBER_CHOICES, widget=forms.Select)
-    num_spr_events = django_filters.ChoiceFilter(action=_specify_event_numbers_spr, label=u'Num. topograms',
+    num_spr_events = django_filters.ChoiceFilter(action=_specify_event_numbers_spr, label=u'Num. localisers',
                                                  choices=EVENT_NUMBER_CHOICES, widget=forms.Select)
     num_stationary_events = django_filters.ChoiceFilter(action=_specify_event_numbers_stationary,
                                                         label=u'Num. stationary events', choices=EVENT_NUMBER_CHOICES,
