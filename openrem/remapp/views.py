@@ -1654,7 +1654,8 @@ def openrem_home(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except ObjectDoesNotExist:
+    except (ObjectDoesNotExist, AttributeError):
+        # Attribute error needed for AnonymousUser, who doesn't have a userprofile attribute
         if request.user.is_authenticated():
             # Create a default userprofile for the user if one doesn't exist
             create_user_profile(sender=request.user, instance=request.user, created=True)
