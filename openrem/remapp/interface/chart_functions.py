@@ -179,8 +179,8 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                 # Rearrange the list into the same order as series_names
                 summary_temp = []
                 for series_name in return_structure['series_names']:
-                    summary_temp.append(filter(lambda item: item['db_series_names_to_use'] == series_name,
-                                               return_structure['summary'][index])[0])
+                    series_data = filter(lambda item: item['db_series_names_to_use'] == series_name, return_structure['summary'][index])
+                    summary_temp.append(next(series_data)) # There should only be one item
                 return_structure['summary'][index] = summary_temp
 
     if plot_average and calculate_histograms:
