@@ -33,7 +33,7 @@ Filtering for specific studies
 
 This image shows the CT studies view, available to any logged in user, filtered by entering terms in the
 boxes on the right hand side to show just the studies where the modality
-model name includes the term 'soma':
+manufacturer name includes the term 'Siemens':
 
 .. figure:: img/CTFilter.png
    :figwidth: 100 %
@@ -52,8 +52,8 @@ for a future release.
 
 The last box below the filtering search boxes is the ordering preference.
 
-A note on filtering CT studies by acquisition type
---------------------------------------------------
+CT: acquisition type restriction
+--------------------------------
 
 The CT study filters includes the ability to restrict the displayed studies
 by acquisition type, such as ``Spiral`` or ``Axial``. By default none of these
@@ -81,6 +81,18 @@ acquisitions present in the studies will not be shown in the chart. Any study-
 or request-level chart will show all the data as every one of them includes
 at least one ``Axial`` acquisition.
 
+CT: specifying number of event types
+------------------------------------
+
+In addition (or as an alternative) to specifying that studies must have at least one of one of the
+acquisition type restrictions, if any are selected, it is also possible to filter for studies that have specific
+numbers of each acquisition type.
+
+For example, if the standard ``CT Abdomen`` on a particular scanner has two localisers and one spiral scan,
+then to filter for all the studies that followed this without deviation (an extra localiser or an extra series)
+the filters might be set to the particular Display Name and Requested Procedure, and Num. spiral events set
+to one and Num. localisers set to two. This can be useful for exporting a clean set of data to process
+for a dose audit.
 
 Setting the number of studies displayed per page
 ================================================
