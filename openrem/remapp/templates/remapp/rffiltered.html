@@ -4,7 +4,6 @@
 {% block navrf %}<li class="active">{% endblock %}
 
 {% block toprow %}
-{% load pagination_tags %}
       <p>
         There are {{ filter.count }} studies in this list.
       </p>
@@ -107,8 +106,6 @@
 
 {% block col1 %}
 {% load l10n %}
-    {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
-    {% paginate %}
 
     <table class="table table-bordered table-hover row-clickable small">
         <tr>
@@ -142,7 +139,7 @@
             <th>Delete?</th>
             {% endif %}
         </tr>
-        {% for exam in filter_list %}
+        {% for exam in study_list %}
           {% with equipment=exam.generalequipmentmoduleattr_set.get %}
           {% with projection_set=exam.projectionxrayradiationdose_set.get %}
           {% with accum_set=projection_set.accumxraydose_set.all %}
@@ -271,7 +268,6 @@
         {% endfor %}
     </table>
 
-    {% paginate %}
 
 
 {% endblock %}
