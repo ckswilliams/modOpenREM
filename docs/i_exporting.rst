@@ -162,7 +162,7 @@ The CT studies should then be filtered in OpenREM; by date (ideally previous 12 
 (each scanner and protocol combination should be a new sheet), by minimum age of 16, and by study description (or
 combination of factors to specify a particular protocol). The guidance specifies patients between 50 to 90 kg -- if you
 have weight data in OpenREM this filter could be added, but the values form part of the output anyway so it isn't
-essential. It  however enable filtering out of those studies that don't have weight data if the majority does. If
+essential. It would however enable filtering out of those studies that don't have weight data if the majority does. If
 patient weight data isn't available in OpenREM then just ensure the sample is large!
 
 Finally the studies should be filtered to have exactly the right number of each type of acquisition for that protocol.
@@ -173,7 +173,7 @@ the standard protocol.
 The export can then be started and monitored in the normal way by clicking on the 'PHE 2019 survey' button. The
 resulting export will be in xlsx format, with one header row. The data from row 2 onwards can be copied and pasted
 directly into row 150 onwards of the Patient and Protocol sheet of the PHE data collection spreadsheet. Column AL is
-for patient comments. OpenREM uses this cell to record the series types that have been exported for each study. This
+for patient comments, and OpenREM uses this cell to record the series types that have been exported for each study. This
 can therefore be used to double check the data is as you expect it to be. If the protocol has more than four series
 excluding localisers, the data is continued in the same format from column AM onwards.
 
