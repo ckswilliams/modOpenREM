@@ -49,6 +49,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
@@ -117,7 +118,7 @@ def dx_summary_list_filter(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -205,7 +206,18 @@ def dx_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
+    paginator = Paginator(f, user_profile.itemsPerPage)
+    page = request.GET.get('page')
+    try:
+        study_list = paginator.page(page)
+    except PageNotAnInteger:
+        study_list = paginator.page(1)
+    except EmptyPage:
+        study_list = paginator.page(paginator.num_pages)
+
+    return_structure = {'filter': f, 'study_list': study_list,
+                        'admin': admin, 'chartOptionsForm': chart_options_form,
+                        'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/dxfiltered.html',
@@ -230,7 +242,7 @@ def dx_summary_chart_data(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -515,7 +527,7 @@ def rf_summary_list_filter(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -625,7 +637,18 @@ def rf_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form, 'alertLevels': alert_levels}
+    paginator = Paginator(f, user_profile.itemsPerPage)
+    page = request.GET.get('page')
+    try:
+        study_list = paginator.page(page)
+    except PageNotAnInteger:
+        study_list = paginator.page(1)
+    except EmptyPage:
+        study_list = paginator.page(paginator.num_pages)
+
+    return_structure = {'filter': f, 'study_list': study_list,
+                        'admin': admin, 'chartOptionsForm': chart_options_form,
+                        'itemsPerPageForm': items_per_page_form, 'alertLevels': alert_levels}
 
     return render_to_response(
         'remapp/rffiltered.html',
@@ -652,7 +675,7 @@ def rf_summary_chart_data(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -956,7 +979,7 @@ def ct_summary_list_filter(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -1040,7 +1063,18 @@ def ct_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
+    paginator = Paginator(f, user_profile.itemsPerPage)
+    page = request.GET.get('page')
+    try:
+        study_list = paginator.page(page)
+    except PageNotAnInteger:
+        study_list = paginator.page(1)
+    except EmptyPage:
+        study_list = paginator.page(paginator.num_pages)
+
+    return_structure = {'filter': f, 'study_list': study_list,
+                        'admin': admin, 'chartOptionsForm': chart_options_form,
+                        'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/ctfiltered.html',
@@ -1063,7 +1097,7 @@ def ct_summary_chart_data(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -1362,7 +1396,7 @@ def mg_summary_list_filter(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -1422,7 +1456,18 @@ def mg_summary_list_filter(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form, 'itemsPerPageForm': items_per_page_form}
+    paginator = Paginator(f, user_profile.itemsPerPage)
+    page = request.GET.get('page')
+    try:
+        study_list = paginator.page(page)
+    except PageNotAnInteger:
+        study_list = paginator.page(1)
+    except EmptyPage:
+        study_list = paginator.page(paginator.num_pages)
+
+    return_structure = {'filter': f, 'study_list': study_list,
+                        'admin': admin, 'chartOptionsForm': chart_options_form,
+                        'itemsPerPageForm': items_per_page_form}
 
     return render_to_response(
         'remapp/mgfiltered.html',
@@ -1449,7 +1494,7 @@ def mg_summary_chart_data(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -1609,7 +1654,8 @@ def openrem_home(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except (ObjectDoesNotExist, AttributeError):
+        # Attribute error needed for AnonymousUser, who doesn't have a userprofile attribute
         if request.user.is_authenticated():
             # Create a default userprofile for the user if one doesn't exist
             create_user_profile(sender=request.user, instance=request.user, created=True)
@@ -2119,7 +2165,7 @@ def charts_off(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         if request.user.is_authenticated():
             # Create a default userprofile for the user if one doesn't exist
             create_user_profile(sender=request.user, instance=request.user, created=True)
@@ -2989,7 +3035,7 @@ def chart_options_view(request):
             try:
                 # See if the user has plot settings in userprofile
                 user_profile = request.user.userprofile
-            except:
+            except ObjectDoesNotExist:
                 # Create a default userprofile for the user if one doesn't exist
                 create_user_profile(sender=request.user, instance=request.user, created=True)
                 user_profile = request.user.userprofile
@@ -3058,7 +3104,7 @@ def chart_options_view(request):
     try:
         # See if the user has plot settings in userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
@@ -3161,7 +3207,7 @@ def homepage_options_view(request):
             try:
                 # See if the user has a userprofile
                 user_profile = request.user.userprofile
-            except:
+            except ObjectDoesNotExist:
                 # Create a default userprofile for the user if one doesn't exist
                 create_user_profile(sender=request.user, instance=request.user, created=True)
                 user_profile = request.user.userprofile
@@ -3192,7 +3238,7 @@ def homepage_options_view(request):
     try:
         # See if the user has a userprofile
         user_profile = request.user.userprofile
-    except:
+    except ObjectDoesNotExist:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
