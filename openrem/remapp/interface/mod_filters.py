@@ -207,6 +207,7 @@ CT_ACQ_TYPE_CHOICES = (
     ('Free Acquisition', 'Free acquisition'),
 )
 
+
 EVENT_NUMBER_CHOICES = (
     (None, 'Any'),
     (0, 'None'),
