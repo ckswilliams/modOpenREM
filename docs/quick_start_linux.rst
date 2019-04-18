@@ -127,8 +127,8 @@ Install Python packages
     There will be error messages when you install pynetdicom from this source. As long as the final line is
     ``Successfully installed pynetdicom-0.8.2b2`` then everything is ok!
 
-Addd orthanc and www-data users to openrem group
-------------------------------------------------
+Add orthanc and www-data users to openrem group
+-----------------------------------------------
 
 .. code-block:: console
 
@@ -591,16 +591,11 @@ Enable RadbbitMQ queue management interface
 
     sudo rabbitmq-plugins enable rabbitmq_management
 
-Now you need to create a RabbitMQ Administrator. The password is printed to the terminal, so add a space before
-the ``sudo`` so that the command does not get saved to your history file, and then we will ``clear`` the terminal so it
-isn't displayed any longer:
+**Optional -- RabbitMQ Administrator**
 
-.. code-block:: console
-
-    sudo rabbitmqctl add_user <username> <password>
-    clear
-    sudo rabbitmqctl set_user_tags <username> administrator
-    sudo rabbitmqctl set_permissions -p / <username> "." "." ".*"
+This is not required unless you wish to interact with the RabbitMQ management interface directly. Most
+functions can be carried out in the OpenREM interface instead. If you do wish to create a user for this
+purpose, see the general instructions to :ref:`enableRabbitMQ`.
 
 Log locations
 ^^^^^^^^^^^^^
