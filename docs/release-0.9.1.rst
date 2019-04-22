@@ -31,7 +31,7 @@ Ubuntu installs that followed :doc:`quick_start_linux`
 
 Systemd service files have been renamed in these docs to use *openrem-function* rather than *function-openrem*. To
 update the service files accordingly, follow the following steps. **This is optional**, but will make finding them
-easier (e.g. ``sudo systemctl status openrem[tab][tab]`` will list them!)
+easier (e.g. ``sudo systemctl status openrem-[tab][tab]`` will list them!)
 
 .. sourcecode:: console
 
