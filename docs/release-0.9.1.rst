@@ -15,7 +15,7 @@ originally for OpenREM 0.6 in 2014 or earlier, these may now be too old and need
 
 To check the Python version, activate the virtualenv if you are using one, then:
 
-.. sourecode:: console
+.. code-block:: console
 
     python -V
 
@@ -38,7 +38,7 @@ If the version is earlier than ``2.7.9``, then an upgrade is needed.
 * With a version of Python 2.7.9 or later (**not Python 3**), setuptools can be updated (activate virtualenv if using
   one:
 
-    .. sourcecode:: console
+    .. code-block:: console
 
         pip install setuptools -U
 
