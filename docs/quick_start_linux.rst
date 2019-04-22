@@ -296,7 +296,7 @@ console and you are in the ``site-packages/openrem/`` folder:
 
 Create the Gunicorn systemd service file:
 
-``sudo nano /etc/systemd/system/gunicorn-openrem.service``
+``sudo nano /etc/systemd/system/openrem-gunicorn.service``
 
 .. code-block:: bash
 
@@ -325,13 +325,13 @@ Set the new Gunicorn service to start on boot:
 
 .. code-block:: console
 
-    sudo systemctl enable gunicorn-openrem.service
+    sudo systemctl enable openrem-gunicorn.service
 
 Start the Gunicorn service, and restart the NGINX service:
 
 .. code-block:: console
 
-    sudo systemctl start gunicorn-openrem.service
+    sudo systemctl start openrem-gunicorn.service
     sudo systemctl restart nginx.service
 
 Test the webserver
@@ -343,7 +343,7 @@ You can check that NGINX and Gunicorn are running with the following two command
 
 .. code-block:: console
 
-    sudo systemctl status gunicorn-openrem.service
+    sudo systemctl status openrem-gunicorn.service
     sudo systemctl status nginx.service
 
 
@@ -388,7 +388,7 @@ First, create a Celery configuration file:
 
 Now create the systemd service files:
 
-``sudo nano /etc/systemd/system/celery-openrem.service``:
+``sudo nano /etc/systemd/system/openrem-celery.service``:
 
 .. code-block:: bash
 
@@ -415,7 +415,7 @@ Now create the systemd service files:
     [Install]
     WantedBy=multi-user.target
 
-``sudo nano /etc/systemd/system/flower-openrem.service``:
+``sudo nano /etc/systemd/system/openrem-flower.service``:
 
 .. code-block:: bash
 
@@ -441,10 +441,10 @@ Now register, set to start on boot, and start the services:
 .. code-block:: console
 
     sudo systemctl daemon-reload
-    sudo systemctl enable celery-openrem.service
-    sudo systemctl start celery-openrem.service
-    sudo systemctl enable flower-openrem.service
-    sudo systemctl start flower-openrem.service
+    sudo systemctl enable openrem-celery.service
+    sudo systemctl start openrem-celery.service
+    sudo systemctl enable openrem-flower.service
+    sudo systemctl start openrem-flower.service
 
 
 DICOM Store SCP
@@ -602,10 +602,10 @@ Log locations
 
 * OpenREM: ``/var/dose/log/``
 * Celery: ``/var/dose/log/default.log``
-* Celery systemd: ``sudo journalctl -u gunicorn-openrem``
+* Celery systemd: ``sudo journalctl -u openrem-celery``
 * NGINX: ``/var/log/nginx/``
 * Orthanc: ``/var/log/orthanc/Orthanc.log``
-* Gunicorn systemd: ``sudo journalctl -u gunicorn-openrem``
+* Gunicorn systemd: ``sudo journalctl -u openrem-gunicorn``
 
 
 .. _`WinSCP`: https://winscp.net
