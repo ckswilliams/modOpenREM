@@ -1,5 +1,5 @@
 ########################
-Upgrade to OpenREM 0.9.0
+Upgrade to OpenREM 0.9.1
 ########################
 
 ****************
@@ -22,7 +22,7 @@ Upgrading from version 0.8.x
 
 
 ****************************
-Upgrading from version 0.9.1
+Upgrading from version 0.9.0
 ****************************
 
 
@@ -30,7 +30,8 @@ Ubuntu installs that followed :doc:`quick_start_linux`
 ======================================================
 
 Systemd service files have been renamed in these docs to use *openrem-function* rather than *function-openrem*. To
-update the service files accordingly, follow the following steps. **This is optional**.
+update the service files accordingly, follow the following steps. **This is optional**, but will make finding them
+easier (e.g. ``sudo systemctl status openrem[tab][tab]`` will list them!)
 
 .. sourcecode:: console
 
