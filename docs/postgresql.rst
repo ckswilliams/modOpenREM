@@ -145,7 +145,7 @@ Restore the database
 If the restore is taking place on a different system,
 
 * ensure that PostgreSQL is installed and the same user has been added as was used to create the initial database
-  (see :ref:`create-psql-db`).
+  (see :ref:`create-psql-db`) -- check ``local_settings.py`` if you can't remember the the user name used!
 * Ensure that the new system has the same version of OpenREM installed as the system the database was backed up from.
 * Ensure the ``openrem/remapp/migrations/`` folder has no files in except __init__.py
 
