@@ -24,7 +24,10 @@ If the version is earlier than ``2.7.9``, then an upgrade is needed.
 **Ubuntu Linux**
 
 * Check which version of Ubuntu is installed (``lsb_release -a``)
-* If it is 14.04 LTS (Trusty), then an operating system upgrade or transfer to a new server is required (see later)
+* If it is 14.04 LTS (Trusty), then an operating system upgrade or migration to a new server is required. If migrating,
+  ensure the version of OpenREM installed on the new server is the same as the one on the old server, then
+  :ref:`restore-psql-linux` following the instructions and when up and running again perform the upgrade on the new
+  server
 * 16.04 LTS (Xenial) or later should have 2.7.11 or later available.
 * For other Linux distributions check in their archives for which versions are available.
 
@@ -36,7 +39,7 @@ If the version is earlier than ``2.7.9``, then an upgrade is needed.
 **Linux and Windows**
 
 * With a version of Python 2.7.9 or later (**not Python 3**), setuptools can be updated (activate virtualenv if using
-  one:
+  one):
 
     .. code-block:: console
 
