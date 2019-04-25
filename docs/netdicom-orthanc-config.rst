@@ -155,7 +155,7 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
       }
 
 Configure Orthanc to make use of the openrem_orthanc_config.lua file
------------------------------------------------------
+--------------------------------------------------------------------
 
 Edit ``orthanc.json`` which can be found in:
 
