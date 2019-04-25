@@ -75,21 +75,19 @@ Upgrade
 
     **Linux server:**
 
-    .. code-block::
+    .. code-block:: console
 
         pip install celery==4.3
 
-
     **Windows server:**
 
-    .. code-block::
+    .. code-block:: console
 
         pip install celery==3.1.25
 
-
 * Install the new version of OpenREM:
 
-    .. code-block:: bash
+    .. code-block:: console
 
         pip install openrem==0.9.0
 
