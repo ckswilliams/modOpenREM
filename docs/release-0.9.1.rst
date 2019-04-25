@@ -79,11 +79,13 @@ Upgrade
 
         pip install celery==4.3
 
+
     **Windows server:**
 
     .. code-block::
 
         pip install celery==3.1.25
+
 
 * Install the new version of OpenREM:
 
