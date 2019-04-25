@@ -10,8 +10,9 @@ Headline changes
 Upgrade preparation
 *******************
 
-Version 0.9 of OpenREM has a minimum Python 2.7 version and a minimum version of setuptools. If your installation was
-originally for OpenREM 0.6 in 2014 or earlier, these may now be too old and need updating.
+Version 0.9 of OpenREM has a minimum Python version of 2.7.9 (still needs to be 2.7 not 3) and a minimum version of
+setuptools. If your installation was originally for OpenREM 0.6 in 2014 or earlier, these may now be too old and need
+updating.
 
 To check the Python version, activate the virtualenv if you are using one, then:
 
@@ -38,8 +39,7 @@ If the version is earlier than ``2.7.9``, then an upgrade is needed.
 
 **Linux and Windows**
 
-* With a version of Python 2.7.9 or later (**not Python 3**), setuptools can be updated (activate virtualenv if using
-  one):
+* With a version of Python 2.7.9 or later, setuptools can be updated (activate virtualenv if using one):
 
     .. code-block:: console
 
@@ -89,7 +89,7 @@ Upgrade
 
     .. code-block:: console
 
-        pip install openrem==0.9.0
+        pip install openrem==0.9.1
 
 
 
@@ -110,7 +110,7 @@ Date format - changed with 0.8
 Set the date format for xlsx exports (need to check csv situation). Copy the following code into your
 ``local_settings.py`` file if you want to change it from ``dd/mm/yyy``:
 
-.. sourcecode:: python
+.. code-block:: python
 
     # Date format for exporting data to Excel xlsx files.
     # Default in OpenREM is dd/mm/yyyy. Override it by uncommenting and customising below; a full list of codes is available
@@ -160,7 +160,7 @@ edit your local_settings file
 Then change the e-mail section settings to reflect the e-mail server that is to
 be used:
 
-.. sourcecode:: python
+.. code-block:: python
 
     EMAIL_HOST = 'localhost'
     EMAIL_PORT = 25
@@ -185,7 +185,7 @@ In a shell/command window, move into the ``openrem`` folder:
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``virtualenvfolder\Lib\site-packages\openrem\``
 
-.. sourcecode:: bash
+.. code-block:: console
 
     python manage.py makemigrations remapp
     python manage.py migrate remapp
@@ -198,7 +198,7 @@ In the same shell/command window as you used above run the following command to 
 belonging to your previous OpenREM version and replace them with those belonging to the version you have
 just installed (assuming you are using a production web server...):
 
-.. sourcecode:: bash
+.. code-block:: console
 
     python manage.py collectstatic --clear
 
