@@ -14,6 +14,7 @@ pipelines:
       - step:
           script:
             - mv openrem/openremproject/local_settings.py{.example,}
+            - sed -i "s/INFO/DEBUG/g" openrem/openremproject/local_settings.py
             - mv openrem/openremproject/wsgi.py{.example,}
             - pip install -U tox
             - tox -e ci
@@ -26,6 +27,7 @@ pipelines:
       - step:
           script:
             - mv openrem/openremproject/local_settings.py{.example,}
+            - sed -i "s/INFO/DEBUG/g" openrem/openremproject/local_settings.py
             - mv openrem/openremproject/wsgi.py{.example,}
             - pip install -U tox
             - tox -e ci
