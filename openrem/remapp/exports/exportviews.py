@@ -132,6 +132,21 @@ def ctxlsx1(request, name=None, pat_id=None):
 
 @csrf_exempt
 @login_required
+def ct_xlsx_phe2019(request):
+    """View to launch celery task to export CT studies to xlsx file in PHE 2019 CT survey format
+
+    :param request: Contains the database filtering parameters and user details.
+    """
+    from django.shortcuts import redirect
+    from remapp.exports.ct_export import ct_phe_2019
+    if request.user.groups.filter(name="exportgroup"):
+        job = ct_phe_2019.delay(request.GET, request.user.id)
+        logger.debug(u'Export CT to XLSX job is {0}'.format(job))
+    return redirect(reverse_lazy('export'))
+
+
+@csrf_exempt
+@login_required
 def dxcsv1(request, name=None, pat_id=None):
     """View to launch celery task to export DX and CR studies to csv file
 

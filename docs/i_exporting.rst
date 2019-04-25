@@ -145,6 +145,38 @@ then you should further prepare the data as follows:
 Where patients have had both 2D and tomographic exposures in the same study, NCCPM will be able to match them up as they
 will have the same patient number in both surveys.
 
+PHE 2019 CT survey
+------------------
+
+This export is specific to the UK Public Health England (PHE) CT dose audit and exports the data in the correct
+format to copy and paste into the spreadsheet provided by PHE. More information about the survey and copies of the
+data collection spreadsheet can be found on the `CT User Group (CTUG) website`_.
+
+The introduction and guidance tabs of the PHE data collection spreadsheet
+should be read and the 'Your details' sheet completed. Then the 'Patient and Protocol data 1' sheet
+should be copied and renamed appropriately for each protocol and scanner combination that you will be submitting.
+The first 142 rows of each sheet should be filled in manually with all the details for that protocol, though looking at
+study data in OpenREM may help to answer some of the questions.
+
+The CT studies should then be filtered in OpenREM; by date (ideally previous 12 months, no older than 2017), by scanner
+(each scanner and protocol combination should be a new sheet), by minimum age of 16, and by study description (or
+combination of factors to specify a particular protocol). The guidance specifies patients between 50 to 90 kg -- if you
+have weight data in OpenREM this filter could be added, but the values form part of the output anyway so it isn't
+essential. It would however enable filtering out of those studies that don't have weight data if the majority does. If
+patient weight data isn't available in OpenREM then just ensure the sample is large!
+
+Finally the studies should be filtered to have exactly the right number of each type of acquisition for that protocol.
+This might be one spiral, one localiser and two stationary (bolus tracking) acquisitions for example. Localisers do not
+appear in the export so are less important to specify, but more localisers than usual might indicate a deviation from
+the standard protocol.
+
+The export can then be started and monitored in the normal way by clicking on the 'PHE 2019 survey' button. The
+resulting export will be in xlsx format, with one header row. The data from row 2 onwards can be copied and pasted
+directly into row 150 onwards of the Patient and Protocol sheet of the PHE data collection spreadsheet. Column AL is
+for patient comments, and OpenREM uses this cell to record the series types that have been exported for each study. This
+can therefore be used to double check the data is as you expect it to be. If the protocol has more than four series
+excluding localisers, the data is continued in the same format from column AM onwards.
+
 Opening csv exports in Excel
 ============================
 
@@ -165,3 +197,4 @@ To correctly render characters in csv files with Excel, you will need to follow 
 
 ..  _`#116`: https://bitbucket.org/openrem/openrem/issue/116/
 ..  _ACR MQCM 1999 Equivalent code.: http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4014.html
+..  _CT User Group (CTUG) website: http://ctug.org.uk/ctsurvey.html

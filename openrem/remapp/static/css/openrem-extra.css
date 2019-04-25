@@ -367,7 +367,7 @@ ul.no-marker {
 #id_ct_acquisition_type {
     list-style: none;
     padding: 0;
-    height: 5em;
-    overflow: scroll;
-    overflow-x: hidden;
+    /*height: 5em;*/
+    /*overflow: scroll;*/
+    /*overflow-x: hidden;*/
 }

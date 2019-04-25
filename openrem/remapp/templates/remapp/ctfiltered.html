@@ -42,6 +42,10 @@
                            class="btn btn-default btn-sm" role="button">With both</a>
                     {% endif %}
                     </p>
+              <p>
+                  <a href="{% url 'ct_xlsx_phe2019' %}?{{ request.GET.urlencode }}"
+                     class="btn btn-default btn-sm" role="button">PHE 2019 survey</a>
+              </p>
 
             {% else %}
                 <p>

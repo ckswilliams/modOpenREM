@@ -279,7 +279,7 @@ def ct_csv(filterdict, pid=False, name=None, patid=None, user=None):
 
 
 def _generate_all_data_headers_ct(max_events):
-    """Generate the headers for CT that repeat once for each series of the exaqm with the most series in
+    """Generate the headers for CT that repeat once for each series of the exam with the most series in
 
     :param max_events: maximum number of times to repeat headers
     :return: list of headers
@@ -435,3 +435,176 @@ def _ct_get_series_data(s):
         s.comment,
         ]
     return seriesdata
+
+
+@shared_task
+def ct_phe_2019(filterdict, user=None):
+    """Export filtered CT database data in the format required for the 2019 Public Health England
+    CT dose survey
+
+    :param filterdict: Queryset of studies to export
+    :param user:  User that has started the export
+    :return: Saves Excel file into Media directory for user to download
+    """
+
+    import datetime
+    from decimal import Decimal
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import ct_acq_filter
+    import uuid
+
+    tsk = Exports.objects.create()
+
+    tsk.task_id = ct_phe_2019.request.id
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
+    tsk.modality = u"CT"
+    tsk.export_type = u"PHE CT 2019 export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
+    tsk.includes_pid = False
+    tsk.export_user_id = user
+    tsk.save()
+
+    tmp_xlsx, book = create_xlsx(tsk)
+    if not tmp_xlsx:
+        exit()
+
+    # Get the data!
+    exams = ct_acq_filter(filterdict, pid=False).qs
+
+    tsk.num_records = exams.count()
+    if abort_if_zero_studies(tsk.num_records, tsk):
+        return
+
+    tsk.progress = u'{0} studies in query.'.format(tsk.num_records)
+    tsk.save()
+
+    headings = [
+        u'Patient No',
+        u'Age (yrs)',
+        u'Weight (kg)',
+        u'Height (cm)',
+    ]
+    for x in range(4):  #pylint: disable=unused-variable
+        headings += [
+            u'Imaged length',
+            u'Start position',
+            u'End position',
+            u'kV',
+            u'CTDI phantom',
+            u'Scan FOV (mm)',
+            u'CTDIvol (mGy)*',
+            u'DLP (mGy.cm)*',
+        ]
+    headings += [
+        u"Total DLP* (whole scan) mGy.cm",
+        u"Patient comments",
+    ]
+    sheet = book.add_worksheet("PHE CT 2019")
+    sheet.write_row(0, 0, headings)
+
+    num_rows = exams.count()
+    for row, exam in enumerate(exams):
+        tsk.progress = u"Writing study {0} of {1}".format(row+1, num_rows)
+        tsk.save()
+
+        exam_data = []
+        comments = []
+        patient_age_decimal = None
+        patient_size = None
+        patient_weight = None
+        try:
+            patient_study_module = exam.patientstudymoduleattr_set.get()
+            patient_age_decimal = patient_study_module.patient_age_decimal
+            patient_size = patient_study_module.patient_size
+            try:
+                patient_size = patient_study_module.patient_size * Decimal(100.)
+            except TypeError:
+                pass
+        except ObjectDoesNotExist:
+            logger.debug(u"PHE CT 2019 export: patientstudymoduleattr_set object does not exist."
+                         u" AccNum {0}, Date {1}".format(exam.accession_number, exam.study_date))
+        exam_data += [
+            row+1,
+            patient_age_decimal,
+            patient_weight,
+            patient_size,
+        ]
+        series_index = 0
+        for event in exam.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id'):
+            try:
+                ct_acquisition_type = event.ct_acquisition_type.code_meaning
+                if ct_acquisition_type in u"Constant Angle Acquisition":
+                    continue
+                comments += [ct_acquisition_type, ]
+            except (ObjectDoesNotExist, AttributeError):
+                comments += ["unknown type", ]
+            if series_index == 4:
+                exam_data += ['', '', ]
+            series_index += 1
+            scanning_length = None
+            start_position = None
+            end_position = None
+            kv = None
+            ctdi_phantom = None
+            scan_fov = None
+            try:
+                scanning_length_data = event.scanninglength_set.get()
+                scanning_length = scanning_length_data.scanning_length
+                start_position = scanning_length_data.bottom_z_location_of_scanning_length
+                end_position = scanning_length_data.top_z_location_of_scanning_length
+            except ObjectDoesNotExist:
+                pass
+            try:
+                source_parameters = event.ctxraysourceparameters_set.order_by('pk')
+                if source_parameters.count() == 2:
+                    kv = u"{0} | {1}".format(source_parameters[0].kvp, source_parameters[1].kvp)
+                else:
+                    kv = source_parameters[0].kvp
+            except (ObjectDoesNotExist, IndexError):
+                pass
+            try:
+                if event.ctdiw_phantom_type.code_value == u'113691':
+                    ctdi_phantom = u'32 cm'
+                elif event.ctdiw_phantom_type.code_value == u'113690':
+                    ctdi_phantom = u'16 cm'
+                else:
+                    ctdi_phantom = event.ctdiw_phantom_type.code_meaning
+            except AttributeError:
+                pass
+            exam_data += [
+                scanning_length,
+                start_position,
+                end_position,
+                kv,
+                ctdi_phantom,
+                scan_fov,
+                event.mean_ctdivol,
+                event.dlp,
+            ]
+        ct_dose_length_product_total = None
+        try:
+            ct_accumulated = exam.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
+            ct_dose_length_product_total = ct_accumulated.ct_dose_length_product_total
+        except ObjectDoesNotExist:
+            pass
+        sheet.write_row(row+1, 0, exam_data)
+        sheet.write(row+1, 36, ct_dose_length_product_total)
+        patient_comment_cell = u"Series types: " + u", ".join(comments)
+        sheet.write(row+1, 37, patient_comment_cell)
+    book.close()
+    tsk.progress = u"PHE CT 2019 export complete"
+    tsk.save()
+
+    xlsxfilename = u"PHE_CT2019{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    write_export(tsk, xlsxfilename, tmp_xlsx, datestamp)
+
+
+
+
+
+

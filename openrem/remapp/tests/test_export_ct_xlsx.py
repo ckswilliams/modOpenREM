@@ -1,12 +1,12 @@
 # This Python file uses the following encoding: utf-8
 # test_export_ct_xlsx.py
 
-import hashlib
 import os
 from django.contrib.auth.models import User, Group
 from django.test import TestCase, RequestFactory
+import xlrd
 from remapp.extractors import rdsr
-from remapp.exports.ct_export import ctxlsx
+from remapp.exports.ct_export import ctxlsx, ct_csv, ct_phe_2019
 from remapp.models import PatientIDSettings, Exports
 
 
@@ -50,7 +50,6 @@ class ExportCTxlsx(TestCase):
 
         ctxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
 
-        import xlrd
         task = Exports.objects.all()[0]
 
         book = xlrd.open_workbook(task.filename.path)
@@ -146,3 +145,31 @@ class ExportCTxlsx(TestCase):
 
         task = Exports.objects.all()[0]
         self.assertEqual(4, task.num_records)
+
+    def test_export_phe(self):
+        filter_set = {"num_spiral_events": "2"}
+
+        ct_phe_2019(filter_set, user=self.user)
+
+        task = Exports.objects.order_by('pk')[0]
+        self.assertEqual(3, task.num_records)
+
+        book = xlrd.open_workbook(task.filename.path)
+        phe_sheet = book.sheet_by_name('PHE CT 2019')
+
+        self.assertEqual(phe_sheet.cell_value(1, 4), 487)  # first series imaged length
+        self.assertEqual(phe_sheet.cell_value(2, 4), 5)
+        self.assertEqual(phe_sheet.cell_value(3, 4), 418.75)
+        self.assertEqual(phe_sheet.cell_value(1, 10), 5.3)  # first series CTDIvol
+        self.assertEqual(phe_sheet.cell_value(2, 10), 32.83)
+        self.assertEqual(phe_sheet.cell_value(3, 10), 3.23)
+        self.assertEqual(phe_sheet.cell_value(1, 19), 251.2)  # second series DLP
+        self.assertEqual(phe_sheet.cell_value(2, 19), 429.19)
+        self.assertEqual(phe_sheet.cell_value(3, 19), 259.85)
+        self.assertEqual(phe_sheet.cell_value(1, 36), 502.4)  # total DLP
+        self.assertEqual(phe_sheet.cell_value(2, 36), 2002.39)
+        self.assertEqual(phe_sheet.cell_value(3, 36), 415.82)
+
+        # cleanup
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
+        task.delete()  # not necessary, by hey, why not?

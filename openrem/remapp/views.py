@@ -1358,7 +1358,7 @@ def ct_detail_view(request, pk=None):
         return redirect(reverse_lazy('ct_summary_list_filter'))
 
     events_all = study.ctradiationdose_set.get().ctirradiationeventdata_set.select_related(
-        'ct_acquisition_type', 'ctdiw_phantom_type').all()
+        'ct_acquisition_type', 'ctdiw_phantom_type').order_by('pk')
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
