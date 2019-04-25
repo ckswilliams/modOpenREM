@@ -8,13 +8,13 @@ Install Python 2.7.x and pip
 * Windows – instructions and downloads are available at `python.org <https://www.python.org/downloads>`_
 * Linux – likely to be installed already except on newer distributions
 
-  Check by typing ``python -V`` - if the response is ``Python 2.7.x`` (x can be any number) then move on to installing
-  pip.
+  Check by typing ``python -V`` - if the response is ``Python 2.7.x`` (x can be any number 9 or greater) then move on to
+  installing pip.
 
   If the response is that the command can't be found, you will need to install Python. On Ubuntu, Python 2.7 is python
   and Python 3.x is Python3::
 
-      sudo apt-get install python
+      sudo apt install python
 
 Add Python and the scripts folder to the path
 ---------------------------------------------

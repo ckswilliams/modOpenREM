@@ -127,8 +127,8 @@ Install Python packages
     There will be error messages when you install pynetdicom from this source. As long as the final line is
     ``Successfully installed pynetdicom-0.8.2b2`` then everything is ok!
 
-Addd orthanc and www-data users to openrem group
-------------------------------------------------
+Add orthanc and www-data users to openrem group
+-----------------------------------------------
 
 .. code-block:: console
 
@@ -296,7 +296,7 @@ console and you are in the ``site-packages/openrem/`` folder:
 
 Create the Gunicorn systemd service file:
 
-``sudo nano /etc/systemd/system/gunicorn-openrem.service``
+``sudo nano /etc/systemd/system/openrem-gunicorn.service``
 
 .. code-block:: bash
 
@@ -325,13 +325,13 @@ Set the new Gunicorn service to start on boot:
 
 .. code-block:: console
 
-    sudo systemctl enable gunicorn-openrem.service
+    sudo systemctl enable openrem-gunicorn.service
 
 Start the Gunicorn service, and restart the NGINX service:
 
 .. code-block:: console
 
-    sudo systemctl start gunicorn-openrem.service
+    sudo systemctl start openrem-gunicorn.service
     sudo systemctl restart nginx.service
 
 Test the webserver
@@ -343,7 +343,7 @@ You can check that NGINX and Gunicorn are running with the following two command
 
 .. code-block:: console
 
-    sudo systemctl status gunicorn-openrem.service
+    sudo systemctl status openrem-gunicorn.service
     sudo systemctl status nginx.service
 
 
@@ -388,7 +388,7 @@ First, create a Celery configuration file:
 
 Now create the systemd service files:
 
-``sudo nano /etc/systemd/system/celery-openrem.service``:
+``sudo nano /etc/systemd/system/openrem-celery.service``:
 
 .. code-block:: bash
 
@@ -415,7 +415,7 @@ Now create the systemd service files:
     [Install]
     WantedBy=multi-user.target
 
-``sudo nano /etc/systemd/system/flower-openrem.service``:
+``sudo nano /etc/systemd/system/openrem-flower.service``:
 
 .. code-block:: bash
 
@@ -441,10 +441,10 @@ Now register, set to start on boot, and start the services:
 .. code-block:: console
 
     sudo systemctl daemon-reload
-    sudo systemctl enable celery-openrem.service
-    sudo systemctl start celery-openrem.service
-    sudo systemctl enable flower-openrem.service
-    sudo systemctl start flower-openrem.service
+    sudo systemctl enable openrem-celery.service
+    sudo systemctl start openrem-celery.service
+    sudo systemctl enable openrem-flower.service
+    sudo systemctl start openrem-flower.service
 
 
 DICOM Store SCP
@@ -591,26 +591,21 @@ Enable RadbbitMQ queue management interface
 
     sudo rabbitmq-plugins enable rabbitmq_management
 
-Now you need to create a RabbitMQ Administrator. The password is printed to the terminal, so add a space before
-the ``sudo`` so that the command does not get saved to your history file, and then we will ``clear`` the terminal so it
-isn't displayed any longer:
+**Optional -- RabbitMQ Administrator**
 
-.. code-block:: console
-
-    sudo rabbitmqctl add_user <username> <password>
-    clear
-    sudo rabbitmqctl set_user_tags <username> administrator
-    sudo rabbitmqctl set_permissions -p / <username> "." "." ".*"
+This is not required unless you wish to interact with the RabbitMQ management interface directly. Most
+functions can be carried out in the OpenREM interface instead. If you do wish to create a user for this
+purpose, see the general instructions to :ref:`enableRabbitMQ`.
 
 Log locations
 ^^^^^^^^^^^^^
 
 * OpenREM: ``/var/dose/log/``
 * Celery: ``/var/dose/log/default.log``
-* Celery systemd: ``sudo journalctl -u gunicorn-openrem``
+* Celery systemd: ``sudo journalctl -u openrem-celery``
 * NGINX: ``/var/log/nginx/``
 * Orthanc: ``/var/log/orthanc/Orthanc.log``
-* Gunicorn systemd: ``sudo journalctl -u gunicorn-openrem``
+* Gunicorn systemd: ``sudo journalctl -u openrem-gunicorn``
 
 
 .. _`WinSCP`: https://winscp.net
