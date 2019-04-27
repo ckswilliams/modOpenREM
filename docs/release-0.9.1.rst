@@ -6,6 +6,13 @@ Upgrade to OpenREM 0.9.1
 Headline changes
 ****************
 
+* Imports: fixed imports for GE surgical flat panel c-arm with irregular value types and value meanings
+* Interface: added feature to filter by specific number of exposure types -- CT only
+* Query-retrieve: new option to get SR series when PACS returns empty series level response
+* Query-retrieve: handle illegal missing instance number in image level response
+* Query-retrieve: improved logging
+* Exports: added export to UK PHE 2019 CT survey format
+
 *******************
 Upgrade preparation
 *******************
