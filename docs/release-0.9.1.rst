@@ -53,6 +53,13 @@ If the version is earlier than ``2.7.9``, then an upgrade is needed.
 
         pip install setuptools -U
 
+***************************************************
+Upgrading an OpenREM server with no internet access
+***************************************************
+
+Follow the instructions found at :doc:`upgrade-offline`, before returning here to update the configuration, migrate the
+database and complete the upgrade.
+
 ***************************************
 Upgrading from version 0.7.3 or earlier
 ***************************************
@@ -99,7 +106,7 @@ Upgrade
 
         pip install openrem==0.9.1
 
-
+.. _update_configuration091:
 
 Update the configuration
 ========================
