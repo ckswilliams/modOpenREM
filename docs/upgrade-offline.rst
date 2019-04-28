@@ -61,23 +61,27 @@ On the OpenREM server without internet access
 
 * If you are using a virtualenv, activate it
 
-  .. code-block:: console
+Upgrade setuptools:
+
+.. code-block:: console
 
     pip install --no-index --find-links=openremfiles setuptools -U
 
-**Linux server:**
+Install specific version of Celery:
 
-.. code-block:: console
+    **Linux server:**
 
-    pip install celery==4.3
+    .. code-block:: console
 
-**Windows server:**
+        pip install celery==4.3
 
-.. code-block:: console
+    **Windows server:**
 
-    pip install celery==3.1.25
+    .. code-block:: console
 
-**Both**
+        pip install celery==3.1.25
+
+Install OpenREM:
 
 .. code-block:: console
 
