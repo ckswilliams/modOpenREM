@@ -12,6 +12,7 @@ Headline changes
 * Query-retrieve: handle illegal missing instance number in image level response
 * Query-retrieve: improved logging
 * Exports: added export to UK PHE 2019 CT survey format
+* General documentation and interface improvements, bug fixes, and changes to prepare for Python 3
 
 *******************
 Upgrade preparation
