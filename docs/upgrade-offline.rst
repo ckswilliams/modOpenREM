@@ -35,6 +35,8 @@ Download specific version of Celery:
 
         pip download -d openremfiles celery==3.1.25
 
+Download OpenREM and all other dependencies:
+
 .. code-block:: console
 
     pip download -d openremfiles openrem==0.9.1
@@ -59,7 +61,7 @@ On the OpenREM server without internet access
 
 * If you are using a virtualenv, activate it
 
-.. code-block:: console
+  .. code-block:: console
 
     pip install --no-index --find-links=openremfiles setuptools -U
 
@@ -76,6 +78,8 @@ On the OpenREM server without internet access
     pip install celery==3.1.25
 
 **Both**
+
+.. code-block:: console
 
     pip install --no-index --find-links=openremfiles openrem==0.9.1
 
