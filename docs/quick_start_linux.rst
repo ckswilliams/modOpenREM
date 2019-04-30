@@ -88,7 +88,7 @@ The ``\`` just allows the ``sudo apt install`` command to spread to two lines --
     sudo apt update
     sudo apt upgrade
     sudo apt install python python-pip virtualenv rabbitmq-server \
-    postgresql nginx orthanc dcmtk default-jre
+    postgresql nginx orthanc dcmtk default-jre zip
 
     cd /var/dose/pixelmed
     wget http://www.dclunie.com/pixelmed/software/webstart/pixelmed.jar
