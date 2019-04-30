@@ -3,8 +3,8 @@ Offline Installation on Windows
 *******************************
 
 In order to carry out an offline installation you will need to download the OpenREM package and dependencies.
-The instructions below should work for downloading on any operating system, as long as you have Python 2.7 and a
-reasonably up to date version of pip installed.
+The instructions below should work for downloading on any operating system, as long as you have Python 2.7 (version
+2.7.9 or later) and a reasonably up to date version of pip installed.
 
 If you have trouble when installing the Python packages due to incorrect architecture, you may need to either download
 on a Windows system similar to the server (matching 32-bit/64-bit), or to download the files from
@@ -51,19 +51,34 @@ download them all:
 .. code-block:: console
 
     mkdir openremfiles
-    pip download -d openremfiles celery==3.1.25  # this line not required for Linux
+    pip download -d openremfiles setuptools
+
+Download specific version of Celery:
+
+    **Linux server:**
+
+    .. code-block:: console
+
+        pip download -d openremfiles celery==4.3
+
+    **Windows server:**
+
+    .. code-block:: console
+
+        pip download -d openremfiles celery==3.1.25
+
+Download OpenREM and all other dependencies:
+
+.. code-block:: console
+
     pip download -d openremfiles openrem
     pip download -d openremfiles psycopg2-binary
     pip download --no-deps -d openremfiles https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
-.. note::
+.. admonition:: pynetdicom version
 
-    Older versions of pip may need to use the following command instead:
-
-    ``pip install -d openremfiles openrem``
-
-    * Note: this  of ``pynetdicom`` is modified in comparison to the version in PyPI, and will malfunction if you use
-      the official version
+    This  of ``pynetdicom`` is modified in comparison to the version in PyPI, and will malfunction if you use
+    the official version
 
 Copy everything to the Windows machine
 --------------------------------------
@@ -88,9 +103,30 @@ Installation of the python packages
 
 In a console, navigate to the directory that your ``openremfiles`` directory is in, and
 
-.. sourcecode:: python
+Ensure setuptools is up to date:
 
-    pip install --no-index --find-links=openremfiles celery==3.1.25  # this link not required for Linux
+.. code-block:: console
+
+    pip install --no-index --find-links=openremfiles setuptools -U
+
+Install specific version of Celery:
+
+    **Linux server:**
+
+    .. code-block:: console
+
+        pip install celery==4.3
+
+    **Windows server:**
+
+    .. code-block:: console
+
+        pip install celery==3.1.25
+
+Install OpenREM and other dependencies:
+
+.. code-block:: python
+
     pip install --no-index --find-links=openremfiles openrem  # where openremfiles is the directory you created
     pip install --no-index --find-links=openremfiles psycopg2-binary
 
