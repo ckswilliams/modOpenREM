@@ -92,7 +92,7 @@ Upgrade
 
     .. code-block:: console
 
-        pip install celery==4.3
+        pip install celery==4.2.2
 
     **Windows server:**
 

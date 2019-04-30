@@ -59,7 +59,7 @@ Download specific version of Celery:
 
     .. code-block:: console
 
-        pip download -d openremfiles celery==4.3
+        pip download -d openremfiles celery==4.2.2
 
     **Windows server:**
 
@@ -115,7 +115,7 @@ Install specific version of Celery:
 
     .. code-block:: console
 
-        pip install celery==4.3
+        pip install celery==4.2.2
 
     **Windows server:**
 
