@@ -29,6 +29,7 @@ Edit the top two sections
 
     -- Set this to 'mkdir' on Windows, or 'mkdir -p' on Linux
     local mkdir_cmd = 'mkdir'
+    -- local mkdir_cmd = 'mkdir -p'
 
     -- Set this to '\\'' on Windows, or '/' on Linux
     local dir_sep = '\\'
@@ -41,14 +42,17 @@ Edit the top two sections
     local physics_to_keep_folder = 'E:\\conquest\\dicom\\physics\\'
 
     -- Set this to the path and name of your zip utility, and include any switches that
-    -- are needed to create an archive (used with physics-related images)
-    -- You can install and use the 'zip' command on Linux without any switches
-    local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a'
+    -- are needed to create an archive and include all files in a supplied folder
+    -- (used with physics-related images)
+    local zip_executable = 'D:\\Server_Apps\\7zip\\7za.exe a -r'
+    -- For Linux use the path to your zip command with the -r switch, such as:
+    -- local zip_executable = '/usr/bin/zip -r'
 
     -- Set this to the path and name of your remove folder command, including switches
     -- for it to be quiet (used with physics-related images)
-    -- You can use the command 'rm -r' if you are using Linux
     local rmdir_cmd = 'rmdir /s/q'
+    -- You can use the command 'rm -r' if you are using Linux:
+    -- local rmdir_cmd = 'rm -r'
     -------------------------------------------------------------------------------------
 
 
@@ -118,7 +122,8 @@ Note: the folder must exist and Orthanc must be able to write to it. On Ubuntu L
 * Using Orthanc to collect Physics QA images:
 
   **use_physics_filtering** set this to ``false`` if you don't want to use this facility. If this is false, the other
-  physics image related values don't matter. If it is ``true``, the:
+  physics image related values don't matter. If it is ``true``, then ensure that 7zip or similar (Windows) or zip
+  (Linux) are installed, and:
 
   **physics_to_keep_folder** *Optional* Set this to the path where you want to keep physics-related DICOM images::
 
