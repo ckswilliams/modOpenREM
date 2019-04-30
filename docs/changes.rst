@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.9.1 (2019-04-xx)
-------------------
+0.9.1b1 (2019-04-30)
+--------------------
 * `#748`_  Charts: fixed error that caused blank charts if series per system was selected
 * `#743`_  Testing: added configuration to enable testing with default logging
 * `#742`_  Interface: sorting of task tables now works in Internet Explorer 11
