@@ -169,6 +169,8 @@ class ExportCTxlsx(TestCase):
         self.assertEqual(phe_sheet.cell_value(1, 36), 502.4)  # total DLP
         self.assertEqual(phe_sheet.cell_value(2, 36), 2002.39)
         self.assertEqual(phe_sheet.cell_value(3, 36), 415.82)
+        self.assertEqual(phe_sheet.cell_value(3, 2), 78.2)
+        self.assertEqual(phe_sheet.cell_value(3, 3), 164)
 
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
