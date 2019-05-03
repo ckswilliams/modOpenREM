@@ -85,7 +85,6 @@ class ExportCTxlsx(TestCase):
 
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
-        task.delete()  # not necessary, by hey, why not?
 
     def test_zero_filter(self):
         """Test error handled correctly when empty filter.
@@ -116,6 +115,9 @@ class ExportCTxlsx(TestCase):
         task = Exports.objects.all()[0]
         self.assertEqual(4, task.num_records)
 
+        # cleanup
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
+
     def test_acq_type_filter_sequenced(self):
         """Test to check that filtering CT by acquisition type works
         as expected.
@@ -131,6 +133,9 @@ class ExportCTxlsx(TestCase):
         task = Exports.objects.all()[0]
         self.assertEqual(1, task.num_records)
 
+        # cleanup
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
+
     def test_acq_type_filter_spiral_and_sequenced(self):
         """Test to check that filtering CT by acquisition type works
         as expected.
@@ -145,6 +150,9 @@ class ExportCTxlsx(TestCase):
 
         task = Exports.objects.all()[0]
         self.assertEqual(4, task.num_records)
+
+        # cleanup
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
 
     def test_export_phe(self):
         filter_set = {"num_spiral_events": "2"}
@@ -174,4 +182,3 @@ class ExportCTxlsx(TestCase):
 
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
-        task.delete()  # not necessary, by hey, why not?

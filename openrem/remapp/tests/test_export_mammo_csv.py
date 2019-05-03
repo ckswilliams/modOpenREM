@@ -71,7 +71,7 @@ class ExportMammoCSV(TestCase):
 
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
-        task.delete()  # not necessary, by hey, why not?
+
 
 class ExportMammoCSVNHSBSP(TestCase):
     def setUp(self):
@@ -146,4 +146,6 @@ class ExportMammoCSVNHSBSP(TestCase):
         self.assertAlmostEquals(rcc3.kV.values[0], 20.0)
         self.assertAlmostEquals(rcc3.Thickness.values[0], 128.0)
 
+        # cleanup
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
 
