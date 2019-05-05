@@ -2,8 +2,9 @@
 OpenREM version history
 =======================
 
-0.9.1b1 (2019-04-30)
+0.9.1b2 (2019-05-xx)
 --------------------
+* `#752`_  Exports: fixed missing weight field in PHE CT 2019 export
 * `#748`_  Charts: fixed error that caused blank charts if series per system was selected
 * `#743`_  Testing: added configuration to enable testing with default logging
 * `#742`_  Interface: sorting of task tables now works in Internet Explorer 11
