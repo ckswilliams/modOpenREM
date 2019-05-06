@@ -524,6 +524,7 @@ def ct_phe_2019(filterdict, user=None):
                 patient_size = patient_study_module.patient_size * Decimal(100.)
             except TypeError:
                 pass
+            patient_weight = patient_study_module.patient_weight
         except ObjectDoesNotExist:
             logger.debug(u"PHE CT 2019 export: patientstudymoduleattr_set object does not exist."
                          u" AccNum {0}, Date {1}".format(exam.accession_number, exam.study_date))
