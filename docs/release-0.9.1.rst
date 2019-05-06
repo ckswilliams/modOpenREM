@@ -104,7 +104,7 @@ Upgrade
 
     .. code-block:: console
 
-        pip install openrem==0.9.1b1
+        pip install openrem==0.9.1b2
 
 .. _update_configuration091:
 

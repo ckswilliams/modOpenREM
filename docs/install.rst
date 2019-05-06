@@ -13,12 +13,12 @@ For Linux users, the correct version of Celery will be install automatically wit
     pip install celery==3.1.25
 
 
-Install OpenREM 0.9.1b1
+Install OpenREM 0.9.1b2
 =======================
 
 .. sourcecode:: bash
 
-    pip install openrem==0.9.1b1
+    pip install openrem==0.9.1b2
 
 *Will need* ``sudo`` *or equivalent if installing on linux without using a virtualenv*
 

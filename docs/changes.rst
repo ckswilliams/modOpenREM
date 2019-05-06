@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.9.1b2 (2019-05-xx)
+0.9.1b2 (2019-05-06)
 --------------------
 * `#752`_  Exports: fixed missing weight field in PHE CT 2019 export
 * `#748`_  Charts: fixed error that caused blank charts if series per system was selected
