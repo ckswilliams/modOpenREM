@@ -1319,10 +1319,19 @@ def _generalstudymoduleattributes(dataset, g, ch):
     try:
         template_identifier = dataset.ContentTemplateSequence[0].TemplateIdentifier
     except AttributeError:
-        logger.error(u"Study UID {0} of modality {1} has no template sequence - incomplete RDSR. Aborting.".format(
-            g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset)))
-        g.delete()
-        return
+        try:
+            if dataset.ContentSequence[0].ConceptCodeSequence[0].CodeValue == u"113704":
+                template_identifier = '10001'
+            else:
+                logger.error(u"Study UID {0} of modality {1} has no template sequence - incomplete RDSR. "
+                             u"Aborting.".format(g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset)))
+                g.delete()
+                return
+        except AttributeError:
+            logger.error(u"Study UID {0} of modality {1} has no template sequence - incomplete RDSR. Aborting.".format(
+                g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset)))
+            g.delete()
+            return
     if template_identifier == '10001':
         _projectionxrayradiationdose(dataset, g, 'projection', ch)
     elif template_identifier == '10011':
