@@ -2,6 +2,10 @@
 OpenREM version history
 =======================
 
+0.9.2 (2019-xx-xx)
+------------------
+* `#746`_  Imports: enabled import of GE Elite Mini View C-arm RDSR with no template declaration
+
 0.9.1b2 (2019-05-06)
 --------------------
 * `#752`_  Exports: fixed missing weight field in PHE CT 2019 export
