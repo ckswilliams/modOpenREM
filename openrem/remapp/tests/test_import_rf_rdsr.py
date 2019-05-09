@@ -213,7 +213,7 @@ class ImportRFRDSRGEOECMiniView(TestCase):
     Tests for importing an RDSR from a GE ELite Mini View C-Arm that doesn't declare a template type
     """
 
-    def _disable_test_ge_mini_view_rdsr(self):
+    def test_ge_mini_view_rdsr(self):
         """Tests that GE OEC Elite Mini View RDSR imports correctly as no template is declared
 
         :return: None
