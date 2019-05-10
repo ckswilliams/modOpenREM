@@ -106,6 +106,11 @@ Upgrade
 
         pip install openrem==0.9.1b2
 
+    ..  Note::
+
+	    If you are running your website in a virtual directory, you have to update the reverse.py file.
+	    See  instructions the ``Update the reverse.py`` paragraph in doc:`virtual_directory`.
+
 .. _update_configuration091:
 
 Update the configuration
