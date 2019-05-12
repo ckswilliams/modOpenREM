@@ -106,11 +106,6 @@ Upgrade
 
         pip install openrem==0.9.1b2
 
-    ..  Note::
-
-	    If you are running your website in a virtual directory, you have to update the reverse.py file.
-	    See  instructions the ``Update the reverse.py`` paragraph in doc:`virtual_directory`.
-
 .. _update_configuration091:
 
 Update the configuration
@@ -221,6 +216,16 @@ just installed (assuming you are using a production web server...):
 .. code-block:: console
 
     python manage.py collectstatic --clear
+
+..  admonition:: Virtual directory users
+
+    If you are running your website in a virtual directory, you have to also update the reverse.js file:
+
+    .. code-block:: console
+
+        python manage.py collectstatic_js_reverse
+
+    See  :doc:`virtual_directory` for more details.
 
 Enable task management - changed in 0.9.0
 =========================================
