@@ -43,7 +43,7 @@
                 $("#button-id-recalc_all_summed_data").val("Recalculating - this may take some time").attr("disabled", true);
                 $.ajax({
                     type: "GET",
-                    url: "/admin/rfrecalculateaccumdoses/",
+                    url: "{%  url 'rf_recalculate_accum_doses' %}",
                     data: requestData,
                     dataType: "json",
                     success: function( json ) {
