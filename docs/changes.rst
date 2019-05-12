@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.1b2 (2019-05-06)
 --------------------
+* `#753`_  Query-retrieve: removed patient age fields from study level C-FIND that were not used
 * `#752`_  Exports: fixed missing weight field in PHE CT 2019 export
 * `#748`_  Charts: fixed error that caused blank charts if series per system was selected
 * `#743`_  Testing: added configuration to enable testing with default logging
