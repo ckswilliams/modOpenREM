@@ -128,21 +128,45 @@
 
 {% block mainblock %}
 
-  <div class="pagination">
-    <span class="step-links">
-        {% if studies.has_previous %}
-            <a href="?page={{ studies.previous_page_number }}">previous</a>
-        {% endif %}
+                    {% if studies.has_other_pages %}
+                    {% load proper_paginate %}
+                    {% load url_replace %}
+                    <ul class="pagination">
+                        {% if studies.number == 1 %}
+                            <li class="disabled"><span>⇤</span></li>
+                        {% else %}
+                            <li><a class="page-link" href="?{% url_replace request 'page' 1 %}">⇤</a></li>
+                        {% endif %}
+                        {% if studies.has_previous %}
+                            <li><a class="page-link"
+                                   href="?{% url_replace request 'page' studies.previous_page_number %}">&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="disabled"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in studies.paginator|proper_paginate:studies.number %}
+                            {% if studies.number == i %}
+                                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                            {% else %}
+                                <li><a class="page-link" href="?{% url_replace request 'page' i %}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if studies.has_next %}
+                            <li><a class="page-link"
+                                   href="?{% url_replace request 'page' studies.next_page_number %}">&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled"><span>&raquo;</span></li>
+                        {% endif %}
+                        {% if studies.number == studies.paginator.num_pages %}
+                            <li class="disabled"><span>⇥</span></li>
+                        {% else %}
+                            <li><a class="page-link"
+                                   href="?{% url_replace request 'page' studies.paginator.num_pages %}">⇥</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
 
-        <span class="current">
-            Page {{ studies.number }} of {{ studies.paginator.num_pages }}.
-        </span>
 
-        {% if studies.has_next %}
-            <a href="?page={{ studies.next_page_number }}">next</a>
-        {% endif %}
-    </span>
-</div>
 
   <table class="table table-bordered table-striped">
     <tr>
