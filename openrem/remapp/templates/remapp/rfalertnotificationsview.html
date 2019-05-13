@@ -30,7 +30,7 @@
 
 {% block mainblock %}
     {% if admin.admingroup %}
-        <form action="/admin/rfalertnotifications/" method="post">
+        <form action="{% url 'rf_alert_notifications_view' %}" method="POST">
 
             <table class="table table-bordered table-hover row-clickable sortable" id="alert_recipient_table">
                 <tr>
