@@ -25,7 +25,7 @@ requires = [
     'xlrd',
     'testfixtures >= 6.0',
     'mock',
-    'django-js-reverse',
+    'django-js-reverse >= 0.9.1',
     'requests',
     'flower',
     'numpy',
