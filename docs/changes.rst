@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.9.1b2 (2019-05-06)
+0.9.1b3 (2019-05-15)
 --------------------
 * `#755`_  Interface: fix more static URLs to allow virtual directory web server configurations
 * `#754`_  Documentation and install: updated docs and minimum version for collectstatic_js_reverse
