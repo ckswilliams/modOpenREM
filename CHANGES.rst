@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.1b2 (2019-05-06)
 --------------------
+* `#755`_  Interface: fix more static URLs to allow virtual directory web server configurations
 * `#754`_  Documentation and install: updated docs and minimum version for collectstatic_js_reverse
 * `#753`_  Query-retrieve: removed patient age fields from study level C-FIND that were not used
 * `#752`_  Exports: fixed missing weight field in PHE CT 2019 export
