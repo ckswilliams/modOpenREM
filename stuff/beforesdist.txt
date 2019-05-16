@@ -10,7 +10,7 @@ Change the version number in
 	    upgrade-offline.rst (twice)
 	    upgrade-offline.rst - make user link back to release notes is right
 	date and other details in changes and CHANGES
-    Edit README.rst
+    Edit README.rst including docs links
     Edit description in setup.py between beta and release
 
 Clean the existing distribute folder:

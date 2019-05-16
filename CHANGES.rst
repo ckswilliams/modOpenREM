@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.9.1b3 (2019-05-15)
---------------------
+0.9.1 (2019-05-16)
+------------------
 * `#755`_  Interface: fix more static URLs to allow virtual directory web server configurations
 * `#754`_  Documentation and install: updated docs and minimum version for collectstatic_js_reverse
 * `#753`_  Query-retrieve: removed patient age fields from study level C-FIND that were not used
