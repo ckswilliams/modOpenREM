@@ -45,12 +45,14 @@ Real upload:
 
 Update docs versions
     Go to https://readthedocs.org/projects/openrem/versions/ and find docs branch and set to public and active
+    For release, set docs to default in https://readthedocs.org/dashboard/openrem/versions/
 
 Update demo site for full release
     If release, log into the demo site (ssh deploy@openrem.org)
     Go to the folder /home/deploy/sites/demo.openrem.org/source/
     git checkout master
-    . /home/deploy/sites/virtualenv/bin/activate
+    git pull
+    . /home/deploy/sites/demo.openrem.org/virtualenv/bin/activate
     pip install -e /home/deploy/sites/demo.openrem.org/source/
     cd openrem
     python manage.py makemigrations remapp
