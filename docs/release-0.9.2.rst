@@ -7,6 +7,7 @@ Headline changes
 ****************
 
 *
+*
 
 *******************
 Upgrade preparation
@@ -98,7 +99,7 @@ Upgrade
 
     .. code-block:: console
 
-        pip install openrem==0.9.1
+        pip install openrem==0.9.2b1
 
 .. _update_configuration092:
 
