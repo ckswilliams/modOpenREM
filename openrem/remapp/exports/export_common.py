@@ -573,7 +573,7 @@ def create_summary_sheet(task, studies, book, summary_sheet, sheet_list):
     titleformat.set_font_color = '#FF0000'
     titleformat.set_bold()
     toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = u'OpenREM is copyright 2018 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
+    linetwostring = u'OpenREM is copyright 2019 The Royal Marsden NHS Foundation Trust, and available under the GPL. ' \
                     u'See http://openrem.org'
     summary_sheet.write(0, 0, toplinestring, titleformat)
     summary_sheet.write(1, 0, linetwostring)
@@ -605,7 +605,7 @@ def create_summary_sheet(task, studies, book, summary_sheet, sheet_list):
     summary_sheet.write(5, 7, u"Frequency")
     sorted_protocols = sorted(iter(sheet_list.items()), key=lambda k_v: k_v[1]['count'], reverse=True)
     for row, item in enumerate(sorted_protocols):
-        summary_sheet.write(row+6, 6, u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
+        summary_sheet.write(row+6, 6, u', '.join(item[1]['protocolname']))  # Join - can't write list to a single cell.
         summary_sheet.write(row+6, 7, item[1]['count'])
     summary_sheet.set_column('G:G', 15)
 
