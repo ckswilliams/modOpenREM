@@ -104,7 +104,7 @@ Upgrade
 
     .. code-block:: console
 
-        pip install openrem==0.9.1b2
+        pip install openrem==0.9.1
 
 .. _update_configuration091:
 
@@ -216,6 +216,16 @@ just installed (assuming you are using a production web server...):
 .. code-block:: console
 
     python manage.py collectstatic --clear
+
+..  admonition:: Virtual directory users
+
+    If you are running your website in a virtual directory, you have to also update the reverse.js file:
+
+    .. code-block:: console
+
+        python manage.py collectstatic_js_reverse
+
+    See  :doc:`virtual_directory` for more details.
 
 Enable task management - changed in 0.9.0
 =========================================

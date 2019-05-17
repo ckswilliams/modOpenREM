@@ -95,7 +95,7 @@ class SkinDoseMapCalcSettings(SingletonModel):
     calc_on_import = models.BooleanField(default=True, verbose_name="Calculate skin dose map on import?")
 
     def get_absolute_url(self):
-        return '/admin/skindosemapsettings/1/'
+        return reverse('skin_dose_map_settings_update', kwargs={'pk': 1})
 
 
 class HighDoseMetricAlertSettings(SingletonModel):
@@ -111,7 +111,7 @@ class HighDoseMetricAlertSettings(SingletonModel):
     send_high_dose_metric_alert_emails = models.BooleanField(default=False, verbose_name="Send notification e-mails when alert levels are exceeded?")
 
     def get_absolute_url(self):
-        return '/admin/rfalertsettings/1/'
+        return reverse('rf_alert_settings_update', kwargs={'pk': 1})
 
 
 class HighDoseMetricAlertRecipients(models.Model):
@@ -138,10 +138,12 @@ class HomePageAdminSettings(SingletonModel):
     """
     Table to store home page settings
     """
-    enable_workload_stats = models.BooleanField(default=False, verbose_name="Enable calculation and display of workload stats on home page?")
-
-    def get_absolute_url(self):
-        return '/admin/homepagesettings/1/'
+    enable_workload_stats = models.BooleanField(default=False,
+                                                verbose_name="Enable calculation and display of workload stats on "
+                                                             "home page?")
+    #
+    # def get_absolute_url(self):
+    #     return '/admin/homepagesettings/1/'
 
 
 class MergeOnDeviceObserverUIDSettings(SingletonModel):

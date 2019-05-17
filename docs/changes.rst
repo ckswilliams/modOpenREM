@@ -2,14 +2,19 @@
 OpenREM version history
 =======================
 
-0.9.2 (2019-xx-xx)
-------------------
+0.9.2b1 (2019-xx-xx)
+--------------------
 * `#746`_  Imports: enabled import of GE Elite Mini View C-arm RDSR with no template declaration
 
-0.9.1b2 (2019-05-06)
---------------------
+0.9.1 (2019-05-16)
+------------------
+* `#755`_  Interface: fix more static URLs to allow virtual directory web server configurations
+* `#754`_  Documentation and install: updated docs and minimum version for collectstatic_js_reverse
+* `#753`_  Query-retrieve: removed patient age fields from study level C-FIND that were not used
 * `#752`_  Exports: fixed missing weight field in PHE CT 2019 export
+* `#749`_  Documentation: updated the Linux quick install docs
 * `#748`_  Charts: fixed error that caused blank charts if series per system was selected
+* `#747`_  Installation: changed minimum Python version for current version of Flower
 * `#743`_  Testing: added configuration to enable testing with default logging
 * `#742`_  Interface: sorting of task tables now works in Internet Explorer 11
 * `#740`_  Installation: fixed Celery version to avoid dependency on Django 1.11

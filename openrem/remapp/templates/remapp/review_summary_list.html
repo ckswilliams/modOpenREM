@@ -4,97 +4,100 @@
 {% endblock %}
 
 {% block confnav %}
-  <li class="dropdown active">{% endblock %}
+    <li class="dropdown active">{% endblock %}
 
 {% block navhelp %}
-  <li>
-    <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/i_deletestudies.html" target="_blank"
-       data-toggle="tooltip" title="Study deletion documentation - opens in a new tab">
-      Study deletion documentation
-    </a>
-  </li>
+    <li>
+        <a href="https://docs.openrem.org/en/{{ admin.docsversion }}/i_deletestudies.html" target="_blank"
+           data-toggle="tooltip" title="Study deletion documentation - opens in a new tab">
+            Study deletion documentation
+        </a>
+    </li>
 {% endblock %}
 
 {% block toprow %}
 
 
-  <p>The entry in the unique equipment names table for these {{ modality }} studies looks like this
-  </p>
+    <p>The entry in the unique equipment names table for these {{ modality }} studies looks like this
+    </p>
 
-  <table class="table table-bordered">
-    <tr>
-      <th>Display name</th>
-      <th>User defined modality</th>
-      <th>Institution</th>
-      <th>Department</th>
-      <th>Manufacturer</th>
-      <th>Model</th>
-      <th>Station name</th>
-      <th>Serial no.</th>
-      <th>Software version</th>
-      <th>Gantry ID</th>
-    </tr>
-    <tr>
-      <td>{{ equipment.display_name }}</td>
-      <td>{{ equipment.user_defined_modality }}</td>
-      <td>{{ equipment.institution_name }}</td>
-      <td>{{ equipment.institutional_department_name }}</td>
-      <td>{{ equipment.manufacturer }}</td>
-      <td>{{ equipment.manufacturer_model_name }}</td>
-      <td>{{ equipment.station_name }}</td>
-      <td>{{ equipment.device_serial_number }}</td>
-      <td>{{ equipment.software_versions }}</td>
-      <td>{{ equipment.gantry_id }}</td>
-    </tr>
-  </table>
+    <table class="table table-bordered">
+        <tr>
+            <th>Display name</th>
+            <th>User defined modality</th>
+            <th>Institution</th>
+            <th>Department</th>
+            <th>Manufacturer</th>
+            <th>Model</th>
+            <th>Station name</th>
+            <th>Serial no.</th>
+            <th>Software version</th>
+            <th>Gantry ID</th>
+        </tr>
+        <tr>
+            <td>{{ equipment.display_name }}</td>
+            <td>{{ equipment.user_defined_modality }}</td>
+            <td>{{ equipment.institution_name }}</td>
+            <td>{{ equipment.institutional_department_name }}</td>
+            <td>{{ equipment.manufacturer }}</td>
+            <td>{{ equipment.manufacturer_model_name }}</td>
+            <td>{{ equipment.station_name }}</td>
+            <td>{{ equipment.device_serial_number }}</td>
+            <td>{{ equipment.software_versions }}</td>
+            <td>{{ equipment.gantry_id }}</td>
+        </tr>
+    </table>
 
-  <p>
-    {% if modality == "OT" %}
-      This list is of studies that are not identified as being CT, fluoroscopy, mammography or radiography (DX and CR).
-      The total number of studies associated with this equipment (before filtering out the modalities) is
-      {{ count_all }}, and {{ studies_count }} after doing the exclusions.
-    {% else %}
-    There are {{ count_all }} studies associated with this equipment, and {{ studies_count }} studies in this list which
-  has been filtered by the modality {{ modality }} {% if modality == "DX" %}(including CR){% endif %}
-  {% endif %}
-  </p>
+    <p>
+        {% if modality == "OT" %}
+            This list is of studies that are not identified as being CT, fluoroscopy, mammography or radiography (DX and
+            CR).
+            The total number of studies associated with this equipment (before filtering out the modalities) is
+            {{ count_all }}, and {{ studies_count }} after doing the exclusions.
+        {% else %}
+            There are {{ count_all }} studies associated with this equipment, and {{ studies_count }} studies in this
+            list which
+            has been filtered by the modality {{ modality }} {% if modality == "DX" %}(including CR){% endif %}
+        {% endif %}
+    </p>
 
 
 
-  <script>
-      function studiesDeleteButton() {
-          $.ajax(
-              {
-                  url: "{% url 'review_studies_delete' %}",
-                  data: {
-                      csrfmiddlewaretoken: '{{ csrf_token }}',
-                      equip_name_pk: '{{ equip_name_pk }}',
-                      modality: '{{ modality }}'
-                  },
-                  type: "POST",
-                  success: function (data) {
-                      $('#deleteStudiesSpan').html(data);
-                  }
-              }
-          )
-      }
-      function studiesEquipDeleteButton() {
-          $.ajax(
-              {
-                  url: "{% url 'review_studies_equip_delete' %}",
-                  data: {
-                      csrfmiddlewaretoken: '{{ csrf_token }}',
-                      equip_name_pk: '{{ equip_name_pk }}',
-                      modality: '{{ modality }}'
-                  },
-                  type: "POST",
-                  success: function (data) {
-                      $('#deleteStudiesEquipSpan').html(data);
-                  }
-              }
-          )
-      }
-  </script>
+    <script>
+        function studiesDeleteButton() {
+            $.ajax(
+                {
+                    url: "{% url 'review_studies_delete' %}",
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        equip_name_pk: '{{ equip_name_pk }}',
+                        modality: '{{ modality }}'
+                    },
+                    type: "POST",
+                    success: function (data) {
+                        $('#deleteStudiesSpan').html(data);
+                    }
+                }
+            )
+        }
+
+        function studiesEquipDeleteButton() {
+            $.ajax(
+                {
+                    url: "{% url 'review_studies_equip_delete' %}",
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        equip_name_pk: '{{ equip_name_pk }}',
+                        modality: '{{ modality }}'
+                    },
+                    type: "POST",
+                    success: function (data) {
+                        $('#deleteStudiesEquipSpan').html(data);
+                    }
+                }
+            )
+        }
+    </script>
 
 
     <div class="panel panel-info">
@@ -104,8 +107,8 @@
         <div class="panel-body">
             <p>Which should you choose, if you want to remove these studies?</p>
             <p>If you have added ths equipment to an equipment name, for example "Imported", then just delete the
-               studies so that new studies that are imported will drop into the same display name. Otherwise delete the
-               studies and the equipment name table entry too.</p>
+                studies so that new studies that are imported will drop into the same display name. Otherwise delete the
+                studies and the equipment name table entry too.</p>
 
             <span id="deleteStudiesSpan">
                 {% if studies_count %}
@@ -128,74 +131,98 @@
 
 {% block mainblock %}
 
-  <div class="pagination">
-    <span class="step-links">
-        {% if studies.has_previous %}
-            <a href="?page={{ studies.previous_page_number }}">previous</a>
-        {% endif %}
+    {% if studies.has_other_pages %}
+        {% load proper_paginate %}
+        {% load url_replace %}
+        <ul class="pagination">
+            {% if studies.number == 1 %}
+                <li class="disabled"><span>⇤</span></li>
+            {% else %}
+                <li><a class="page-link" href="?{% url_replace request 'page' 1 %}">⇤</a></li>
+            {% endif %}
+            {% if studies.has_previous %}
+                <li><a class="page-link"
+                       href="?{% url_replace request 'page' studies.previous_page_number %}">&laquo;</a>
+                </li>
+            {% else %}
+                <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in studies.paginator|proper_paginate:studies.number %}
+                {% if studies.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li><a class="page-link" href="?{% url_replace request 'page' i %}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if studies.has_next %}
+                <li><a class="page-link"
+                       href="?{% url_replace request 'page' studies.next_page_number %}">&raquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+            {% if studies.number == studies.paginator.num_pages %}
+                <li class="disabled"><span>⇥</span></li>
+            {% else %}
+                <li><a class="page-link"
+                       href="?{% url_replace request 'page' studies.paginator.num_pages %}">⇥</a></li>
+            {% endif %}
+        </ul>
+    {% endif %}
 
-        <span class="current">
-            Page {{ studies.number }} of {{ studies.paginator.num_pages }}.
-        </span>
 
-        {% if studies.has_next %}
-            <a href="?page={{ studies.next_page_number }}">next</a>
-        {% endif %}
-    </span>
-</div>
 
-  <table class="table table-bordered table-striped">
-    <tr>
-      <td colspan="2">General</td>
-      <td colspan="2">Patient module</td>
-      <td colspan="3">CT data</td>
-      <td colspan="2">DX/RF/MG</td>
-      <td colspan="4">Accumulated data</td>
-      <td colspan="4">Irradiation event data</td>
-    </tr>
-    <tr>
-      <th>Date</th>
-      <th>Time</th>
-      <th>General</th>
-      <th>Study</th>
-      <th>Template</th>
-      <th>Accumulated</th>
-      <th>Events</th>
-      <th>Template</th>
-      <th>Accumulated</th>
-      <th>Fluoro & DX</th>
-      <th>Mammography</th>
-      <th>Cassette based</th>
-      <th>Projection</th>
-      <th>General</th>
-      <th>Detector</th>
-      <th>Source</th>
-      <th>Mechanical</th>
-    </tr>
-    {% for study in studies %}
+    <table class="table table-bordered table-striped">
+        <tr>
+            <td colspan="2">General</td>
+            <td colspan="2">Patient module</td>
+            <td colspan="3">CT data</td>
+            <td colspan="2">DX/RF/MG</td>
+            <td colspan="4">Accumulated data</td>
+            <td colspan="4">Irradiation event data</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>General</th>
+            <th>Study</th>
+            <th>Template</th>
+            <th>Accumulated</th>
+            <th>Events</th>
+            <th>Template</th>
+            <th>Accumulated</th>
+            <th>Fluoro & DX</th>
+            <th>Mammography</th>
+            <th>Cassette based</th>
+            <th>Projection</th>
+            <th>General</th>
+            <th>Detector</th>
+            <th>Source</th>
+            <th>Mechanical</th>
+        </tr>
+        {% for study in studies %}
 
-      <script>
-          $(document).ready(
-              function get_review_data(json) {
-                  $.ajax(
-                      {
-                          url: "{% url 'review_study_details' %}",
-                          data: {
-                              study_pk: '{{ study.pk }}',
-                              csrfmiddlewaretoken: '{{ csrf_token }}'
-                          },
-                          type: "POST",
-                          success: function (data) {
-                              $('#row{{ study.pk }}').html(data);
-                          }
-                      }
-                  )
-              }
-          )
-      </script>
-      <tr id="row{{ study.pk }}"></tr>
-    {% endfor %}
-  </table>
+            <script>
+                $(document).ready(
+                    function get_review_data(json) {
+                        $.ajax(
+                            {
+                                url: "{% url 'review_study_details' %}",
+                                data: {
+                                    study_pk: '{{ study.pk }}',
+                                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                                },
+                                type: "POST",
+                                success: function (data) {
+                                    $('#row{{ study.pk }}').html(data);
+                                }
+                            }
+                        )
+                    }
+                )
+            </script>
+            <tr id="row{{ study.pk }}"></tr>
+        {% endfor %}
+    </table>
     <div class="pagination">
     <span class="step-links">
         {% if studies.has_previous %}
@@ -210,6 +237,6 @@
             <a href="?page={{ studies.next_page_number }}">next</a>
         {% endif %}
     </span>
-</div>
+    </div>
 
 {% endblock %}

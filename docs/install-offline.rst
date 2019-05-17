@@ -71,7 +71,7 @@ Download OpenREM and all other dependencies:
 
 .. code-block:: console
 
-    pip download -d openremfiles openrem==0.9.1b2
+    pip download -d openremfiles openrem==0.9.1
     pip download -d openremfiles psycopg2-binary
     pip download --no-deps -d openremfiles https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
@@ -127,7 +127,7 @@ Install OpenREM and other dependencies:
 
 .. code-block:: python
 
-    pip install --no-index --find-links=openremfiles openrem==0.9.1b2  # where openremfiles is the directory you created
+    pip install --no-index --find-links=openremfiles openrem==0.9.1  # where openremfiles is the directory you created
     pip install --no-index --find-links=openremfiles psycopg2-binary
 
     pip install openremfiles\default.tar.gz  # this is the custom version of pynetdicom

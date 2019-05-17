@@ -7,8 +7,8 @@ web server application that you are using (IIS or nginx). Next to that you also 
 The following steps are necessary:
 
 
-    - Configure virtual directory in local_settings.py
-    - Update the reverse.py
+    - Configure virtual directory in ``local_settings.py``
+    - Update the ``reverse.js`` file
 
 Configure virtual directory in local_settings.py
 ================================================
@@ -16,61 +16,47 @@ Configure virtual directory in local_settings.py
 Django should know in what virtual directory you are running OpenREM. Perform the following steps to do this.
 
 
-    - In the Openrem ``local_settings.py`` file, located in the openremproject directory
-      (e.g. ``C:\Python27\Lib\site-packages\openrem\oprenremproject\local_settings.py``) find the ``VIRTUAL_DIRECTORY`` variable
+    - In the OpenREM ``local_settings.py`` file, located in the openremproject directory
+      (e.g. ``C:\Python27\Lib\site-packages\openrem\oprenremproject\local_settings.py``) find the ``VIRTUAL_DIRECTORY``
+      variable - if there isn't one, somewhere in the ``local_settings.py`` file add ``VIRTUAL_DIRECTORY=''`` at the
+      start of a line.
     - Set this variable to the desired virtual directory
     - Add under this line the following code to set the ``STATIC_URL`` variable
 
-      .. code:: python
+        .. code-block:: python
 
-        STATIC_URL = '/' + os.path.join(VIRTUAL_DIRECTORY, STATIC_URL.lstrip('/'))
+            STATIC_URL = '/' + os.path.join(VIRTUAL_DIRECTORY, STATIC_URL.lstrip('/'))
 
     - In order to make this command work ``os`` has to be imported, add in ``local_settings.py`` as third line
 
-      .. code:: python
+        .. code-block:: python
 
-        import os
+            import os
 
     - Instead of the above two changes, you can also put a hard-coded STATIC_URL as follows
 
-      .. code:: python
+        .. code-block:: python
 
-        STATIC_URL = '/VIRTUAL_DIRECTORY/static/'
+            STATIC_URL = '/VIRTUAL_DIRECTORY/static/'
 
      (replace ``VIRTUAL_DIRECTORY`` by the actual value):
 
 
-   ..  Note::
-     - Take care the virtual directory name ends with a slash (/)
-     - Take care the virtual directory name is exactly the same as configured in the web server (this is case-sensitive)
+    ..  note::
 
-Update the reverse.py
-=====================
+        - Take care the virtual directory name ends with a slash (``/``)
+        - Take care the virtual directory name is exactly the same as configured in the web server (this is
+          case-sensitive)
 
-The static reverse.py file should be updated in order to change the URLs in the static javascript files also.
+Update reverse.js
+=================
 
-    ..  Warning::
+The static reverse.js file should be updated in order to change the URLs in the static javascript files also.
 
-      The current version of django-js-reverse (v0.8.2) has an ommission.
-      To prevent a wrong update, you have to edit the collectstatic_js_reverse.py file of this package.
-
-      - Browse to the ``collectstatic_js_reverse.py`` file, e.g.
-        ``C:\Python27\Lib\site-packages\django_js_reverse\management\commands``
-      - Open the file in an editor
-      - line 40 ("``default_urlresolver = get_resolver(None)``") should be replaced with the following lines
-        (correct indentation is important in Python; the "``try:``" should start with 8 leading spaces)
-
-        .. code:: python
-
-          urlconf = getattr(settings, 'ROOT_URLCONF', None)
-          default_urlresolver = get_resolver(urlconf)
-
-      - Save the file
-
-After updating the ``collectstatic_js_reverse.py`` file, perform the following 2 steps:
     - Open a command prompt and navigate to the openrem directory, e.g. ``C:\Python27\Lib\site-packages\openrem``
     - Type ``python manage.py collectstatic_js_reverse``
 
-    ..  Note::
-      Take care the resulting reverse.py is written to the correct static directory.
-      If that is not the case copy the file manually to the correct location.
+    ..  note::
+
+        Take care the resulting ``reverse.js`` is written to the correct static directory.
+        If that is not the case copy the file manually to the correct location.
