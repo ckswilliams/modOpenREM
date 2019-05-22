@@ -219,7 +219,15 @@ just installed (assuming you are using a production web server...):
 
 ..  admonition:: Virtual directory users
 
-    If you are running your website in a virtual directory, you have to also update the reverse.js file:
+    If you are running your website in a virtual directory, you also have to update the reverse.js file.
+    To get the file in the correct path, take care that you insert just after the declaration of
+    ``STATIC_ROOT`` the following line in your ``local_settings.py``:
+
+    .. code-block:: console
+
+        JS_REVERSE_OUTPUT_PATH = os.path.join(STATIC_ROOT, 'js', 'django_reverse')
+
+    To update the reverse.js file execute the following command:
 
     .. code-block:: console
 
