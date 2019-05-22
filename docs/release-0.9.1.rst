@@ -61,14 +61,14 @@ Follow the instructions found at :doc:`upgrade-offline`, before returning here t
 database and complete the upgrade.
 
 ***************************************
-Upgrading from version 0.7.3 or earlier
+Upgrading from version 0.7.1 or earlier
 ***************************************
 
 Follow the instructions to :doc:`release-0.7.3` first, then return to these instructions to upgrade to 0.9.1.
 
 
 *************************************
-Upgrading from version 0.7.4 or later
+Upgrading from version 0.7.3 or later
 *************************************
 
 Upgrade
@@ -219,7 +219,15 @@ just installed (assuming you are using a production web server...):
 
 ..  admonition:: Virtual directory users
 
-    If you are running your website in a virtual directory, you have to also update the reverse.js file:
+    If you are running your website in a virtual directory, you also have to update the reverse.js file.
+    To get the file in the correct path, take care that you insert just after the declaration of
+    ``STATIC_ROOT`` the following line in your ``local_settings.py``:
+
+    .. code-block:: console
+
+        JS_REVERSE_OUTPUT_PATH = os.path.join(STATIC_ROOT, 'js', 'django_reverse')
+
+    To update the reverse.js file execute the following command:
 
     .. code-block:: console
 
