@@ -37,7 +37,7 @@ import django
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
 if projectpath not in sys.path:
-    sys.path.insert(1,projectpath)
+    sys.path.insert(1, projectpath)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
@@ -98,8 +98,10 @@ def send_rf_high_dose_alert_email(study_pk=None, test_message=None, test_user=No
             included_studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF', patientmoduleattr__patient_id__exact=patient_id, study_date__range=[oldest_date, study_date])
         else:
             included_studies = None
+            week_delta = None
     else:
         included_studies = None
+        week_delta = None
 
     if this_study_dap >= alert_levels['alert_total_dap_rf'] or this_study_rp_dose >= alert_levels['alert_total_rp_dose_rf'] or accum_dap >= alert_levels['alert_total_dap_rf'] or accum_rp_dose >= alert_levels['alert_total_rp_dose_rf']:
 

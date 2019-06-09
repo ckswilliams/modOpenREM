@@ -70,3 +70,9 @@ Update website for full release
     Merge, check https://openrem.org
 
     Tell developers (beta) or public (late beta or release)
+
+    Git statistics:
+        Number of commits:
+            git rev-list 0.9.1 ^0.9.0 --count
+        Contributers:
+            git shortlog -s -n 0.9.1 ^0.9.0

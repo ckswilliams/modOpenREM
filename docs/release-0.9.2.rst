@@ -1,18 +1,13 @@
 ########################
-Upgrade to OpenREM 0.9.1
+Upgrade to OpenREM 0.9.2
 ########################
 
 ****************
 Headline changes
 ****************
 
-* Imports: fixed imports for GE surgical flat panel c-arm with irregular value types and value meanings
-* Interface: added feature to filter by specific number of exposure types -- CT only
-* Query-retrieve: new option to get SR series when PACS returns empty series level response
-* Query-retrieve: handle illegal missing instance number in image level response
-* Query-retrieve: improved logging
-* Exports: added export to UK PHE 2019 CT survey format
-* General documentation and interface improvements, bug fixes, and changes to prepare for Python 3
+*
+*
 
 *******************
 Upgrade preparation
@@ -61,14 +56,14 @@ Follow the instructions found at :doc:`upgrade-offline`, before returning here t
 database and complete the upgrade.
 
 ***************************************
-Upgrading from version 0.7.1 or earlier
+Upgrading from version 0.7.3 or earlier
 ***************************************
 
 Follow the instructions to :doc:`release-0.7.3` first, then return to these instructions to upgrade to 0.9.1.
 
 
 *************************************
-Upgrading from version 0.7.3 or later
+Upgrading from version 0.7.4 or later
 *************************************
 
 Upgrade
@@ -104,9 +99,9 @@ Upgrade
 
     .. code-block:: console
 
-        pip install openrem==0.9.1
+        pip install openrem==0.9.2b1
 
-.. _update_configuration091:
+.. _update_configuration092:
 
 Update the configuration
 ========================
@@ -221,7 +216,7 @@ just installed (assuming you are using a production web server...):
 
     If you are running your website in a virtual directory, you also have to update the reverse.js file.
     To get the file in the correct path, take care that you insert just after the declaration of
-    ``STATIC_ROOT`` the following line in your ``local_settings.py``:
+    ``STATIC_ROOT`` the following line in your ``local_settings.py`` (see also the sample ``local_settings.py.example``):
 
     .. code-block:: console
 

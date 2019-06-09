@@ -30,6 +30,7 @@ MEDIA_ROOT = ''
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = ''
+JS_REVERSE_OUTPUT_PATH = os.path.join(STATIC_ROOT, 'js', 'django_reverse')
 
 # You should generate a new secret key. Make this unique, and don't
 # share it with anybody. See the docs.
