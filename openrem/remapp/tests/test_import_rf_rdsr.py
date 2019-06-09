@@ -206,3 +206,37 @@ class ImportRFRDSRGESurgical(TestCase):
         self.assertAlmostEqual(event_4_source.dose_rp, Decimal(0.00210763))
         self.assertAlmostEqual(event_4_source.collimated_field_area, Decimal(0.04196800))
         self.assertAlmostEqual(event_4_source.average_xray_tube_current, Decimal(18.90340042))
+
+
+class ImportRFRDSRGEOECMiniView(TestCase):
+    """
+    Tests for importing an RDSR from a GE ELite Mini View C-Arm that doesn't declare a template type
+    """
+
+    def test_ge_mini_view_rdsr(self):
+        """Tests that GE OEC Elite Mini View RDSR imports correctly as no template is declared
+
+        :return: None
+        """
+
+        PatientIDSettings.objects.create()
+
+        dicom_file = "test_files/RF-RDSR-GE-OECEliteMiniView.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path = os.path.join(root_tests, dicom_file)
+
+        rdsr(dicom_path)
+        study = GeneralStudyModuleAttr.objects.order_by('id')[0]
+
+        accum_proj = study.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
+        total_fluoro_dap = accum_proj.fluoro_dose_area_product_total
+        total_fluoro_rp_dose = accum_proj.fluoro_dose_rp_total
+        total_acq_dap = accum_proj.acquisition_dose_area_product_total
+        total_acq_rp_dose = accum_proj.acquisition_dose_rp_total
+        self.assertAlmostEqual(total_fluoro_dap, Decimal(0.0000013316568))
+        self.assertAlmostEqual(total_fluoro_rp_dose, Decimal(0.00022034578))
+        self.assertEqual(total_acq_dap, Decimal(0))
+        self.assertEqual(total_acq_rp_dose, Decimal(0))
+
+
+
