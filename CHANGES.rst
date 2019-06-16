@@ -4,6 +4,7 @@ OpenREM version history
 
 0.9.2b1 (2019-xx-xx)
 --------------------
+* `#763`_  Imports: corrected delta week fluoro study counting for dual plane modalities
 * `#761`_  Imports: fixed issue in high dose alert e-mail code where week_delta may be used before assignment
 * `#746`_  Imports: enabled import of GE Elite Mini View C-arm RDSR with no template declaration
 

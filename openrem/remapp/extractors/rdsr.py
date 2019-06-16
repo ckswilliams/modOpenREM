@@ -1536,11 +1536,13 @@ def _rdsr2db(dataset):
 
                     bulk_entries = []
                     for pk in included_studies.values_list('pk', flat=True):
-                        new_entry = PKsForSummedRFDoseStudiesInDeltaWeeks()
-                        new_entry.general_study_module_attributes_id = g.pk
-                        new_entry.study_pk_in_delta_weeks = pk
-                        bulk_entries.append(new_entry)
-
+                        if not PKsForSummedRFDoseStudiesInDeltaWeeks.objects.filter(
+                                general_study_module_attributes_id__exact=g.pk).filter(
+                                study_pk_in_delta_weeks__exact=pk):
+                            new_entry = PKsForSummedRFDoseStudiesInDeltaWeeks()
+                            new_entry.general_study_module_attributes_id = g.pk
+                            new_entry.study_pk_in_delta_weeks = pk
+                            bulk_entries.append(new_entry)
                     if len(bulk_entries):
                         PKsForSummedRFDoseStudiesInDeltaWeeks.objects.bulk_create(bulk_entries)
 
