@@ -13,8 +13,11 @@
 """
 
 import sys
+import os
+parent_dir_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(parent_dir_name)
 from glob import glob
-from openrem.remapp.extractors.rdsr import rdsr
+from remapp.extractors.rdsr import rdsr
 
 if len(sys.argv) < 2:
     sys.exit(u'Error: Supply at least one argument - the radiation dose structured report')

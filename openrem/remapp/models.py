@@ -215,6 +215,8 @@ class DicomStoreSCP(models.Model):
     aetitle = models.CharField(max_length=16, blank=True, null=True,
                                verbose_name="AE Title of this node - 16 or fewer letters and numbers, no spaces")
     port = models.IntegerField(blank=True, null=True, verbose_name="Port: 104 is standard for DICOM but over 1024 requires fewer admin rights")
+    ip = models.GenericIPAddressField(blank=True, null=True, verbose_name="Local IP address")
+    hostname = models.CharField(max_length=32, blank=True, null=True, default='localhost', verbose_name="Or local hostname, default localhost")
     task_id = models.CharField(max_length=64, blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
     run = models.BooleanField(default=False)

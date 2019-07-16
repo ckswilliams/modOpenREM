@@ -31,7 +31,7 @@
 from builtins import str  # pylint: disable=redefined-builtin
 import sys
 import os
-from openrem.remapp.extractors import rdsr
+from remapp.extractors import rdsr
 from openremproject.settings import JAVA_EXE, JAVA_OPTIONS, PIXELMED_JAR, PIXELMED_JAR_OPTIONS
 import shutil
 import django

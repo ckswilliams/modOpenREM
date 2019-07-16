@@ -890,7 +890,7 @@ def qrscu(
         d.StudyTime = ''
 
     all_mods = collections.OrderedDict()
-    all_mods['CT'] = {'inc': False, 'mods': ['CT']}
+    all_mods['CT'] = {'inc': False, 'mods': ['CT', 'NM', 'PT']}
     all_mods['MG'] = {'inc': False, 'mods': ['MG']}
     all_mods['FL'] = {'inc': False, 'mods': ['RF', 'XA']}
     all_mods['DX'] = {'inc': False, 'mods': ['DX', 'CR']}

@@ -7,6 +7,9 @@
 """
 
 import sys
-from openrem.remapp.netdicom.qrscu import qrscu_script
+import os
+parent_dir_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(parent_dir_name)
+from remapp.netdicom.qrscu import qrscu_script
 
 sys.exit(qrscu_script())

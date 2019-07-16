@@ -63,19 +63,19 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
         aet = "OPENREMECHO"
     elif qr_scp and scp_pk:
         scp = DicomRemoteQR.objects.get(pk=scp_pk)
-        if scp.hostname:
-            rh = scp.hostname
-        else:
-            rh = scp.ip
         aet = scp.callingaet
         if not aet:
             aet = "OPENREMECHO"
     else:
         logger.warning(u"echoscu called without SCP information")
         return 0
-
+    
     rp = scp.port
     aec = scp.aetitle
+    if scp.hostname:
+        rh = scp.hostname
+    elif scp.ip:
+        rh = scp.ip
 
     ts = [
         ExplicitVRLittleEndian,

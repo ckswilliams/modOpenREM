@@ -10,7 +10,10 @@
 """
 
 import sys
-from openrem.remapp.netdicom import storescp
+import os
+parent_dir_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(parent_dir_name)
+from remapp.netdicom import storescp
 
 if len(sys.argv) != 2:
     sys.exit(u'Error: Supply at one argument - the ID of the SCP configuration from the web interface')

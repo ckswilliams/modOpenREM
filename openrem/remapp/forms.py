@@ -568,7 +568,7 @@ class DicomStoreForm(forms.ModelForm):
         self.helper.field_class = 'col-md-4'
         self.helper.layout = Layout(
             Div(
-                'name', 'aetitle', 'port',
+                'name', 'aetitle', 'port', 'ip', 'hostname'
             ),
             Accordion(
                 AccordionGroup(
@@ -606,7 +606,7 @@ class DicomStoreForm(forms.ModelForm):
 
     class Meta(object):
         model = DicomStoreSCP
-        fields = ['name', 'aetitle', 'port', 'controlled', 'keep_alive']
+        fields = ['name', 'aetitle', 'port', 'ip', 'hostname', 'controlled', 'keep_alive']
         labels = {
             'port': "Port: 104 is standard for DICOM but ports higher than 1024 requires fewer admin rights",
             'controlled': "Advanced use only: tick this box to control the server using OpenREM",
